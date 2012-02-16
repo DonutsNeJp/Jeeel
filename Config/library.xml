@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE time [
+  <!ENTITY copy "&#169;">
+  <!ENTITY hoge "ほげらっちょ!!">
+]>
+<?xml-stylesheet href="style.xsl" type="text/xsl" ?>
+<!--
+hoigehogege
+-->
+<config h="n" j="k">
+  <debug>
+    <url>/dev/debug/eval/</url>  
+  </debug>
+  <time>
+    <p>&hoge;</p>
+    <copyright>&copy; OOO</copyright>
+  </time>
+  <buki xmlns:a="http://example.com/ns/a/"></buki>
+  <hoge>
+    AAAA
+    <a></a>
+    <?instruction ?>
+    <?hoge a="n" b="u"?>
+    <!--comment-->
+    <![CDATA[hoge & hoge <hugu>]]>
+  </hoge>
+</config>
