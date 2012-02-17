@@ -17,7 +17,7 @@
  *                 引数にvar_argsがあったらそれは可変引数を示します。<br />
  *                 var_argsを含めて順に引数を必要数渡します。
  *
- * @name Jeeel.js(Javascript Elasticity Error Extinction Library: Japanease Eeel)
+ * @name Jeeel.js(Javascript Easy Error and Exception handling Library: Japanease Eeel)
  * @author Masato Shimada
  * @version 2.0.0β58
  * @license <a href="http://en.wikipedia.org/wiki/BSD_licenses">BSD License</a>

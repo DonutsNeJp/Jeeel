@@ -17,13 +17,13 @@
  *                 引数にvar_argsがあったらそれは可変引数を示します。<br />
  *                 var_argsを含めて順に引数を必要数渡します。
  *
- * @name Jeeel.js(Javascript Elasticity Error Extinction Library: Japanease Eeel)
+ * @name Jeeel.js(Javascript Easy Error and Exception handling Library: Japanease Eeel)
  * @author Masato Shimada
  * @version 2.0.0β58
  * @license <a href="http://en.wikipedia.org/wiki/BSD_licenses">BSD License</a>
  */
- 
- var _JEEEL_MANUAL_LOAD_ = true;
+
+var _JEEEL_MANUAL_LOAD_ = true;
 
 // Jeeelが定義されていた場合バックアップを取ってから書き換えを行う
 if (typeof window !== 'undefined' && window.Jeeel) {
@@ -86,7 +86,7 @@ var Jeeel = {
      * @type String
      * @constant
      */
-    HOST: 'http://jbc2.localhost',
+    HOST: 'http://localhost',
     
     /**
      * クロスドメインかどうか
