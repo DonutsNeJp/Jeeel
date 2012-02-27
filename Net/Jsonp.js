@@ -226,7 +226,7 @@ Jeeel.Net.Jsonp.prototype = {
     execute: function () {
         var url = this._url + '?' + this._params.toQueryString();
         
-        this._script = Jeeel.Import.importScript(url, this._loaded);
+        this._script = Jeeel.Loader.loadScript(url, this._loaded);
          
         return this;
     },

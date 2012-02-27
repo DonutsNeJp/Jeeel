@@ -7,9 +7,9 @@
  * @augments Jeeel.Filter.Abstract
  * @param {Boolean} [useDefaultValue] trueにすると現在値でなくデフォルト値を参照して纏め上げる(値もデフォルト値になる)
  * @param {String} [unknownName] 名前のついていないinputに使用する名前(デフォルトは無視する)
- * @param {String} [overwriteName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はJeeel.Object.Item[]になる)
+ * @param {String} [overwrittenName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はJeeel.Object.Item[]になる)
  */
-Jeeel.Filter.Html.FormValue = function (useDefaultValue, unknownName, overwriteName) {
+Jeeel.Filter.Html.FormValue = function (useDefaultValue, unknownName, overwrittenName) {
 
     Jeeel.Filter.Abstract.call(this);
     
@@ -19,7 +19,7 @@ Jeeel.Filter.Html.FormValue = function (useDefaultValue, unknownName, overwriteN
         this._unknownName = unknownName + '[]';
     }
     
-    this._overwriteName = overwriteName || null;
+    this._overwrittenName = overwrittenName || null;
 };
 
 /**
@@ -27,11 +27,11 @@ Jeeel.Filter.Html.FormValue = function (useDefaultValue, unknownName, overwriteN
  *
  * @param {Boolean} [useDefaultValue] trueにすると現在値でなくデフォルト値を参照して纏め上げる
  * @param {String} [unknownName] 名前のついていないinputに使用する名前(デフォルトは無視する)
- * @param {String} [overwriteName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はJeeel.Object.Item[]になる)
+ * @param {String} [overwrittenName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はJeeel.Object.Item[]になる)
  * @return {Jeeel.Filter.Html.FormValue} 作成したインスタンス
  */
-Jeeel.Filter.Html.FormValue.create = function (useDefaultValue, unknownName, overwriteName) {
-    return new this(useDefaultValue, unknownName, overwriteName);
+Jeeel.Filter.Html.FormValue.create = function (useDefaultValue, unknownName, overwrittenName) {
+    return new this(useDefaultValue, unknownName, overwrittenName);
 };
 
 Jeeel.Filter.Html.FormValue.prototype = {
@@ -40,7 +40,7 @@ Jeeel.Filter.Html.FormValue.prototype = {
     
     _unknownName: '',
     
-    _overwriteName: null,
+    _overwrittenName: null,
     
     _avoidValues: [],
     
@@ -52,13 +52,7 @@ Jeeel.Filter.Html.FormValue.prototype = {
             throw new Error('Elementではない要素を含んでいます。');
         }
 
-        val = Jeeel.Dom.Element.create(val);
-
-        var inputs = val.getElementsByTagName('input');
-
-        inputs = inputs.concat(val.getElementsByTagName('select'));
-        inputs = inputs.concat(val.getElementsByTagName('textarea'));
-        inputs = inputs.concat(val.getElementsByTagName('button'));
+        var inputs = this._getInputs(val);
         
         var res = {}, name;
         
@@ -74,8 +68,8 @@ Jeeel.Filter.Html.FormValue.prototype = {
             this._setParams(res, name, inputs[i]);
         }
         
-        if (this._overwriteName) {
-            res[this._overwriteName] = this._avoidValues;
+        if (this._overwrittenName) {
+            res[this._overwrittenName] = this._avoidValues;
         }
 
         return res;
@@ -102,6 +96,8 @@ Jeeel.Filter.Html.FormValue.prototype = {
 
         return res;
     },
+    
+    _getInputs: Jeeel._Object.JeeelFilter.getInputs,
     
     _getName: Jeeel._Object.JeeelFilter.getInputName,
     
@@ -162,7 +158,7 @@ Jeeel.Filter.Html.FormValue.prototype = {
     
     _setParams: function (res, name, element) {
 
-        if (element.tagName.toLowerCase() === 'input') {
+        if (element.tagName.toUpperCase() === 'INPUT') {
             if (element.type.toLowerCase() === 'checkbox' && ! this._getProp(element, 'checked')) {
                 return;
             } else if (element.type.toLowerCase() === 'radio' && ! this._getProp(element, 'checked')) {

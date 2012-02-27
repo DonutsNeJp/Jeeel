@@ -235,7 +235,7 @@ Jeeel.Gui.Dialog.prototype = {
                   + '}\n';
                 
         this._defaultStyle = style;
-        this._styleTag = Jeeel.Import.addStyle(style);
+        this._styleTag = Jeeel.Loader.addStyle(style);
     }
 };
 

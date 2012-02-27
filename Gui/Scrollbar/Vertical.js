@@ -60,7 +60,7 @@ Jeeel.Gui.Scrollbar.Vertical.initStyle = function () {
               + '  background-color: #D6E7FF;\n'
               + '}';
 
-    this._styleTag = Jeeel.Import.addStyle(style);
+    this._styleTag = Jeeel.Loader.addStyle(style);
 };
 
 Jeeel.Gui.Scrollbar.Vertical.prototype = {

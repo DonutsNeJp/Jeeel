@@ -535,7 +535,7 @@ Jeeel.Dom.Event.getEventType = function (event) {
  * @param {String} type イベントタイプ
  * @param {Function} listener 登録イベントメソッド
  * @param {Mixied} [thisArg] コールバック中のthisに相当する値
- * @param {Mixied} var_args 可変引数、コールバックに渡す引数(最初の引数はJeeel.Dom.Eventで固定)
+ * @param {Mixied} var_args 可変引数、コールバックに渡す引数(最初の引数はJeeel.Dom.Event、次の引数はイベント発生Element、3つ目以降に任意引数)
  */
 Jeeel.Dom.Event.addEventListener = function (element, type, listener, thisArg, var_args) {
     var m = this.Manager.getInstance();
@@ -562,7 +562,7 @@ Jeeel.Dom.Event.removeEventListener = function (element, type, listener) {
  * @param {String} type イベントタイプ
  * @param {Function} listener 登録イベントメソッド
  * @param {Mixied} [thisArg] コールバック中のthisに相当する値
- * @param {Mixied} var_args 可変引数、コールバックに渡す引数(最初の引数はJeeel.Dom.Eventで固定)
+ * @param {Mixied} var_args 可変引数、コールバックに渡す引数(最初の引数はJeeel.Dom.Event、次の引数はイベント発生Element、3つ目以降に任意引数)
  */
 Jeeel.Dom.Event.delegate = function (elementList, type, listener, thisArg, var_args) {
     var m = this.Manager.getInstance();

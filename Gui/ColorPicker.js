@@ -132,7 +132,7 @@ Jeeel.Gui.ColorPicker.initStyle = function () {
               + '  font-size: 10px;\n'
               + '}';
 
-    this._styleTag = Jeeel.Import.addStyle(style);
+    this._styleTag = Jeeel.Loader.addStyle(style);
 };
 
 /**

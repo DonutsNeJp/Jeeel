@@ -549,15 +549,16 @@ Jeeel.Debug.Console = {
                 + '    top: 40px;\n'
                 + '    overflow-x: hidden;\n'
                 + '    overflow-y: auto;\n'
+                + '    background-color: white;\n'
                 + '    max-height: 210px;\n'
+                + '    _height: 210px;\n'
                 + '}\n'
                 + 'div#' + this.CONSOLE_CODE_ASSIST_ID + ' div {\n'
-                + '    background-color: white;\n'
                 + '    padding: 2px;\n'
                 + '    cursor: pointer;\n'
                 + '}';
 
-        Jeeel.Import.addStyle(css);
+        Jeeel.Loader.addStyle(css);
     },
 
     /**
@@ -893,7 +894,7 @@ Jeeel.Debug.Console = {
                 divs[i] = div;
             }
 
-            caData.winChild = Jeeel.Dom.ElementOperator.create(divs);
+            caData.winChild = new Jeeel.Dom.ElementOperator(divs);
 
             elm.appendChild(divs);
             this._codeAssistWindowShow();

@@ -154,7 +154,7 @@ Jeeel.Net.Submit.UNKNOWN_NAME = '_UNKNOWN_';
  * @constant
  * @memberOf Jeeel.Net.Submit
  */
-Jeeel.Net.Submit.OVERWRITE_NAME = '_OVERWRITE_';
+Jeeel.Net.Submit.OVERWRITTEN_NAME = '_OVERWRITE_';
 
 Jeeel.Net.Submit.prototype = {
 
@@ -333,7 +333,7 @@ Jeeel.Net.Submit.prototype = {
                 param = param[names[i]];
             }
             
-            key = names[names.length-1];
+            key = names[l];
         }
         
         param = param[key];
@@ -366,7 +366,7 @@ Jeeel.Net.Submit.prototype = {
                 param = param[names[i]];
             }
             
-            key = names[names.length-1];
+            key = names[l];
         }
         
         param = param[key];
@@ -403,7 +403,7 @@ Jeeel.Net.Submit.prototype = {
                 obj = obj[names[i]];
             }
             
-            obj[names[names.length-1]] = val;
+            obj[names[l]] = val;
             
             key = names[0];
             val = base[key];
@@ -411,7 +411,7 @@ Jeeel.Net.Submit.prototype = {
         
         var input = this.getElementAll()[key];
         
-        Jeeel.Dom.ElementOperator.create(this.getOverwriteElements())
+        Jeeel.Dom.ElementOperator.create(this.getOverwrittenElements())
                                .filterName(key, true)
                                .remove();
 
@@ -446,7 +446,7 @@ Jeeel.Net.Submit.prototype = {
      * @return {Jeeel.Net.Submit} 自インスタンス
      */
     unset: function (key) {
-        Jeeel.Dom.ElementOperator.create([this.getElement(key), this.getOverwriteElements()])
+        Jeeel.Dom.ElementOperator.create([this.getElement(key), this.getOverwrittenElements()])
                                .filterName(key, true)
                                .removeAttr('name');
         
@@ -480,7 +480,7 @@ Jeeel.Net.Submit.prototype = {
                 param = param[names[i]];
             }
             
-            key = names[names.length-1];
+            key = names[l];
         }
         
         param = param[key];
@@ -490,7 +490,7 @@ Jeeel.Net.Submit.prototype = {
 
     /**
      * form内の全てのinput要素を取得する<br />
-     * その際checkedが付いていないradioボタンやcheckboxは無視される
+     * その際radioボタンは常にリストになる
      * 
      * @return {Hash} input要素のリスト
      */
@@ -516,19 +516,55 @@ Jeeel.Net.Submit.prototype = {
      * </form>
      * 上記のformの場合最初から2つのhogeの要素が取得される
      */
-    getOverwriteElements: function () {},
+    getOverwrittenElements: function () {},
     
     /**
-     * 指定キーのinput要素を破棄する<br />
-     * その際checkedが付いていないradioボタンやcheckboxは無視される
+     * 指定キーのinput要素を破棄する
      *
      * @param {String} key キー
      * @return {Jeeel.Net.Submit} 自インスタンス
      */
     unsetElement: function (key) {
-        Jeeel.Dom.ElementOperator.create([this.getElement(key), this.getOverwriteElements()])
+        Jeeel.Dom.ElementOperator.create([this.getElement(key), this.getOverwrittenElements()])
                                .filterName(key, true)
                                .remove();
+        
+        return this;
+    },
+    
+    /**
+     * selectタグのoptionを指定した値に全て置き換える
+     * 
+     * @param {String} key selectタグのname
+     * @param {Hash} options オプションの値に使う値と表示値のリスト({value1: text1, value2: text2, ...})
+     * @return {Jeeel.Net.Submit} 自インスタンス
+     */
+    replaceSelectOptions: function (key, options) {
+        var select = this.getElement(key),
+            nodeName = select && select.nodeName;
+        
+        if ( ! nodeName || nodeName.toUpperCase() !== 'SELECT') {
+            return this;
+        } else if ( ! Jeeel.Type.isHash(options)) {
+            return this;
+        }
+        
+        select = new Jeeel.Dom.Element(select);
+        
+        var addOptions = [],
+            txtFilter = Jeeel.Filter.Html.Escape.create(),
+            val, option;
+        
+        for (val in options) {
+            option = Jeeel.Document.createElement('option');
+            option.value = val;
+            option.innerHTML = txtFilter.filter(options[val]);
+            
+            addOptions[addOptions.length] = option;
+        }
+        
+        select.clearChildNodes()
+              .appendChild(addOptions);
         
         return this;
     },
@@ -566,7 +602,7 @@ Jeeel.Net.Submit.prototype = {
     
     _init: function () {
         var uName = Jeeel.Net.Submit.UNKNOWN_NAME;
-        var oName = Jeeel.Net.Submit.OVERWRITE_NAME;
+        var oName = Jeeel.Net.Submit.OVERWRITTEN_NAME;
         var fnvf = new Jeeel.Filter.Html.FormValue();
         var fdvf = new Jeeel.Filter.Html.FormValue(true);
         var fnef = new Jeeel.Filter.Html.Form();
@@ -594,7 +630,7 @@ Jeeel.Net.Submit.prototype = {
             return Jeeel.Hash.getValues(parm || []);
         };
         
-        self.getOverwriteElements = function () {
+        self.getOverwrittenElements = function () {
             return foef.filter(this._pseudoForm || this._form)[oName];
         };
         

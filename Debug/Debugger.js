@@ -506,14 +506,6 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Debug.Debugger, Jeeel.file.Jeeel.Debug.
             if (Jeeel === window.Jeeel) {
                 Jeeel.Debug.Debugger.setInformation(Jeeel, 'Jeeel', true, window);
             }
-            
-            if (Jeeel.HOST && Jeeel.HOST.match(/^https?:\/\//)) {
-                var host = Jeeel.Filter.RegularExpressionEscape.create().filter(Jeeel.UserAgent.getProtocol() + '://' + Jeeel.UserAgent.getHost());
-
-                if ( ! Jeeel.HOST.match(new RegExp('^' + host))) {
-                    Jeeel.CROSS_DOMAIN = true;
-                }
-            }
         } else {
             setTimeout(arguments.callee, 1);
         }

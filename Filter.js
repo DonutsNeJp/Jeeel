@@ -73,6 +73,27 @@ Jeeel.Filter.Abstract.prototype = {
 };
 
 Jeeel._Object.JeeelFilter = {
+    
+    getInputs: function (elm) {
+        var selector = "input, select, textarea, button";
+        var res = [], i, l;
+        
+        if (elm.querySelectorAll) {
+            var sres = elm.querySelectorAll(selector);
+            
+            for (i = 0, l = sres.length; i < l; i++) {
+                res[i] = sres[i];
+            }
+        } else {
+            
+            var tags = ['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'];
+
+            res = Jeeel.Dom.Core.Searcher.create(elm).getElementsByTagName(tags);
+        }
+        
+        return res;
+    },
+    
     getInputName: function (name) {
         var names1 = decodeURIComponent(name).split('][');
         var names2 = names1[0].split('[');

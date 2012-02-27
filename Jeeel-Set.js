@@ -19,11 +19,11 @@
  *
  * @name Jeeel.js(Javascript Easy Error and Exception handling Library: Japanease Eeel)
  * @author Masato Shimada
- * @version 2.0.0β58
+ * @version 2.0.0β60
  * @license <a href="http://en.wikipedia.org/wiki/BSD_licenses">BSD License</a>
  */
-
-var _JEEEL_MANUAL_LOAD_ = true;
+ 
+ var _JEEEL_MANUAL_LOAD_ = true;
 
 // Jeeelが定義されていた場合バックアップを取ってから書き換えを行う
 if (typeof window !== 'undefined' && window.Jeeel) {
@@ -61,7 +61,7 @@ var Jeeel = {
      * @type String
      * @constant
      */
-    VERSION: '2.0.0β58',
+    VERSION: '2.0.0β60',
     
     /**
      * Jeeelのscriptタグに付くclass名
@@ -69,7 +69,7 @@ var Jeeel = {
      * @type String
      * @constant
      */
-    SCRIPT_CLASS: 'JEEEL-SCRIPT-CLASS',
+    SCRIPT_CLASS: 'jeeel-script-class',
     
     /**
      * Jeeelのscriptタグに付くid名(実際にはこれにインデックス番号が付く)
@@ -77,7 +77,7 @@ var Jeeel = {
      * @type String
      * @constant
      */
-    SCRIPT_ID: 'JEEEL-SCRIPT-ID',
+    SCRIPT_ID: 'jeeel-script-id',
 
     /**
      * Jeeelファイルが置かれているホスト<br />
@@ -87,6 +87,15 @@ var Jeeel = {
      * @constant
      */
     HOST: 'http://localhost',
+
+    /**
+     * Jeeelファイルが置かれている相対URL<br />
+     * 通常は指定しなくても良い
+     *
+     * @type String
+     * @constant
+     */
+    BASE_URL: '',
     
     /**
      * クロスドメインかどうか
@@ -95,15 +104,7 @@ var Jeeel = {
      * @constant
      */
     CROSS_DOMAIN: false,
-
-    /**
-     * Jeeelファイルが置かれている相対URL
-     *
-     * @type String
-     * @constant
-     */
-    BASE_URL: '/st/js/',
-
+    
     /**
      * サーバー側のevalを使用できる相対URL<br />
      * 以下のパラメータを受け取り実行した後結果を返す機能をサーバーに実装
@@ -707,29 +708,55 @@ Jeeel.directory.Jeeel = {
     }
 };
 
-if (Jeeel._global && Jeeel._debugMode) {
-    Jeeel._global.onerror = Jeeel._error;
-}
-
 (function () {
-    if ( ! Jeeel._doc) {
-        return;
+    
+    // 基本デバッグの有効化
+    if (Jeeel._global && Jeeel._debugMode) {
+        Jeeel._global.onerror = Jeeel._error;
     }
     
-    var scripts = Jeeel._doc.getElementsByTagName('script');
-    var script  = scripts[scripts.length - 1];
-    script.className = Jeeel.SCRIPT_CLASS;
-    script.id = Jeeel.SCRIPT_ID + '-0';
-})();
+    // クロスドメインの判定
+    if (Jeeel.HOST && Jeeel.HOST.match(/^https?:\/\//) && typeof location !== 'undefined') {
+        var host = (location.protocol + '//' + location.host).replace(/([\/()\[\]{}|*+-.,\^$?\\])/g, '\\$1');
 
-(function () {
+        if ( ! Jeeel.HOST.match(new RegExp('^' + host))) {
+            Jeeel.CROSS_DOMAIN = true;
+        }
+    }
+    
+    // ユニークIDを設定する
     Jeeel.UNIQUE_ID = 'Jeeel-' + (Jeeel.VERSION + Math.random()).replace(/\D/g, '');
+    Jeeel.SCRIPT_ID = Jeeel.SCRIPT_ID + '-' + Jeeel.UNIQUE_ID;
+    
+    // ベースURLとクラス、IDの設定
+    if (Jeeel._doc) {
+        
+        var scripts = Jeeel._doc.getElementsByTagName('script');
+        var jeeelRegExp = /^(.*)\/Jeeel\/\w+\.js(.*)$/i,
+            jeeelMatch;
+
+        for (var i = scripts.length; i--;) {
+            var script = scripts[i],
+                src = script.getAttribute('src');
+
+            if ( ! src || ! (jeeelMatch = src.match(jeeelRegExp))) {
+                continue;
+            }
+
+            Jeeel.BASE_URL = jeeelMatch[1] + '/';
+
+            script.className = Jeeel.SCRIPT_CLASS;
+            script.id = Jeeel.SCRIPT_ID + '-0';
+
+            break;
+        }
+    }
     
     if (Jeeel._global) {
         Jeeel._global.Jeeel = Jeeel;
     }
     
-    Jeeel.file.Jeeel = ['Class', 'Filter', 'Type', 'Method', 'Hash', 'String', 'Number', 'Code', 'Import', 'Function', 'UserAgent', 'Json', 'Session', 'Dom', 'Net', 'Evaluator', 'Template', 'Timer', 'DataStructure', 'Object', 'Parameter', 'Validator', 'Storage', 'Namespace', 'External', 'Deferred', 'Framework', 'Config', 'Util'];
+    Jeeel.file.Jeeel = ['Class', 'Filter', 'Type', 'Method', 'Hash', 'String', 'Number', 'Code', 'Loader', 'Function', 'UserAgent', 'Json', 'Session', 'Dom', 'Net', 'Evaluator', 'Template', 'Timer', 'DataStructure', 'Object', 'Parameter', 'Validator', 'Storage', 'Namespace', 'External', 'Deferred', 'Framework', 'Config', 'Util'];
    
     if (Jeeel._extendMode.Gui && Jeeel._doc) {
         Jeeel.file.Jeeel[Jeeel.file.Jeeel.length] = 'Gui';
@@ -763,6 +790,7 @@ if (Jeeel._global && Jeeel._debugMode) {
         Jeeel.file.Jeeel[Jeeel.file.Jeeel.length] = 'Debug';
     }
 
+    // 自動ロードを始動
     if (Jeeel._auto) {
         Jeeel._tmp = function () {
             for (var i = 4, l = Jeeel.file.Jeeel.length; i < l; i++) {
@@ -779,6 +807,7 @@ if (Jeeel._global && Jeeel._debugMode) {
     }
 })();
 
+// グローバル関数・変数の設定
 (function () {
     if ( ! Jeeel._global) {
         return;
@@ -1415,6 +1444,27 @@ Jeeel.Filter.Abstract.prototype = {
 };
 
 Jeeel._Object.JeeelFilter = {
+    
+    getInputs: function (elm) {
+        var selector = "input, select, textarea, button";
+        var res = [], i, l;
+        
+        if (elm.querySelectorAll) {
+            var sres = elm.querySelectorAll(selector);
+            
+            for (i = 0, l = sres.length; i < l; i++) {
+                res[i] = sres[i];
+            }
+        } else {
+            
+            var tags = ['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'];
+
+            res = Jeeel.Dom.Core.Searcher.create(elm).getElementsByTagName(tags);
+        }
+        
+        return res;
+    },
+    
     getInputName: function (name) {
         var names1 = decodeURIComponent(name).split('][');
         var names2 = names1[0].split('[');
@@ -3441,13 +3491,13 @@ Jeeel.Class.extend(Jeeel.Filter.Html.Unescape, Jeeel.Filter.Abstract);
  * コンストラクタ
  *
  * @class Html要素毎に内部のinputをまとめあげる(送信時のパラメータのようにnameで区分け)<br />
- *         その際無効なinputは無視する(checkedが付いていないradioボタンやcheckbox、選択されていないselectbox)
+ *         その際radioボタンは強制的にリストになる
  * @augments Jeeel.Filter.Abstract
  * @param {Boolean} [useDefaultValue] trueにすると現在値でなくデフォルト値を参照して纏め上げる
  * @param {String} [unknownName] 名前のついていないinputに使用する名前(デフォルトは無視する)
- * @param {String} [overwriteName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はElement[]になる)
+ * @param {String} [overwrittenName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はElement[]になる)
  */
-Jeeel.Filter.Html.Form = function (useDefaultValue, unknownName, overwriteName) {
+Jeeel.Filter.Html.Form = function (useDefaultValue, unknownName, overwrittenName) {
 
     Jeeel.Filter.Abstract.call(this);
     
@@ -3457,7 +3507,7 @@ Jeeel.Filter.Html.Form = function (useDefaultValue, unknownName, overwriteName) 
         this._unknownName = unknownName + '[]';
     }
     
-    this._overwriteName = overwriteName || null;
+    this._overwrittenName = overwrittenName || null;
 };
 
 /**
@@ -3465,11 +3515,11 @@ Jeeel.Filter.Html.Form = function (useDefaultValue, unknownName, overwriteName) 
  *
  * @param {Boolean} [useDefaultValue] trueにすると現在値でなくデフォルト値を参照して纏め上げる
  * @param {String} [unknownName] 名前のついていないinputに使用する名前(デフォルトは無視する)
- * @param {String} [overwriteName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はElement[]になる)
+ * @param {String} [overwrittenName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はElement[]になる)
  * @return {Jeeel.Filter.Html.Form} 作成したインスタンス
  */
-Jeeel.Filter.Html.Form.create = function (useDefaultValue, unknownName, overwriteName) {
-    return new this(useDefaultValue, unknownName, overwriteName);
+Jeeel.Filter.Html.Form.create = function (useDefaultValue, unknownName, overwrittenName) {
+    return new this(useDefaultValue, unknownName, overwrittenName);
 };
 
 Jeeel.Filter.Html.Form.prototype = {
@@ -3478,7 +3528,7 @@ Jeeel.Filter.Html.Form.prototype = {
     
     _unknownName: '',
     
-    _overwriteName: null,
+    _overwrittenName: null,
     
     _avoidValues: [],
     
@@ -3490,13 +3540,7 @@ Jeeel.Filter.Html.Form.prototype = {
             throw new Error('Elementではない要素を含んでいます。');
         }
 
-        val = Jeeel.Dom.Element.create(val);
-
-        var inputs = val.getElementsByTagName('input');
-
-        inputs = inputs.concat(val.getElementsByTagName('select'));
-        inputs = inputs.concat(val.getElementsByTagName('textarea'));
-        inputs = inputs.concat(val.getElementsByTagName('button'));
+        var inputs = this._getInputs(val);
 
         var res = {}, name;
         
@@ -3513,8 +3557,8 @@ Jeeel.Filter.Html.Form.prototype = {
             this._setParams(res, name, inputs[i]);
         }
         
-        if (this._overwriteName) {
-            res[this._overwriteName] = this._avoidValues;
+        if (this._overwrittenName) {
+            res[this._overwrittenName] = this._avoidValues;
         }
 
         return res;
@@ -3542,6 +3586,8 @@ Jeeel.Filter.Html.Form.prototype = {
         return res;
     },
     
+    _getInputs: Jeeel._Object.JeeelFilter.getInputs,
+
     _getName: Jeeel._Object.JeeelFilter.getInputName,
     
     _repairName: Jeeel._Object.JeeelFilter.repairInputName,
@@ -3576,16 +3622,8 @@ Jeeel.Filter.Html.Form.prototype = {
     
     _setParams: function (res, name, element) {
 
-        if (element.tagName.toLowerCase() === 'input') {
-            if (element.type.toLowerCase() === 'checkbox' && ! this._getProp(element, 'checked')) {
-                return;
-            } else if (element.type.toLowerCase() === 'radio' && ! this._getProp(element, 'checked')) {
-                return;
-            }
-        } else if (element.tagName.toLowerCase() === 'select') {
-            if (element.selectedIndex < 0) {
-                return;
-            }
+        if (element.tagName.toUpperCase() === 'INPUT' && element.type.toLowerCase() === 'radio') {
+            name = name + '[]';
         }
 
         var key, names = this._getName(name);
@@ -3642,9 +3680,9 @@ Jeeel.Class.extend(Jeeel.Filter.Html.Form, Jeeel.Filter.Abstract);
  * @augments Jeeel.Filter.Abstract
  * @param {Boolean} [useDefaultValue] trueにすると現在値でなくデフォルト値を参照して纏め上げる(値もデフォルト値になる)
  * @param {String} [unknownName] 名前のついていないinputに使用する名前(デフォルトは無視する)
- * @param {String} [overwriteName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はJeeel.Object.Item[]になる)
+ * @param {String} [overwrittenName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はJeeel.Object.Item[]になる)
  */
-Jeeel.Filter.Html.FormValue = function (useDefaultValue, unknownName, overwriteName) {
+Jeeel.Filter.Html.FormValue = function (useDefaultValue, unknownName, overwrittenName) {
 
     Jeeel.Filter.Abstract.call(this);
     
@@ -3654,7 +3692,7 @@ Jeeel.Filter.Html.FormValue = function (useDefaultValue, unknownName, overwriteN
         this._unknownName = unknownName + '[]';
     }
     
-    this._overwriteName = overwriteName || null;
+    this._overwrittenName = overwrittenName || null;
 };
 
 /**
@@ -3662,11 +3700,11 @@ Jeeel.Filter.Html.FormValue = function (useDefaultValue, unknownName, overwriteN
  *
  * @param {Boolean} [useDefaultValue] trueにすると現在値でなくデフォルト値を参照して纏め上げる
  * @param {String} [unknownName] 名前のついていないinputに使用する名前(デフォルトは無視する)
- * @param {String} [overwriteName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はJeeel.Object.Item[]になる)
+ * @param {String} [overwrittenName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はJeeel.Object.Item[]になる)
  * @return {Jeeel.Filter.Html.FormValue} 作成したインスタンス
  */
-Jeeel.Filter.Html.FormValue.create = function (useDefaultValue, unknownName, overwriteName) {
-    return new this(useDefaultValue, unknownName, overwriteName);
+Jeeel.Filter.Html.FormValue.create = function (useDefaultValue, unknownName, overwrittenName) {
+    return new this(useDefaultValue, unknownName, overwrittenName);
 };
 
 Jeeel.Filter.Html.FormValue.prototype = {
@@ -3675,7 +3713,7 @@ Jeeel.Filter.Html.FormValue.prototype = {
     
     _unknownName: '',
     
-    _overwriteName: null,
+    _overwrittenName: null,
     
     _avoidValues: [],
     
@@ -3687,13 +3725,7 @@ Jeeel.Filter.Html.FormValue.prototype = {
             throw new Error('Elementではない要素を含んでいます。');
         }
 
-        val = Jeeel.Dom.Element.create(val);
-
-        var inputs = val.getElementsByTagName('input');
-
-        inputs = inputs.concat(val.getElementsByTagName('select'));
-        inputs = inputs.concat(val.getElementsByTagName('textarea'));
-        inputs = inputs.concat(val.getElementsByTagName('button'));
+        var inputs = this._getInputs(val);
         
         var res = {}, name;
         
@@ -3709,8 +3741,8 @@ Jeeel.Filter.Html.FormValue.prototype = {
             this._setParams(res, name, inputs[i]);
         }
         
-        if (this._overwriteName) {
-            res[this._overwriteName] = this._avoidValues;
+        if (this._overwrittenName) {
+            res[this._overwrittenName] = this._avoidValues;
         }
 
         return res;
@@ -3737,6 +3769,8 @@ Jeeel.Filter.Html.FormValue.prototype = {
 
         return res;
     },
+    
+    _getInputs: Jeeel._Object.JeeelFilter.getInputs,
     
     _getName: Jeeel._Object.JeeelFilter.getInputName,
     
@@ -3797,7 +3831,7 @@ Jeeel.Filter.Html.FormValue.prototype = {
     
     _setParams: function (res, name, element) {
 
-        if (element.tagName.toLowerCase() === 'input') {
+        if (element.tagName.toUpperCase() === 'INPUT') {
             if (element.type.toLowerCase() === 'checkbox' && ! this._getProp(element, 'checked')) {
                 return;
             } else if (element.type.toLowerCase() === 'radio' && ! this._getProp(element, 'checked')) {
@@ -4607,6 +4641,10 @@ Jeeel.Type = {
      * @return {Boolean} 判定結果
      */
     isNumeric: function (val) {
+        if ( ! val && val !== 0) {
+            return false;
+        }
+      
         val = +val;
         
         return ! (isNaN(val) || val === -Infinity || val === Infinity);
@@ -4619,6 +4657,10 @@ Jeeel.Type = {
      * @return {Boolean} 判定結果
      */
     isDigit: function (val) {
+        if ( ! val && val !== 0) {
+            return false;
+        }
+        
         return this.isInteger(+val);
     },
     
@@ -10693,7 +10735,7 @@ Jeeel.Code.HtmlCode = {
 /**
  * 読み込み関連のメソッドを提供するModule
  */
-Jeeel.Import = {
+Jeeel.Loader = {
 
     /**
      * Prototype.jsが読み込まれているかどうかを返す。
@@ -10743,7 +10785,7 @@ Jeeel.Import = {
      * @return {Element} scriptタグのElement
      * @see Jeeel.Code.CharEncoding
      */
-    importScript: function (url, callback, charCode) {
+    loadScript: function (url, callback, charCode) {
         var script  = Jeeel.Document.createElement('script');
         script.type = 'text/javascript';
 
@@ -10782,7 +10824,7 @@ Jeeel.Import = {
      * @return {Element} linkタグのElement
      * @see Jeeel.Code.CharEncoding
      */
-    importStyle: function (url, charCode) {
+    loadStyle: function (url, charCode) {
         var style  = Jeeel.Document.createElement('link');
         style.type = 'text/css';
         style.rel  = 'stylesheet';
@@ -10854,7 +10896,7 @@ Jeeel.Import = {
     getCurrentScript: function () {
         return (
             function (e) {
-                return (e.nodeName.toLowerCase() == 'script' ? e : arguments.callee(e.lastChild));
+                return (e.nodeName.toLowerCase() === 'script' ? e : arguments.callee(e.lastChild));
             })(Jeeel._doc);
     },
 
@@ -10895,7 +10937,7 @@ Jeeel.Import = {
     }
 };
 
-Jeeel.Import._init();
+Jeeel.Loader._init();
 /**
  * コンストラクタ
  *
@@ -11624,7 +11666,7 @@ Jeeel.UserAgent = {
                 Jeeel.Timer.setTimeout(function () {
                     var style = 'v\\:* { behavior: url(#default#VML); }';
 
-                    self._tag = Jeeel.Import.addStyle(style);
+                    self._tag = Jeeel.Loader.addStyle(style);
                 }, 1);
             }
         } else {
@@ -13148,10 +13190,629 @@ Jeeel.Dom = {
 
 };
 
-Jeeel.file.Jeeel.Dom = ['Node', 'Window', 'Document', 'Xml', 'Event', 'Style', 'Element', 'ElementOperator', 'SearchOption'];
+Jeeel.file.Jeeel.Dom = ['Core', 'Node', 'Window', 'Document', 'Xml', 'Event', 'Style', 'Element', 'ElementOperator', 'SearchOption'];
 
-Jeeel._autoImports(Jeeel.directory.Jeeel.Dom, Jeeel.file.Jeeel.Dom);
+if (Jeeel._auto) {
+    Jeeel.Dom._tmp = function () {
+        for (var i = 1, l = Jeeel.file.Jeeel.Dom.length; i < l; i++) {
+            Jeeel._import(Jeeel.directory.Jeeel.Dom, Jeeel.file.Jeeel.Dom[i]);
+        }
 
+        delete Jeeel.Dom._tmp;
+    };
+
+    Jeeel._import(Jeeel.directory.Jeeel.Dom, Jeeel.file.Jeeel.Dom[0]);
+}
+Jeeel.directory.Jeeel.Dom.Core = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel.Dom + 'Core/';
+    }
+};
+
+Jeeel.Dom.Core = {
+    
+};
+
+Jeeel.file.Jeeel.Dom.Core = ['Searcher'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Core, Jeeel.file.Jeeel.Dom.Core);
+
+if (Jeeel.Dom._tmp) {
+    Jeeel.Dom._tmp();
+}
+/**
+ * コンストラクタ
+ * 
+ * @class 指定した要素内の検索を行うクラス
+ * @param {Node} target 検索対象ノード
+ */
+Jeeel.Dom.Core.Searcher = function (target) {
+    this._target = target;
+    this._init();
+};
+
+/**
+ * インスタンスの作成を行う
+ * 
+ * @param {Node} target 検索対象ノード
+ * @return {Jeeel.Dom.Core.Searcher} 作成したインスタンス
+ */
+Jeeel.Dom.Core.Searcher.create = function (target) {
+    return new this(target);
+};
+
+Jeeel.Dom.Core.Searcher.caches = {};
+
+Jeeel.Dom.Core.Searcher.prototype = {
+  
+    /**
+     * 検索対象要素
+     * 
+     * @type Node
+     * @private
+     */
+    _target: null,
+    
+    /**
+     * このElement内から指定IDのHTML要素を取得する
+     *
+     * @param {String} id 検索ID
+     * @return {Element} 取得したElement
+     */
+    getElementById: function (id) {
+        return this._target.getElementById(id) || null;
+    },
+    
+    /**
+     * このElement内から指定ClassのHTML要素を取得する
+     *
+     * @param {String|String[]} className 検索Class
+     * @return {Element[]} 取得したElement配列
+     */
+    getElementsByClassName: function (className) {
+
+        if (Jeeel.Type.isArray(className)) {
+            return this.searchElementsByClassName(className);
+        }
+      
+        var res = this._target.getElementsByClassName(className);
+        
+        return Jeeel.Hash.toArray(res);
+    },
+    
+    /**
+     * このElement内から指定NameのHTML要素を取得する
+     * なおsubmitSearchを指定すると<br />
+     * この動作は一部本来のgetElementsByNameと違い、<br />
+     * c[]等で配列指定した値に対してもヒットする
+     *
+     * @param {String|String[]} name 検索Name
+     * @param {Boolean} [submitSearch=false] 送信時と同じようにc[]等の配列指定をヒットさせるかどうか
+     * @return {Element[]} 取得したElement配列
+     */
+    getElementsByName: function (name, submitSearch) {
+        
+        if (Jeeel.Type.isArray(name) || submitSearch) {
+            return this.searchElementsByName(name, submitSearch);
+        }
+        
+        var res = this._target.getElementsByName(name);
+        
+        return Jeeel.Hash.toArray(res);
+    },
+    
+    /**
+     * このElement内から指定TagのHTML要素を取得する
+     *
+     * @param {String|String[]} tagName 検索Tag
+     * @return {Element[]} 取得したElement配列
+     */
+    getElementsByTagName: function (tagName) {
+      
+        if (Jeeel.Type.isArray(tagName)) {
+            return this.searchElementsByTagName(tagName);
+        }
+      
+        var res = this._target.getElementsByTagName(tagName);
+        
+        return Jeeel.Hash.toArray(res);
+    },
+    
+    /**
+     * このElement内から指定属性が指定値のHTML要素を取得する
+     *
+     * @param {String} attribute 属性名
+     * @param {String} value 属性値('*'を指定すると任意の値の意味になる)
+     * @return {Element[]} 取得したElement配列
+     */
+    getElementsByAttribute: function (attribute, value) {
+        var res = this._target.getElementsByAttribute(attribute, value);
+        
+        return Jeeel.Hash.toArray(res);
+    },
+    
+    /**
+     * このElement内から指定プロパティが指定値のHTML要素を取得する<br />
+     * Elementのプロパティである事に注意
+     *
+     * @param {String} property プロパティ名
+     * @param {Mixied} value プロパティ値('*'を指定すると任意の値の意味になる)
+     * @return {Element[]} 取得したElement配列
+     */
+    getElementsByProperty: function (property, value) {
+        var res = this._target.getElementsByProperty(property, value);
+        
+        return Jeeel.Hash.toArray(res);
+    },
+    
+    /**
+     * このElement内部に絞り込みを掛ける<br />
+     * 現在のHTML内に存在しない要素は取れない
+     *
+     * @param {String} selector CSSと同じ絞り込みセレクタ
+     * @return {Element[]} 絞り込んだElement配列
+     */
+    getElementsBySelector: function (selector) {
+        var res = this._target.querySelectorAll(selector);
+        
+        return Jeeel.Hash.toArray(res);
+    },
+    
+    searchElementById: function (id) {
+        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        var search = function (elm, id, f) {
+            if ( ! f && elm.id === id) {
+                return elm;
+            }
+            
+            var tmp, child = elm.firstChild;
+
+            while(child) {
+
+                if (child.nodeType === nodeType) {
+                    tmp = search(child, id);
+
+                    if (tmp) {
+                        return tmp;
+                    }
+                }
+
+                child = child.nextSibling;
+            }
+
+            return null;
+        };
+        
+        this.searchElementById = function (id) {
+            return id && search(this._target, id, true) || null;
+        };
+        
+        if (arguments.callee === this.getElementById) {
+            this.constructor.caches[this._target.nodeType].getElementById = this.getElementById = this.searchElementById;
+        }
+        
+        return this.searchElementById(id);
+    },
+    
+    searchElementsByClassName: function (className) {
+        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        var search = function (res, target, reg, f) {
+
+            var className = target.className;
+            
+            if ( ! f && className.match && className.match(reg)) {
+                res[res.length] = target;
+            }
+
+            var child = target.firstChild;
+
+            while(child) {
+
+                if (child.nodeType === nodeType) {
+                    search(res, child, reg);
+                }
+
+                child = child.nextSibling;
+            }
+        };
+        
+        this.searchElementsByClassName = function (className) {
+            var res = [];
+            
+            if ( ! className) {
+                return res;
+            }
+            
+            var isArr = Jeeel.Type.isArray(className),
+                reg;
+            
+            if (isArr) {
+                
+                if (className.length === 0) {
+                    return res;
+                }
+                
+                reg = new RegExp('(?:^| )' + className.join('|') + '(?: |$)', 'i');
+            } else {
+                
+                reg = new RegExp('(?:^| )' + className + '(?: |$)', 'i');
+            }
+
+            search(res, this._target, reg, true);
+            
+            return res;
+        };
+        
+        if (arguments.callee === this.getElementsByClassName) {
+            this.constructor.caches[this._target.nodeType].getElementsByClassName = this.getElementsByClassName = this.searchElementsByClassName;
+        }
+        
+        return this.searchElementsByClassName(className);
+    },
+
+    searchElementsByName: function (name, submitSearch) {
+        var rf = new Jeeel.Filter.RegularExpressionEscape();
+        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        var search = function (res, target, reg, s, f) {
+
+            var name = target.name;
+              
+            if ( ! f && name) {
+                if (s) {
+                    if (name.match(reg)) {
+                        res[res.length] = target;
+                    }
+                } else {
+                    if (name === reg) {
+                        res[res.length] = target;
+                    }
+                }
+            }
+
+            var child = target.firstChild;
+
+            while(child) {
+
+                if (child.nodeType === nodeType) {
+                    search(res, child, reg, s);
+                }
+
+                child = child.nextSibling;
+            }
+        };
+        
+        var multiSearch = function (res, target, regs, s, f) {
+
+            var name = target.name;
+              
+            if ( ! f && name) {
+                if (s) {
+                    for (var i = regs.length; i--;) {
+                        if (name.match(regs[i])) {
+                            res[res.length] = target;
+                            break;
+                        }
+                    }
+                } else {
+                    if (Jeeel.Type.inArray(name, regs, true)) {
+                        res[res.length] = target;
+                    }
+                }
+            }
+
+            var child = target.firstChild;
+
+            while(child) {
+
+                if (child.nodeType === nodeType) {
+                    multiSearch(res, child, regs, s);
+                }
+
+                child = child.nextSibling;
+            }
+        };
+        
+        this.searchElementsByName = function (name, submitSearch) {
+            var res = [];
+            
+            if ( ! name) {
+                return res;
+            }
+
+            var isArr = Jeeel.Type.isArray(name),
+                l = isArr && name.length;
+            
+            // 配列かどうかで検索手法を切り替える
+            if (isArr && l === 0) {
+                return res;
+            } else if (isArr && name.length > 1) {
+  
+                if (submitSearch) {
+                    while (l--) {
+                        name[l] = new RegExp('^' + rf.filter(name[l]) + '(?:$|\\[)');
+                    }
+                }
+
+                multiSearch(res, this._target, name, submitSearch, true);
+            } else {
+                if (isArr) {
+                    name = name[0];
+                }
+                
+                if (submitSearch) {
+                    name = new RegExp('^' + rf.filter(name) + '(?:$|\\[)');
+                }
+                
+                search(res, this._target, name, submitSearch, true);
+            }
+            
+            return res;
+        };
+        
+        if (arguments.callee === this.getElementsByName) {
+            this.constructor.caches[this._target.nodeType].getElementsByName = this.getElementsByName = this.searchElementsByName;
+        }
+        
+        return this.searchElementsByName(name, submitSearch);
+    },
+
+    searchElementsByTagName: function (tagName) {
+        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        var search = function (res, target, tag, f) {
+
+            if ( ! f && tag === '*' || target.nodeName.toUpperCase() === tag) {
+                res[res.length] = target;
+            }
+
+            var child = target.firstChild;
+
+            while(child) {
+
+                if (child.nodeType === nodeType) {
+                    search(res, child, tag);
+                }
+
+                child = child.nextSibling;
+            }
+        };
+        
+        var multiSearch = function (res, target, tags, f) {
+
+            if ( ! f && Jeeel.Type.inArray(target.nodeName.toUpperCase(), tags, true)) {
+                res[res.length] = target;
+            }
+
+            var child = target.firstChild;
+
+            while(child) {
+
+                if (child.nodeType === nodeType) {
+                    multiSearch(res, child, tags);
+                }
+
+                child = child.nextSibling;
+            }
+        };
+        
+        this.searchElementsByTagName = function (tagName) {
+            var res = [];
+            
+            if ( ! tagName) {
+                return res;
+            }
+            
+            var isArr = Jeeel.Type.isArray(tagName),
+                l = isArr && tagName.length;
+            
+            if (isArr && l === 0) {
+                return res;
+            } else if (isArr && l > 1) {
+                if (Jeeel.Type.inArray('*', tagName, true)) {
+                    search(res, this._target, '*', true);
+                } else {
+                    while (l--) {
+                        tagName[l] = tagName[l].toUpperCase();
+                    }
+                    
+                    multiSearch(res, this._target, tagName, true);
+                }
+            } else {
+                if (isArr) {
+                    tagName = tagName[0];
+                }
+                
+                search(res, this._target, tagName.toUpperCase(), true);
+            }
+
+            return res;
+        };
+        
+        if (arguments.callee === this.getElementsByTagName) {
+            this.constructor.caches[this._target.nodeType].getElementsByTagName = this.getElementsByTagName = this.searchElementsByTagName;
+        }
+        
+        return this.searchElementsByTagName(tagName);
+    },
+
+    searchElementsByAttribute: function (attribute, value) {
+        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        var search = function (res, target, attr, value, f) {
+
+            if ( ! f && target.getAttribute) {
+                var val = target.getAttribute(attr);
+
+                if ((val && value === '*') || val === value) {
+                    res[res.length] = target;
+                }
+            }
+ 
+            var child = target.firstChild;
+
+            while(child) {
+
+                if (child.nodeType === nodeType) {
+                    search(res, child, attr, value);
+                }
+
+                child = child.nextSibling;
+            }
+        };
+        
+        this.searchElementsByAttribute = function (attribute, value) {
+            var res = [];
+            
+            if ( ! attribute) {
+                return res;
+            }
+            
+            search(res, this._target, attribute, value, true);
+            
+            return res;
+        };
+        
+        if (arguments.callee === this.getElementsByAttribute) {
+            this.constructor.caches[this._target.nodeType].getElementsByAttribute = this.getElementsByAttribute = this.searchElementsByAttribute;
+        }
+        
+        return this.searchElementsByAttribute(attribute, value);
+    },
+    
+    searchElementsByProperty: function (property, value) {
+        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        var search = function (res, target, prop, value, f) {
+
+            if ( ! f && prop in target) {
+                var val = target[prop];
+
+                if (value === '*' || val == value) {
+                    res[res.length] = target;
+                }
+            }
+
+            var child = target.firstChild;
+
+            while(child) {
+
+                if (child.nodeType === nodeType) {
+                    search(res, child, prop, value);
+                }
+
+                child = child.nextSibling;
+            }
+        };
+        
+        this.searchElementsByProperty = function (property, value) {
+            var res = [];
+            
+            if ( ! property) {
+                return res;
+            }
+            
+            search(res, this._target, property, value, true);
+            
+            return res;
+        };
+        
+        if (arguments.callee === this.getElementsByProperty) {
+            this.constructor.caches[this._target.nodeType].getElementsByProperty = this.getElementsByProperty = this.searchElementsByProperty;
+        }
+        
+        return this.searchElementsByProperty(property, value);
+    },
+    
+    searchElementsBySelector: function (selector) {
+        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        var search = function (res, target, selector, f) {
+
+        };
+        
+        this.searchElementsBySelector = function (selector) {
+            var res = [];
+            
+            return res;
+            
+            if ( ! selector) {
+                return res;
+            }
+            
+            search(res, this._target, selector, true);
+            
+            return res;
+        };
+        
+        if (arguments.callee === this.getElementsBySelector) {
+            this.constructor.caches[this._target.nodeType].getElementsBySelector = this.getElementsBySelector = this.searchElementsBySelector;
+        }
+        
+        return this.searchElementsBySelector(selector);
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Dom.Core.Searcher,
+    
+    _init: function () {
+        
+        var key, cache = this.constructor.caches[this._target.nodeType];
+        
+        if (cache) {
+            
+            for (key in cache) {
+                this[key] = cache[key];
+            }
+            
+            return;
+        }
+        
+        if ( ! this._target.getElementById) {
+            this.getElementById = this.searchElementById;
+        }
+        
+        if ( ! this._target.getElementsByClassName) {
+            this.getElementsByClassName = this.searchElementsByClassName;
+        }
+        
+        if ( ! this._target.getElementsByName) {
+            this.getElementsByName = this.searchElementsByName;
+        }
+        
+        if ( ! this._target.getElementsByTagName) {
+            this.getElementsByTagName = this.searchElementsByTagName;
+        }
+
+        if ( ! this._target.getElementsByAttribute) {
+            this.getElementsByAttribute = this.searchElementsByAttribute;
+        }
+        
+        if ( ! this._target.getElementsByProperty) {
+            this.getElementsByProperty = this.searchElementsByProperty;
+        }
+        
+        if ( ! this._target.querySelectorAll) {
+            this.getElementsBySelector = this.searchElementsBySelector;
+        }
+        
+        cache = {};
+        
+        for (key in this) {
+            if (key !== 'constructor' && key.indexOf('_') < 0) {
+                cache[key] = this[key];
+            }
+        }
+        
+        this.constructor.caches[this._target.nodeType] = cache;
+    }
+};
 /**
  * Nodeに関する事を保持するネームスペース
  */
@@ -13537,7 +14198,8 @@ Jeeel.Dom.Window.prototype = {
             return;
         }
         
-        var self = this;
+        var self = this,
+            body;
         
         if (win.innerWidth) {
             self.getWindowSize = function () {
@@ -13555,7 +14217,7 @@ Jeeel.Dom.Window.prototype = {
             self.getWindowSize = function () {
                 var root = this._document.getDocumentElement();
 
-                return new Jeeel.Object.Size(root.clientWidth, root.clientWidth);
+                return new Jeeel.Object.Size(root.clientWidth, root.clientHeight);
             };
             
             self.getScrollPosition = function () {
@@ -13563,11 +14225,11 @@ Jeeel.Dom.Window.prototype = {
                 
                 return new Jeeel.Object.Point(root.scrollLeft, root.scrollTop);
             };
-        } else if (doc.body.clientWidth) {
+        } else if ((body = doc.body || doc.createElement('body')) && 'clientWidth' in body) {
             self.getWindowSize = function () {
                 var root = this._document.getBody();
 
-                return new Jeeel.Object.Size(root.clientWidth, root.clientWidth);
+                return new Jeeel.Object.Size(root.clientWidth, root.clientHeight);
             };
             
             self.getScrollPosition = function () {
@@ -14458,6 +15120,7 @@ Jeeel.Dom.Document = function (document) {
     }
 
     this._document = document;
+    this._searcher = new Jeeel.Dom.Core.Searcher(document);
     this._elementCash = {};
 };
 
@@ -14488,6 +15151,14 @@ Jeeel.Dom.Document.prototype = {
      * @private
      */
     _window: null,
+    
+    /**
+     * 検索インスタンス
+     * 
+     * @type Jeeel.Dom.Core.Searcher
+     * @private
+     */
+    _searcher: null,
     
     /**
      * Elementの作成で使用するキャッシュ
@@ -14522,7 +15193,7 @@ Jeeel.Dom.Document.prototype = {
     },
     
     /**
-     * Elementの作成を行う(複数回同じタグを生成する場合はdocumentのcreateElementを使用するよりも早い)
+     * Elementの作成を行う
      * 
      * @param {String} tagName 作成タグの名前(タグ名は大文字小文字を統一した方が早くなる)
      * @return {Element} 作成したタグ
@@ -14538,7 +15209,7 @@ Jeeel.Dom.Document.prototype = {
     },
     
     /**
-     * ネームスペースを指定してElementの作成を行う(複数回同じタグを生成する場合はdocumentのcreateElementNSを使用するよりも早い)
+     * ネームスペースを指定してElementの作成を行う
      * 
      * @param {String} namespaceUri ネームスペースURI(例： http://www.w3.org/1999/xhtml)
      * @param {String} tagName 作成タグの名前(タグ名は大文字小文字を統一した方が早くなる)
@@ -14699,16 +15370,20 @@ Jeeel.Dom.Document.prototype = {
      * @param {String} id 検索ID
      * @return {Element} 取得したElement
      */
-    getElementById: function (id) {},
+    getElementById: function (id) {
+        return this._searcher.getElementById(id);
+    },
 
     /**
      * 指定ClassのHTML要素を取得する
      *
-     * @param {String} className 検索Class
+     * @param {String|String[]} className 検索Class
      * @return {Element[]} 取得したElement配列
      */
-    getElementsByClassName: function (className) {},
-
+    getElementsByClassName: function (className) {
+        return this._searcher.getElementsByClassName(className);
+    },
+    
     /**
      * 指定NameのHTML要素を取得する<br />
      * なおsubmitSearchを指定すると<br />
@@ -14716,19 +15391,42 @@ Jeeel.Dom.Document.prototype = {
      * c[]等で配列指定した値に対してもヒットする<br />
      * submitSearchなしのIEではName属性の解釈が違うので注意
      * 
-     * @param {String} name 検索Name
+     * @param {String|String[]} name 検索Name
      * @param {Boolean} [submitSearch=false] 送信時と同じようにc[]等の配列指定をヒットさせるかどうか
      * @return {Element[]} 取得したElement配列
      */
-    getElementsByName: function (name, submitSearch) {},
-
+    getElementsByName: function (name, submitSearch) {
+        return this._searcher.getElementsByName(name, submitSearch);
+    },
+    
     /**
      * 指定TagのHTML要素を取得する
      *
-     * @param {String} tagName 検索Tag
+     * @param {String|String[]} tagName 検索Tag
      * @return {Element[]} 取得したElement配列
      */
-    getElementsByTagName: function (tagName) {},
+    getElementsByTagName: function (tagName) {
+        
+        if ( ! tagName) {
+            return [];
+        }
+        
+        var isArr = Jeeel.Type.isArray(tagName);
+        
+        if ( ! isArr) {
+            tagName = tagName.toUpperCase();
+
+            if (tagName === 'BODY') {
+                return [this._document.body];
+            } else if (tagName === 'HEAD' && this._document.head) {
+                return [this._document.head];
+            } else if (tagName === 'HTML') {
+                return [this._document.documentElement];
+            }
+        }
+      
+        return this._searcher.getElementsByTagName(tagName);
+    },
 
     /**
      * 指定属性が指定値のHTML要素を取得する
@@ -14737,7 +15435,9 @@ Jeeel.Dom.Document.prototype = {
      * @param {String} value 属性値('*'を指定すると任意の値の意味になる)
      * @return {Element[]} 取得したElement配列
      */
-    getElementsByAttribute: function (attribute, value) {},
+    getElementsByAttribute: function (attribute, value) {
+        return this._searcher.getElementsByAttribute(attribute, value);
+    },
 
     /**
      * 指定プロパティが指定値のHTML要素を取得する<br />
@@ -14747,7 +15447,9 @@ Jeeel.Dom.Document.prototype = {
      * @param {Mixied} value 指定値('*'を指定すると任意の値の意味になる)
      * @return {Element[]} 取得したElement配列
      */
-    getElementsByProperty: function (property, value) {},
+    getElementsByProperty: function (property, value) {
+        return this._searcher.getElementsByProperty(property, value);
+    },
 
     /**
      * 指定セレクタで絞り込んだHTML要素を取得する
@@ -14756,7 +15458,9 @@ Jeeel.Dom.Document.prototype = {
      * @return {Element[]} 取得したElement配列
      * @ignore
      */
-    getElementsBySelector: function (selector) {},
+    getElementsBySelector: function (selector) {
+        return this._searcher.getElementsBySelector(selector);
+    },
     
     /**
      * HTML要素を指定範囲検索する
@@ -14882,141 +15586,8 @@ Jeeel.Dom.Document.prototype = {
             return;
         }
         
-        var rf = new Jeeel.Filter.RegularExpressionEscape();
-        var _id, _name, _tag, _reg, _s, _attr, _prop, _value, _option, _rect;
-        var slice = Array.prototype.slice;
-        
-        function _searchId(target) {
+        var _option, _rect;
 
-            if (target.id === _id) {
-                return target;
-            }
-
-            var tmp, child = target.firstChild;
-
-            while(child) {
-
-                if (child.nodeType === nodeType) {
-                    tmp = _searchId(child);
-
-                    if (tmp) {
-                        return tmp;
-                    }
-                }
-
-                child = child.nextSibling;
-            }
-
-            return null;
-        }
-        
-        function _searchClass(res, target) {
-
-            if (target.className.match(_reg)) {
-                res[res.length] = target;
-            }
-
-            var child = target.firstChild;
-
-            while(child) {
-
-                if (child.nodeType === nodeType) {
-                    _searchClass(res, child);
-                }
-
-                child = child.nextSibling;
-            }
-        }
-        
-        function _searchName(res, target) {
-            var name = target.name;
-              
-            if (name) {
-                if (_s) {
-                    if (name.match(_reg)) {
-                        res[res.length] = target;
-                    }
-                } else {
-                    if (name === _name) {
-                        res[res.length] = target;
-                    }
-                }
-            }
-
-            var child = target.firstChild;
-
-            while(child) {
-
-                if (child.nodeType === nodeType) {
-                    _searchName(res, child);
-                }
-
-                child = child.nextSibling;
-            }
-        }
-        
-        function _searchTag(res, target) {
-
-            if (target.nodeName.toUpperCase() === _tag) {
-                res[res.length] = target;
-            }
-
-            var child = target.firstChild;
-
-            while(child) {
-
-                if (child.nodeType === nodeType) {
-                    _searchTag(res, child);
-                }
-
-                child = child.nextSibling;
-            }
-        }
-        
-        function _searchAttr(res, target) {
-
-            if (target.getAttribute) {
-                var val = target.getAttribute(_attr);
-
-                if ((val && _value === '*') || val === _value) {
-                    res[res.length] = target;
-                }
-            }
-
-            var child = target.firstChild;
-
-            while(child) {
-
-                if (child.nodeType === nodeType) {
-                    _searchAttr(res, child);
-                }
-
-                child = child.nextSibling;
-            }
-        }
-        
-        function _searchProp(res, target) {
-
-            if (_prop in target) {
-                var val = target[_prop];
-
-                if (_value === '*' || val == _value) {
-                    res[res.length] = target;
-                }
-            }
-
-            var child = target.firstChild;
-
-            while(child) {
-
-                if (child.nodeType === nodeType) {
-                    _searchProp(res, child);
-                }
-
-                child = child.nextSibling;
-            }
-        }
-        
         function _searchRange(res, target) {
             var trect = Jeeel.Dom.Element.create(target).getRect();
 
@@ -15037,186 +15608,6 @@ Jeeel.Dom.Document.prototype = {
         }
         
         var self = this;
-        
-        if (doc.getElementById) {
-            if (Jeeel.UserAgent.isInternetExplorer()) {
-                self.getElementById = function (id) {
-                    return this._document.getElementById(id) || null;
-                };
-            } else {
-                self.getElementById = function (id) {
-                    return this._document.getElementById(id);
-                };
-            }
-        } else {
-            self.getElementById = function (id) {
-                if ( ! id) {
-                    return null;
-                }
-
-                _id = id;
-
-                return _searchId(this._document.documentElement);
-            };
-        }
-        
-        if (doc.getElementsByClassName) {
-            self.getElementsByClassName = function (className) {
-                var tmp = this._document.getElementsByClassName(className);
-
-                return Jeeel.Hash.toArray(tmp);
-            };
-        } else {
-            self.getElementsByClassName = function (className) {
-                if ( ! className) {
-                    return [];
-                }
-
-                _reg = new RegExp('(^| )' + className + '( |$)', 'i');
-                var res = [];
-
-                _searchClass(res, this._document.documentElement);
-
-                return res;
-            };
-        }
-        
-        if (doc.getElementsByName) {
-            self.getElementsByName = function (name, submitSearch) {
-
-                if ( ! name) {
-                    return [];
-                }
-
-                _s = !!submitSearch;
-
-                if (_s) {
-                    _reg = new RegExp('^' + rf.filter(name) + '($|\\[)');
-                } else {
-                    var tmp = this._document.getElementsByName(name);
-
-                    return Jeeel.Hash.toArray(tmp);
-                }
-
-                var res = [];
-
-                _searchName(res, this._document.documentElement);
-
-                return res;
-            };
-        } else {
-            self.getElementsByName = function (name, submitSearch) {
-
-                if ( ! name) {
-                    return [];
-                }
-
-                _s = !!submitSearch;
-
-                if (_s) {
-                    _reg = new RegExp('^' + rf.filter(name) + '($|\\[)');
-                } else {
-                    _name = name;
-                }
-
-                var res = [];
-
-                _searchName(res, this._document.documentElement);
-
-                return res;
-            };
-        }
-        
-        if (doc.getElementsByTagName) {
-            self.getElementsByTagName = function (tagName) {
-                if ( ! tagName) {
-                    return [];
-                }
-
-                tagName = tagName.toUpperCase();
-
-                if (tagName === 'BODY') {
-                    return [this._document.body];
-                } else if (tagName === 'HEAD' && this._document.head) {
-                    return [this._document.head];
-                } else if (tagName === 'HTML') {
-                    return [this._document.documentElement];
-                }
-                
-                var tmp = this._document.getElementsByTagName(tagName);
-
-                return Jeeel.Hash.toArray(tmp);
-            };
-        } else {
-            self.getElementsByTagName = function (tagName) {
-
-                if ( ! tagName) {
-                    return [];
-                }
-
-                _tag = tagName.toUpperCase();
-
-                if (_tag === 'BODY') {
-                    return [this._document.body];
-                } else if (_tag === 'HEAD' && this._document.head) {
-                    return [this._document.head];
-                } else if (_tag === 'HTML') {
-                    return [this._document.documentElement];
-                }
-
-                var res = [];
-
-                _searchTag(res, this._document.documentElement);
-
-                return res;
-            };
-        }
-        
-        self.getElementsByAttribute = function (attribute, value) {
-            if ( ! attribute) {
-                return [];
-            }
-            
-            _attr = attribute;
-            _value = value;
-
-            var res = [];
-
-            _searchAttr(res, this._document.documentElement);
-
-            return res;
-        };
-        
-        self.getElementsByProperty = function (property, value) {
-            if ( ! property) {
-                return [];
-            }
-            
-            _prop = property;
-            _value = value;
-
-            var res = [];
-
-            _searchProp(res, this._document.documentElement);
-
-            return res;
-        };
-        
-        if (doc.querySelectorAll) {
-            self.getElementsBySelector = function (selector) {
-                var tmp = this._document.querySelectorAll(selector);
-
-                return slice.call(tmp, 0, tmp.length);
-            };
-        } else {
-            self.getElementsBySelector = function (selector) {
-                if ( ! selector) {
-                    return [];
-                }
-
-                return [];
-            };
-        }
         
         self.searchElementsByRange = function (rect, option) {
             if ( ! rect) {
@@ -15255,10 +15646,10 @@ Jeeel.file.Jeeel.Dom.Document = ['ReadyStatus'];
 Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Document, Jeeel.file.Jeeel.Dom.Document);
 
 if (Jeeel._doc) {
-    Jeeel.Document = Jeeel.Dom.Document.create();
+    Jeeel.Document = new Jeeel.Dom.Document();
     Jeeel.Window = Jeeel.Document.getWindow();
 } else if (Jeeel._global) {
-    Jeeel.Window = Jeeel.Dom.Window.create();
+    Jeeel.Window = new Jeeel.Dom.Window();
 }
 
 (function () {
@@ -16432,7 +16823,7 @@ Jeeel.Dom.Event.getEventType = function (event) {
  * @param {String} type イベントタイプ
  * @param {Function} listener 登録イベントメソッド
  * @param {Mixied} [thisArg] コールバック中のthisに相当する値
- * @param {Mixied} var_args 可変引数、コールバックに渡す引数(最初の引数はJeeel.Dom.Eventで固定)
+ * @param {Mixied} var_args 可変引数、コールバックに渡す引数(最初の引数はJeeel.Dom.Event、次の引数はイベント発生Element、3つ目以降に任意引数)
  */
 Jeeel.Dom.Event.addEventListener = function (element, type, listener, thisArg, var_args) {
     var m = this.Manager.getInstance();
@@ -16459,7 +16850,7 @@ Jeeel.Dom.Event.removeEventListener = function (element, type, listener) {
  * @param {String} type イベントタイプ
  * @param {Function} listener 登録イベントメソッド
  * @param {Mixied} [thisArg] コールバック中のthisに相当する値
- * @param {Mixied} var_args 可変引数、コールバックに渡す引数(最初の引数はJeeel.Dom.Eventで固定)
+ * @param {Mixied} var_args 可変引数、コールバックに渡す引数(最初の引数はJeeel.Dom.Event、次の引数はイベント発生Element、3つ目以降に任意引数)
  */
 Jeeel.Dom.Event.delegate = function (elementList, type, listener, thisArg, var_args) {
     var m = this.Manager.getInstance();
@@ -18229,7 +18620,10 @@ Jeeel.Dom.Style.prototype = {
      * @return {String} スタイル値
      */
     getStyle: function (style) {
-        return (this._computedStyle || this._style)[Jeeel.String.toCamelCase(style)];
+        style = Jeeel.String.toCamelCase(style);
+        
+        // まず通常のスタイルを参照し、存在しないスタイルは計算済みスタイルから参照する
+        return this._style[style] || this._computedStyle[style];
     },
 
     /**
@@ -18252,9 +18646,13 @@ Jeeel.Dom.Style.prototype = {
      * @return {Jeeel.Dom.Style} 自インスタンス
      */
     setStyleList: function (styles) {
+        var cssText = [];
+        
         for (var style in styles) {
-            this._style[Jeeel.String.toCamelCase(style)] = styles[style];
+            cssText[cssText.length] = Jeeel.String.toHyphenation(style) + ': ' + styles[style] + ';';
         }
+        
+        this._style.cssText += '; ' + cssText.join('');
         
         return this;
     },
@@ -19016,6 +19414,7 @@ Jeeel.directory.Jeeel.Dom.Element = {
 Jeeel.Dom.Element = function (element) {
     this._element = element;
     this._style = new Jeeel.Dom.Style(element);
+    this._searcher = new Jeeel.Dom.Core.Searcher(element);
     this._doc = new Jeeel.Dom.Document(element && element.ownerDocument || Jeeel._doc);
 };
 
@@ -19065,6 +19464,14 @@ Jeeel.Dom.Element.prototype = {
     _doc: null,
     
     /**
+     * 検索インスタンス
+     * 
+     * @type Jeeel.Dom.Core.Searcher
+     * @private
+     */
+    _searcher: null,
+    
+    /**
      * ElementのStyleラッパー
      * 
      * @type Jeeel.Dom.Style
@@ -19106,36 +19513,44 @@ Jeeel.Dom.Element.prototype = {
      * @param {String} id 検索ID
      * @return {Element} 取得したElement
      */
-    getElementById: function (id) {},
+    getElementById: function (id) {
+        return this._searcher.getElementById(id);
+    },
 
     /**
      * このElement内から指定ClassのHTML要素を取得する
      *
-     * @param {String} className 検索Class
+     * @param {String|String[]} className 検索Class
      * @return {Element[]} 取得したElement配列
      */
-    getElementsByClassName: function (className) {},
-
+    getElementsByClassName: function (className) {
+        return this._searcher.getElementsByClassName(className);
+    },
+    
     /**
      * このElement内から指定NameのHTML要素を取得する
      * なおsubmitSearchを指定すると<br />
      * この動作は一部本来のgetElementsByNameと違い、<br />
      * c[]等で配列指定した値に対してもヒットする
      *
-     * @param {String} name 検索Name
+     * @param {String|String[]} name 検索Name
      * @param {Boolean} [submitSearch=false] 送信時と同じようにc[]等の配列指定をヒットさせるかどうか
      * @return {Element[]} 取得したElement配列
      */
-    getElementsByName: function (name, submitSearch) {},
-
+    getElementsByName: function (name, submitSearch) {
+        return this._searcher.getElementsByName(name, submitSearch);
+    },
+    
     /**
      * このElement内から指定TagのHTML要素を取得する
      *
-     * @param {String} tagName 検索Tag
+     * @param {String|String[]} tagName 検索Tag
      * @return {Element[]} 取得したElement配列
      */
-    getElementsByTagName: function (tagName) {},
-
+    getElementsByTagName: function (tagName) {
+        return this._searcher.getElementsByTagName(tagName);
+    },
+    
     /**
      * このElement内から指定属性が指定値のHTML要素を取得する
      *
@@ -19143,7 +19558,9 @@ Jeeel.Dom.Element.prototype = {
      * @param {String} value 属性値('*'を指定すると任意の値の意味になる)
      * @return {Element[]} 取得したElement配列
      */
-    getElementsByAttribute: function (attribute, value) {},
+    getElementsByAttribute: function (attribute, value) {
+        return this._searcher.getElementsByAttribute(attribute, value);
+    },
 
     /**
      * このElement内から指定プロパティが指定値のHTML要素を取得する<br />
@@ -19153,7 +19570,9 @@ Jeeel.Dom.Element.prototype = {
      * @param {Mixied} value プロパティ値('*'を指定すると任意の値の意味になる)
      * @return {Element[]} 取得したElement配列
      */
-    getElementsByProperty: function (property, value) {},
+    getElementsByProperty: function (property, value) {
+        return this._searcher.getElementsByProperty(property, value);
+    },
     
     /**
      * このElement内部に絞り込みを掛ける<br />
@@ -19161,8 +19580,11 @@ Jeeel.Dom.Element.prototype = {
      *
      * @param {String} selector CSSと同じ絞り込みセレクタ
      * @return {Element[]} 絞り込んだElement配列
+     * @ignore
      */
-    getElementsBySelector: function (selector) {},
+    getElementsBySelector: function (selector) {
+        return this._searcher.getElementsBySelector(selector);
+    },
     
     /**
      * このElement内のHTML要素を指定範囲検索する
@@ -20122,164 +20544,18 @@ Jeeel.Dom.Element.prototype = {
     constructor: Jeeel.Dom.Element,
     
     _init: function () {
-        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
-        var txt = Jeeel.Dom.Node.TEXT_NODE;
-        
         if ( ! Jeeel._doc) {
             delete this._init;
             return;
         }
         
+        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        var txt = Jeeel.Dom.Node.TEXT_NODE;
         var div = (Jeeel.Document || Jeeel._doc).createElement('div');
         
-        var _first, _id, _name, _tag, _reg, _s, _attr, _prop, _value, _option, _rect;
-        var uf = new Jeeel.Filter.Array.Unique(true, true);
-        var rf = new Jeeel.Filter.RegularExpressionEscape();
+        var _first, _option, _rect;
         var ef = new Jeeel.Filter.Html.Escape(true);
         var slice = Array.prototype.slice;
-        
-        function _searchId(target) {
-
-            if ( ! _first && target.id === _id) {
-                return target;
-            }
-            
-            _first = false;
-
-            var tmp, child = target.firstChild;
-
-            while(child) {
-
-                if (child.nodeType === nodeType) {
-                    tmp = _searchId(child);
-
-                    if (tmp) {
-                        return tmp;
-                    }
-                }
-
-                child = child.nextSibling;
-            }
-
-            return null;
-        }
-        
-        function _searchClass(res, target) {
-
-            if ( ! _first && target.className.match(_reg)) {
-                res[res.length] = target;
-            }
-            
-            _first = false;
-
-            var child = target.firstChild;
-
-            while(child) {
-
-                if (child.nodeType === nodeType) {
-                    _searchClass(res, child);
-                }
-
-                child = child.nextSibling;
-            }
-        }
-        
-        function _searchName(res, target) {
-            var name = target.name;
-              
-            if ( ! _first && name) {
-                if (_s) {
-                    if (name.match(_reg)) {
-                        res[res.length] = target;
-                    }
-                } else {
-                    if (name === _name) {
-                        res[res.length] = target;
-                    }
-                }
-            }
-            
-            _first = false;
-
-            var child = target.firstChild;
-
-            while(child) {
-
-                if (child.nodeType === nodeType) {
-                    _searchName(res, child);
-                }
-
-                child = child.nextSibling;
-            }
-        }
-        
-        function _searchTag(res, target) {
-
-            if ( ! _first && target.nodeName.toUpperCase() === _tag) {
-                res[res.length] = target;
-            }
-            
-            _first = false;
-
-            var child = target.firstChild;
-
-            while(child) {
-
-                if (child.nodeType === nodeType) {
-                    _searchTag(res, child);
-                }
-
-                child = child.nextSibling;
-            }
-        }
-        
-        function _searchAttr(res, target) {
-
-            if ( ! _first && target.getAttribute) {
-                var val = target.getAttribute(_attr);
-
-                if ((val && _value === '*') || val === _value) {
-                    res[res.length] = target;
-                }
-            }
-            
-            _first = false;
-
-            var child = target.firstChild;
-
-            while(child) {
-
-                if (child.nodeType === nodeType) {
-                    _searchAttr(res, child);
-                }
-
-                child = child.nextSibling;
-            }
-        }
-        
-        function _searchProp(res, target) {
-
-            if ( ! _first && _prop in target) {
-                var val = target[_prop];
-
-                if (_value === '*' || val == _value) {
-                    res[res.length] = target;
-                }
-            }
-            
-            _first = false;
-
-            var child = target.firstChild;
-
-            while(child) {
-
-                if (child.nodeType === nodeType) {
-                    _searchProp(res, child);
-                }
-
-                child = child.nextSibling;
-            }
-        }
         
         function _searchRange(res, target) {
             var trect = Jeeel.Dom.Element.create(target).getRect();
@@ -20319,159 +20595,6 @@ Jeeel.Dom.Element.prototype = {
         
         var self = this;
 
-        self.getElementById = function (id) {
-            if ( ! id) {
-                return null;
-            }
-
-            _id = id;
-            _first = true;
-
-            return _searchId(this._element);
-        };
-        
-        if (div.getElementsByClassName) {
-            self.getElementsByClassName = function (className) {
-                var tmp = this._element.getElementsByClassName(className);
-
-                return Jeeel.Hash.toArray(tmp);
-            };
-        } else {
-            self.getElementsByClassName = function (className) {
-                if ( ! className) {
-                    return [];
-                }
-
-                _first = true;
-                _reg = new RegExp('(^| )' + className + '( |$)', 'i');
-                var res = [];
-
-                _searchClass(res, this._element);
-
-                return res;
-            };
-        }
-        
-        if (div.getElementsByName) {
-            self.getElementsByName = function (name, submitSearch) {
-
-                if ( ! name) {
-                    return [];
-                }
-
-                _s = !!submitSearch;
-
-                if (_s) {
-                    _first = true;
-                    _reg = new RegExp('^' + rf.filter(name) + '($|\\[)');
-                } else {
-                    var tmp = this._element.getElementsByName(name);
-
-                    return Jeeel.Hash.toArray(tmp);
-                }
-
-                var res = [];
-
-                _searchName(res, this._element);
-
-                 return res;
-            };
-        } else {
-            self.getElementsByName = function (name, submitSearch) {
-
-                if ( ! name) {
-                    return [];
-                }
-
-                _first = true;
-                _s = !!submitSearch;
-
-                if (_s) {
-                    _reg = new RegExp('^' + rf.filter(name) + '($|\\[)');
-                } else {
-                    _name = name;
-                }
-
-                var res = [];
-
-                _searchName(res, this._element);
-
-                 return res;
-            };
-        }
-        
-        if (div.getElementsByTagName) {
-            self.getElementsByTagName = function (tagName) {
-                var tmp = this._element.getElementsByTagName(tagName);
-
-                return Jeeel.Hash.toArray(tmp);
-            };
-        } else {
-            self.getElementsByTagName = function (tagName) {
-
-                if ( ! tagName) {
-                    return [];
-                }
-
-                _first = true;
-                _tag = tagName.toUpperCase();
-
-                var res = [];
-
-                _searchTag(res, this._element);
-
-                return res;
-            };
-        }
-        
-        self.getElementsByAttribute = function (attribute, value) {
-            if ( ! attribute) {
-                return [];
-            }
-            
-            _first = true;
-            _attr = attribute;
-            _value = value;
-
-            var res = [];
-
-            _searchAttr(res, this._element);
-
-            return res;
-        };
-        
-        self.getElementsByProperty = function (property, value) {
-            if ( ! property) {
-                return [];
-            }
-            
-            _first = true;
-            _prop = property;
-            _value = value;
-
-            var res = [];
-
-            _searchProp(res, this._element);
-
-            return res;
-        };
-        
-        if (div.querySelectorAll) {
-            self.getElementsBySelector = function (selector) {
-                var tmp = this._element.querySelectorAll(selector);
-
-                return slice.call(tmp, 0, tmp.length);
-            };
-        } else {
-            self.getElementsBySelector = function (selector) {
-                if ( ! selector) {
-                    return [];
-                }
-
-                return [];
-            };
-        }
-        
         self.searchElementsByRange = function (rect, option) {
             if ( ! rect) {
                 return [];
@@ -20554,7 +20677,7 @@ Jeeel.Dom.Element.prototype = {
             
         } else {
             self.getClassNames = function () {
-                return this._element.className.split(' ');
+                return this._element.className.split(/\s+/);
             };
             
             self.addClassName = function (className) {
@@ -22488,7 +22611,7 @@ Jeeel.Dom.ElementOperator.prototype = {
     /**
      * 全ての要素の子リストから指定ClassのHTML要素を取得する
      *
-     * @param {String} className 検索Class
+     * @param {String|String[]} className 検索Class
      * @return {Jeeel.Dom.ElementOperator} 取得したElement配列ラッパー
      */
     $CLASS: function (className) {
@@ -22517,7 +22640,7 @@ Jeeel.Dom.ElementOperator.prototype = {
      * この動作は一部本来のgetElementsByNameと違い、<br />
      * c[]等で配列指定した値に対してもヒットする
      *
-     * @param {String} name 検索Name
+     * @param {String|String[]} name 検索Name
      * @param {Boolean} [submitSearch] 送信時と同じようにc[]等の配列指定をヒットさせるかどうか(初期値はfalse)
      * @return {Jeeel.Dom.ElementOperator} 取得したElement配列ラッパー
      */
@@ -22544,7 +22667,7 @@ Jeeel.Dom.ElementOperator.prototype = {
     /**
      * 全ての要素の子リストから指定TagのHTML要素を取得する
      *
-     * @param {String} tagName 検索Tag
+     * @param {String|String[]} tagName 検索Tag
      * @return {Jeeel.Dom.ElementOperator} 取得したElement配列ラッパー
      */
     $TAG: function (tagName) {
@@ -23104,7 +23227,7 @@ Jeeel.Dom.ElementOperator.prototype = {
 
             if (submitSearch) {
                 for (var i = name.length; i--;) {
-                    name[i] = new RegExp('^' + ref.filter(name[i]) + '($|\\[)');
+                    name[i] = new RegExp('^' + ref.filter(name[i]) + '(?:$|\\[)');
                 }
 
                 res = this._each(
@@ -23142,7 +23265,7 @@ Jeeel.Dom.ElementOperator.prototype = {
 
             if (submitSearch) {
                 for (var i = name.length; i--;) {
-                    name[i] = new RegExp('^' + ref.filter(name[i]) + '($|\\[)');
+                    name[i] = new RegExp('^' + ref.filter(name[i]) + '(?:$|\\[)');
                 }
 
                 res = this._each(
@@ -23463,7 +23586,7 @@ Jeeel.Net.Submit.UNKNOWN_NAME = '_UNKNOWN_';
  * @constant
  * @memberOf Jeeel.Net.Submit
  */
-Jeeel.Net.Submit.OVERWRITE_NAME = '_OVERWRITE_';
+Jeeel.Net.Submit.OVERWRITTEN_NAME = '_OVERWRITE_';
 
 Jeeel.Net.Submit.prototype = {
 
@@ -23642,7 +23765,7 @@ Jeeel.Net.Submit.prototype = {
                 param = param[names[i]];
             }
             
-            key = names[names.length-1];
+            key = names[l];
         }
         
         param = param[key];
@@ -23675,7 +23798,7 @@ Jeeel.Net.Submit.prototype = {
                 param = param[names[i]];
             }
             
-            key = names[names.length-1];
+            key = names[l];
         }
         
         param = param[key];
@@ -23712,7 +23835,7 @@ Jeeel.Net.Submit.prototype = {
                 obj = obj[names[i]];
             }
             
-            obj[names[names.length-1]] = val;
+            obj[names[l]] = val;
             
             key = names[0];
             val = base[key];
@@ -23720,7 +23843,7 @@ Jeeel.Net.Submit.prototype = {
         
         var input = this.getElementAll()[key];
         
-        Jeeel.Dom.ElementOperator.create(this.getOverwriteElements())
+        Jeeel.Dom.ElementOperator.create(this.getOverwrittenElements())
                                .filterName(key, true)
                                .remove();
 
@@ -23755,7 +23878,7 @@ Jeeel.Net.Submit.prototype = {
      * @return {Jeeel.Net.Submit} 自インスタンス
      */
     unset: function (key) {
-        Jeeel.Dom.ElementOperator.create([this.getElement(key), this.getOverwriteElements()])
+        Jeeel.Dom.ElementOperator.create([this.getElement(key), this.getOverwrittenElements()])
                                .filterName(key, true)
                                .removeAttr('name');
         
@@ -23789,7 +23912,7 @@ Jeeel.Net.Submit.prototype = {
                 param = param[names[i]];
             }
             
-            key = names[names.length-1];
+            key = names[l];
         }
         
         param = param[key];
@@ -23799,7 +23922,7 @@ Jeeel.Net.Submit.prototype = {
 
     /**
      * form内の全てのinput要素を取得する<br />
-     * その際checkedが付いていないradioボタンやcheckboxは無視される
+     * その際radioボタンは常にリストになる
      * 
      * @return {Hash} input要素のリスト
      */
@@ -23825,19 +23948,55 @@ Jeeel.Net.Submit.prototype = {
      * </form>
      * 上記のformの場合最初から2つのhogeの要素が取得される
      */
-    getOverwriteElements: function () {},
+    getOverwrittenElements: function () {},
     
     /**
-     * 指定キーのinput要素を破棄する<br />
-     * その際checkedが付いていないradioボタンやcheckboxは無視される
+     * 指定キーのinput要素を破棄する
      *
      * @param {String} key キー
      * @return {Jeeel.Net.Submit} 自インスタンス
      */
     unsetElement: function (key) {
-        Jeeel.Dom.ElementOperator.create([this.getElement(key), this.getOverwriteElements()])
+        Jeeel.Dom.ElementOperator.create([this.getElement(key), this.getOverwrittenElements()])
                                .filterName(key, true)
                                .remove();
+        
+        return this;
+    },
+    
+    /**
+     * selectタグのoptionを指定した値に全て置き換える
+     * 
+     * @param {String} key selectタグのname
+     * @param {Hash} options オプションの値に使う値と表示値のリスト({value1: text1, value2: text2, ...})
+     * @return {Jeeel.Net.Submit} 自インスタンス
+     */
+    replaceSelectOptions: function (key, options) {
+        var select = this.getElement(key),
+            nodeName = select && select.nodeName;
+        
+        if ( ! nodeName || nodeName.toUpperCase() !== 'SELECT') {
+            return this;
+        } else if ( ! Jeeel.Type.isHash(options)) {
+            return this;
+        }
+        
+        select = new Jeeel.Dom.Element(select);
+        
+        var addOptions = [],
+            txtFilter = Jeeel.Filter.Html.Escape.create(),
+            val, option;
+        
+        for (val in options) {
+            option = Jeeel.Document.createElement('option');
+            option.value = val;
+            option.innerHTML = txtFilter.filter(options[val]);
+            
+            addOptions[addOptions.length] = option;
+        }
+        
+        select.clearChildNodes()
+              .appendChild(addOptions);
         
         return this;
     },
@@ -23875,7 +24034,7 @@ Jeeel.Net.Submit.prototype = {
     
     _init: function () {
         var uName = Jeeel.Net.Submit.UNKNOWN_NAME;
-        var oName = Jeeel.Net.Submit.OVERWRITE_NAME;
+        var oName = Jeeel.Net.Submit.OVERWRITTEN_NAME;
         var fnvf = new Jeeel.Filter.Html.FormValue();
         var fdvf = new Jeeel.Filter.Html.FormValue(true);
         var fnef = new Jeeel.Filter.Html.Form();
@@ -23903,7 +24062,7 @@ Jeeel.Net.Submit.prototype = {
             return Jeeel.Hash.getValues(parm || []);
         };
         
-        self.getOverwriteElements = function () {
+        self.getOverwrittenElements = function () {
             return foef.filter(this._pseudoForm || this._form)[oName];
         };
         
@@ -25804,7 +25963,7 @@ Jeeel.Net.Jsonp.prototype = {
     execute: function () {
         var url = this._url + '?' + this._params.toQueryString();
         
-        this._script = Jeeel.Import.importScript(url, this._loaded);
+        this._script = Jeeel.Loader.loadScript(url, this._loaded);
          
         return this;
     },
@@ -33863,7 +34022,7 @@ Jeeel.Gui.Abstract.prototype = {
     loadStyle: function (url) {
         Jeeel.Dom.Element.create(this._styleTag).remove();
         
-        this._styleTag = Jeeel.Import.importStyle(url);
+        this._styleTag = Jeeel.Loader.loadStyle(url);
         
         return this;
     },
@@ -33876,7 +34035,7 @@ Jeeel.Gui.Abstract.prototype = {
     resetStyle: function () {
         Jeeel.Dom.Element.create(this._styleTag).remove();
         
-        this._styleTag = Jeeel.Import.addStyle(this._defaultStyle);
+        this._styleTag = Jeeel.Loader.addStyle(this._defaultStyle);
         
         return this;
     }
@@ -33960,7 +34119,7 @@ Jeeel.Gui.Tooltip.initStyle = function () {
                + '}\n';
     }
 
-    this._styleTag = Jeeel.Import.addStyle(style);
+    this._styleTag = Jeeel.Loader.addStyle(style);
 };
 
 /**
@@ -34297,7 +34456,7 @@ Jeeel.Gui.ColorPicker.initStyle = function () {
               + '  font-size: 10px;\n'
               + '}';
 
-    this._styleTag = Jeeel.Import.addStyle(style);
+    this._styleTag = Jeeel.Loader.addStyle(style);
 };
 
 /**
@@ -35268,7 +35427,7 @@ Jeeel.Gui.Scrollbar.Vertical.initStyle = function () {
               + '  background-color: #D6E7FF;\n'
               + '}';
 
-    this._styleTag = Jeeel.Import.addStyle(style);
+    this._styleTag = Jeeel.Loader.addStyle(style);
 };
 
 Jeeel.Gui.Scrollbar.Vertical.prototype = {
@@ -35626,7 +35785,7 @@ Jeeel.Gui.Scrollbar.Horizontal.initStyle = function () {
               + '  background-color: #D6E7FF;\n'
               + '}';
 
-    this._styleTag = Jeeel.Import.addStyle(style);
+    this._styleTag = Jeeel.Loader.addStyle(style);
 };
 
 Jeeel.Gui.Scrollbar.Horizontal.prototype = {
@@ -36100,7 +36259,7 @@ Jeeel.Gui.Calendar._initStyle = function () {
             + '}\n';
 
     this._defaultStyle = css;
-    this._styleTag = Jeeel.Import.addStyle(css);
+    this._styleTag = Jeeel.Loader.addStyle(css);
 };
 
 Jeeel.Gui.Calendar.prototype = {
@@ -41654,7 +41813,7 @@ Jeeel.Debug.ObjectExpander._createCss = function () {
             + '    padding: 0 0 2px 0;\n'
             + '}';
 
-    Jeeel.Import.addStyle(css);
+    Jeeel.Loader.addStyle(css);
 };
 
 Jeeel.Debug.ObjectExpander.prototype = {
@@ -42473,7 +42632,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
      */
     _markupElement: function (element, target) {
         var foreground = Jeeel.Document.createElement('div');
-        var foregroundStyle = Jeeel.Dom.Style.create(foreground.style);
+        var foregroundStyle = Jeeel.Dom.Style.create(foreground);
         var elementStyle = element.style;
         
         Jeeel.Dom.Event.disableMouseEvent(foreground);
@@ -43564,15 +43723,16 @@ Jeeel.Debug.Console = {
                 + '    top: 40px;\n'
                 + '    overflow-x: hidden;\n'
                 + '    overflow-y: auto;\n'
+                + '    background-color: white;\n'
                 + '    max-height: 210px;\n'
+                + '    _height: 210px;\n'
                 + '}\n'
                 + 'div#' + this.CONSOLE_CODE_ASSIST_ID + ' div {\n'
-                + '    background-color: white;\n'
                 + '    padding: 2px;\n'
                 + '    cursor: pointer;\n'
                 + '}';
 
-        Jeeel.Import.addStyle(css);
+        Jeeel.Loader.addStyle(css);
     },
 
     /**
@@ -43908,7 +44068,7 @@ Jeeel.Debug.Console = {
                 divs[i] = div;
             }
 
-            caData.winChild = Jeeel.Dom.ElementOperator.create(divs);
+            caData.winChild = new Jeeel.Dom.ElementOperator(divs);
 
             elm.appendChild(divs);
             this._codeAssistWindowShow();
@@ -45762,14 +45922,6 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Debug.Debugger, Jeeel.file.Jeeel.Debug.
         if (state.match(/loaded|complete/) && ((Jeeel.Object || {}).Technical || {}).Information) {
             if (Jeeel === window.Jeeel) {
                 Jeeel.Debug.Debugger.setInformation(Jeeel, 'Jeeel', true, window);
-            }
-            
-            if (Jeeel.HOST && Jeeel.HOST.match(/^https?:\/\//)) {
-                var host = Jeeel.Filter.RegularExpressionEscape.create().filter(Jeeel.UserAgent.getProtocol() + '://' + Jeeel.UserAgent.getHost());
-
-                if ( ! Jeeel.HOST.match(new RegExp('^' + host))) {
-                    Jeeel.CROSS_DOMAIN = true;
-                }
             }
         } else {
             setTimeout(arguments.callee, 1);

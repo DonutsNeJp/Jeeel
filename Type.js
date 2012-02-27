@@ -426,6 +426,10 @@ Jeeel.Type = {
      * @return {Boolean} 判定結果
      */
     isNumeric: function (val) {
+        if ( ! val && val !== 0) {
+            return false;
+        }
+      
         val = +val;
         
         return ! (isNaN(val) || val === -Infinity || val === Infinity);
@@ -438,6 +442,10 @@ Jeeel.Type = {
      * @return {Boolean} 判定結果
      */
     isDigit: function (val) {
+        if ( ! val && val !== 0) {
+            return false;
+        }
+        
         return this.isInteger(+val);
     },
     

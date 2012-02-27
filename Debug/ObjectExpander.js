@@ -153,7 +153,7 @@ Jeeel.Debug.ObjectExpander._createCss = function () {
             + '    padding: 0 0 2px 0;\n'
             + '}';
 
-    Jeeel.Import.addStyle(css);
+    Jeeel.Loader.addStyle(css);
 };
 
 Jeeel.Debug.ObjectExpander.prototype = {
@@ -972,7 +972,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
      */
     _markupElement: function (element, target) {
         var foreground = Jeeel.Document.createElement('div');
-        var foregroundStyle = Jeeel.Dom.Style.create(foreground.style);
+        var foregroundStyle = Jeeel.Dom.Style.create(foreground);
         var elementStyle = element.style;
         
         Jeeel.Dom.Event.disableMouseEvent(foreground);

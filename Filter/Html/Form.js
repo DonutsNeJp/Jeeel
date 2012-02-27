@@ -3,13 +3,13 @@
  * コンストラクタ
  *
  * @class Html要素毎に内部のinputをまとめあげる(送信時のパラメータのようにnameで区分け)<br />
- *         その際無効なinputは無視する(checkedが付いていないradioボタンやcheckbox、選択されていないselectbox)
+ *         その際radioボタンは強制的にリストになる
  * @augments Jeeel.Filter.Abstract
  * @param {Boolean} [useDefaultValue] trueにすると現在値でなくデフォルト値を参照して纏め上げる
  * @param {String} [unknownName] 名前のついていないinputに使用する名前(デフォルトは無視する)
- * @param {String} [overwriteName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はElement[]になる)
+ * @param {String} [overwrittenName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はElement[]になる)
  */
-Jeeel.Filter.Html.Form = function (useDefaultValue, unknownName, overwriteName) {
+Jeeel.Filter.Html.Form = function (useDefaultValue, unknownName, overwrittenName) {
 
     Jeeel.Filter.Abstract.call(this);
     
@@ -19,7 +19,7 @@ Jeeel.Filter.Html.Form = function (useDefaultValue, unknownName, overwriteName) 
         this._unknownName = unknownName + '[]';
     }
     
-    this._overwriteName = overwriteName || null;
+    this._overwrittenName = overwrittenName || null;
 };
 
 /**
@@ -27,11 +27,11 @@ Jeeel.Filter.Html.Form = function (useDefaultValue, unknownName, overwriteName) 
  *
  * @param {Boolean} [useDefaultValue] trueにすると現在値でなくデフォルト値を参照して纏め上げる
  * @param {String} [unknownName] 名前のついていないinputに使用する名前(デフォルトは無視する)
- * @param {String} [overwriteName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はElement[]になる)
+ * @param {String} [overwrittenName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はElement[]になる)
  * @return {Jeeel.Filter.Html.Form} 作成したインスタンス
  */
-Jeeel.Filter.Html.Form.create = function (useDefaultValue, unknownName, overwriteName) {
-    return new this(useDefaultValue, unknownName, overwriteName);
+Jeeel.Filter.Html.Form.create = function (useDefaultValue, unknownName, overwrittenName) {
+    return new this(useDefaultValue, unknownName, overwrittenName);
 };
 
 Jeeel.Filter.Html.Form.prototype = {
@@ -40,7 +40,7 @@ Jeeel.Filter.Html.Form.prototype = {
     
     _unknownName: '',
     
-    _overwriteName: null,
+    _overwrittenName: null,
     
     _avoidValues: [],
     
@@ -52,13 +52,7 @@ Jeeel.Filter.Html.Form.prototype = {
             throw new Error('Elementではない要素を含んでいます。');
         }
 
-        val = Jeeel.Dom.Element.create(val);
-
-        var inputs = val.getElementsByTagName('input');
-
-        inputs = inputs.concat(val.getElementsByTagName('select'));
-        inputs = inputs.concat(val.getElementsByTagName('textarea'));
-        inputs = inputs.concat(val.getElementsByTagName('button'));
+        var inputs = this._getInputs(val);
 
         var res = {}, name;
         
@@ -75,8 +69,8 @@ Jeeel.Filter.Html.Form.prototype = {
             this._setParams(res, name, inputs[i]);
         }
         
-        if (this._overwriteName) {
-            res[this._overwriteName] = this._avoidValues;
+        if (this._overwrittenName) {
+            res[this._overwrittenName] = this._avoidValues;
         }
 
         return res;
@@ -104,6 +98,8 @@ Jeeel.Filter.Html.Form.prototype = {
         return res;
     },
     
+    _getInputs: Jeeel._Object.JeeelFilter.getInputs,
+
     _getName: Jeeel._Object.JeeelFilter.getInputName,
     
     _repairName: Jeeel._Object.JeeelFilter.repairInputName,
@@ -138,16 +134,8 @@ Jeeel.Filter.Html.Form.prototype = {
     
     _setParams: function (res, name, element) {
 
-        if (element.tagName.toLowerCase() === 'input') {
-            if (element.type.toLowerCase() === 'checkbox' && ! this._getProp(element, 'checked')) {
-                return;
-            } else if (element.type.toLowerCase() === 'radio' && ! this._getProp(element, 'checked')) {
-                return;
-            }
-        } else if (element.tagName.toLowerCase() === 'select') {
-            if (element.selectedIndex < 0) {
-                return;
-            }
+        if (element.tagName.toUpperCase() === 'INPUT' && element.type.toLowerCase() === 'radio') {
+            name = name + '[]';
         }
 
         var key, names = this._getName(name);

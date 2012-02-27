@@ -128,7 +128,10 @@ Jeeel.Dom.Style.prototype = {
      * @return {String} スタイル値
      */
     getStyle: function (style) {
-        return (this._computedStyle || this._style)[Jeeel.String.toCamelCase(style)];
+        style = Jeeel.String.toCamelCase(style);
+        
+        // まず通常のスタイルを参照し、存在しないスタイルは計算済みスタイルから参照する
+        return this._style[style] || this._computedStyle[style];
     },
 
     /**
@@ -151,9 +154,13 @@ Jeeel.Dom.Style.prototype = {
      * @return {Jeeel.Dom.Style} 自インスタンス
      */
     setStyleList: function (styles) {
+        var cssText = [];
+        
         for (var style in styles) {
-            this._style[Jeeel.String.toCamelCase(style)] = styles[style];
+            cssText[cssText.length] = Jeeel.String.toHyphenation(style) + ': ' + styles[style] + ';';
         }
+        
+        this._style.cssText += '; ' + cssText.join('');
         
         return this;
     },

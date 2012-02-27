@@ -2,7 +2,7 @@
 /**
  * 読み込み関連のメソッドを提供するModule
  */
-Jeeel.Import = {
+Jeeel.Loader = {
 
     /**
      * Prototype.jsが読み込まれているかどうかを返す。
@@ -52,7 +52,7 @@ Jeeel.Import = {
      * @return {Element} scriptタグのElement
      * @see Jeeel.Code.CharEncoding
      */
-    importScript: function (url, callback, charCode) {
+    loadScript: function (url, callback, charCode) {
         var script  = Jeeel.Document.createElement('script');
         script.type = 'text/javascript';
 
@@ -91,7 +91,7 @@ Jeeel.Import = {
      * @return {Element} linkタグのElement
      * @see Jeeel.Code.CharEncoding
      */
-    importStyle: function (url, charCode) {
+    loadStyle: function (url, charCode) {
         var style  = Jeeel.Document.createElement('link');
         style.type = 'text/css';
         style.rel  = 'stylesheet';
@@ -163,7 +163,7 @@ Jeeel.Import = {
     getCurrentScript: function () {
         return (
             function (e) {
-                return (e.nodeName.toLowerCase() == 'script' ? e : arguments.callee(e.lastChild));
+                return (e.nodeName.toLowerCase() === 'script' ? e : arguments.callee(e.lastChild));
             })(Jeeel._doc);
     },
 
@@ -204,4 +204,4 @@ Jeeel.Import = {
     }
 };
 
-Jeeel.Import._init();
+Jeeel.Loader._init();

@@ -18,6 +18,16 @@ Jeeel.Dom = {
 
 };
 
-Jeeel.file.Jeeel.Dom = ['Node', 'Window', 'Document', 'Xml', 'Event', 'Style', 'Element', 'ElementOperator', 'SearchOption'];
+Jeeel.file.Jeeel.Dom = ['Core', 'Node', 'Window', 'Document', 'Xml', 'Event', 'Style', 'Element', 'ElementOperator', 'SearchOption'];
 
-Jeeel._autoImports(Jeeel.directory.Jeeel.Dom, Jeeel.file.Jeeel.Dom);
+if (Jeeel._auto) {
+    Jeeel.Dom._tmp = function () {
+        for (var i = 1, l = Jeeel.file.Jeeel.Dom.length; i < l; i++) {
+            Jeeel._import(Jeeel.directory.Jeeel.Dom, Jeeel.file.Jeeel.Dom[i]);
+        }
+
+        delete Jeeel.Dom._tmp;
+    };
+
+    Jeeel._import(Jeeel.directory.Jeeel.Dom, Jeeel.file.Jeeel.Dom[0]);
+}

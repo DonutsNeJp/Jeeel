@@ -19,7 +19,7 @@
  *
  * @name Jeeel.js(Javascript Easy Error and Exception handling Library: Japanease Eeel)
  * @author Masato Shimada
- * @version 2.0.0β58
+ * @version 2.0.0β60
  * @license <a href="http://en.wikipedia.org/wiki/BSD_licenses">BSD License</a>
  */
 
@@ -59,7 +59,7 @@ var Jeeel = {
      * @type String
      * @constant
      */
-    VERSION: '2.0.0β58',
+    VERSION: '2.0.0β60',
     
     /**
      * Jeeelのscriptタグに付くclass名
@@ -67,7 +67,7 @@ var Jeeel = {
      * @type String
      * @constant
      */
-    SCRIPT_CLASS: 'JEEEL-SCRIPT-CLASS',
+    SCRIPT_CLASS: 'jeeel-script-class',
     
     /**
      * Jeeelのscriptタグに付くid名(実際にはこれにインデックス番号が付く)
@@ -75,7 +75,7 @@ var Jeeel = {
      * @type String
      * @constant
      */
-    SCRIPT_ID: 'JEEEL-SCRIPT-ID',
+    SCRIPT_ID: 'jeeel-script-id',
 
     /**
      * Jeeelファイルが置かれているホスト<br />
@@ -85,6 +85,15 @@ var Jeeel = {
      * @constant
      */
     HOST: '',
+
+    /**
+     * Jeeelファイルが置かれている相対URL<br />
+     * 通常は指定しなくても良い
+     *
+     * @type String
+     * @constant
+     */
+    BASE_URL: '',
     
     /**
      * クロスドメインかどうか
@@ -93,15 +102,7 @@ var Jeeel = {
      * @constant
      */
     CROSS_DOMAIN: false,
-
-    /**
-     * Jeeelファイルが置かれている相対URL
-     *
-     * @type String
-     * @constant
-     */
-    BASE_URL: '/st/js/',
-
+    
     /**
      * サーバー側のevalを使用できる相対URL<br />
      * 以下のパラメータを受け取り実行した後結果を返す機能をサーバーに実装
@@ -705,29 +706,55 @@ Jeeel.directory.Jeeel = {
     }
 };
 
-if (Jeeel._global && Jeeel._debugMode) {
-    Jeeel._global.onerror = Jeeel._error;
-}
-
 (function () {
-    if ( ! Jeeel._doc) {
-        return;
+    
+    // 基本デバッグの有効化
+    if (Jeeel._global && Jeeel._debugMode) {
+        Jeeel._global.onerror = Jeeel._error;
     }
     
-    var scripts = Jeeel._doc.getElementsByTagName('script');
-    var script  = scripts[scripts.length - 1];
-    script.className = Jeeel.SCRIPT_CLASS;
-    script.id = Jeeel.SCRIPT_ID + '-0';
-})();
+    // クロスドメインの判定
+    if (Jeeel.HOST && Jeeel.HOST.match(/^https?:\/\//) && typeof location !== 'undefined') {
+        var host = (location.protocol + '//' + location.host).replace(/([\/()\[\]{}|*+-.,\^$?\\])/g, '\\$1');
 
-(function () {
+        if ( ! Jeeel.HOST.match(new RegExp('^' + host))) {
+            Jeeel.CROSS_DOMAIN = true;
+        }
+    }
+    
+    // ユニークIDを設定する
     Jeeel.UNIQUE_ID = 'Jeeel-' + (Jeeel.VERSION + Math.random()).replace(/\D/g, '');
+    Jeeel.SCRIPT_ID = Jeeel.SCRIPT_ID + '-' + Jeeel.UNIQUE_ID;
+    
+    // ベースURLとクラス、IDの設定
+    if (Jeeel._doc) {
+        
+        var scripts = Jeeel._doc.getElementsByTagName('script');
+        var jeeelRegExp = /^(.*)\/Jeeel\/\w+\.js(.*)$/i,
+            jeeelMatch;
+
+        for (var i = scripts.length; i--;) {
+            var script = scripts[i],
+                src = script.getAttribute('src');
+
+            if ( ! src || ! (jeeelMatch = src.match(jeeelRegExp))) {
+                continue;
+            }
+
+            Jeeel.BASE_URL = jeeelMatch[1] + '/';
+
+            script.className = Jeeel.SCRIPT_CLASS;
+            script.id = Jeeel.SCRIPT_ID + '-0';
+
+            break;
+        }
+    }
     
     if (Jeeel._global) {
         Jeeel._global.Jeeel = Jeeel;
     }
     
-    Jeeel.file.Jeeel = ['Class', 'Filter', 'Type', 'Method', 'Hash', 'String', 'Number', 'Code', 'Import', 'Function', 'UserAgent', 'Json', 'Session', 'Dom', 'Net', 'Evaluator', 'Template', 'Timer', 'DataStructure', 'Object', 'Parameter', 'Validator', 'Storage', 'Namespace', 'External', 'Deferred', 'Framework', 'Config', 'Util'];
+    Jeeel.file.Jeeel = ['Class', 'Filter', 'Type', 'Method', 'Hash', 'String', 'Number', 'Code', 'Loader', 'Function', 'UserAgent', 'Json', 'Session', 'Dom', 'Net', 'Evaluator', 'Template', 'Timer', 'DataStructure', 'Object', 'Parameter', 'Validator', 'Storage', 'Namespace', 'External', 'Deferred', 'Framework', 'Config', 'Util'];
    
     if (Jeeel._extendMode.Gui && Jeeel._doc) {
         Jeeel.file.Jeeel[Jeeel.file.Jeeel.length] = 'Gui';
@@ -761,6 +788,7 @@ if (Jeeel._global && Jeeel._debugMode) {
         Jeeel.file.Jeeel[Jeeel.file.Jeeel.length] = 'Debug';
     }
 
+    // 自動ロードを始動
     if (Jeeel._auto) {
         Jeeel._tmp = function () {
             for (var i = 4, l = Jeeel.file.Jeeel.length; i < l; i++) {
@@ -777,6 +805,7 @@ if (Jeeel._global && Jeeel._debugMode) {
     }
 })();
 
+// グローバル関数・変数の設定
 (function () {
     if ( ! Jeeel._global) {
         return;

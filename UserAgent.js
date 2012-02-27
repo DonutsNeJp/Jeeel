@@ -363,7 +363,7 @@ Jeeel.UserAgent = {
                 Jeeel.Timer.setTimeout(function () {
                     var style = 'v\\:* { behavior: url(#default#VML); }';
 
-                    self._tag = Jeeel.Import.addStyle(style);
+                    self._tag = Jeeel.Loader.addStyle(style);
                 }, 1);
             }
         } else {

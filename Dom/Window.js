@@ -282,7 +282,8 @@ Jeeel.Dom.Window.prototype = {
             return;
         }
         
-        var self = this;
+        var self = this,
+            body;
         
         if (win.innerWidth) {
             self.getWindowSize = function () {
@@ -300,7 +301,7 @@ Jeeel.Dom.Window.prototype = {
             self.getWindowSize = function () {
                 var root = this._document.getDocumentElement();
 
-                return new Jeeel.Object.Size(root.clientWidth, root.clientWidth);
+                return new Jeeel.Object.Size(root.clientWidth, root.clientHeight);
             };
             
             self.getScrollPosition = function () {
@@ -308,11 +309,11 @@ Jeeel.Dom.Window.prototype = {
                 
                 return new Jeeel.Object.Point(root.scrollLeft, root.scrollTop);
             };
-        } else if (doc.body.clientWidth) {
+        } else if ((body = doc.body || doc.createElement('body')) && 'clientWidth' in body) {
             self.getWindowSize = function () {
                 var root = this._document.getBody();
 
-                return new Jeeel.Object.Size(root.clientWidth, root.clientWidth);
+                return new Jeeel.Object.Size(root.clientWidth, root.clientHeight);
             };
             
             self.getScrollPosition = function () {

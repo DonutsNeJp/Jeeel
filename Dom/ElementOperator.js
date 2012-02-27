@@ -1109,7 +1109,7 @@ Jeeel.Dom.ElementOperator.prototype = {
     /**
      * 全ての要素の子リストから指定ClassのHTML要素を取得する
      *
-     * @param {String} className 検索Class
+     * @param {String|String[]} className 検索Class
      * @return {Jeeel.Dom.ElementOperator} 取得したElement配列ラッパー
      */
     $CLASS: function (className) {
@@ -1138,7 +1138,7 @@ Jeeel.Dom.ElementOperator.prototype = {
      * この動作は一部本来のgetElementsByNameと違い、<br />
      * c[]等で配列指定した値に対してもヒットする
      *
-     * @param {String} name 検索Name
+     * @param {String|String[]} name 検索Name
      * @param {Boolean} [submitSearch] 送信時と同じようにc[]等の配列指定をヒットさせるかどうか(初期値はfalse)
      * @return {Jeeel.Dom.ElementOperator} 取得したElement配列ラッパー
      */
@@ -1165,7 +1165,7 @@ Jeeel.Dom.ElementOperator.prototype = {
     /**
      * 全ての要素の子リストから指定TagのHTML要素を取得する
      *
-     * @param {String} tagName 検索Tag
+     * @param {String|String[]} tagName 検索Tag
      * @return {Jeeel.Dom.ElementOperator} 取得したElement配列ラッパー
      */
     $TAG: function (tagName) {
@@ -1725,7 +1725,7 @@ Jeeel.Dom.ElementOperator.prototype = {
 
             if (submitSearch) {
                 for (var i = name.length; i--;) {
-                    name[i] = new RegExp('^' + ref.filter(name[i]) + '($|\\[)');
+                    name[i] = new RegExp('^' + ref.filter(name[i]) + '(?:$|\\[)');
                 }
 
                 res = this._each(
@@ -1763,7 +1763,7 @@ Jeeel.Dom.ElementOperator.prototype = {
 
             if (submitSearch) {
                 for (var i = name.length; i--;) {
-                    name[i] = new RegExp('^' + ref.filter(name[i]) + '($|\\[)');
+                    name[i] = new RegExp('^' + ref.filter(name[i]) + '(?:$|\\[)');
                 }
 
                 res = this._each(

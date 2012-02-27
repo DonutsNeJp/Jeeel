@@ -40,7 +40,7 @@ Jeeel.Gui.ContextMenu._initStyle = function () {
             + '}\n';
 
     this._defaultStyle = css;
-    this._styleTag = Jeeel.Import.addStyle(css);
+    this._styleTag = Jeeel.Loader.addStyle(css);
 };
 
 Jeeel.Gui.ContextMenu.prototype = {

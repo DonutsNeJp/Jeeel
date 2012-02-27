@@ -27,7 +27,7 @@ Jeeel.Gui.Abstract.prototype = {
     loadStyle: function (url) {
         Jeeel.Dom.Element.create(this._styleTag).remove();
         
-        this._styleTag = Jeeel.Import.importStyle(url);
+        this._styleTag = Jeeel.Loader.loadStyle(url);
         
         return this;
     },
@@ -40,7 +40,7 @@ Jeeel.Gui.Abstract.prototype = {
     resetStyle: function () {
         Jeeel.Dom.Element.create(this._styleTag).remove();
         
-        this._styleTag = Jeeel.Import.addStyle(this._defaultStyle);
+        this._styleTag = Jeeel.Loader.addStyle(this._defaultStyle);
         
         return this;
     }
