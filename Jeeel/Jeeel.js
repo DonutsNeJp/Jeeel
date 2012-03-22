@@ -27,7 +27,7 @@
  * @author Masato Shimada
  * @version 2.0.0β71
  * @license <a href="http://ja.wikipedia.org/wiki/MIT_License">MIT License</a>
- * @copylight (c) 2012 Masato Shimada
+ * @copylight (c) 2012 Donuts
  */
 
 // Jeeelが定義されていた場合バックアップを取ってから書き換えを行う

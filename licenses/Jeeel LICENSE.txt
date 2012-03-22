@@ -1,6 +1,7 @@
 ・English
 
-Copyright (c) 2012 Masato Shimada
+Copyright (c) 2012 Donuts
+Author Masato Shimada<shimada@donuts.ne.jp>
 The MIT License
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -13,7 +14,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ・日本語
 
-Copyright (c) 2012 嶋田 将人
+Copyright (c) 2012 Donuts
+Author 嶋田 将人<shimada@donuts.ne.jp>
 MITライセンスです。
 
 以下に定める条件に従い、本ソフトウェアおよび関連文書のファイル（以下「ソフトウェア」）の複製を取得するすべての人に対し、ソフトウェアを無制限に扱うことを無償で許可します。
