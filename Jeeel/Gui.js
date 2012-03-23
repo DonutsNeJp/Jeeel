@@ -18,6 +18,6 @@ Jeeel.Gui = {
     
 };
 
-Jeeel.file.Jeeel.Gui = ['Abstract', 'Tooltip'/*, 'ColorPicker'*/, 'Scrollbar', 'Calendar', 'Mouse'];
+Jeeel.file.Jeeel.Gui = ['Abstract', 'Tooltip', 'ColorPicker', 'Scrollbar', 'Calendar', 'Mouse'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Gui, Jeeel.file.Jeeel.Gui);

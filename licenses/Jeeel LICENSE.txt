@@ -1,6 +1,6 @@
 ・English
 
-Copyright (c) 2012 Donuts
+Copyright (c) 2012 Donuts, Masato Shimada
 Author Masato Shimada<shimada@donuts.ne.jp>
 The MIT License
 
@@ -14,7 +14,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ・日本語
 
-Copyright (c) 2012 Donuts
+Copyright (c) 2012 Donuts, 嶋田 将人
 Author 嶋田 将人<shimada@donuts.ne.jp>
 MITライセンスです。
 

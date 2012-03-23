@@ -1,7 +1,7 @@
 library Name: Jeeel
 
 The MIT License
-Copyright (c) 2012 Donuts
+Copyright (c) 2012 Donuts, Masato Shimada
 Author 嶋田 将人<shimada@donuts.ne.jp>
 
 Jeeel is only compatible with Japanese
