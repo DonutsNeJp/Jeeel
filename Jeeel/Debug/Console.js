@@ -1,6 +1,6 @@
 
 /**
- * コンソールを管理するスタティッククラス
+ * @staticClass コンソールを管理するスタティッククラス
  */
 Jeeel.Debug.Console = {
 
@@ -43,7 +43,7 @@ Jeeel.Debug.Console = {
      * @constant
      */
     CONSOLE_CODE_ASSIST_ID: 'jeeel-debug-console-code-assist',
-
+    
     /**
      * コンソール
      *
@@ -112,9 +112,16 @@ Jeeel.Debug.Console = {
      * コンソールの保存媒体
      * 
      * @type Jeeel.Session.Name
+     * @private
      */
     _consoleSession: null,
     
+    /**
+     * 現在のモードが単数行モードかどうか
+     * 
+     * @type Boolean
+     * @private
+     */
     _isSingleLineMode: true,
 
     /**
@@ -130,8 +137,15 @@ Jeeel.Debug.Console = {
      *
      * @type Hash
      * @private
+     * @ignore
      */
     _codeAssistData: {
+      
+        /**
+         * コード補完を使うかどうか
+         * 
+         * @type Boolean
+         */
         use: true,
         
         /**
@@ -249,9 +263,9 @@ Jeeel.Debug.Console = {
 
         var div = Jeeel.Document.createElement('div');
         div.innerHTML = '<textarea style="height: 25px;" id="' + this.CONSOLE_LOG_ID + '"></textarea>\n'
-                      + '<div id="' + this.CONSOLE_KEYBOARD_ID + '"></div>\n'
+                      + '<div id="' + this.CONSOLE_KEYBOARD_ID + '"><div class="title">キーボード</div></div>\n'
                       + '<div id="' + this.CONSOLE_RESULT_ID + '"></div>\n'
-                      + '<div style="display: none;" id="' + this.CONSOLE_CODE_ASSIST_ID + '"></div>';
+                      + '<ul style="display: none;" id="' + this.CONSOLE_CODE_ASSIST_ID + '"></ul>';
 
         div.id = this.CONSOLE_ID;
         this._console = Jeeel.Debug.Debugger.elementInsertTop(div);
@@ -264,13 +278,18 @@ Jeeel.Debug.Console = {
         this._consoleIn  = Jeeel.Dom.Element.Textarea.create(Jeeel.Document.getElementById(this.CONSOLE_LOG_ID));
         this._consoleOut = Jeeel.Document.getElementById(this.CONSOLE_RESULT_ID);
         this._consoleKeyboard = Jeeel.Document.getElementById(this.CONSOLE_KEYBOARD_ID);
-        this._consoleCodeAssistWindow = Jeeel.Dom.ElementOperator.create(Jeeel.Dom.Element.create(Jeeel.Document.getElementById(this.CONSOLE_CODE_ASSIST_ID)).setBackgroundIframe());
+        this._consoleCodeAssistWindow = Jeeel.Dom.ElementOperator.create(Jeeel.Dom.Element.create(Jeeel.Document.getElementById(this.CONSOLE_CODE_ASSIST_ID)).setShim());
 
         this._consoleLog    = session.get(this.CONSOLE_LOG_ID, []);
         this._consoleResult = Jeeel.Filter.Hash.Fill.create(0, this._consoleLog.length, null).filter([]);
         this._initKeyboard();
 
         this._consolePosition = this._consoleLog.length;
+        
+        // モバイル系ではキーボードがショボイためソフトウェアキーボードを有効化
+        if (Jeeel.UserAgent.isMobile()) {
+            this._consoleKeyboard.style.display = 'block';
+        }
         
         var singleLine, multiLine;
 
@@ -284,20 +303,23 @@ Jeeel.Debug.Console = {
             self._isSingleLineMode = listener === singleLine;
         };
 
+        /**
+         * @ignore
+         */
         singleLine = function () {
             var e = Jeeel.Dom.Event.getEventObject();
             var keyCode = e.getKeyCode();
             var timeoutId;
-
+            
             if (self._codeAssistData.use) {
-                if (Jeeel.Type.inArray(keyCode, [Jeeel.Code.KeyCode.Space, Jeeel.Code.KeyCode.LeftBracket, Jeeel.Code.KeyCode.RightBracket])) {
+                if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Space, Jeeel.Dom.Event.KeyCode.LeftBracket, Jeeel.Dom.Event.KeyCode.RightBracket])) {
                     self._codeAssistDataClose();
-                } else if (self._codeAssistData.enable || Jeeel.Type.inArray(keyCode, [Jeeel.Code.KeyCode.Period, Jeeel.Code.KeyCode.BackSpace]) || ! self._consoleIn.getText()) {
+                } else if (self._codeAssistData.enable || Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Period, Jeeel.Dom.Event.KeyCode.BackSpace]) || ! self._consoleIn.getText()) {
                     timeoutId = Jeeel.Timer.setTimeout(self._setCodeAssistData, 1);
                 }
             }
 
-            if (keyCode === Jeeel.Code.KeyCode.Enter) {
+            if (keyCode === Jeeel.Dom.Event.KeyCode.Enter) {
 
                 e.stop();
 
@@ -305,7 +327,7 @@ Jeeel.Debug.Console = {
                 
                 return false;
                 
-            } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Code.KeyCode.Up, Jeeel.Code.KeyCode.PageUp])) {
+            } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Up, Jeeel.Dom.Event.KeyCode.PageUp])) {
 
                 e.stop();
 
@@ -315,7 +337,7 @@ Jeeel.Debug.Console = {
 
                 return false;
                 
-            } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Code.KeyCode.Down, Jeeel.Code.KeyCode.PageDown])) {
+            } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Down, Jeeel.Dom.Event.KeyCode.PageDown])) {
                 
                 e.stop();
 
@@ -325,7 +347,7 @@ Jeeel.Debug.Console = {
 
                 return false;
                 
-            } else if (self._codeAssistData.enable && keyCode === Jeeel.Code.KeyCode.Tab) {
+            } else if (self._codeAssistData.enable && keyCode === Jeeel.Dom.Event.KeyCode.Tab) {
                 e.stop();
 
                 if (e.shiftKey) {
@@ -338,7 +360,7 @@ Jeeel.Debug.Console = {
 
                 return false;
                 
-            } else if (keyCode === Jeeel.Code.KeyCode.M && e.ctrlKey) {
+            } else if (keyCode === Jeeel.Dom.Event.KeyCode.M && e.ctrlKey) {
 
                 e.stop();
 
@@ -350,7 +372,7 @@ Jeeel.Debug.Console = {
                 Jeeel.Dom.Element.create(self._consoleOut).hide().show();
 
                 return false;
-            } else if (keyCode === Jeeel.Code.KeyCode.Shift) {
+            } else if (keyCode === Jeeel.Dom.Event.KeyCode.Shift) {
                 e.stop();
                 
                 Jeeel.Timer.clearTimeout(timeoutId);
@@ -361,12 +383,15 @@ Jeeel.Debug.Console = {
             return true;
         };
 
+        /**
+         * @ignore
+         */
         multiLine = function () {
             var e = Jeeel.Dom.Event.getEventObject();
             var keyCode = e.getKeyCode();
             
             if (e.ctrlKey) {
-                if (keyCode === Jeeel.Code.KeyCode.Enter) {
+                if (keyCode === Jeeel.Dom.Event.KeyCode.Enter) {
 
                     e.stop();
 
@@ -374,7 +399,7 @@ Jeeel.Debug.Console = {
 
                     return false;
 
-                } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Code.KeyCode.Up, Jeeel.Code.KeyCode.PageUp])) {
+                } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Up, Jeeel.Dom.Event.KeyCode.PageUp])) {
 
                     e.stop();
 
@@ -382,7 +407,7 @@ Jeeel.Debug.Console = {
 
                     return false;
 
-                } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Code.KeyCode.Down, Jeeel.Code.KeyCode.PageDown])) {
+                } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Down, Jeeel.Dom.Event.KeyCode.PageDown])) {
 
                     e.stop();
 
@@ -390,7 +415,7 @@ Jeeel.Debug.Console = {
 
                     return false;
 
-                } else if (keyCode === Jeeel.Code.KeyCode.M) {
+                } else if (keyCode === Jeeel.Dom.Event.KeyCode.M) {
 
                     e.stop();
 
@@ -511,6 +536,8 @@ Jeeel.Debug.Console = {
         arguments.callee.ignore = true;
 
         var css = 'div#' + this.CONSOLE_ID + ' {\n'
+                + '    position: relative;\n'
+                + '    z-index: 100000;\n'
                 + '    background-color: white;\n'
                 + '    text-align: left;\n'
                 + '    font-family: "Arial", "Times New Roman", "Courier New", "Courier", cursive;\n'
@@ -528,18 +555,60 @@ Jeeel.Debug.Console = {
                 + '}\n'
                 + 'div#' + this.CONSOLE_KEYBOARD_ID + ' {\n'
                 + '    background-color: white;\n'
-                + '    width: 100%;\n'
-                + '    height: 25px;\n'
+                + '    position: fixed;\n'
+                + '    z-index: 20;\n'
+                + '    top: 38%;\n'
+                + '    left: 38%;\n'
+                + '    border: 1px solid #C2C2C2;\n'
+                + '    width: 30%;\n'
+                + '    height: 100px;\n'
                 + '    display: none;\n'
+                + '}\n'
+                + 'div#' + this.CONSOLE_KEYBOARD_ID + ' .title {\n'
+                + '    text-align: center;\n'
+                + '}\n'
+                + 'div#' + this.CONSOLE_KEYBOARD_ID + ' .keyboard {\n'
+                + '    border-top: 1px solid #F2F2F2;\n'
+                + '}\n'
+                + 'div#' + this.CONSOLE_KEYBOARD_ID + ' .operator {\n'
+                + '    text-align: center;\n'
                 + '}\n'
                 + 'div#' + this.CONSOLE_KEYBOARD_ID + ' .button {\n'
                 + '    cursor: pointer;\n'
-                + '    text-align: center;\n'
-                + '    float: left;'
-                + '    width: 25px;\n'
+                + '    display: inline-block;\n'
+                + '    color: #d9eef7;\n'
+                + '    padding: .2em 1.25em .4em;\n'
+                + '    margin: 3px;\n'
+                + '    border: solid 1px #0076a3;\n'
+                + '    -webkit-border-radius: .5em;\n'
+                + '    -moz-border-radius: .5em;\n'
+                + '    border-radius: .5em;\n'
+                + '    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);\n'
+                + '    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.2);\n'
+                + '    box-shadow: 0 1px 2px rgba(0,0,0,.2);\n'
+                + '    background: #0095cd;\n'
+                + '    background: -webkit-gradient(linear, left top, left bottom, from(#00adee), to(#0078a5));\n'
+                + '    background: -moz-linear-gradient(top,  #00adee,  #0078a5);\n'
+                + '    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr=\'#00adee\', endColorstr=\'#0078a5\');\n'
                 + '}\n'
-                + 'div#' + this.CONSOLE_CODE_ASSIST_ID + ' {\n'
+                + 'div#' + this.CONSOLE_KEYBOARD_ID + ' .button:hover {\n'
+                + '    background: #007ead;\n'
+                + '    background: -webkit-gradient(linear, left top, left bottom, from(#0095cc), to(#00678e));\n'
+                + '    background: -moz-linear-gradient(top,  #0095cc,  #00678e);\n'
+                + '    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr=\'#0095cc\', endColorstr=\'#00678e\');\n'
+                + '}\n'
+                + 'div#' + this.CONSOLE_KEYBOARD_ID + ' .button:active {\n'
+                + '    position: relative;\n'
+                + '    top: 1px;\n'
+                + '    color: #80bed6;\n'
+                + '    background: -webkit-gradient(linear, left top, left bottom, from(#0078a5), to(#00adee));\n'
+                + '    background: -moz-linear-gradient(top,  #0078a5,  #00adee);\n'
+                + '    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr=\'#0078a5\', endColorstr=\'#00adee\');\n'
+                + '}\n'
+                + 'ul#' + this.CONSOLE_CODE_ASSIST_ID + ' {\n'
+                + '    padding: 0;\n'
                 + '    font-size: 15px;\n'
+                + '    line-height: 18px;\n'
                 + '    text-align: left;\n'
                 + '    overflow: auto;\n'
                 + '    border: solid 1px gray;\n'
@@ -550,11 +619,12 @@ Jeeel.Debug.Console = {
                 + '    overflow-x: hidden;\n'
                 + '    overflow-y: auto;\n'
                 + '    background-color: white;\n'
-                + '    max-height: 210px;\n'
-                + '    _height: 210px;\n'
+                + '    max-height: 200px;\n'
+                + '    _height: 200px;\n'
                 + '}\n'
-                + 'div#' + this.CONSOLE_CODE_ASSIST_ID + ' div {\n'
-                + '    padding: 2px;\n'
+                + 'ul#' + this.CONSOLE_CODE_ASSIST_ID + ' li {\n'
+                + '    list-style-type: none;\n'
+                + '    padding: 1px 20px 1px 2px;\n'
                 + '    cursor: pointer;\n'
                 + '}';
 
@@ -714,6 +784,8 @@ Jeeel.Debug.Console = {
     
     /**
      * コード補完ウィンドウを表示させる
+     * 
+     * @ignore
      */
     _codeAssistWindowShow: function () {
         var left = this._codeAssistData.index * 10 + 20;
@@ -726,6 +798,8 @@ Jeeel.Debug.Console = {
     
     /**
      * コード補完ウィンドウを非表示にする
+     * 
+     * @ignore
      */
     _codeAssistWindowHide: function () {
         this._consoleCodeAssistWindow.hide();
@@ -734,6 +808,8 @@ Jeeel.Debug.Console = {
     
     /**
      * コード補完に必要なデータを更新する
+     * 
+     * @ignore
      */
     _setCodeAssistData: (function () {
         var txtReg = /(^|[;:{}(\[\] ])([a-zA-Z$_][a-zA-Z0-9$_.]*)\.(|[a-zA-Z$_][a-zA-Z0-9$_]*)$/;
@@ -809,7 +885,7 @@ Jeeel.Debug.Console = {
                     }
 
                     try {
-                        caData.pairs = Jeeel.Hash.getPairs(target, true);
+                        caData.pairs = Jeeel.Hash.getPairs(target, true, true);
                     } catch(e) {
                         this._codeAssistDataClose(true);
                         return;
@@ -873,7 +949,7 @@ Jeeel.Debug.Console = {
             }
 
             var elm = this._consoleCodeAssistWindow;
-            var divs = [];
+            var lis = [];
             var self = this;
 
             if (caData.winChild) {
@@ -882,31 +958,40 @@ Jeeel.Debug.Console = {
 
             for (i = 0, l = keys.length; i < l; i++) {
                 var key = keys[i];
-                var div = Jeeel.Document.createElement('div');
-                div.innerHTML = key;
+                var li = Jeeel.Document.createElement('li');
+                li.innerHTML = key;
 
-                div.onclick = function () {
+                /**
+                 * @ignore
+                 */
+                li.onclick = function () {
                     self._replaceLog(arguments.callee.data);
                 };
 
-                div.onclick.data = key;
+                li.onclick.data = key;
 
-                divs[i] = div;
+                lis[i] = li;
             }
 
-            caData.winChild = new Jeeel.Dom.ElementOperator(divs);
+            caData.winChild = new Jeeel.Dom.ElementOperator(lis);
 
-            elm.appendChild(divs);
+            elm.appendChild(lis);
             this._codeAssistWindowShow();
         }
     })(),
     
+    /**
+     * @ignore
+     */
     _setCodeData: function (index, divs) {
         var self = this;
         var key = this._codeAssistData.keys[index];
         var div = this._codeAssistData.winChild[index] || Jeeel.Document.createElement('div');
         div.innerHTML = key;
 
+        /**
+         * @ignore
+         */
         div.onclick = function () {
             self._replaceLog(arguments.callee.data);
         };
@@ -918,6 +1003,8 @@ Jeeel.Debug.Console = {
     
     /**
      * コード補完の候補を選択する
+     * 
+     * @ignore
      */
     _selectCodeAssistData: function (advanceIndex) {
         var caData = this._codeAssistData;
@@ -936,13 +1023,23 @@ Jeeel.Debug.Console = {
         caData.winChild.$GET(caData.selectIndex).setCss('backgroundColor', '#FFF');
         
         caData.winChild.$GET(index).setCss('backgroundColor', '#FFD700');
-//        caData.winChild.$GET(index).get().;
-        
+
         caData.selectIndex = index;
+        
+        var top = index * 20;
+        var pos = this._consoleCodeAssistWindow.getScrollPos();
+        
+        if (pos.y < (top - 180)) {
+            this._consoleCodeAssistWindow.scroll(0, top - 180);
+        } else if (pos.y > top) {
+            this._consoleCodeAssistWindow.scroll(0, top);
+        }
     },
     
     /**
      * 選択されているコード補完候補を使用して適用する
+     * 
+     * @ignore
      */
     _selectCodeAssistDataExecute: function () {
         var caData = this._codeAssistData;
@@ -962,6 +1059,8 @@ Jeeel.Debug.Console = {
 
     /**
      * 補完データを選択した時に現在の値を書き換える
+     * 
+     * @ignore
      */
     _replaceLog: function (key) {
         var txt = this._consoleIn.getText();
@@ -973,20 +1072,37 @@ Jeeel.Debug.Console = {
         this._consoleIn.setSelectionStart(txt.length);
     },
     
+    /**
+     * ソフトウェアキーボードの初期化を行う
+     * 
+     * @ignore
+     */
     _initKeyboard: function () {
         var keyboard = this._consoleKeyboard;
         
+        var keyboardArea = Jeeel.Document.createElement('div');
         var keyInputer = Jeeel.Document.createElement('div');
         var consoleOperator = Jeeel.Document.createElement('div');
         
+        keyboardArea.className = 'keyboard';
+        consoleOperator.className = 'operator';
+        
         var button, type, keyTypes = [
-//            {txt: '{' , dispatch: function (){}},
-//            {txt: '}' , key: Jeeel.Code.KeyCode.RightBracket, shift: true, ctrl: false},
-//            {txt: '[' , key: Jeeel.Code.KeyCode.LeftBracket, shift: false, ctrl: false},
-//            {txt: ']' , key: Jeeel.Code.KeyCode.RightBracket, shift: false, ctrl: false}
+//            {txt: '{' , dispatch: Jeeel.Function.Template.EMPTY},
+//            {txt: '}' , key: Jeeel.Dom.Event.KeyCode.RightBracket, shift: true, ctrl: false},
+//            {txt: '[' , key: Jeeel.Dom.Event.KeyCode.LeftBracket, shift: false, ctrl: false},
+//            {txt: ']' , key: Jeeel.Dom.Event.KeyCode.RightBracket, shift: false, ctrl: false}
         ], operatorTypes = [
             {txt: '↑' , dispatch: function (){this._consoleUp();}},
-            {txt: '↓' , dispatch: function (){this._consoleDown();}}
+            {txt: '↓' , dispatch: function (){this._consoleDown();}},
+            {txt: Jeeel.Code.HtmlCode.CarriageReturn , dispatch: function (){
+                    if (this._codeAssistData.enable || ! this._consoleIn.getText()) {
+                        Jeeel.Timer.setTimeout(this._setCodeAssistData, 1);
+                    }
+                    
+                    this._evalConsoleText();
+                }
+            }
         ];
         
         var self = this, consoleIn = this._consoleIn.getElement();
@@ -996,6 +1112,10 @@ Jeeel.Debug.Console = {
             
             button = Jeeel.Document.createElement('div');
             button.innerHTML = type.txt;
+            
+            /**
+             * @ignore
+             */
             button.onclick = function () {
                 var op = new Jeeel.Dom.Event.Option();
                 op.setKeyCodeArg(type.key)
@@ -1014,20 +1134,31 @@ Jeeel.Debug.Console = {
             button = Jeeel.Document.createElement('div');
             button.className = 'button';
             button.innerHTML = type.txt;
+            
+            /**
+             * @ignore
+             */
             button.onclick = function () {
                 arguments.callee.type.dispatch.call(self);
-                Jeeel.Dom.Event.getEventObject().stop();
+                
+                return false;
             };
             
             button.onclick.type = type;
+            button.onmousemove = Jeeel.Function.Template.RETURN_FALSE;
             
             consoleOperator.appendChild(button);
         }
         
-        keyboard.appendChild(keyInputer);
-        keyboard.appendChild(consoleOperator);
+        keyboardArea.appendChild(keyInputer);
+        keyboardArea.appendChild(consoleOperator);
+        
+        keyboard.appendChild(keyboardArea);
     },
     
+    /**
+     * @ignore
+     */
     _appendLogText: function (appendText) {
         
         var txt = this._consoleIn.getText() + appendText;

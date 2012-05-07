@@ -1,6 +1,7 @@
 
 /**
  * コンストラクタ
+ * 
  * @class 垂直スクロールバーを単体で扱うクラス
  * @augments Jeeel.Gui.Abstract
  */

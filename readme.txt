@@ -28,6 +28,7 @@ http://dean.edwards.name/packer/
 ・Prototype(http://prototypejs.org/)
 ・Dojo(http://dojotoolkit.org/)
 ・JSDeferred(https://github.com/cho45/jsdeferred)
+・JsDoc Toolkit(http://code.google.com/p/jsdoc-toolkit/)
 
 デザインを参考にさせてもらったもの
 ・Chrome
@@ -106,12 +107,12 @@ jeeelConfigに対して設定できる項目
 manualLoad: 自動読み込みの無効化(Jeeel-Set.js, Jeeel-Set-Min.jsは定義済み)
 clean: Jeeel以外のグローバル変数を使わせない
 debug: デバッグモードの有効化
-extend: 拡張機能を項目別に有効化(gui, webStorage, database, worker, geolocation, file, media, graphics, net)
+extend: 拡張機能を項目別に有効化(gui, webStorage, database, worker, geolocation, file, media, graphics, net, framework)
 full: 全機能の有効化(デバッグモードと拡張機能)
 
 URLのクエリ(?以降の文)に対して設定できる項目
 ml: 自動読み込みの無効化(Jeeel-Set.js, Jeeel-Set-Min.jsはjeeelConfigにて定義済み)
 cl: Jeeel以外のグローバル変数を使わせない
 dbg: デバッグモードの有効化
-ext: 拡張機能を項目別に有効化(gui, ws, db, wk, geo, file, md, grp, net)
+ext: 拡張機能を項目別に有効化(gui, ws, db, wk, geo, file, md, grp, net, fw)
 full: 全機能の有効化(デバッグモードと拡張機能)

@@ -141,8 +141,19 @@ Jeeel.Dom.Core.Searcher.prototype = {
         return Jeeel.Hash.toArray(res);
     },
     
+    /**
+     * このElement内から指定IDのHTML要素を取得する<br />
+     * この際既存のAPIに頼らずに検索を実行する
+     *
+     * @param {String} id 検索ID
+     * @return {Element} 取得したElement
+     */
     searchElementById: function (id) {
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        
+        /**
+         * @ignore
+         */
         var search = function (elm, id, f) {
             if ( ! f && elm.id === id) {
                 return elm;
@@ -166,6 +177,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             return null;
         };
         
+        /**
+         * @ignore
+         */
         this.searchElementById = function (id) {
             return id && search(this._target, id, true) || null;
         };
@@ -177,8 +191,19 @@ Jeeel.Dom.Core.Searcher.prototype = {
         return this.searchElementById(id);
     },
     
+    /**
+     * このElement内から指定ClassのHTML要素を取得する<br />
+     * この際既存のAPIに頼らずに検索を実行する
+     *
+     * @param {String|String[]} className 検索Class
+     * @return {Element[]} 取得したElement配列
+     */
     searchElementsByClassName: function (className) {
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        
+        /**
+         * @ignore
+         */
         var search = function (res, target, reg, f) {
 
             var className = target.className;
@@ -199,6 +224,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             }
         };
         
+        /**
+         * @ignore
+         */
         this.searchElementsByClassName = function (className) {
             var res = [];
             
@@ -233,9 +261,24 @@ Jeeel.Dom.Core.Searcher.prototype = {
         return this.searchElementsByClassName(className);
     },
 
+    /**
+     * このElement内から指定NameのHTML要素を取得する<br />
+     * この際既存のAPIに頼らずに検索を実行する
+     * なおsubmitSearchを指定すると<br />
+     * この動作は一部本来のgetElementsByNameと違い、<br />
+     * c[]等で配列指定した値に対してもヒットする
+     *
+     * @param {String|String[]} name 検索Name
+     * @param {Boolean} [submitSearch=false] 送信時と同じようにc[]等の配列指定をヒットさせるかどうか
+     * @return {Element[]} 取得したElement配列
+     */
     searchElementsByName: function (name, submitSearch) {
         var rf = new Jeeel.Filter.String.RegularExpressionEscape();
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        
+        /**
+         * @ignore
+         */
         var search = function (res, target, reg, s, f) {
 
             var name = target.name;
@@ -264,6 +307,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             }
         };
         
+        /**
+         * @ignore
+         */
         var multiSearch = function (res, target, regs, s, f) {
 
             var name = target.name;
@@ -295,6 +341,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             }
         };
         
+        /**
+         * @ignore
+         */
         this.searchElementsByName = function (name, submitSearch) {
             var res = [];
             
@@ -339,11 +388,22 @@ Jeeel.Dom.Core.Searcher.prototype = {
         return this.searchElementsByName(name, submitSearch);
     },
 
+    /**
+     * このElement内から指定TagのHTML要素を取得する<br />
+     * この際既存のAPIに頼らずに検索を実行する
+     *
+     * @param {String|String[]} tagName 検索Tag
+     * @return {Element[]} 取得したElement配列
+     */
     searchElementsByTagName: function (tagName) {
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        
+        /**
+         * @ignore
+         */
         var search = function (res, target, tag, f) {
 
-            if ( ! f && tag === '*' || target.nodeName.toUpperCase() === tag) {
+            if ( ! f && (tag === '*' || target.nodeName.toUpperCase() === tag)) {
                 res[res.length] = target;
             }
 
@@ -359,6 +419,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             }
         };
         
+        /**
+         * @ignore
+         */
         var multiSearch = function (res, target, tags, f) {
 
             if ( ! f && Jeeel.Type.inArray(target.nodeName.toUpperCase(), tags, true)) {
@@ -377,6 +440,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             }
         };
         
+        /**
+         * @ignore
+         */
         this.searchElementsByTagName = function (tagName) {
             var res = [];
             
@@ -417,8 +483,20 @@ Jeeel.Dom.Core.Searcher.prototype = {
         return this.searchElementsByTagName(tagName);
     },
 
+    /**
+     * このElement内から指定属性が指定値のHTML要素を取得する<br />
+     * この際既存のAPIに頼らずに検索を実行する
+     *
+     * @param {String} attribute 属性名
+     * @param {String} value 属性値('*'を指定すると任意の値の意味になる)
+     * @return {Element[]} 取得したElement配列
+     */
     searchElementsByAttribute: function (attribute, value) {
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        
+        /**
+         * @ignore
+         */
         var search = function (res, target, attr, value, f) {
 
             if ( ! f && target.getAttribute) {
@@ -441,6 +519,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             }
         };
         
+        /**
+         * @ignore
+         */
         this.searchElementsByAttribute = function (attribute, value) {
             var res = [];
             
@@ -460,8 +541,21 @@ Jeeel.Dom.Core.Searcher.prototype = {
         return this.searchElementsByAttribute(attribute, value);
     },
     
+    /**
+     * このElement内から指定プロパティが指定値のHTML要素を取得する<br />
+     * この際既存のAPIに頼らずに検索を実行する<br />
+     * Elementのプロパティである事に注意
+     *
+     * @param {String} property プロパティ名
+     * @param {Mixied} value プロパティ値('*'を指定すると任意の値の意味になる)
+     * @return {Element[]} 取得したElement配列
+     */
     searchElementsByProperty: function (property, value) {
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        
+        /**
+         * @ignore
+         */
         var search = function (res, target, prop, value, f) {
 
             if ( ! f && prop in target) {
@@ -484,6 +578,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             }
         };
         
+        /**
+         * @ignore
+         */
         this.searchElementsByProperty = function (property, value) {
             var res = [];
             
@@ -503,24 +600,24 @@ Jeeel.Dom.Core.Searcher.prototype = {
         return this.searchElementsByProperty(property, value);
     },
     
+    /**
+     * このElement内部に絞り込みを掛ける<br />
+     * この際既存のAPIに頼らずに検索を実行する<br />
+     * 現在のHTML内に存在しない要素は取れない
+     *
+     * @param {String} selector CSSと同じ絞り込みセレクタ
+     * @return {Element[]} 絞り込んだElement配列
+     */
     searchElementsBySelector: function (selector) {
-        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
-        var search = function (res, target, selector, f) {
-
-        };
-        
+        /**
+         * @ignore
+         */
         this.searchElementsBySelector = function (selector) {
-            var res = [];
-            
-            return res;
-            
             if ( ! selector) {
-                return res;
+                return [];
             }
             
-            search(res, this._target, selector, true);
-            
-            return res;
+            return Jeeel.Dom.Selector.create(selector).search(this._target);
         };
         
         if (arguments.callee === this.getElementsBySelector) {
@@ -537,6 +634,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
      */
     constructor: Jeeel.Dom.Core.Searcher,
     
+    /**
+     * @ignore
+     */
     _init: function () {
         
         var key, cache = this.constructor.caches[this._target.nodeType];

@@ -12,12 +12,15 @@ Jeeel.directory.Jeeel.String.Hash = {
 };
 
 /**
- * Hash関数関連のネームスペース
+ * @namespace Hash関数関連のネームスペース
  */
 Jeeel.String.Hash = {
 
 };
 
+/**
+ * @ignore
+ */
 Jeeel._Object.JeeelStringHash = {
     
 };

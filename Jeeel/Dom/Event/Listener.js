@@ -307,6 +307,9 @@ Jeeel.Dom.Event.Listener.prototype = {
                           || Jeeel.UserAgent.isIPod();
 
     if (Jeeel._global && isTouchPanelMobile) {
+        /**
+         * @ignore
+         */
         getType = function (type) {
             switch (type) {
                 case Jeeel.Dom.Event.Type.MOUSE_DOWN:
@@ -328,26 +331,41 @@ Jeeel.Dom.Event.Listener.prototype = {
             return type;
         };
     } else {
-        getType = function (type) {
-            return type;
-        };
+        getType = Jeeel.Function.Template.RETURN_ARGUMENT;
     }
     
     if (Jeeel._global && Jeeel._global.addEventListener) {
+        /**
+         * @ignore
+         */
         add = function (type) {
             this._element.addEventListener(type, this.listener, false);
         };
+        
+        /**
+         * @ignore
+         */
         remove = function (type) {
             this._element.removeEventListener(type, this.listener, false);
         };
     } else if (Jeeel._global && Jeeel._global.attachEvent) {
+        /**
+         * @ignore
+         */
         add = function (type) {
             this._element.attachEvent("on" + type, this.listener);
         };
+        
+        /**
+         * @ignore
+         */
         remove = function (type) {
             this._element.detachEvent("on" + type, this.listener);
         };
     } else {
+        /**
+         * @ignore
+         */
         add = remove = function (type) {
             Jeeel.errorDump('このブラウザはイベント登録に対応していません。');
         };

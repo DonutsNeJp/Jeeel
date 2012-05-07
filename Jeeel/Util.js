@@ -12,7 +12,8 @@ Jeeel.directory.Jeeel.Util = {
 };
 
 /**
- * ユーティル関連のネームスペース
+ * @namespace ユーティル関連のネームスペース
+ * @deprecated 今後削除される可能性あり
  */
 Jeeel.Util = {
 

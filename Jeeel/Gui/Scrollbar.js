@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Gui.Scrollbar = {
 };
 
 /**
- * スクロールバー関連のネームスペース
+ * @namespace スクロールバー関連のネームスペース
  */
 Jeeel.Gui.Scrollbar = {
     

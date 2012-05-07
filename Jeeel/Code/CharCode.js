@@ -1,6 +1,6 @@
 
 /**
- * 文字コードに関する列挙体
+ * @namespace 文字コードに関する列挙体
  */
 Jeeel.Code.CharCode = {
 
@@ -1030,15 +1030,18 @@ Jeeel.Code.CharCode = {
 };
 
 Jeeel.Code.CharCode.getChar = function (charCode) {
-    var res = Jeeel.Hash.getKeys(this, charCode, true);
     
-    if (res.length < 1) {
-        return null;
-    } else if (res.length == 1) {
-        return res[0];
+    var hash;
+    
+    if (this.getChar._hash) {
+        hash = this.getChar._hash;
     } else {
-        return (res[0].length < res[1].length ? res[1] : res[0]);
+        hash = new Jeeel.Hash(this);
+        
+        this.getChar._hash = hash;
     }
+
+    return hash.search(charCode, true);
 };
 
 (function () {

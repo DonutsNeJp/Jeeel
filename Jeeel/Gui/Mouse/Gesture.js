@@ -200,9 +200,9 @@ Jeeel.Gui.Mouse.Gesture.prototype = {
         var vLength  = newPoint.y - oldPoint.y;
 
         if (Math.abs(hLength) > Math.abs(vLength) + this._sensitivityPlay) {
-            newGesture = (hLength < 0 ? Jeeel.Code.KeyCode.Left : Jeeel.Code.KeyCode.Right);
+            newGesture = (hLength < 0 ? Jeeel.Dom.Event.KeyCode.Left : Jeeel.Dom.Event.KeyCode.Right);
         } else if (this._sensitivityPlay + Math.abs(hLength) < Math.abs(vLength)) {
-            newGesture = (vLength < 0 ? Jeeel.Code.KeyCode.Up : Jeeel.Code.KeyCode.Down);
+            newGesture = (vLength < 0 ? Jeeel.Dom.Event.KeyCode.Up : Jeeel.Dom.Event.KeyCode.Down);
         } else {
             return;
         }
@@ -319,19 +319,19 @@ Jeeel.Gui.Mouse.Gesture.prototype = {
             }
 
             switch (this._gestureList[i]) {
-                case Jeeel.Code.KeyCode.Left:
+                case Jeeel.Dom.Event.KeyCode.Left:
                     res += '←';
                     break;
 
-                case Jeeel.Code.KeyCode.Right:
+                case Jeeel.Dom.Event.KeyCode.Right:
                     res += '→';
                     break;
 
-                case Jeeel.Code.KeyCode.Up:
+                case Jeeel.Dom.Event.KeyCode.Up:
                     res += '↑';
                     break;
 
-                case Jeeel.Code.KeyCode.Down:
+                case Jeeel.Dom.Event.KeyCode.Down:
                     res += '↓';
                     break;
 

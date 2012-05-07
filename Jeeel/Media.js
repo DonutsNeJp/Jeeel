@@ -13,7 +13,7 @@ Jeeel.directory.Jeeel.Media = {
 };
 
 /**
- * メディア関連のネームスペース
+ * @namespace メディア関連のネームスペース
  */
 Jeeel.Media = {
 

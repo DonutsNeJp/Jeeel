@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.DataStructure = {
 };
 
 /**
- * データ構造
+ * @namespace データ構造関するネームスペース
  */
 Jeeel.DataStructure = {
     

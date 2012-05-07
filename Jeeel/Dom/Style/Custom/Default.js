@@ -13,38 +13,56 @@
     // opacityの登録
     parts[i] = {name: 'opacity'};
     
-    if ('MozOpacity' in style) {
-        name = '-moz-opacity';
+    if ('opacity' in style) {
+        name = 'opacity';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozOpacity || '1.0';
+            return this._style.opacity || this._computedStyle.opacity || '1.0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (opacity) {
-            this._style.MozOpacity = opacity;
+            this._style.opacity = opacity;
         };
         
         filter = null;
-    } else if ('opacity' in style) {
-        name = 'opacity';
+    } else if ('MozOpacity' in style) {
+        name = '-moz-opacity';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.opacity || '1.0';
+            return this._style.MozOpacity || this._computedStyle.MozOpacity || '1.0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (opacity) {
-            this._style.opacity = opacity;
+            this._style.MozOpacity = opacity;
         };
         
         filter = null;
     } else if ('filter' in style) {
         name = 'filter';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            var match = this._style.filter.match(/alpha\(.*opacity=(-?[0-9.]+).*\)/i);
+            var match = (this._style.filter || this._computedStyle.filter).match(/(?:progid:DXImageTransform\.Microsoft\.)?Alpha\(.*opacity=(-?[0-9.]+).*\)/i);
             return '' + ((match && match[1] || 100) / 100);
         };
         
+        /**
+         * @ignore
+         */
         set = function (opacity) {
 
             var css = this.opacity(opacity, true);
@@ -52,6 +70,9 @@
             this._style.cssText += ';' + css;
         };
         
+        /**
+         * @ignore
+         */
         filter = function (opacity) {
             opacity = opacity * 100;
 
@@ -61,14 +82,14 @@
                 hack = '; zoom: 1';
             }
             
-            var filter = this._style.filter;
+            var filter = this._style.filter || this._computedStyle.filter;
 
             if ( ! filter) {
                 filter = 'alpha(opacity=' + opacity + ')';
-            } else if (filter.indexOf('alpha(') < 0) {
+            } else if ( ! filter.match(/(?:progid:DXImageTransform\.Microsoft\.)?Alpha\(/i)) {
                 filter += ' alpha(opacity=' + opacity + ')';
             } else {
-                filter = filter.replace(/alpha\(.*opacity=(-?[0-9.]+).*\)/i, 'alpha(opacity=' + opacity + ')');
+                filter = filter.replace(/(?:progid:DXImageTransform\.Microsoft\.)?Alpha\(.*opacity=(-?[0-9.]+).*\)/i, 'alpha(opacity=' + opacity + ')');
             }
             
             return filter + hack;
@@ -76,10 +97,16 @@
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 1.0;
         };
         
+        /**
+         * @ignore
+         */
         set = function (opacity) {};
         
         filter = null;
@@ -98,10 +125,16 @@
     if ('backgroundPositionX' in style) {
         name = 'background-position-x';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.backgroundPositionX || '0%';
+            return this._style.backgroundPositionX || this._computedStyle.backgroundPositionX || '0%';
         };
         
+        /**
+         * @ignore
+         */
         set = function (position) {
             this._style.backgroundPositionX = position;
         };
@@ -110,8 +143,11 @@
     } else if ('backgroundPosition' in style) {
         name = 'backgroundPosition';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            var pos = this._style.backgroundPosition.split(' ');
+            var pos = (this._style.backgroundPosition || this._computedStyle.backgroundPosition).split(' ');
             
             if (pos.length > 1) {
                 return pos[0];
@@ -120,12 +156,18 @@
             return '0%';
         };
         
+        /**
+         * @ignore
+         */
         set = function (position) {
             this._style.backgroundPosition = this.backgroundPositionX(position, true);
         };
         
+        /**
+         * @ignore
+         */
         filter = function (position) {
-            var pos = this._style.backgroundPosition.split(' ');
+            var pos = (this._style.backgroundPosition || this._computedStyle.backgroundPosition).split(' ');
             
             if (pos.length <= 1) {
                 pos = [
@@ -141,10 +183,16 @@
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return '0%';
         };
         
+        /**
+         * @ignore
+         */
         set = function (position) {};
         
         filter = null;
@@ -164,10 +212,16 @@
     if ('backgroundPositionY' in style) {
         name = 'background-position-y';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.backgroundPositionY || '0%';
+            return this._style.backgroundPositionY || this._computedStyle.backgroundPositionY || '0%';
         };
         
+        /**
+         * @ignore
+         */
         set = function (position) {
             this._style.backgroundPositionY = position;
         };
@@ -176,8 +230,11 @@
     } else if ('backgroundPosition' in style) {
         name = 'backgroundPosition';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            var pos = this._style.backgroundPosition.split(' ');
+            var pos = (this._style.backgroundPosition || this._computedStyle.backgroundPosition).split(' ');
             
             if (pos.length > 1) {
                 return pos[1];
@@ -186,12 +243,18 @@
             return '0%';
         };
         
+        /**
+         * @ignore
+         */
         set = function (position) {
             this._style.backgroundPosition = this.backgroundPositionY(position, true);
         };
         
+        /**
+         * @ignore
+         */
         filter = function (position) {
-            var pos = this._style.backgroundPosition.split(' ');
+            var pos = (this._style.backgroundPosition || this._computedStyle.backgroundPosition).split(' ');
             
             if (pos.length <= 1) {
                 pos = [
@@ -207,10 +270,16 @@
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return '0%';
         };
         
+        /**
+         * @ignore
+         */
         set = function (position) {};
         
         filter = null;
@@ -227,13 +296,37 @@
     // perspectiveの登録
     parts[i] = {name: 'perspective'};
     
-    if ('MozPerspective' in style) {
-        name = '-moz-perspective';
+    if ('perspective' in style) {
+        name = 'perspective';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozPerspective || 'none';
+            return this._style.perspective || this._computedStyle.perspective || 'none';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (perspective) {
+            this._style.perspective = perspective;
+        };
+        
+        filter = null;
+    } else if ('MozPerspective' in style) {
+        name = '-moz-perspective';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozPerspective || this._computedStyle.MozPerspective || 'none';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (perspective) {
             this._style.MozPerspective = perspective;
         };
@@ -242,10 +335,16 @@
     } else if ('WebkitPerspective' in style) {
         name = '-webkit-perspective';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitPerspective || 'none';
+            return this._style.WebkitPerspective || this._computedStyle.WebkitPerspective || 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (perspective) {
             this._style.WebkitPerspective = perspective;
         };
@@ -254,10 +353,16 @@
     } else if ('MsPerspective' in style) {
         name = '-ms-perspective';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsPerspective || 'none';
+            return this._style.MsPerspective || this._computedStyle.MsPerspective || 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (perspective) {
             this._style.MsPerspective = perspective;
         };
@@ -266,34 +371,34 @@
     } else if ('OPerspective' in style) {
         name = '-o-perspective';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OPerspective || 'none';
+            return this._style.OPerspective || this._computedStyle.OPerspective || 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (perspective) {
             this._style.OPerspective = perspective;
-        };
-        
-        filter = null;
-    } else if ('perspective' in style) {
-        name = 'perspective';
-        
-        get = function () {
-            return this._style.perspective || 'none';
-        };
-        
-        set = function (perspective) {
-            this._style.perspective = perspective;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (perspective) {};
         
         filter = null;
@@ -310,13 +415,37 @@
     // backface-visibilityの登録
     parts[i] = {name: 'backfaceVisibility'};
     
-    if ('MozBackfaceVisibility' in style) {
-        name = '-moz-backface-visibility';
+    if ('backfaceVisibility' in style) {
+        name = 'backface-visibility';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozBackfaceVisibility || 'visible';
+            return this._style.backfaceVisibility || this._computedStyle.backfaceVisibility || 'visible';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (backfaceVisibility) {
+            this._style.backfaceVisibility = backfaceVisibility;
+        };
+        
+        filter = null;
+    } else if ('MozBackfaceVisibility' in style) {
+        name = '-moz-backface-visibility';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozBackfaceVisibility || this._computedStyle.MozBackfaceVisibility || 'visible';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (backfaceVisibility) {
             this._style.MozBackfaceVisibility = backfaceVisibility;
         };
@@ -325,10 +454,16 @@
     } else if ('WebkitBackfaceVisibility' in style) {
         name = '-webkit-backface-visibility';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitBackfaceVisibility || 'visible';
+            return this._style.WebkitBackfaceVisibility || this._computedStyle.WebkitBackfaceVisibility || 'visible';
         };
         
+        /**
+         * @ignore
+         */
         set = function (backfaceVisibility) {
             this._style.WebkitBackfaceVisibility = backfaceVisibility;
         };
@@ -337,10 +472,16 @@
     } else if ('MsBackfaceVisibility' in style) {
         name = '-ms-backface-visibility';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsBackfaceVisibility || 'visible';
+            return this._style.MsBackfaceVisibility || this._computedStyle.MsBackfaceVisibility || 'visible';
         };
         
+        /**
+         * @ignore
+         */
         set = function (backfaceVisibility) {
             this._style.MsBackfaceVisibility = backfaceVisibility;
         };
@@ -349,34 +490,34 @@
     } else if ('OBackfaceVisibility' in style) {
         name = '-o-backface-visibility';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OBackfaceVisibility || 'visible';
+            return this._style.OBackfaceVisibility || this._computedStyle.OBackfaceVisibility || 'visible';
         };
         
+        /**
+         * @ignore
+         */
         set = function (backfaceVisibility) {
             this._style.OBackfaceVisibility = backfaceVisibility;
-        };
-        
-        filter = null;
-    } else if ('backfaceVisibility' in style) {
-        name = 'backface-visibility';
-        
-        get = function () {
-            return this._style.backfaceVisibility || 'visible';
-        };
-        
-        set = function (backfaceVisibility) {
-            this._style.backfaceVisibility = backfaceVisibility;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 'visible';
         };
         
+        /**
+         * @ignore
+         */
         set = function (backfaceVisibility) {};
         
         filter = null;
@@ -393,13 +534,37 @@
     // transform-originの登録
     parts[i] = {name: 'transformOrigin'};
     
-    if ('MozTransformOrigin' in style) {
-        name = '-moz-transform-origin';
+    if ('transformOrigin' in style) {
+        name = 'transform-origin';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransformOrigin || '50% 50% 0';
+            return this._style.transformOrigin || this._computedStyle.transformOrigin || '50% 50% 0';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transformOrigin) {
+            this._style.transformOrigin = transformOrigin;
+        };
+        
+        filter = null;
+    } else if ('MozTransformOrigin' in style) {
+        name = '-moz-transform-origin';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransformOrigin || this._computedStyle.MozTransformOrigin || '50% 50% 0';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transformOrigin) {
             this._style.MozTransformOrigin = transformOrigin;
         };
@@ -408,10 +573,16 @@
     } else if ('WebkitTransformOrigin' in style) {
         name = '-webkit-transform-origin';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransformOrigin || '50% 50% 0';
+            return this._style.WebkitTransformOrigin || this._computedStyle.WebkitTransformOrigin || '50% 50% 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformOrigin) {
             this._style.WebkitTransformOrigin = transformOrigin;
         };
@@ -420,10 +591,16 @@
     } else if ('MsTransformOrigin' in style) {
         name = '-ms-transform-origin';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransformOrigin || '50% 50% 0';
+            return this._style.MsTransformOrigin || this._computedStyle.MsTransformOrigin || '50% 50% 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformOrigin) {
             this._style.MsTransformOrigin = transformOrigin;
         };
@@ -432,34 +609,34 @@
     } else if ('OTransformOrigin' in style) {
         name = '-o-transform-origin';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransformOrigin || '50% 50% 0';
+            return this._style.OTransformOrigin || this._computedStyle.OTransformOrigin || '50% 50% 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformOrigin) {
             this._style.OTransformOrigin = transformOrigin;
-        };
-        
-        filter = null;
-    } else if ('transformOrigin' in style) {
-        name = 'transform-origin';
-        
-        get = function () {
-            return this._style.transformOrigin || '50% 50% 0';
-        };
-        
-        set = function (transformOrigin) {
-            this._style.transformOrigin = transformOrigin;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return '50% 50% 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformOrigin) {};
         
         filter = null;
@@ -476,13 +653,37 @@
     // transform-styleの登録
     parts[i] = {name: 'transformStyle'};
     
-    if ('MozTransformStyle' in style) {
-        name = '-moz-transform-style';
+    if ('transformStyle' in style) {
+        name = 'transform-style';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransformStyle || 'flat';
+            return this._style.transformStyle || this._computedStyle.transformStyle || 'flat';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transformStyle) {
+            this._style.transformStyle = transformStyle;
+        };
+        
+        filter = null;
+    } else if ('MozTransformStyle' in style) {
+        name = '-moz-transform-style';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransformStyle || this._computedStyle.MozTransformStyle || 'flat';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transformStyle) {
             this._style.MozTransformStyle = transformStyle;
         };
@@ -491,10 +692,16 @@
     } else if ('WebkitTransformStyle' in style) {
         name = '-webkit-transform-style';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransformStyle || 'flat';
+            return this._style.WebkitTransformStyle || this._computedStyle.WebkitTransformStyle || 'flat';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformStyle) {
             this._style.WebkitTransformStyle = transformStyle;
         };
@@ -503,10 +710,16 @@
     } else if ('MsTransformStyle' in style) {
         name = '-ms-transform-style';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransformStyle || 'flat';
+            return this._style.MsTransformStyle || this._computedStyle.MsTransformStyle || 'flat';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformStyle) {
             this._style.MsTransformStyle = transformStyle;
         };
@@ -515,34 +728,34 @@
     } else if ('OTransformStyle' in style) {
         name = '-o-transform-style';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransformStyle || 'flat';
+            return this._style.OTransformStyle || this._computedStyle.OTransformStyle || 'flat';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformStyle) {
             this._style.OTransformStyle = transformStyle;
-        };
-        
-        filter = null;
-    } else if ('transformStyle' in style) {
-        name = 'transform-style';
-        
-        get = function () {
-            return this._style.transformStyle || 'flat';
-        };
-        
-        set = function (transformStyle) {
-            this._style.transformStyle = transformStyle;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 'flat';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformStyle) {};
         
         filter = null;
@@ -559,13 +772,37 @@
     // transformの登録
     parts[i] = {name: 'transform'};
     
-    if ('MozTransform' in style) {
-        name = '-moz-transform';
+    if ('transform' in style) {
+        name = 'transform';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransform || 'none';
+            return this._style.transform || this._computedStyle.transform || 'none';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transform) {
+            this._style.transform = transform;
+        };
+        
+        filter = null;
+    } else if ('MozTransform' in style) {
+        name = '-moz-transform';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransform || this._computedStyle.MozTransform || 'none';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transform) {
             this._style.MozTransform = transform;
         };
@@ -574,10 +811,16 @@
     } else if ('WebkitTransform' in style) {
         name = '-webkit-transform';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransform || 'none';
+            return this._style.WebkitTransform || this._computedStyle.WebkitTransform || 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transform) {
             this._style.WebkitTransform = transform;
         };
@@ -586,10 +829,16 @@
     } else if ('MsTransform' in style) {
         name = '-ms-transform';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransform || 'none';
+            return this._style.MsTransform || this._computedStyle.MsTransform || 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transform) {
             this._style.MsTransform = transform;
         };
@@ -598,34 +847,34 @@
     } else if ('OTransform' in style) {
         name = '-o-transform';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransform || 'none';
+            return this._style.OTransform || this._computedStyle.OTransform || 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transform) {
             this._style.OTransform = transform;
-        };
-        
-        filter = null;
-    } else if ('transform' in style) {
-        name = 'transform';
-        
-        get = function () {
-            return this._style.transform || 'none';
-        };
-        
-        set = function (transform) {
-            this._style.transform = transform;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transform) {};
         
         filter = null;
@@ -642,15 +891,24 @@
     // rotateの登録
     parts[i] = {name: 'rotate'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/rotate\(([^\)]+)\)/i);
         return match && match[1] || '0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (rotate) {
         this.transform(this.rotate(rotate, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (rotate) {
         var trs = this.transform();
         
@@ -676,15 +934,24 @@
     // rotateXの登録
     parts[i] = {name: 'rotateX'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/rotateX\(([^\)]+)\)/i);
         return match && match[1] || '0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (rotateX) {
         this.transform(this.rotateX(rotateX, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (rotateX) {
         var trs = this.transform();
         
@@ -710,15 +977,24 @@
     // rotateYの登録
     parts[i] = {name: 'rotateY'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/rotateY\(([^\)]+)\)/i);
         return match && match[1] || '0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (rotateY) {
         this.transform(this.rotateY(rotateY, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (rotateY) {
         var trs = this.transform();
         
@@ -741,18 +1017,27 @@
     i++;
     
     
-    // rotateYの登録
+    // rotateZの登録
     parts[i] = {name: 'rotateZ'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/rotateZ\(([^\)]+)\)/i);
         return match && match[1] || '0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (rotateZ) {
         this.transform(this.rotateZ(rotateZ, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (rotateZ) {
         var trs = this.transform();
         
@@ -778,15 +1063,24 @@
     // rotate3dの登録
     parts[i] = {name: 'rotate3d'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/rotate3d\(([^\)]+)\)/i);
         return match && match[1] || '0, 0, 0, 0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (rotate3d) {
         this.transform(this.rotate3d(rotate3d, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (rotate3d) {
         var trs = this.transform();
         
@@ -812,15 +1106,24 @@
     // translateの登録
     parts[i] = {name: 'translate'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/translate\(([^\)]+)\)/i);
         return match && match[1] || '0px';
     };
     
+    /**
+     * @ignore
+     */
     set = function (translate) {
         this.transform(this.translate(translate, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (translate) {
         var trs = this.transform();
         
@@ -846,15 +1149,24 @@
     // translateXの登録
     parts[i] = {name: 'translateX'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/translateX\(([^\)]+)\)/i);
         return match && match[1] || '0px';
     };
     
+    /**
+     * @ignore
+     */
     set = function (translateX) {
         this.transform(this.translateX(translateX, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (translateX) {
         var trs = this.transform();
         
@@ -880,15 +1192,24 @@
     // translateYの登録
     parts[i] = {name: 'translateY'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/translateY\(([^\)]+)\)/i);
         return match && match[1] || '0px';
     };
     
+    /**
+     * @ignore
+     */
     set = function (translateY) {
         this.transform(this.translateY(translateY, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (translateY) {
         var trs = this.transform();
         
@@ -914,15 +1235,24 @@
     // translateZの登録
     parts[i] = {name: 'translateZ'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/translateZ\(([^\)]+)\)/i);
         return match && match[1] || '0px';
     };
     
+    /**
+     * @ignore
+     */
     set = function (translateZ) {
         this.transform(this.translateZ(translateZ, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (translateZ) {
         var trs = this.transform();
         
@@ -948,15 +1278,24 @@
     // translate3dの登録
     parts[i] = {name: 'translate3d'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/translate3d\(([^\)]+)\)/i);
         return match && match[1] || '0px, 0px, 0px';
     };
     
+    /**
+     * @ignore
+     */
     set = function (translate3d) {
         this.transform(this.translate3d(translate3d, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (translate3d) {
         var trs = this.transform();
         
@@ -982,15 +1321,24 @@
     // scaleの登録
     parts[i] = {name: 'scale'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/scale\(([^\)]+)\)/i);
         return match && match[1] || '1';
     };
     
+    /**
+     * @ignore
+     */
     set = function (scale) {
         this.transform(this.scale(scale, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (scale) {
         var trs = this.transform();
         
@@ -1016,15 +1364,24 @@
     // scaleXの登録
     parts[i] = {name: 'scaleX'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/scaleX\(([^\)]+)\)/i);
         return match && match[1] || '1';
     };
     
+    /**
+     * @ignore
+     */
     set = function (scaleX) {
         this.transform(this.scaleX(scaleX, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (scaleX) {
         var trs = this.transform();
         
@@ -1050,15 +1407,24 @@
     // scaleYの登録
     parts[i] = {name: 'scaleY'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/scaleY\(([^\)]+)\)/i);
         return match && match[1] || '1';
     };
     
+    /**
+     * @ignore
+     */
     set = function (scaleY) {
         this.transform(this.scaleY(scaleY, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (scaleY) {
         var trs = this.transform();
         
@@ -1084,15 +1450,24 @@
     // scaleZの登録
     parts[i] = {name: 'scaleZ'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/scaleZ\(([^\)]+)\)/i);
         return match && match[1] || '1';
     };
     
+    /**
+     * @ignore
+     */
     set = function (scaleZ) {
         this.transform(this.scaleZ(scaleZ, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (scaleZ) {
         var trs = this.transform();
         
@@ -1118,15 +1493,24 @@
     // scale3dの登録
     parts[i] = {name: 'scale3d'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/scale3d\(([^\)]+)\)/i);
         return match && match[1] || '1, 1, 1';
     };
     
+    /**
+     * @ignore
+     */
     set = function (scale3d) {
         this.transform(this.scale3d(scale3d, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (scale3d) {
         var trs = this.transform();
         
@@ -1152,15 +1536,24 @@
     // skewの登録
     parts[i] = {name: 'skew'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/skew\(([^\)]+)\)/i);
         return match && match[1] || '0deg, 0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (skew) {
         this.transform(this.skew(skew, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (skew) {
         var trs = this.transform();
         
@@ -1186,15 +1579,24 @@
     // skewXの登録
     parts[i] = {name: 'skewX'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/skewX\(([^\)]+)\)/i);
         return match && match[1] || '0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (skewX) {
         this.transform(this.skewX(skewX, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (skewX) {
         var trs = this.transform();
         
@@ -1220,15 +1622,24 @@
     // skewYの登録
     parts[i] = {name: 'skewY'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/skewY\(([^\)]+)\)/i);
         return match && match[1] || '0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (skewY) {
         this.transform(this.skewY(skewY, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (skewY) {
         var trs = this.transform();
         
@@ -1254,15 +1665,24 @@
     // matrixの登録
     parts[i] = {name: 'matrix'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/matrix\(([^\)]+)\)/i);
         return match && match[1] || '1, 0, 0, 1, 0, 0';
     };
     
+    /**
+     * @ignore
+     */
     set = function (matrix) {
         this.transform(this.matrix(matrix, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (matrix) {
         var trs = this.transform();
         
@@ -1288,15 +1708,24 @@
     // matrix3dの登録
     parts[i] = {name: 'matrix3d'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/matrix3d\(([^\)]+)\)/i);
         return match && match[1] || '1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1';
     };
     
+    /**
+     * @ignore
+     */
     set = function (matrix3d) {
         this.transform(this.matrix3d(matrix3d, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (matrix3d) {
         var trs = this.transform();
         
@@ -1322,13 +1751,37 @@
     // transitionの登録
     parts[i] = {name: 'transition'};
     
-    if ('MozTransition' in style) {
-        name = '-moz-transition';
+    if ('transition' in style) {
+        name = 'transition';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransition || 'all 0 ease 0';
+            return this._style.transition || this._computedStyle.transition || 'all 0 ease 0';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transition) {
+            this._style.transition = transition;
+        };
+        
+        filter = null;
+    } else if ('MozTransition' in style) {
+        name = '-moz-transition';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransition || this._computedStyle.MozTransition || 'all 0 ease 0';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transition) {
             this._style.MozTransition = transition;
         };
@@ -1337,10 +1790,16 @@
     } else if ('WebkitTransition' in style) {
         name = '-webkit-transition';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransition || 'all 0 ease 0';
+            return this._style.WebkitTransition || this._computedStyle.WebkitTransition || 'all 0 ease 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transition) {
             this._style.WebkitTransition = transition;
         };
@@ -1349,10 +1808,16 @@
     } else if ('MsTransition' in style) {
         name = '-ms-transition';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransition || 'all 0 ease 0';
+            return this._style.MsTransition || this._computedStyle.MsTransition || 'all 0 ease 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transition) {
             this._style.MsTransition = transition;
         };
@@ -1361,34 +1826,34 @@
     } else if ('OTransition' in style) {
         name = '-o-transition';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransition || 'all 0 ease 0';
+            return this._style.OTransition || this._computedStyle.OTransition || 'all 0 ease 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transition) {
             this._style.OTransition = transition;
-        };
-        
-        filter = null;
-    } else if ('transition' in style) {
-        name = 'transition';
-        
-        get = function () {
-            return this._style.transition || 'all 0 ease 0';
-        };
-        
-        set = function (transition) {
-            this._style.transition = transition;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 'all 0 ease 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transition) {};
         
         filter = null;
@@ -1405,13 +1870,37 @@
     // transition-propertyの登録
     parts[i] = {name: 'transitionProperty'};
     
-    if ('MozTransitionProperty' in style) {
-        name = '-moz-transition-property';
+    if ('transitionProperty' in style) {
+        name = 'transition-property';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransitionProperty || 'all';
+            return this._style.transitionProperty || this._computedStyle.transitionProperty || 'all';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transitionProperty) {
+            this._style.transitionProperty = transitionProperty;
+        };
+        
+        filter = null;
+    } else if ('MozTransitionProperty' in style) {
+        name = '-moz-transition-property';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransitionProperty || this._computedStyle.MozTransitionProperty || 'all';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transitionProperty) {
             this._style.MozTransitionProperty = transitionProperty;
         };
@@ -1420,10 +1909,16 @@
     } else if ('WebkitTransitionProperty' in style) {
         name = '-webkit-transition-property';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransitionProperty || 'all';
+            return this._style.WebkitTransitionProperty || this._computedStyle.WebkitTransitionProperty || 'all';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionProperty) {
             this._style.WebkitTransitionProperty = transitionProperty;
         };
@@ -1432,10 +1927,16 @@
     } else if ('MsTransitionProperty' in style) {
         name = '-ms-transition-property';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransitionProperty || 'all';
+            return this._style.MsTransitionProperty || this._computedStyle.MsTransitionProperty || 'all';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionProperty) {
             this._style.MsTransitionProperty = transitionProperty;
         };
@@ -1444,34 +1945,34 @@
     } else if ('OTransitionProperty' in style) {
         name = '-o-transition-property';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransitionProperty || 'all';
+            return this._style.OTransitionProperty || this._computedStyle.OTransitionProperty || 'all';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionProperty) {
             this._style.OTransitionProperty = transitionProperty;
-        };
-        
-        filter = null;
-    } else if ('transitionProperty' in style) {
-        name = 'transition-property';
-        
-        get = function () {
-            return this._style.transitionProperty || 'all';
-        };
-        
-        set = function (transitionProperty) {
-            this._style.transitionProperty = transitionProperty;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 'all';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionProperty) {};
         
         filter = null;
@@ -1488,13 +1989,37 @@
     // transition-durationの登録
     parts[i] = {name: 'transitionDuration'};
     
-    if ('MozTransitionDuration' in style) {
-        name = '-moz-transition-duration';
+    if ('transitionDuration' in style) {
+        name = 'transition-duration';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransitionDuration || '0';
+            return this._style.transitionDuration || this._computedStyle.transitionDuration || '0';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transitionDuration) {
+            this._style.transitionDuration = transitionDuration;
+        };
+        
+        filter = null;
+    } else if ('MozTransitionDuration' in style) {
+        name = '-moz-transition-duration';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransitionDuration || this._computedStyle.MozTransitionDuration || '0';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transitionDuration) {
             this._style.MozTransitionDuration = transitionDuration;
         };
@@ -1503,10 +2028,16 @@
     } else if ('WebkitTransitionDuration' in style) {
         name = '-webkit-transition-duration';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransitionDuration || '0';
+            return this._style.WebkitTransitionDuration || this._computedStyle.WebkitTransitionDuration || '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDuration) {
             this._style.WebkitTransitionDuration = transitionDuration;
         };
@@ -1515,10 +2046,16 @@
     } else if ('MsTransitionDuration' in style) {
         name = '-ms-transition-duration';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransitionDuration || '0';
+            return this._style.MsTransitionDuration || this._computedStyle.MsTransitionDuration || '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDuration) {
             this._style.MsTransitionDuration = transitionDuration;
         };
@@ -1527,34 +2064,34 @@
     } else if ('OTransitionDuration' in style) {
         name = '-o-transition-duration';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransitionDuration || '0';
+            return this._style.OTransitionDuration || this._computedStyle.OTransitionDuration || '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDuration) {
             this._style.OTransitionDuration = transitionDuration;
-        };
-        
-        filter = null;
-    } else if ('transitionDuration' in style) {
-        name = 'transition-duration';
-        
-        get = function () {
-            return this._style.transitionDuration || '0';
-        };
-        
-        set = function (transitionDuration) {
-            this._style.transitionDuration = transitionDuration;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDuration) {};
         
         filter = null;
@@ -1571,13 +2108,37 @@
     // transition-timing-functionの登録
     parts[i] = {name: 'transitionTimingFunction'};
     
-    if ('MozTransitionTimingFunction' in style) {
-        name = '-moz-transition-timing-function';
+    if ('transitionTimingFunction' in style) {
+        name = 'transition-timing-function';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransitionTimingFunction || 'ease';
+            return this._style.transitionTimingFunction || this._computedStyle.transitionTimingFunction || 'ease';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transitionTimingFunction) {
+            this._style.transitionTimingFunction = transitionTimingFunction;
+        };
+        
+        filter = null;
+    } else if ('MozTransitionTimingFunction' in style) {
+        name = '-moz-transition-timing-function';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransitionTimingFunction || this._computedStyle.MozTransitionTimingFunction || 'ease';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transitionTimingFunction) {
             this._style.MozTransitionTimingFunction = transitionTimingFunction;
         };
@@ -1586,10 +2147,16 @@
     } else if ('WebkitTransitionTimingFunction' in style) {
         name = '-webkit-transition-timing-function';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransitionTimingFunction || 'ease';
+            return this._style.WebkitTransitionTimingFunction || this._computedStyle.WebkitTransitionTimingFunction || 'ease';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionTimingFunction) {
             this._style.WebkitTransitionTimingFunction = transitionTimingFunction;
         };
@@ -1598,10 +2165,16 @@
     } else if ('MsTransitionTimingFunction' in style) {
         name = '-ms-transition-timing-function';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransitionTimingFunction || 'ease';
+            return this._style.MsTransitionTimingFunction || this._computedStyle.MsTransitionTimingFunction || 'ease';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionTimingFunction) {
             this._style.MsTransitionTimingFunction = transitionTimingFunction;
         };
@@ -1610,34 +2183,34 @@
     } else if ('OTransitionTimingFunction' in style) {
         name = '-o-transition-timing-function';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransitionTimingFunction || 'ease';
+            return this._style.OTransitionTimingFunction || this._computedStyle.OTransitionTimingFunction || 'ease';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionTimingFunction) {
             this._style.OTransitionTimingFunction = transitionTimingFunction;
-        };
-        
-        filter = null;
-    } else if ('transitionTimingFunction' in style) {
-        name = 'transition-timing-function';
-        
-        get = function () {
-            return this._style.transitionTimingFunction || 'ease';
-        };
-        
-        set = function (transitionTimingFunction) {
-            this._style.transitionTimingFunction = transitionTimingFunction;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 'ease';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionTimingFunction) {};
         
         filter = null;
@@ -1654,13 +2227,37 @@
     // transition-delayの登録
     parts[i] = {name: 'transitionDelay'};
     
-    if ('MozTransitionDelay' in style) {
-        name = '-moz-transition-delay';
+    if ('transitionDelay' in style) {
+        name = 'transition-delay';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransitionDelay || '0';
+            return this._style.transitionDelay || this._computedStyle.transitionDelay || '0';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transitionDelay) {
+            this._style.transitionDelay = transitionDelay;
+        };
+        
+        filter = null;
+    } else if ('MozTransitionDelay' in style) {
+        name = '-moz-transition-delay';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransitionDelay || this._computedStyle.MozTransitionDelay || '0';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transitionDelay) {
             this._style.MozTransitionDelay = transitionDelay;
         };
@@ -1669,10 +2266,16 @@
     } else if ('WebkitTransitionDelay' in style) {
         name = '-webkit-transition-delay';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransitionDelay || '0';
+            return this._style.WebkitTransitionDelay || this._computedStyle.WebkitTransitionDelay || '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDelay) {
             this._style.WebkitTransitionDelay = transitionDelay;
         };
@@ -1681,10 +2284,16 @@
     } else if ('MsTransitionDelay' in style) {
         name = '-ms-transition-delay';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransitionDelay || '0';
+            return this._style.MsTransitionDelay || this._computedStyle.MsTransitionDelay || '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDelay) {
             this._style.MsTransitionDelay = transitionDelay;
         };
@@ -1693,34 +2302,34 @@
     } else if ('OTransitionDelay' in style) {
         name = '-o-transition-delay';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransitionDelay || '0';
+            return this._style.OTransitionDelay || this._computedStyle.OTransitionDelay || '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDelay) {
             this._style.OTransitionDelay = transitionDelay;
-        };
-        
-        filter = null;
-    } else if ('transitionDelay' in style) {
-        name = 'transition-delay';
-        
-        get = function () {
-            return this._style.transitionDelay || '0';
-        };
-        
-        set = function (transitionDelay) {
-            this._style.transitionDelay = transitionDelay;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDelay) {};
         
         filter = null;

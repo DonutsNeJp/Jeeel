@@ -12,12 +12,12 @@ Jeeel.directory.Jeeel.Filter.Html = {
 };
 
 /**
- * Html関連のフィルター管理ネームスペース
+ * @namespace Html関連のフィルター管理ネームスペース
  */
 Jeeel.Filter.Html = {
 
 };
 
-Jeeel.file.Jeeel.Filter.Html = ['Escape', 'Unescape', 'Form', 'FormValue', 'Hidden', 'HiddenString', 'ElementTagBundle', 'ElementAttributeReduce'];
+Jeeel.file.Jeeel.Filter.Html = ['Escape', 'Unescape', 'Form', 'FormValue', 'Hidden', 'HiddenString'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Filter.Html, Jeeel.file.Jeeel.Filter.Html);

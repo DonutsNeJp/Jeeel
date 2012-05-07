@@ -16,19 +16,56 @@ Jeeel.directory.Jeeel.Dom.Style = {
  * 
  * @class スタイルを扱うクラス
  * @param {Element} element スタイルの操作対象Element
+ * @example
+ * 通常のスタイルに加え以下のクロスブラウザ実装と疑似実装を行っている
+ * なおキャメルケースで記述しているがハイフネーション形式でも問題なく動作する
+ * opacity
+ * backgroundPositionX
+ * backgroundPositionY
+ * perspective
+ * backfaceVisibility
+ * transformOrigin
+ * transformStyle
+ * transform
+ * rotate
+ * rotateX
+ * rotateY
+ * rotateZ
+ * rotate3d
+ * translate
+ * translateX
+ * translateY
+ * translateZ
+ * translate3d
+ * scale
+ * scaleX
+ * scaleY
+ * scaleZ
+ * scale3d
+ * skew
+ * skewX
+ * skewY
+ * matrix
+ * matrix3d
+ * transition
+ * transitionProperty
+ * transitionDuration
+ * transitionTimingFunction
+ * transitionDelay
  */
 Jeeel.Dom.Style = function (element) {
     this._style = element && element.style || null;
-    this._hook = element && new this.constructor.Hook(element, this);
-    this._customStyle = this._style &&  new this.constructor.Custom(this._style);
-    this._bundler = this._customStyle && new this.constructor.Bundler(this._customStyle);
-    this._defaultDisplay = this.constructor.getDefaultDisplay(element && element.nodeName);
-    this._animationQueue = [];
-    this._nextAnimate = Jeeel.Function.simpleBind(this._nextAnimate, this);
     
     if (element) {
         this._computedStyle = element.parentNode && Jeeel.Document.getComputedStyle(element) || null;
     }
+    
+    this._hook = element && new this.constructor.Hook(element, this);
+    this._customStyle = this._style &&  new this.constructor.Custom(this._style, this._computedStyle);
+    this._bundler = this._customStyle && new this.constructor.Bundler(this._customStyle);
+    this._defaultDisplay = this.constructor.getDefaultDisplay(element && element.nodeName);
+    this._animationQueue = [];
+    this._nextAnimate = Jeeel.Function.simpleBind(this._nextAnimate, this);
 };
 
 /**
@@ -183,7 +220,7 @@ Jeeel.Dom.Style.prototype = {
         
         // まずフックを参照し、続いて通常のスタイル、カスタムスタイル、計算済みスタイルから参照する
         return (this._hook[style] && this._hook[style]()) 
-            || this._style[style] 
+            || this._style[style]
             || (this._customStyle[style] && this._customStyle[style]()) 
             || (this._computedStyle && this._computedStyle[style])
             || null;
@@ -224,7 +261,6 @@ Jeeel.Dom.Style.prototype = {
         styles = this._bundler.bundle(styles);
         
         for (var style in styles) {
-            
             var styleName  = Jeeel.String.toCamelCase(style);
             var styleValue = styles[style];
 

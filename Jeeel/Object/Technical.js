@@ -13,7 +13,7 @@ Jeeel.directory.Jeeel.Object.Technical = {
 };
 
 /**
- * Jeeel内部で使用している特殊クラスを保持するネームスペース
+ * @namespace Jeeel内部で使用している特殊クラスを保持するネームスペース
  */
 Jeeel.Object.Technical = {
 

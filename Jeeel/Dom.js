@@ -12,13 +12,13 @@ Jeeel.directory.Jeeel.Dom = {
 };
 
 /**
- * Domに関するネームスペース
+ * @namespace Domに関するネームスペース
  */
 Jeeel.Dom = {
 
 };
 
-Jeeel.file.Jeeel.Dom = ['Core', 'Node', 'Window', 'Document', 'Xml', 'Event', 'Style', 'Element', 'ElementOperator', 'SearchOption'];
+Jeeel.file.Jeeel.Dom = ['Core', 'Node', 'Window', 'Document', 'Xml', 'Event', 'Style', 'Element', 'ElementOperator', 'Selector', 'Behavior', 'SearchOption'];
 
 if (Jeeel._auto) {
     Jeeel.Dom._tmp = function () {

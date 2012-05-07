@@ -2,7 +2,8 @@
 (function (createPacker) {
 
     /**
-     * 未完成
+     * @staticClass ファイルを圧縮するスタティッククラス
+     * @ignore 未完成
      */
     Jeeel.Debug.Compressor = {
         
@@ -30,7 +31,10 @@
     };
 
 })(function() {
-  
+    
+    /**
+     * @ignore
+     */
     var base2 = {
         name: "base2",
         version: "1.0.1(pre)",
@@ -151,6 +155,10 @@
                 ancestorOf: delegate(_11),
                 extend: _9,
                 forEach: delegate(_8),
+                
+                /**
+                 * @ignore
+                 */
                 implement: function(a) {
                     if (typeof a == "function") {
                         if (_11(Base, a)) {
@@ -277,7 +285,7 @@
                 return d;
             }}
         );
-          
+        
         
         function _12(a, b) {
             for (var c in b) {
@@ -576,6 +584,10 @@
                 if (arguments.length == 1) {
                     var l = this;
                     var m = this[_15];
+                    
+                    /**
+                     * @ignore
+                     */
                     j = function(a) {
                         if (a) {
                             var b, c = 1, i = 0;
@@ -638,7 +650,7 @@
                         } else {
                             var Q = /'/.test(b.replace(/\\./g, "")) ? '"' : "'";
                             b = b.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\$(\d+)/g, Q + "+(arguments[$1]||" + Q + Q + ")+" + Q);
-                            b = new Function("return " + Q + b.replace(/(['"])\1\+(.*)\+\1\1$/, "$1") + Q)
+                            b = new Function("return " + Q + b.replace(/(['"])\1\+(.*)\+\1\1$/, "$1") + Q);
                         }
                     }
                     this.length = RegGrp.count(a);
@@ -656,25 +668,46 @@
                 }, this)
             }};
         if ((new Date).getYear() > 1900) {
+            /**
+             * @ignore
+             */
             Date.prototype.getYear = function() {
                 return this.getFullYear() - 1900
             };
+            
+            /**
+             * @ignore
+             */
             Date.prototype.setYear = function(a) {
                 return this.setFullYear(a + 1900)
             }
         }
-        Function.prototype.prototype = {};
+        
+        /**
+         * @ignore
+         */
+        (Function || {}).prototype.prototype = {};
+        
         if ("".replace(/^/, K("$$")) == "$") {
             extend(String.prototype, "replace", function(a, b) {
                 if (typeof b == "function") {
                     var c = b;
+                    
+                    /**
+                     * @ignore
+                     */
                     b = function() {
                         return String(c.apply(null, arguments)).split("$").join("$$")
-                    }
+                    };
                 }
-                return this.base(a, b)
-            })
+                
+                return this.base(a, b);
+            });
         }
+        
+        /**
+         * @ignore
+         */
         var Array2 = _23(Array, Array, "concat,join,pop,push,reverse,shift,slice,sort,splice,unshift", [Enumerable, {combine: function(d, e) {
                     if (!e)
                         e = d;
@@ -749,14 +782,20 @@
                     return a
                 }}]);
         Array2.reduce = Enumerable.reduce;
+        
+        /**
+         * @ignore
+         */
         Array2.like = function(a) {
             return !!(a && typeof a == "object" && typeof a.length == "number")
         };
+        
         var _25 = /^((-\d+|\d{4,})(-(\d{2})(-(\d{2}))?)?)?T((\d{2})(:(\d{2})(:(\d{2})(\.(\d{1,3})(\d)?\d*)?)?)?)?(([+-])(\d{2})(:(\d{2}))?|Z)?$/;
         var _26 = {FullYear: 2,Month: 4,Date: 6,Hours: 8,Minutes: 10,Seconds: 12,Milliseconds: 14};
         var _27 = {Hectomicroseconds: 15,UTC: 16,Sign: 17,Hours: 18,Minutes: 20};
         var _28 = /(((00)?:0+)?:0+)?\.0+$/;
         var _29 = /(T[0-9:.]+)$/;
+        
         var Date2 = _23(Date, function(a, b, c, h, m, s, d) {
             switch (arguments.length) {
                 case 0:
@@ -766,26 +805,43 @@
                 default:
                     return new Date(a, b, arguments.length == 2 ? 1 : c, h || 0, m || 0, s || 0, d || 0)
             }
-        }, "", [{toISOString: function(c) {
+        }, "", [{
+            toISOString: function(c) {
                     var d = "####-##-##T##:##:##.###";
+                    
                     for (var e in _26) {
                         d = d.replace(/#+/, function(a) {
                             var b = c["getUTC" + e]();
-                            if (e == "Month")
+                            if (e == "Month") {
                                 b++;
-                            return ("000" + b).slice(-a.length)
-                        })
+                            }
+                            
+                            return ("000" + b).slice(-a.length);
+                        });
                     }
-                    return d.replace(_28, "").replace(_29, "$1Z")
-                }}]);
+                    
+                    return d.replace(_28, "").replace(_29, "$1Z");
+                }
+            }
+        ]);
+            
+        /**
+         * @ignore
+         */
         Date2.now = function() {
-            return (new Date).valueOf()
+            return (new Date).valueOf();
         };
+        
+        /**
+         * @ignore
+         */
         Date2.parse = function(a, b) {
             if (arguments.length > 1) {
-                assertType(b, "number", "defaultDate should be of type 'number'.")
+                assertType(b, "number", "defaultDate should be of type 'number'.");
             }
+            
             var c = String(a).match(_25);
+            
             if (c) {
                 if (c[_26.Month])
                     c[_26.Month]--;
@@ -812,9 +868,17 @@
                 return Date.parse(a)
             }
         };
+        
+        /**
+         * @ignore
+         */
         var String2 = _23(String, function(a) {
             return new String(arguments.length == 0 ? "" : a)
         }, "charAt,charCodeAt,concat,indexOf,lastIndexOf,match,replace,search,slice,split,substr,substring,toLowerCase,toUpperCase", [{trim: trim}]);
+        
+        /**
+         * @ignore
+         */
         function _23(c, d, e, f) {
             var g = Module.extend();
             forEach(e.match(/\w+/g), function(a) {
@@ -837,7 +901,10 @@
                 delete h.forEach;
             return h
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function extend(a, b) {
             if (a && b) {
                 if (arguments.length > 2) {
@@ -883,7 +950,10 @@
             }
             return a
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function _11(a, b) {
             while (b) {
                 if (!b.ancestor)
@@ -894,9 +964,16 @@
             }
             return false
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function _22(c, d, e) {
             var f = c[d];
+            
+            /**
+             * @ignore
+             */
             function _30() {
                 var a = this.base;
                 this.base = f;
@@ -904,35 +981,50 @@
                 this.base = a;
                 return b
             }
-            ;
+            
             _30.ancestor = f;
             _30.method = e;
+            
+            /**
+             * @ignore
+             */
             _30.toString = function() {
                 return String(e)
             };
-            c[d] = _30
+            
+            c[d] = _30;
         }
-        ;
+        
         if (typeof StopIteration == "undefined") {
             StopIteration = new Error("StopIteration")
         }
+        
+        /**
+         * @ignore
+         */
         function forEach(a, b, c, d) {
-            if (a == null)
+            if (a == null) {
                 return;
+            }
+            
             if (!d) {
                 if (typeof a == "function" && a.call) {
-                    d = Function
+                    d = Function;
                 } else if (typeof a.forEach == "function" && a.forEach != arguments.callee) {
                     a.forEach(b, c);
-                    return
+                    return;
                 } else if (typeof a.length == "number") {
                     _24(a, b, c);
-                    return
+                    return;
                 }
             }
-            _8(d || Object, a, b, c)
+            
+            _8(d || Object, a, b, c);
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function _24(a, b, c) {
             if (a == null)
                 return;
@@ -948,7 +1040,10 @@
                 }
             }
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function _8(g, h, j, k) {
             var l = function() {
                 this.i = 1
@@ -974,7 +1069,10 @@
             };
             _8(g, h, j, k)
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function instanceOf(a, b) {
             if (typeof b != "function") {
                 throw new TypeError("Invalid 'instanceOf' operand.");
@@ -1008,13 +1106,19 @@
             }
             return false
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function assert(a, b, c) {
             if (!a) {
                 throw new (c || Error)(b || "Assertion failed.");
             }
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function assertArity(a, b, c) {
             if (b == null)
                 b = a.callee.length;
@@ -1022,110 +1126,178 @@
                 throw new SyntaxError(c || "Not enough arguments.");
             }
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function assertType(a, b, c) {
             if (b && (typeof b == "function" ? !instanceOf(a, b) : typeof a != b)) {
                 throw new TypeError(c || "Invalid type.");
             }
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function assignID(a) {
-            if (!a.base2ID)
+            if (!a.base2ID) {
                 a.base2ID = "b2_" + counter();
-            return a.base2ID
+            }
+            
+            return a.base2ID;
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function counter() {
-            return _7++
+            return _7++;
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function copy(a) {
+          
+            /**
+             * @ignore
+             */
             var b = function() {
             };
+            
             b.prototype = a;
-            return new b
+            
+            return new b;
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function format(c) {
             var d = arguments;
             var e = new RegExp("%([1-" + arguments.length + "])", "g");
+            
             return String(c).replace(e, function(a, b) {
-                return b < d.length ? d[b] : a
-            })
+                return b < d.length ? d[b] : a;
+            });
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function match(a, b) {
             return String(a).match(b) || []
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function rescape(a) {
             return String(a).replace(_3, "\\$1")
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function trim(a) {
-            return String(a).replace(_1, "").replace(_2, "")
+            return String(a).replace(_1, "").replace(_2, "");
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function I(i) {
-            return i
+            return i;
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function K(k) {
             return function() {
-                return k
+                return k;
             }
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function bind(a, b) {
             var c = slice(arguments, 2);
+            
+            /**
+             * @ignore
+             */
             var d = function() {
-                return a.apply(b, c.concat(slice(arguments)))
+                return a.apply(b, c.concat(slice(arguments)));
             };
+            
             d._31 = assignID(a);
-            return d
+            
+            return d;
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function delegate(a, b) {
             return function() {
-                return a.apply(b, [this].concat(slice(arguments)))
-            }
+                return a.apply(b, [this].concat(slice(arguments)));
+            };
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function flip(a) {
             return function() {
-                return a.apply(this, Array2.swap(arguments, 0, 1))
-            }
+                return a.apply(this, Array2.swap(arguments, 0, 1));
+            };
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function not(a) {
             return function() {
-                return !a.apply(this, arguments)
-            }
+                return !a.apply(this, arguments);
+            };
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function partial(a) {
             var b = slice.call(arguments, 1);
+            
             return function() {
-                return a.apply(this, b.concat(slice(arguments)))
-            }
+                return a.apply(this, b.concat(slice(arguments)));
+            };
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function unbind(b) {
             return function(a) {
                 return b.apply(a, slice(arguments, 1))
             }
         }
-        ;
+        
+        
         base2 = new Package(this, base2);
         eval(this.exports);
         base2.extend = extend;
         forEach(Enumerable, function(a, b) {
-            if (!Module[b])
-                base2.addName(b, bind(a, Enumerable))
+            if (!Module[b]) {
+                base2.addName(b, bind(a, Enumerable));
+            }
         });
+        
         JavaScript = new Package(this, JavaScript);
-        eval(this.exports)
+        eval(this.exports);
     };
+    
     new function(_) {
         var DOM = new base2.Package(this, {name: "DOM",version: "1.0 (beta 1)",exports: "Interface, Binding, Node, Document, Element, AbstractView, Event, EventTarget, DocumentEvent, " + "NodeSelector, DocumentSelector, ElementSelector, StaticNodeList, " + "ViewCSS, HTMLDocument, HTMLElement, Selector, Traversal, XPathParser",bind: function(a) {
                 if (a && a.nodeType) {
@@ -1173,11 +1345,18 @@
                 closures[e] = b;
                 b = null;
                 c = null;
-                if (!closures[d])
+                if (!closures[d]) {
                     closures[d] = {};
+                }
+                
                 var f = closures[d][e];
-                if (f)
+                if (f) {
                     return f;
+                }
+                
+                /**
+                 * @ignore
+                 */
                 var g = function() {
                     var a = document.all[d];
                     return a ? closures[e].apply(a, arguments) : undefined
@@ -1186,10 +1365,13 @@
                 closures[d][e] = g;
                 return g
             });
+            
             attachEvent("onunload", function() {
-                closures = null
-            })
+                closures = null;
+            });
         }
+        
+        
         var Interface = Module.extend(null, {implement: function(c) {
                 if (typeof c == "object") {
                     forEach(c, function(a, b) {
@@ -1224,18 +1406,21 @@
             }});
         var Node = Binding.extend({"@!(element.compareDocumentPosition)": {compareDocumentPosition: function(a, b) {
                     if (Traversal.contains(a, b)) {
-                        return 4 | 16
+                        return 4 | 16;
                     } else if (Traversal.contains(b, a)) {
-                        return 2 | 8
+                        return 2 | 8;
                     }
+                    
                     var c = _34(a);
                     var d = _34(b);
+                    
                     if (c < d) {
-                        return 4
+                        return 4;
                     } else if (c > d) {
-                        return 2
+                        return 2;
                     }
-                    return 0
+                    
+                    return 0;
                 }}});
         var _34 = document.documentElement.sourceIndex ? function(a) {
             return a.sourceIndex
@@ -1461,20 +1646,28 @@
                     }}}});
         var DOMContentLoadedEvent = Base.extend({constructor: function(b) {
                 var c = false;
+                
+                /**
+                 * @ignore
+                 */
                 this.fire = function() {
                     if (!c) {
                         c = true;
+                        
                         setTimeout(function() {
                             var a = DocumentEvent.createEvent(b, "Events");
                             Event.initEvent(a, "DOMContentLoaded", false, false);
-                            EventTarget.dispatchEvent(b, a)
-                        }, 1)
+                            EventTarget.dispatchEvent(b, a);
+                        }, 1);
                     }
                 };
+                
                 EventTarget.addEventListener(b, "DOMContentLoaded", function() {
-                    c = true
+                    c = true;
                 }, false);
-                EventTarget.addEventListener(Traversal.getDefaultView(b), "load", this.fire, false)
+                
+                EventTarget.addEventListener(Traversal.getDefaultView(b), "load", this.fire, false);
+                
             },"@(attachEvent)": {constructor: function() {
                     this.base(document);
                     Traversal.getDefaultView(document).attachEvent("onload", this.fire)
@@ -1483,12 +1676,16 @@
                     if (a.readyState != "complete") {
                         var b = this;
                         a.write("<script id=__ready defer src=//:><\/script>");
+                        
+                        /**
+                         * @ignore
+                         */
                         a.all.__ready.onreadystatechange = function() {
                             if (this.readyState == "complete") {
                                 this.removeNode();
-                                b.fire()
+                                b.fire();
                             }
-                        }
+                        };
                     }
                 }},"@KHTML": {constructor: function(a) {
                     this.base(a);
@@ -1569,9 +1766,13 @@
         var StaticNodeList = Base.extend({constructor: function(b) {
                 b = b || [];
                 this.length = b.length;
+                
+                /**
+                 * @ignore
+                 */
                 this.item = function(a) {
-                    return b[a]
-                }
+                    return b[a];
+                };
             },length: 0,forEach: function(a, b) {
                 for (var i = 0; i < this.length; i++) {
                     a.call(b, this.item(i), i, this)
@@ -1579,9 +1780,13 @@
             },item: Undefined,"@(XPathResult)": {constructor: function(b) {
                     if (b && b.snapshotItem) {
                         this.length = b.snapshotLength;
+                        
+                        /**
+                         * @ignore
+                         */
                         this.item = function(a) {
                             return b.snapshotItem(a)
-                        }
+                        };
                     } else
                         this.base(b)
                 }}});
@@ -1882,7 +2087,12 @@
                         d = reg.length - 1
                     }
                     return "if(" + format(g, b, d) + "){"
-                }});
+                }
+            });
+            
+            /**
+             * @ignore
+             */
             Selector.parse = function(a) {
                 if (!_65[a]) {
                     reg = [];
@@ -1950,210 +2160,354 @@
         var JSB = new base2.Package(this, {name: "JSB",version: "0.7",imports: "DOM",exports: "Behavior, Rule, RuleList"});
         eval(this.imports);
         var Behavior = Abstract.extend();
-        var Call = Base.extend({constructor: function(a, b, c, d) {
+        var Call = Base.extend({
+            constructor: function(a, b, c, d) {
+                /**
+                 * @ignore
+                 */
                 this.release = function() {
                     b.apply(a, c)
                 };
-                this.rank = d || (100 + Call.list.length)
-            }}, {list: [],defer: function(a, b) {
+                
+                this.rank = d || (100 + Call.list.length);
+            }
+        }, {
+            list: [],
+            
+            defer: function(a, b) {
                 return function() {
                     if (Call.list) {
-                        Call.list.push(new Call(this, a, arguments, b))
+                        Call.list.push(new Call(this, a, arguments, b));
                     } else {
-                        a.apply(this, arguments)
+                        a.apply(this, arguments);
                     }
-                }
-            },init: function() {
+                };
+            },
+            
+            init: function() {
                 EventTarget.addEventListener(document, "DOMContentLoaded", function() {
                     if (Call.list) {
                         DOM.bind(document);
                         Call.list.sort(function(a, b) {
                             return a.rank - b.rank
                         });
+                        
                         invoke(Call.list, "release");
                         delete Call.list;
+                        
                         setTimeout(function() {
+                          
                             var a = DocumentEvent.createEvent(document, "Events");
                             Event.initEvent(a, "ready", false, false);
-                            EventTarget.dispatchEvent(document, a)
-                        }, 1)
+                            EventTarget.dispatchEvent(document, a);
+                        }, 1);
                     }
-                }, false)
-            }});
+                }, false);
+            }
+        });
+        
         var _66 = /^on[a-z]+$/;
-        var Rule = Base.extend({constructor: function(e, f) {
+        
+        var Rule = Base.extend({
+            constructor: function(e, f) {
                 e = new Selector(e);
+                
                 if (Behavior.ancestorOf(f)) {
-                    f = f.prototype
+                    f = f.prototype;
                 }
+                
                 var g = {}, h = {}, i = f.style, j = {};
+                
                 forEach(f, function(a, b) {
                     if (b.charAt(0) == "@") {
                         if (detect(b.slice(1))) {
-                            forEach(a, arguments.callee)
+                            forEach(a, arguments.callee);
                         }
                     } else if (typeof a == "function" && _66.test(b)) {
-                        h[b.slice(2)] = a
+                        h[b.slice(2)] = a;
                     } else if (b != "style") {
-                        g[b] = a
+                        g[b] = a;
                     }
                 });
+                
                 function addBehavior(a) {
                     var b = assignID(a);
+                    
                     if (!j[b]) {
                         j[b] = true;
                         DOM.bind(a);
                         extend(a, g);
                         extend(a.style, i);
+                        
                         for (var c in h) {
                             var target = a;
                             var d = h[c];
                             if (c.indexOf("document") == 0) {
                                 target = document;
                                 c = c.slice(8);
-                                d = bind(d, a)
+                                d = bind(d, a);
                             }
-                            target.addEventListener(c, d, false)
+                            
+                            target.addEventListener(c, d, false);
                         }
                     }
                 }
-                ;
+                
                 this.refresh = Call.defer(function() {
-                    e.exec(document).forEach(addBehavior)
+                    e.exec(document).forEach(addBehavior);
                 });
+                
                 this.toString = K(String(e));
                 this.refresh()
-            },refresh: Undefined});
-        var RuleList = Collection.extend({constructor: function(a) {
+            },
+            
+            refresh: Undefined
+        });
+        
+        var RuleList = Collection.extend({
+            constructor: function(a) {
                 this.base(a);
-                this.globalize()
-            },globalize: Call.defer(function() {
+                this.globalize();
+            },
+            
+            globalize: Call.defer(function() {
                 var e = /[^\s,]+/g;
                 var f = /^#[\w-]+$/;
                 forEach(this, function(c, d) {
                     forEach(match(d, e), function(a) {
                         if (f.test(a)) {
                             var b = ViewCSS.toCamelCase(a.slice(1));
-                            window[b] = Document.querySelector(document, a)
+                            window[b] = Document.querySelector(document, a);
                         }
-                    })
+                    });
                 })
-            }, 10),refresh: function() {
-                this.invoke("refresh")
-            }}, {Item: Rule});
-        eval(this.exports)
+            }, 10),
+            
+            refresh: function() {
+                this.invoke("refresh");
+            }
+        }, {Item: Rule});
+        
+        eval(this.exports);
     };
+    
     eval(base2.namespace);
+    
     var DEFAULT = "@0";
     var IGNORE = RegGrp.IGNORE;
-    var Colorizer = RegGrp.extend({constructor: function(c, d, e) {
+    
+    var Colorizer = RegGrp.extend({
+        constructor: function(c, d, e) {
             this.extend(e);
             this.patterns = c || {};
+            
             var f = {}, i;
+            
             forEach(c, function(a, b) {
-                f[b] = d[b] || DEFAULT
+                f[b] = d[b] || DEFAULT;
             });
+            
             forEach(d, function(a, b) {
-                f[b] = d[b]
+                f[b] = d[b];
             });
-            this.base(f)
-        },patterns: null,tabStop: 4,urls: true,copy: function() {
+            
+            this.base(f);
+        },
+        
+        patterns: null,
+        
+        tabStop: 4,
+        
+        urls: true,
+        
+        copy: function() {
             var a = this.base();
             a.patterns = copy(this.patterns);
-            return a
-        },exec: function(a, b) {
+            
+            return a;
+        }, 
+        
+        exec: function(a, b) {
             a = this.base(this.escape(a));
-            if (!b) {
+            
+            if ( ! b) {
                 a = this._67(a);
-                if (this.urls)
-                    a = Colorizer.urls.exec(a)
-            }
-            return this.unescape(a)
-        },escape: function(a) {
-            return String(a).replace(/</g, "\x01").replace(/&/g, "\x02")
-        },put: function(c, d) {
-            if (!instanceOf(c, RegGrp.Item)) {
-                if (typeof d == "string") {
-                    d = d.replace(/@(\d)/, function(a, b) {
-                        return format(Colorizer.FORMAT, c, b)
-                    })
+                
+                if (this.urls) {
+                    a = Colorizer.urls.exec(a);
                 }
-                c = this.patterns[c] || Colorizer.patterns[c] || c;
-                if (instanceOf(c, RegExp))
-                    c = c.source;
-                c = this.escape(c)
             }
-            return this.base(c, d)
-        },unescape: function(a) {
-            return a.replace(/\x01/g, "&lt;").replace(/\x02/g, "&amp;")
-        },_67: function(c) {
+            
+            return this.unescape(a);
+        },
+        
+        escape: function(a) {
+            return String(a).replace(/</g, "\x01").replace(/&/g, "\x02");
+        },
+        
+        put: function(c, d) {
+            if ( ! instanceOf(c, RegGrp.Item)) {
+                if (typeof d === "string") {
+                    d = d.replace(/@(\d)/, function(a, b) {
+                        return format(Colorizer.FORMAT, c, b);
+                    });
+                }
+                
+                c = this.patterns[c] || Colorizer.patterns[c] || c;
+                
+                if (instanceOf(c, RegExp)) {
+                    c = c.source;
+                }
+                
+                c = this.escape(c);
+            }
+            
+            return this.base(c, d);
+        },
+        
+        unescape: function(a) {
+            return a.replace(/\x01/g, "&lt;").replace(/\x02/g, "&amp;");
+        },
+        
+        _67: function(c) {
             var d = this.tabStop;
+            
             if (d > 0) {
                 var e = Array(d + 1).join(" ");
+                
                 return c.replace(Colorizer.TABS, function(a) {
                     a = a.replace(Colorizer.TAB, e);
                     if (d > 1) {
                         var b = (a.length - 1) % d;
-                        if (b)
-                            a = a.slice(0, -b)
+                        
+                        if (b) {
+                            a = a.slice(0, -b);
+                        }
                     }
-                    return a.replace(/ /g, "&nbsp;")
-                })
+                    
+                    return a.replace(/ /g, "&nbsp;");
+                });
             }
-            return c
-        },"@MSIE": {_67: function(a) {
-                return this.base(a).replace(/\r?\n/g, "<br>")
-            }}}, {version: "0.8",FORMAT: '<span class="%1">$%2</span>',DEFAULT: DEFAULT,IGNORE: IGNORE,TAB: /\t/g,TABS: /\n([\t \xa0]+)/g,init: function() {
+            
+            return c;
+        },
+        
+        "@MSIE": {
+            _67: function(a) {
+                return this.base(a).replace(/\r?\n/g, "<br>");
+            }
+        }
+    }, {
+        version: "0.8",
+        FORMAT: '<span class="%1">$%2</span>',
+        DEFAULT: DEFAULT,
+        IGNORE: IGNORE,
+        TAB: /\t/g,
+        TABS: /\n([\t \xa0]+)/g,
+        init: function() {
             forEach(this.patterns, function(c, d, e) {
                 if (instanceOf(c, Array)) {
                     e[d] = reduce(c, function(a, b) {
                         a.add(e[b]);
-                        return a
-                    }, new RegGrp)
+                        
+                        return a;
+                    }, new RegGrp);
                 }
             });
+            
             this.urls = this.patterns.urls.copy();
             this.urls.putAt(0, '<a href="mailto:$0">$0</a>');
-            this.urls.putAt(1, '<a href="$0">$0</a>')
-        },addScheme: function(a, b, c, d) {
-            this[a] = new this(b, c, d)
-        },patterns: {block_comment: /\/\*[^*]*\*+([^\/][^*]*\*+)*\//,email: /([\w.+-]+@[\w.-]+\.\w+)/,line_comment: /\/\/[^\r\n]*/,number: /\b\-?(0|[1-9]\d*)(\.\d+)?([eE][-+]?\d+)?\b/,string1: /'(\\.|[^'\\])*'/,string2: /"(\\.|[^"\\])*"/,url: /(http:\/\/+[\w\/\-%&#=.,?+$]+)/,comment: ["block_comment", "line_comment"],string: ["string1", "string2"],urls: ["email", "url"]},urls: null});
+            this.urls.putAt(1, '<a href="$0">$0</a>');
+        },
+        
+        addScheme: function(a, b, c, d) {
+            this[a] = new this(b, c, d);
+        },
+        
+        patterns: {
+            block_comment: /\/\*[^*]*\*+([^\/][^*]*\*+)*\//,
+            email: /([\w.+-]+@[\w.-]+\.\w+)/,
+            line_comment: /\/\/[^\r\n]*/,
+            number: /\b\-?(0|[1-9]\d*)(\.\d+)?([eE][-+]?\d+)?\b/,
+            string1: /'(\\.|[^'\\])*'/,
+            string2: /"(\\.|[^"\\])*"/,
+            url: /(http:\/\/+[\w\/\-%&#=.,?+$]+)/,
+            comment: ["block_comment", "line_comment"],
+            string: ["string1", "string2"],
+            urls: ["email", "url"]
+        },
+        
+        urls: null
+    });
+    
     base2.addPackage("code");
     base2.code.addName("Colorizer", Colorizer);
-    with (base2.code.Colorizer)
+    
+    with (base2.code.Colorizer) {
         addScheme("xml", {attribute: /(\w+)=("[^"]*"|'[^']*')/,cdata: /<!\[CDATA\[([^\]]|\][^\]]|\]\][^>])*\]\]>/,comment: /<!\s*(--([^-]|[\r\n]|-[^-])*--\s*)>/,entity: /&#?\w+;/,"processing-instruction": /<\?[\w-]+[^>]+>/,tag: /(<\/?)([\w:-]+)/,text: /[>;][^<>&]*/}, {cdata: IGNORE,tag: "$1@2",attribute: '@1=<span class="attribute value">$2</span>',text: IGNORE}, {tabStop: 1});
-    with (base2)
-        code.Colorizer.addScheme("html", {conditional: /<!(--)?\[[^\]]*\]>|<!\[endif\](--)?>/,doctype: /<!(DOCTYPE|doctype)[^>]+>/,inline: /<(script|style)([^>]*)>((\\.|[^\\])*)<\/\1>/}, {inline: function(a, b, c, d) {
-                return format(this.INLINE, b, this.exec(c, true), d)
-            }}, {INLINE: '&lt;<span class="tag">%1</span>%2&gt;%3&lt;/<span class="tag">%1</span>&gt;',tabStop: 1});
-    with (base2.code.Colorizer)
+    }
+    
+    with (base2) {
+        code.Colorizer.addScheme("html", {
+            conditional: /<!(--)?\[[^\]]*\]>|<!\[endif\](--)?>/,
+            doctype: /<!(DOCTYPE|doctype)[^>]+>/,
+            inline: /<(script|style)([^>]*)>((\\.|[^\\])*)<\/\1>/
+        }, {
+            inline: function(a, b, c, d) {
+                return format(this.INLINE, b, this.exec(c, true), d);
+            }
+        }, {
+            INLINE: '&lt;<span class="tag">%1</span>%2&gt;%3&lt;/<span class="tag">%1</span>&gt;',
+            tabStop: 1
+        });
+    }
+    
+    with (base2.code.Colorizer) {
         html.merge(xml);
-    with (base2.code.Colorizer)
+    }
+    
+    with (base2.code.Colorizer) {
         addScheme("css", {at_rule: /@[\w\s]+/,bracketed: /\([^'\x22)]*\)/,comment: patterns.block_comment,property: /(\w[\w-]*\s*):([^;}]+)/,special: /(\-[\w-]*\s*):/,selector: /([\w-:\[.#][^{};]*)\{/}, {bracketed: IGNORE,selector: "@1{",special: "@1:",property: '@1:<span class="property value">$2</span>'});
-    with (base2.code.Colorizer)
+    }
+    
+    with (base2.code.Colorizer) {
         addScheme("javascript", {conditional: /\/\*@if\s*\([^\)]*\)|\/\*@[\s\w]*|@\*\/|\/\/@\w+|@else[\s\w]*/,global: /\b(clearInterval|clearTimeout|constructor|document|escape|hasOwnProperty|Infinity|isNaN|NaN|parseFloat|parseInt|prototype|setInterval|setTimeout|toString|unescape|valueOf|window)\b/,keyword: /\b(&&|\|\||arguments|break|case|continue|default|delete|do|else|false|for|function|if|in|instanceof|new|null|return|switch|this|true|typeof|var|void|while|with|undefined)\b/,regexp: /([\[(\^=,{}:;&|!*?]\s*)(\/(\\\/|[^\/*])(\\.|[^\/\n\\])*\/[mgi]*)/,special: /\b(assert\w*|alert|catch|confirm|console|debug|debugger|eval|finally|prompt|throw|try)\b/}, {comment: DEFAULT,string: DEFAULT,regexp: "$1@2",number: DEFAULT});
-    with (base2)
-        with (code)
-            Colorizer["html-multi"] = Colorizer.html.union({inline: function(a, b, c, d) {
+    }
+    
+    with (base2) {
+        with (code) {
+            Colorizer["html-multi"] = Colorizer.html.union({
+                inline: function(a, b, c, d) {
                     var e = b == "style" ? "css" : "javascript";
                     d = Colorizer[e].exec(d, true);
                     d = format('<span class="%1">%2</span>', e, d);
-                    return format(this.INLINE, b, this.exec(c, true), d)
-                }});
+                    
+                    return format(this.INLINE, b, this.exec(c, true), d);
+                }
+            });
+        }
+    }
+              
     with (base2.code.Colorizer.javascript) {
         add("\\b(" + (base2.exports + ",base,base2,merge,union,implement,Array2,Date2,String2").match(/[^\s,]+/g).join("|") + ")\\b", '<span class="base2">$0</span>');
         insertAt(0, /("@[^"]+"):/, '<span class="special">$1</span>:');
-        tabStop = 2
+        tabStop = 2;
     }
+    
     eval(base2.namespace);
     eval(DOM.namespace);
     eval(JSB.namespace);
+    
     var bindings = new RuleList;
-    bindings.add("pre", {ondocumentready: function() {
+    
+    bindings.add("pre", {
+        ondocumentready: function() {
             if (this.hasClass("js")) {
-                this.addClass("javascript")
+                this.addClass("javascript");
             }
+            
             var a = this.className.split(/\s+/);
+            
             for (var i = 0; i < a.length; i++) {
                 var b = a[i];
                 var c = Colorizer[b];
@@ -2161,16 +2515,21 @@
                     var d = Traversal.getTextContent(this);
                     this.innerHTML = c.exec(d);
                     this.addClass("highlight");
-                    if (b == "html-multi")
+                    
+                    if (b === "html-multi") {
                         this.addClass("html");
+                    }
+                    
                     break
                 }
             }
-        }});
+        }
+    });
+    
     function updateFlag() {
         this.nextSibling.style.color = this.value ? "#898E79" : "#A03333"
     }
-    ;
+    
     bindings.add("input.required,textarea.required", {ondocumentready: updateFlag,ondocumentmouseup: updateFlag,ondocumentkeyup: updateFlag});
 
     eval(base2.namespace);
@@ -2182,201 +2541,220 @@
     var WORDS = /\w+/g;
 
     var Packer = Base.extend({
-      minify: function(script) {
-        script = script.replace(Packer.CONTINUE, "");
-        script = Packer.data.exec(script);
-        script = Packer.whitespace.exec(script);
-        script = Packer.clean.exec(script);
-        return script;
-      },
+        minify: function(script) {
+            script = script.replace(Packer.CONTINUE, "");
+            script = Packer.data.exec(script);
+            script = Packer.whitespace.exec(script);
+            script = Packer.clean.exec(script);
+            
+            return script;
+        },
 
-      pack: function(script, base62, shrink) {
-        script = this.minify(script + "\n");
-        if (shrink) script = this._shrinkVariables(script);
-        if (base62) script = this._base62Encode(script);	
-        return script;
-      },
+        pack: function(script, base62, shrink) {
+            script = this.minify(script + "\n");
+            
+            if (shrink) {
+                script = this._shrinkVariables(script);
+            }
+            
+            if (base62) {
+                script = this._base62Encode(script);	
+            }
+            
+            return script;
+        },
 
-      _base62Encode: function(script) {
-        var words = new Words(script);
-        var encode = function(word) {
-          return words.get(word).encoded;
-        };
+        _base62Encode: function(script) {
+            var words = new Words(script);
+            
+            var encode = function(word) {
+                return words.get(word).encoded;
+            };
 
-        /* build the packed script */
+            /* build the packed script */
 
-        var p = this._escape(script.replace(WORDS, encode));		
-        var a = Math.min(Math.max(words.size(), 2), 62);
-        var c = words.size();
-        var k = words;
-        var e = Packer["ENCODE" + (a > 10 ? a > 36 ? 62 : 36 : 10)];
-        var r = a > 10 ? "e(c)" : "c";
+            var p = this._escape(script.replace(WORDS, encode));		
+            var a = Math.min(Math.max(words.size(), 2), 62);
+            var c = words.size();
+            var k = words;
+            var e = Packer["ENCODE" + (a > 10 ? a > 36 ? 62 : 36 : 10)];
+            var r = a > 10 ? "e(c)" : "c";
 
-        // the whole thing
-        return format(Packer.UNPACK, p,a,c,k,e,r);
-      },
+            // the whole thing
+            return format(Packer.UNPACK, p,a,c,k,e,r);
+        },
 
-      _escape: function(script) {
-        // single quotes wrap the final string so escape them
-        // also escape new lines required by conditional comments
-        return script.replace(/([\\'])/g, "\\$1").replace(/[\r\n]+/g, "\\n");
-      },
+        _escape: function(script) {
+            // single quotes wrap the final string so escape them
+            // also escape new lines required by conditional comments
+            return script.replace(/([\\'])/g, "\\$1").replace(/[\r\n]+/g, "\\n");
+        },
 
-      _shrinkVariables: function(script) {
-        // Windows Scripting Host cannot do regexp.test() on global regexps.
-        var global = function(regexp) {
-          // This function creates a global version of the passed regexp.
-          return new RegExp(regexp.source, "g");
-        };
+        _shrinkVariables: function(script) {
+            // Windows Scripting Host cannot do regexp.test() on global regexps.
+            var global = function(regexp) {
+                // This function creates a global version of the passed regexp.
+                return new RegExp(regexp.source, "g");
+            };
 
-        var data = []; // encoded strings and regular expressions
-        var REGEXP = /^[^'"]\//;
-        var store = function(string) {
-          var replacement = "#" + data.length;
-          if (REGEXP.test(string)) {
-            replacement = string.charAt(0) + replacement;
-            string = string.slice(1);
-          }
-          data.push(string);
-          return replacement;
-        };
+            var data = []; // encoded strings and regular expressions
+            var REGEXP = /^[^'"]\//;
+            var store = function(string) {
+                var replacement = "#" + data.length;
+                
+                if (REGEXP.test(string)) {
+                    replacement = string.charAt(0) + replacement;
+                    string = string.slice(1);
+                }
+                
+                data.push(string);
+                
+                return replacement;
+            };
 
-        // Base52 encoding (a-Z)
-        var encode52 = function(c) {
-          return (c < 52 ? '' : arguments.callee(parseInt(c / 52))) +
-            ((c = c % 52) > 25 ? String.fromCharCode(c + 39) : String.fromCharCode(c + 97));
-        };
+            // Base52 encoding (a-Z)
+            var encode52 = function(c) {
+                return (c < 52 ? '' : arguments.callee(parseInt(c / 52)))
+                     + ((c = c % 52) > 25 ? String.fromCharCode(c + 39) : String.fromCharCode(c + 97));
+            };
 
-        // identify blocks, particularly identify function blocks (which define scope)
-        var BLOCK = /(function\s*[\w$]*\s*\(\s*([^\)]*)\s*\)\s*)?(\{([^{}]*)\})/;
-        var VAR_ = /var\s+/g;
-        var VAR_NAME = /var\s+[\w$]+/g;
-        var COMMA = /\s*,\s*/;
-        var blocks = []; // store program blocks (anything between braces {})
-        // encoder for program blocks
-        var encode = function(block, func, args) {
-          if (func) { // the block is a function block
+            // identify blocks, particularly identify function blocks (which define scope)
+            var BLOCK = /(function\s*[\w$]*\s*\(\s*([^\)]*)\s*\)\s*)?(\{([^{}]*)\})/;
+            var VAR_ = /var\s+/g;
+            var VAR_NAME = /var\s+[\w$]+/g;
+            var COMMA = /\s*,\s*/;
+            var blocks = []; // store program blocks (anything between braces {})
+            // encoder for program blocks
+            
+            var encode = function(block, func, args) {
+                if (func) { // the block is a function block
 
-            // decode the function block (THIS IS THE IMPORTANT BIT)
-            // We are retrieving all sub-blocks and will re-parse them in light
-            // of newly shrunk variables
-            block = decode(block);
+                    // decode the function block (THIS IS THE IMPORTANT BIT)
+                    // We are retrieving all sub-blocks and will re-parse them in light
+                    // of newly shrunk variables
+                    block = decode(block);
 
-            // create the list of variable and argument names 
-            var vars = match(block, VAR_NAME).join(",").replace(VAR_, "");
-            var ids = Array2.combine(args.split(COMMA).concat(vars.split(COMMA)));
+                    // create the list of variable and argument names 
+                    var vars = match(block, VAR_NAME).join(",").replace(VAR_, "");
+                    var ids = Array2.combine(args.split(COMMA).concat(vars.split(COMMA)));
 
-            // process each identifier
-            var count = 0, shortId;
-            forEach (ids, function(id) {
-              id = trim(id);
-              if (id && id.length > 1) { // > 1 char
-                id = rescape(id);
-                // find the next free short name (check everything in the current scope)
-                do shortId = encode52(count++);
-                while (new RegExp("[^\\w$.]" + shortId + "[^\\w$:]").test(block));
-                // replace the long name with the short name
-                var reg = new RegExp("([^\\w$.])" + id + "([^\\w$:])");
-                while (reg.test(block)) block = block.replace(global(reg), "$1" + shortId + "$2");
-                var reg = new RegExp("([^{,\\w$.])" + id + ":", "g");
-                block = block.replace(reg, "$1" + shortId + ":");
-              }
+                    // process each identifier
+                    var count = 0, shortId;
+                    forEach (ids, function(id) {
+                        id = trim(id);
+                        
+                        if (id && id.length > 1) { // > 1 char
+                            id = rescape(id);
+                            // find the next free short name (check everything in the current scope)
+                            do shortId = encode52(count++);
+                            while (new RegExp("[^\\w$.]" + shortId + "[^\\w$:]").test(block));
+                            // replace the long name with the short name
+                            var reg = new RegExp("([^\\w$.])" + id + "([^\\w$:])");
+                            while (reg.test(block)) block = block.replace(global(reg), "$1" + shortId + "$2");
+                            var reg = new RegExp("([^{,\\w$.])" + id + ":", "g");
+                            block = block.replace(reg, "$1" + shortId + ":");
+                        }
+                    });
+                }
+                
+                var replacement = "~" + blocks.length + "~";
+                
+                blocks.push(block);
+                
+                return replacement;
+            };
+
+            // decoder for program blocks
+            var ENCODED = /~(\d+)~/;
+            var decode = function(script) {
+                while (ENCODED.test(script)) {
+                    script = script.replace(global(ENCODED), function(match, index) {
+                        return blocks[index];
+                    });
+                }
+                
+                return script;
+            };
+
+            // encode strings and regular expressions
+            script = Packer.data.exec(script, store);
+
+            // remove closures (this is for base2 namespaces only)
+            script = script.replace(/new function\(_\)\s*\{/g, "{;#;");
+
+            // encode blocks, as we encode we replace variable and argument names
+            while (BLOCK.test(script)) {
+                script = script.replace(global(BLOCK), encode);
+            }
+
+            // put the blocks back
+            script = decode(script);
+
+            // put back the closure (for base2 namespaces only)
+            script = script.replace(/\{;#;/g, "new function(_){");
+
+            // put strings and regular expressions back
+            script = script.replace(/#(\d+)/g, function(match, index) {		
+                return data[index];
             });
-          }
-          var replacement = "~" + blocks.length + "~";
-          blocks.push(block);
-          return replacement;
-        };
 
-        // decoder for program blocks
-        var ENCODED = /~(\d+)~/;
-        var decode = function(script) {
-          while (ENCODED.test(script)) {
-            script = script.replace(global(ENCODED), function(match, index) {
-              return blocks[index];
-            });
-          }
-          return script;
-        };
-
-        // encode strings and regular expressions
-        script = Packer.data.exec(script, store);
-
-        // remove closures (this is for base2 namespaces only)
-        script = script.replace(/new function\(_\)\s*\{/g, "{;#;");
-
-        // encode blocks, as we encode we replace variable and argument names
-        while (BLOCK.test(script)) {
-          script = script.replace(global(BLOCK), encode);
+            return script;
         }
-
-        // put the blocks back
-        script = decode(script);
-
-        // put back the closure (for base2 namespaces only)
-        script = script.replace(/\{;#;/g, "new function(_){");
-
-        // put strings and regular expressions back
-        script = script.replace(/#(\d+)/g, function(match, index) {		
-          return data[index];
-        });
-
-        return script;
-      }
     }, {
-      CONTINUE: /\\\r?\n/g,
+        CONTINUE: /\\\r?\n/g,
 
-      ENCODE10: "String",
-      ENCODE36: "function(c){return c.toString(a)}",
-      ENCODE62: "function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))}",
+        ENCODE10: "String",
+        ENCODE36: "function(c){return c.toString(a)}",
+        ENCODE62: "function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))}",
 
-      UNPACK: "eval(function(p,a,c,k,e,r){e=%5;if(!''.replace(/^/,String)){while(c--)r[%6]=k[c]" +
-              "||%6;k=[function(e){return r[e]}];e=function(){return'\\\\w+'};c=1};while(c--)if(k[c])p=p." +
-          "replace(new RegExp('\\\\b'+e(c)+'\\\\b','g'),k[c]);return p}('%1',%2,%3,'%4'.split('|'),0,{}))",
+        UNPACK: "eval(function(p,a,c,k,e,r){e=%5;if(!''.replace(/^/,String)){while(c--)r[%6]=k[c]"
+              + "||%6;k=[function(e){return r[e]}];e=function(){return'\\\\w+'};c=1};while(c--)if(k[c])p=p."
+              + "replace(new RegExp('\\\\b'+e(c)+'\\\\b','g'),k[c]);return p}('%1',%2,%3,'%4'.split('|'),0,{}))",
 
-      init: function() {
-        this.data = reduce(this.data, function(data, replacement, expression) {
-          data.put(this.javascript.exec(expression), replacement);
-          return data;
-        }, new RegGrp, this);
-        this.clean = this.data.union(this.clean);
-        this.whitespace = this.data.union(this.whitespace);
-      },
+        init: function() {
+            this.data = reduce(this.data, function(data, replacement, expression) {
+                data.put(this.javascript.exec(expression), replacement);
+                return data;
+            }, new RegGrp, this);
 
-      clean: {
-        "\\(\\s*;\\s*;\\s*\\)": "(;;)", // for (;;) loops
-        "throw[^};]+[};]": IGNORE, // a safari 1.3 bug
-        ";+\\s*([};])": "$1"
-      },
+            this.clean = this.data.union(this.clean);
+            this.whitespace = this.data.union(this.whitespace);
+        },
 
-      data: {
-        // strings
-        "STRING1": IGNORE,
-        'STRING2': IGNORE,
-        "CONDITIONAL": IGNORE, // conditional comments
-        "(COMMENT1)\\n\\s*(REGEXP)?": "\n$3",
-        "(COMMENT2)\\s*(REGEXP)?": " $3",
-        "([\\[(\\^=,{}:;&|!*?])\\s*(REGEXP)": "$1$2"
-      },
+        clean: {
+            "\\(\\s*;\\s*;\\s*\\)": "(;;)", // for (;;) loops
+            "throw[^};]+[};]": IGNORE, // a safari 1.3 bug
+            ";+\\s*([};])": "$1"
+        },
 
-      javascript: new RegGrp({
-        COMMENT1:    /(\/\/|;;;)[^\n]*/.source,
-        COMMENT2:    /\/\*[^*]*\*+([^\/][^*]*\*+)*\//.source,
-        CONDITIONAL: /\/\*@|@\*\/|\/\/@[^\n]*\n/.source,
-        REGEXP:      /\/(\\[\/\\]|[^*\/])(\\.|[^\/\n\\])*\/[gim]*/.source,
-        STRING1:     /'(\\.|[^'\\])*'/.source,
-        STRING2:     /"(\\.|[^"\\])*"/.source
-      }),
+        data: {
+            // strings
+            "STRING1": IGNORE,
+            'STRING2': IGNORE,
+            "CONDITIONAL": IGNORE, // conditional comments
+            "(COMMENT1)\\n\\s*(REGEXP)?": "\n$3",
+            "(COMMENT2)\\s*(REGEXP)?": " $3",
+            "([\\[(\\^=,{}:;&|!*?])\\s*(REGEXP)": "$1$2"
+        },
 
-      whitespace: {
-        "(\\d)\\s+(\\.\\s*[a-z\\$_\\[(])": "$1 $2", // http://dean.edwards.name/weblog/2007/04/packer3/#comment84066
-        "([+-])\\s+([+-])": "$1 $2", // c = a++ +b;
-        "\\b\\s+\\$\\s+\\b": " $ ", // var $ in
-        "\\$\\s+\\b": "$ ", // object$ in
-        "\\b\\s+\\$": " $", // return $object
-        "\\b\\s+\\b": SPACE,
-        "\\s+": REMOVE
-      }
+        javascript: new RegGrp({
+            COMMENT1:    /(\/\/|;;;)[^\n]*/.source,
+            COMMENT2:    /\/\*[^*]*\*+([^\/][^*]*\*+)*\//.source,
+            CONDITIONAL: /\/\*@|@\*\/|\/\/@[^\n]*\n/.source,
+            REGEXP:      /\/(\\[\/\\]|[^*\/])(\\.|[^\/\n\\])*\/[gim]*/.source,
+            STRING1:     /'(\\.|[^'\\])*'/.source,
+            STRING2:     /"(\\.|[^"\\])*"/.source
+        }),
+
+        whitespace: {
+            "(\\d)\\s+(\\.\\s*[a-z\\$_\\[(])": "$1 $2", // http://dean.edwards.name/weblog/2007/04/packer3/#comment84066
+            "([+-])\\s+([+-])": "$1 $2", // c = a++ +b;
+            "\\b\\s+\\$\\s+\\b": " $ ", // var $ in
+            "\\$\\s+\\b": "$ ", // object$ in
+            "\\b\\s+\\$": " $", // return $object
+            "\\b\\s+\\b": SPACE,
+            "\\s+": REMOVE
+        }
     });
 
     var Words = Collection.extend({
@@ -2411,16 +2789,21 @@
             var empty = function() {
                 return ""
             };
+            
             var index = 0;
+            
             forEach(this, function(word) {
                 if (encoded.has(word)) {
                     word.index = encoded.get(word);
                     word.toString = empty;
                 } else {
-                    while (this.has(encode(index)))
+                    while (this.has(encode(index))) {
                         index++;
+                    }
+                    
                     word.index = index++;
                 }
+                
                 word.encoded = encode(word.index);
             }, this);
 
@@ -2436,8 +2819,12 @@
     }, {
         Item: {
             constructor: function(word) {
+              
+                /**
+                 * @ignore
+                 */
                 this.toString = function() {
-                    return word
+                    return word;
                 };
             },
 

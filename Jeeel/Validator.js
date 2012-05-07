@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Validator = {
 };
 
 /**
- * バリデータに関するネームスペース
+ * @namespace バリデータに関するネームスペース
  */
 Jeeel.Validator = {
 
@@ -44,7 +44,13 @@ Jeeel.Validator.Abstract.prototype = {
      * @return {Hash} エラーを保持した連想配列リスト
      */
     validate: function (val) {
-        var errors =  this._validate(val);
+        var errors;
+        
+        if (Jeeel.Type.isHash(val)) {
+            errors = this._validateEach(val);
+        } else {
+            errors = this._validate(val);
+        }
 
         return errors;
     },
@@ -60,6 +66,25 @@ Jeeel.Validator.Abstract.prototype = {
      */
     _validate: function (val) {
         throw new Error('_validateメソッドが実装されていません。');
+    },
+    
+    /**
+     * 配列式の場合のメソッド
+     *
+     * @param {Hash} arr バリデートを掛ける値のリスト
+     * @return {Hash} エラーを保持した連想配列リスト
+     * @protected
+     */
+    _validateEach: function (arr) {
+        var result = {};
+
+        Jeeel.Hash.forEach(arr,
+            function (val, key) {
+                result[key] = this.validate(val);
+            }, this
+        );
+
+        return result;
     },
     
     /**

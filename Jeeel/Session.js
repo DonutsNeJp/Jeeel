@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Session = {
 };
 
 /**
- * Session関連のネームスペース
+ * @namespace Session関連のネームスペース
  */
 Jeeel.Session = {
 

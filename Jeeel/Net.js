@@ -12,13 +12,13 @@ Jeeel.directory.Jeeel.Net = {
 };
 
 /**
- * ネット関連のネームスペース
+ * @namespace ネット関連のネームスペース
  */
 Jeeel.Net = {
 
 };
 
-Jeeel.file.Jeeel.Net = ['Form', 'Ajax', 'Jsonp'];
+Jeeel.file.Jeeel.Net = ['Form', 'Ajax', 'Jsonp', 'Beacon'];
 
 if (Jeeel._extendMode.Net && Jeeel._global) {
     if (Jeeel._global.EventSource) {

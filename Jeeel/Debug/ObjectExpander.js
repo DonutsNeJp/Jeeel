@@ -119,7 +119,7 @@ Jeeel.Debug.ObjectExpander._createCss = function () {
 
     var css = 'table.' + this.EXPAND_OBJECT_ROOT_CLASS + ' {\n'
             + '    position: relative;\n'
-            + '    z-index: 100;\n'
+            + '    z-index: 10;\n'
             + '    border-spacing: 0px;\n'
             + '    white-space: nowrap;\n'
             + '    color: black;\n'
@@ -214,7 +214,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
      * @private
      * @constant
      */
-    _removeGesture: [Jeeel.Code.KeyCode.Down, Jeeel.Code.KeyCode.Right],
+    _removeGesture: [40, 39],
     
     /**
      * コンストラクタ
@@ -277,6 +277,9 @@ Jeeel.Debug.ObjectExpander.prototype = {
             th.innerHTML = this.constructor.COLLAPSE_ARROW;
             thStyle.cursor = 'pointer';
 
+            /**
+             * @ignore
+             */
             var func = function () {
                 var data  = arguments.callee.data;
                 var tbody = arguments.callee.tbody;
@@ -308,6 +311,9 @@ Jeeel.Debug.ObjectExpander.prototype = {
 
         if (elm.isElement) {
 
+            /**
+             * @ignore
+             */
             var mouseDown = function () {
                 var data   = arguments.callee.data;
                 var target = arguments.callee.targetTr;
@@ -320,6 +326,9 @@ Jeeel.Debug.ObjectExpander.prototype = {
             mouseDown.data = obj;
             mouseDown.targetTr = tr;
 
+            /**
+             * @ignore
+             */
             var mouseUp = function () {
                 var event  = Jeeel.Dom.Event.getEventObject();
 
@@ -330,6 +339,9 @@ Jeeel.Debug.ObjectExpander.prototype = {
                 Jeeel.Dom.Event.getEventObject().stop();
             };
 
+            /**
+             * @ignore
+             */
             var over = function () {
                 var data   = arguments.callee.data;
                 var target = arguments.callee.targetTr;
@@ -344,6 +356,9 @@ Jeeel.Debug.ObjectExpander.prototype = {
             over.data = obj;
             over.targetTr = tr;
 
+            /**
+             * @ignore
+             */
             var out = function () {
                 var data   = arguments.callee.data;
                 var target = arguments.callee.targetTr;

@@ -284,10 +284,10 @@ Jeeel.Dom.Event.prototype = {
         if (this.type != 'keypress') {
             keyCode = this.keyCode;
 
-            if (Jeeel.Code.KeyCode.T0 <= keyCode && keyCode <= Jeeel.Code.KeyCode.T9) {
-                keyCode += Jeeel.Code.KeyCode[0] - Jeeel.Code.KeyCode.T0;
-            } else if (Jeeel.Code.KeyCode.TMultiplicationSign <= keyCode && keyCode <= Jeeel.Code.KeyCode.TDivisionSign) {
-                keyCode += Jeeel.Code.KeyCode.MultiplicationSign - Jeeel.Code.KeyCode.TMultiplicationSign;
+            if (Jeeel.Dom.Event.KeyCode.T0 <= keyCode && keyCode <= Jeeel.Dom.Event.KeyCode.T9) {
+                keyCode += Jeeel.Dom.Event.KeyCode[0] - Jeeel.Dom.Event.KeyCode.T0;
+            } else if (Jeeel.Dom.Event.KeyCode.TMultiplicationSign <= keyCode && keyCode <= Jeeel.Dom.Event.KeyCode.TDivisionSign) {
+                keyCode += Jeeel.Dom.Event.KeyCode.MultiplicationSign - Jeeel.Dom.Event.KeyCode.TMultiplicationSign;
             }
 
             return keyCode;
@@ -300,71 +300,71 @@ Jeeel.Dom.Event.prototype = {
             switch (keyCode) {
 
                 case Jeeel.Code.CharCode.RightParenthesis:
-                    keyCode = Jeeel.Code.KeyCode[9];
+                    keyCode = Jeeel.Dom.Event.KeyCode[9];
                     break;
 
                 case Jeeel.Code.CharCode.SubtractionSign:
                 case Jeeel.Code.CharCode.EqualsSign:
-                    keyCode = Jeeel.Code.KeyCode.SubtractionSign;
+                    keyCode = Jeeel.Dom.Event.KeyCode.SubtractionSign;
                     break;
 
                 case Jeeel.Code.CharCode.Caret:
                 case Jeeel.Code.CharCode.Tilde:
-                    keyCode = Jeeel.Code.KeyCode.Caret;
+                    keyCode = Jeeel.Dom.Event.KeyCode.Caret;
                     break;
 
                 case Jeeel.Code.CharCode.YenMark:
                 case Jeeel.Code.CharCode.VerticalBar:
-                    keyCode = Jeeel.Code.KeyCode.YenMark;
+                    keyCode = Jeeel.Dom.Event.KeyCode.YenMark;
                     break;
 
                 case Jeeel.Code.CharCode.Atmark:
                 case Jeeel.Code.CharCode.BackQuote:
-                    keyCode = Jeeel.Code.KeyCode.Atmark;
+                    keyCode = Jeeel.Dom.Event.KeyCode.Atmark;
                     break;
 
                 case Jeeel.Code.CharCode.LeftBracket:
                 case Jeeel.Code.CharCode.LeftBrace:
-                    keyCode = Jeeel.Code.KeyCode.LeftBracket;
+                    keyCode = Jeeel.Dom.Event.KeyCode.LeftBracket;
                     break;
 
                 case Jeeel.Code.CharCode.Semicolon:
                 case Jeeel.Code.CharCode.AdditionSign:
-                    keyCode = Jeeel.Code.KeyCode.AdditionSign;
+                    keyCode = Jeeel.Dom.Event.KeyCode.AdditionSign;
                     break;
 
                 case Jeeel.Code.CharCode.Colon:
                 case Jeeel.Code.CharCode.MultiplicationSign:
-                    keyCode = Jeeel.Code.KeyCode.MultiplicationSign;
+                    keyCode = Jeeel.Dom.Event.KeyCode.MultiplicationSign;
                     break;
 
                 case Jeeel.Code.CharCode.RightBracket:
                 case Jeeel.Code.CharCode.RightBrace:
-                    keyCode = Jeeel.Code.KeyCode.RightBracket;
+                    keyCode = Jeeel.Dom.Event.KeyCode.RightBracket;
                     break;
 
                 case Jeeel.Code.CharCode.Comma:
                 case Jeeel.Code.CharCode.LessThan:
-                    keyCode = Jeeel.Code.KeyCode.Comma;
+                    keyCode = Jeeel.Dom.Event.KeyCode.Comma;
                     break;
 
                 case Jeeel.Code.CharCode.Period:
                 case Jeeel.Code.CharCode.GreaterThan:
-                    keyCode = Jeeel.Code.KeyCode.Period;
+                    keyCode = Jeeel.Dom.Event.KeyCode.Period;
                     break;
 
                 case Jeeel.Code.CharCode.DivisionSign:
                 case Jeeel.Code.CharCode.QuestionMark:
-                    keyCode = Jeeel.Code.KeyCode.DivisionSign;
+                    keyCode = Jeeel.Dom.Event.KeyCode.DivisionSign;
                     break;
 
                 case Jeeel.Code.CharCode.YenMark:
                 case Jeeel.Code.CharCode.Underscore:
-                    keyCode = Jeeel.Code.KeyCode.Underscore;
+                    keyCode = Jeeel.Dom.Event.KeyCode.Underscore;
                     break;
 
                 case 0:
-                    keyCode = Jeeel.Code.KeyCode.Application;
+                    keyCode = Jeeel.Dom.Event.KeyCode.Application;
                     break;
             }
         }
@@ -455,11 +455,11 @@ Jeeel.Dom.Event.prototype = {
  * </script>
  */
 Jeeel.Dom.Event.getEventObject = function (nestCount) {
-    nestCount = nestCount || 0;
+    nestCount = +nestCount || 0;
     
     var caller = arguments.callee.caller;
     
-    while (nestCount--) {
+    while (caller && nestCount--) {
         caller = caller.caller;
     }
     
@@ -699,16 +699,14 @@ Jeeel.Dom.Event._disableMouse = function () {
  * @param {Element} element 対象のElement
  */
 Jeeel.Dom.Event.disableMouseEvent = function (element) {
-    var f = this._disableMouse;
-    
-    element.onmousedown = f;
-    element.onmouseup = f;
-    element.onmouseover = f;
-    element.ondrag = f;
-    element.ondragstart = f;
-    element.ondragend = f;
+    element.onmousedown = element.onmouseup
+                        = element.onmouseover
+                        = element.ondrag
+                        = element.ondragstart
+                        = element.ondragend
+                        = this._disableMouse;
 };
 
-Jeeel.file.Jeeel.Dom.Event = ['Type', 'Listener', 'Manager', 'Option', 'Rollover'];
+Jeeel.file.Jeeel.Dom.Event = ['Type', 'KeyCode', 'Listener', 'Manager', 'Option'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Event, Jeeel.file.Jeeel.Dom.Event);

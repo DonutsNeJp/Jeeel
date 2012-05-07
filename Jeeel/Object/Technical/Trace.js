@@ -33,5 +33,14 @@ Jeeel.Object.Technical.Trace.prototype = {
      *
      * @type Function
      */
-    func: ''
+    func: null,
+    
+    /**
+     * 文字列に変換する
+     * 
+     * @return {String} 文字列
+     */
+    toString: function () {
+        return this.name;
+    }
 };

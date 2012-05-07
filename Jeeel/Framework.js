@@ -12,13 +12,12 @@ Jeeel.directory.Jeeel.Framework = {
 };
 
 /**
- * 大規模アプリケーション開発を円滑にするための汎用クラス等を保持するネームスペース<br />
- * 現在試用段階であり、使用する際は削除・変更が頻繁にある事に注意
+ * @namespace 大規模アプリケーション開発を円滑にするための汎用クラス等を保持するネームスペース
  */
 Jeeel.Framework = {
     
 };
 
-Jeeel.file.Jeeel.Framework = ['Net', 'Event', 'EventDispatcher', 'Layer', 'Mvc'];
+Jeeel.file.Jeeel.Framework = ['Net', 'Event', 'EventDispatcher', 'Layer', 'Mvc', 'Acl'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Framework, Jeeel.file.Jeeel.Framework);

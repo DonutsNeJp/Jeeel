@@ -259,7 +259,7 @@ Jeeel.Dom.Window.prototype = {
             width: size.width + 'px',
             height: size.height + 'px',
             opacity: styles.opacity ||0.75
-        }).setBackgroundIframe();
+        }).setShim();
         
         doc.appendToBody(overlay.getElement());
         
@@ -274,6 +274,9 @@ Jeeel.Dom.Window.prototype = {
      */
     constructor: Jeeel.Dom.Window,
     
+    /**
+     * @ignore
+     */
     _init: function () {
       
         var doc = Jeeel._doc,
@@ -284,51 +287,78 @@ Jeeel.Dom.Window.prototype = {
             return;
         }
         
-        var self = this,
-            body;
+        var body;
         
         if (win.innerWidth) {
-            self.getWindowSize = function () {
+          
+            /**
+             * @ignore
+             */
+            this.getWindowSize = function () {
                 var win = this._window;
 
                 return new Jeeel.Object.Size(win.innerWidth, win.innerHeight);
             };
             
-            self.getScrollPosition = function () {
+            /**
+             * @ignore
+             */
+            this.getScrollPosition = function () {
                 var win = this._window;
                 
                 return new Jeeel.Object.Point(win.pageXOffset, win.pageYOffset);
             };
         } else if (doc.documentElement && doc.documentElement.clientWidth) {
-            self.getWindowSize = function () {
+          
+            /**
+             * @ignore
+             */
+            this.getWindowSize = function () {
                 var root = this._document.getDocumentElement();
 
                 return new Jeeel.Object.Size(root.clientWidth, root.clientHeight);
             };
             
-            self.getScrollPosition = function () {
+            /**
+             * @ignore
+             */
+            this.getScrollPosition = function () {
                 var root = this._document.getDocumentElement();
                 
                 return new Jeeel.Object.Point(root.scrollLeft, root.scrollTop);
             };
         } else if ((body = doc.body || doc.createElement('body')) && 'clientWidth' in body) {
-            self.getWindowSize = function () {
+          
+            /**
+             * @ignore
+             */
+            this.getWindowSize = function () {
                 var root = this._document.getBody();
 
                 return new Jeeel.Object.Size(root.clientWidth, root.clientHeight);
             };
             
-            self.getScrollPosition = function () {
+            /**
+             * @ignore
+             */
+            this.getScrollPosition = function () {
                 var root = this._document.getBody();
                 
                 return new Jeeel.Object.Point(root.scrollLeft, root.scrollTop);
             };
         } else {
-            self.getWindowSize = function () {
+          
+            /**
+             * @ignore
+             */
+            this.getWindowSize = function () {
                 return new Jeeel.Object.Size(0, 0);
             };
             
-            self.getScrollPosition = function () {
+            /**
+             * @ignore
+             */
+            this.getScrollPosition = function () {
                 return new Jeeel.Object.Point(0, 0);
             };
         }

@@ -78,7 +78,7 @@ Jeeel.Filter.Html.FormValue.prototype = {
     /**
      * @private
      */
-    _filterArray: function (vals) {
+    _filterEach: function (vals) {
 
         if (Jeeel.Type.isElement(vals)) {
             return this._filter(vals);
@@ -131,14 +131,28 @@ Jeeel.Filter.Html.FormValue.prototype = {
     },
     
     _getProp: function (elm, propName) {
+        var tag, res, ops, i, l;
+        
         if (this._useDefaultValue) {
             if (propName === 'value') {
-                var tag = elm.tagName.toUpperCase();
+                tag = elm.tagName.toUpperCase();
                 
                 if (tag === 'SELECT') {
-                    var ops = elm.options;
+                    ops = elm.options;
 
-                    for (var i = 0, l = ops.length; i < l; i++) {
+                    if (elm.getAttribute('multiple')) {
+                        res = [];
+
+                        for (i = 0, l = ops.length; i < l; i++) {
+                            if (ops[i].getAttribute('selected')) {
+                                res[res.length] = ops[i].getAttribute(propName);
+                            }
+                        }
+                        
+                        return res;
+                    }
+                    
+                    for (i = 0, l = ops.length; i < l; i++) {
                         if (ops[i].getAttribute('selected')) {
                             return ops[i].getAttribute(propName);
                         }
@@ -153,6 +167,28 @@ Jeeel.Filter.Html.FormValue.prototype = {
             return elm.getAttribute(propName);
         }
         
+        if (propName === 'value') {
+            if (Jeeel.Dom.Behavior.Placeholder.isHolded(elm)) {
+                return '';
+            }
+            
+            tag = elm.tagName.toUpperCase();
+            
+            if (tag === 'SELECT' && elm.multiple) {
+                ops = elm.options;
+                
+                res = [];
+                
+                for (i = 0, l = ops.length; i < l; i++) {
+                    if (ops[i].selected) {
+                        res[res.length] = ops[i].value;
+                    }
+                }
+                
+                return res;
+            }
+        }
+        
         return elm[propName];
     },
     
@@ -165,7 +201,11 @@ Jeeel.Filter.Html.FormValue.prototype = {
                 return;
             }
         } else if (element.tagName.toLowerCase() === 'select') {
-            if (element.selectedIndex < 0) {
+            
+            var multiple = (this._useDefaultValue && element.getAttribute('multiple'))
+                        || ( ! this._useDefaultValue && element.multiple);
+            
+            if (element.selectedIndex < 0 && ! multiple) {
                 return;
             }
         }

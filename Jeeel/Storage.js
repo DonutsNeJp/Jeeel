@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Storage = {
 };
 
 /**
- * ストレージ関連のネームスペース
+ * @namespace ストレージ関連のネームスペース
  */
 Jeeel.Storage = {
 

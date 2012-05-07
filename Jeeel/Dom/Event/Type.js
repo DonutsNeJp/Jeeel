@@ -400,7 +400,7 @@ Jeeel.Dom.Event.Type = {
 (function () {
     var wheel = 'on' + Jeeel.Dom.Event.Type.MOUSE_WHEEL;
     
-    // FireFoxのホイールイベント
+    // Firefoxのホイールイベント
     if (Jeeel._doc && ! (wheel in Jeeel._global || wheel in Jeeel._doc)) {
         Jeeel.Dom.Event.Type.MOUSE_WHEEL = 'DOMMouseScroll';
     }

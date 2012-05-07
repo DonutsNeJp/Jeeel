@@ -26,8 +26,8 @@ Jeeel.Dom.Style.Animation.Hook = function (element, style) {
 /**
  * フックを登録する
  * 
- * @param {String} name 
- * @param {Function} get 
+ * @param {String} name 名前
+ * @param {Function} get 取得メソッド
  */
 Jeeel.Dom.Style.Animation.Hook.register = function (name, get) {
     if (typeof get !== 'function') {
@@ -46,6 +46,7 @@ Jeeel.Dom.Style.Animation.Hook.prototype = {
      * コンストラクタ
      * 
      * @param {Style} style 操作スタイル
+     * @constructor
      */
     constructor: Jeeel.Dom.Style.Animation.Hook
 };

@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.String.Hash.Base64 = {
 };
 
 /**
- * Base64関連のモジュール
+ * @namespace Base64関連のモジュール
  */
 Jeeel.String.Hash.Base64 = {
     

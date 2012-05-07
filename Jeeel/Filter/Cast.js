@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Filter.Cast = {
 };
 
 /**
- * キャスト系のネームスペース
+ * @namespace キャスト系のネームスペース
  */
 Jeeel.Filter.Cast = {
     

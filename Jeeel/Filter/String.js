@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Filter.String = {
 };
 
 /**
- * 文字列関連のフィルター管理ネームスペース
+ * @namespace 文字列関連のフィルター管理ネームスペース
  */
 Jeeel.Filter.String = {
 

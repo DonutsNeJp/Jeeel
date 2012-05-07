@@ -93,7 +93,7 @@ Jeeel.Filter.Chain.prototype = {
     /**
      * @private
      */
-    _filterArray: function (params) {
+    _filterEach: function (params) {
         var log = {};
 
         for (var i = 0, l = this._filters.length; i < l; i++) {

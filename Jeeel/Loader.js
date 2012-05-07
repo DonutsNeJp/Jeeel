@@ -1,6 +1,6 @@
 
 /**
- * 読み込み関連のメソッドを提供するModule
+ * @namespace 読み込み関連のメソッドを提供するModule
  */
 Jeeel.Loader = {
 
@@ -53,6 +53,11 @@ Jeeel.Loader = {
      * @see Jeeel.Code.CharEncoding
      */
     loadScript: function (url, callback, charCode) {
+      
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
         var script  = Jeeel.Document.createElement('script');
         script.type = 'text/javascript';
 
@@ -92,6 +97,11 @@ Jeeel.Loader = {
      * @see Jeeel.Code.CharEncoding
      */
     loadStyle: function (url, charCode) {
+      
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+      
         var style  = Jeeel.Document.createElement('link');
         style.type = 'text/css';
         style.rel  = 'stylesheet';
@@ -159,12 +169,12 @@ Jeeel.Loader = {
      * 読み込み中のJavaScript内から呼ばないと意味がない
      *
      * @return {Element} scriptタグのElement
+     * @deprecated 今後削除予定
      */
     getCurrentScript: function () {
-        return (
-            function (e) {
-                return (e.nodeName.toLowerCase() === 'script' ? e : arguments.callee(e.lastChild));
-            })(Jeeel._doc);
+        return (function (e) {
+            return (e.nodeName.toUpperCase() === 'SCRIPT' ? e : arguments.callee(e.lastChild));
+        })(Jeeel._doc);
     },
 
     /**
@@ -174,6 +184,11 @@ Jeeel.Loader = {
      * @return {Boolean} ファイルが存在するかどうか
      */
     existsFile: function (url) {
+      
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+      
         var file = Jeeel.Net.Ajax.serverResponse(url);
 
         if (Jeeel.Type.isString(file)) {
@@ -183,14 +198,28 @@ Jeeel.Loader = {
         return false;
     },
     
+    /**
+     * @ignore
+     */
     _init: function () {
       
         if (/*@cc_on!@*/false) {
+            /**
+             * @ignore
+             */
             this.preloadFile = function (url) {
                 new Image().src = url;
             };
         } else {
+            /**
+             * @ignore
+             */
             this.preloadFile = function (url) {
+              
+                if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+                    Jeeel.Acl.throwError('Access Error', 404);
+                }
+                
                 var obj = Jeeel.Document.createElement('object');
                 
                 obj.width  = 0;

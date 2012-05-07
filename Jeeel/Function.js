@@ -1,9 +1,20 @@
+Jeeel.directory.Jeeel.Function = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel + 'Function/';
+    }
+};
 
 /**
  * コンストラクタ
  *
  * @class メソッドを拡張するクラス(name, length等の部分は初期化される)
- * @augments Function
  * @param {Function} target 基となるメソッド
  * @throws {Error} targetがメソッドでない場合に起こる
  * @example
@@ -22,6 +33,9 @@ Jeeel.Function = function (target) {
         throw new Error('targetがメソッドではありません。');
     }
 
+    /**
+     * @ignore
+     */
     var f = function () {
         return arguments.callee._cnvTarget.apply(this, arguments);
     };
@@ -362,3 +376,7 @@ Jeeel.Function.prototype = {
         return this._target;
     }
 };
+
+Jeeel.file.Jeeel.Function = ['Template'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Function, Jeeel.file.Jeeel.Function);

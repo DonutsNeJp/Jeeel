@@ -19,6 +19,10 @@
     
     // rgba形式に対応しているかどうかで振り分ける
     if (elmStyle.color) {
+      
+        /**
+         * @ignore
+         */
         filter = function (val) {
             var color = new Jeeel.Object.Color.Rgb(val);
             return [
@@ -29,6 +33,9 @@
             ];
         };
 
+        /**
+         * @ignore
+         */
         unfilter = function (val) {
             return 'rgba(' 
                 + limit(Math.floor(val[0]), 0, 255) + ','
@@ -37,6 +44,10 @@
                 + limit(val[3], 0, 1) + ')';
         };
     } else {
+        
+        /**
+         * @ignore
+         */
         filter = function (val) {
             var color = new Jeeel.Object.Color.Rgb(val);
             return [
@@ -46,6 +57,9 @@
             ];
         };
 
+        /**
+         * @ignore
+         */
         unfilter = function (val) {
             return 'rgb(' 
                 + limit(Math.floor(val[0]), 0, 255) + ','

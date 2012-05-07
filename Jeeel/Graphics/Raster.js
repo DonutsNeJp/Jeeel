@@ -17,7 +17,6 @@ Jeeel.directory.Jeeel.Graphics.Raster = {
  * @class ラスター系のグラフィックス処理機能を提供するクラス
  * @augments Jeeel.Graphics.Abstract
  * @param {Jeeel.Graphics.Raster.*} adapter 内部アダプター
- * @ignore 未完
  */
 Jeeel.Graphics.Raster = function (adapter) {
     Jeeel.Graphics.Abstract.call(this);

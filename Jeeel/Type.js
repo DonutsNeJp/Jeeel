@@ -13,7 +13,7 @@ Jeeel.directory.Jeeel.Type = {
 };
 
 /**
- * 型に関する関数や定数を保持するスタティッククラス
+ * @staticClass 型に関する関数や定数を保持するスタティッククラス
  */
 Jeeel.Type = {
 
@@ -484,14 +484,14 @@ Jeeel.Type = {
      * @param {Mixied} val 判定値
      * @return {Boolean} 判定結果
      */
-    isElementCollection: function (val) {
+    isHtmlCollection: function (val) {
         if ( ! this.isHash(val)) {
             return false;
         }
         
         var member = ['length', 'item', 'namedItem'];
 
-        for (var i = 0, l = member.length; i < l; i++) {
+        for (var i = member.length; i--;) {
             if ( ! (member[i] in val)) {
                 return false;
             }
@@ -513,7 +513,29 @@ Jeeel.Type = {
         
         var member = ['length', 'item'];
 
-        for (var i = 0, l = member.length; i < l; i++) {
+        for (var i = member.length; i--;) {
+            if ( ! (member[i] in val)) {
+                return false;
+            }
+        }
+
+        return true;
+    },
+    
+    /**
+     * Node型かどうかを返す
+     *
+     * @param {Mixied} val 判定値
+     * @return {Boolean} 判定結果
+     */
+    isNode: function (val) {
+        if ( ! this.isHash(val)) {
+            return false;
+        }
+        
+        var member = ['attributes', 'nodeType', 'nodeName', 'nodeValue'];
+
+        for (var i = member.length; i--;) {
             if ( ! (member[i] in val)) {
                 return false;
             }
@@ -655,7 +677,7 @@ Jeeel.Type = {
         
         var member = ['Object', 'Array', 'String', 'Number', 'Boolean', 'Function'];
 
-        for (var i = 0, l = member.length; i < l; i++) {
+        for (var i = member.length; i--;) {
             if ( ! (member[i] in val)) {
                 return false;
             }
@@ -715,7 +737,7 @@ Jeeel.Type = {
         
         var member = ['callee', 'length'];
 
-        for (var i = 0, l = member.length; i < l; i++) {
+        for (var i = member.length; i--;) {
             if ( ! (member[i] in val)) {
                 return false;
             }
@@ -757,7 +779,7 @@ Jeeel.Type = {
         
         var member = ['key', 'getItem', 'setItem', 'removeItem', 'clear'];
 
-        for (var i = 0, l = member.length; i < l; i++) {
+        for (var i = member.length; i--;) {
             if ( ! (member[i] in val)) {
                 return false;
             }
@@ -865,6 +887,16 @@ Jeeel.Type = {
         return key in array;
     }
 };
+
+if (Jeeel._global && Jeeel._global.Array && Jeeel._global.Array.isArray) {
+  
+    /**
+     * @ignore
+     */
+    Jeeel.Type.isArray = function (val) {
+        return Array.isArray(val);
+    };
+}
 
 Jeeel.file.Jeeel.Type = ['ObjectType', 'ObjectKeys'];
 

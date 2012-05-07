@@ -26,7 +26,6 @@ Jeeel.directory.Jeeel.Dom.Style.Animation = {
  * @param {Function|String} [easing] イージング関数
  * @param {Function} [complete] アニメーション終了時のコールバック
  * @param {Function} [step] アニメーション更新時のコールバック(引数にはeasingでの変化値が渡される)
- * @ignore
  */
 Jeeel.Dom.Style.Animation = function (element, style, params, duration, easing, complete, step) {
   
@@ -313,6 +312,7 @@ Jeeel.Dom.Style.Animation.prototype = {
         this._ct = 0;
 
         this._defaultParams = {};
+        this._deltaParams = {};
         this._endParams = {};
         
         var initCss = {};
@@ -522,8 +522,20 @@ Jeeel.Dom.Style.Animation.prototype = {
         return this;
     },
     
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
     constructor: Jeeel.Dom.Style.Animation,
     
+    /**
+     * 加算する
+     * 
+     * @param {Number|Number[]} a 加算元
+     * @param {Number|Number[]} b 加算先
+     * @return {Number|Number[]} 加算結果
+     */
     _add: function (a, b) {
         if (a.splice) {
             var res = [];
@@ -538,6 +550,13 @@ Jeeel.Dom.Style.Animation.prototype = {
         return a + b;
     },
     
+    /**
+     * 減算する
+     * 
+     * @param {Number|Number[]} a 減算元
+     * @param {Number|Number[]} b 減算先
+     * @return {Number|Number[]} 減算結果
+     */
     _sub: function (a, b) {
         if (a.splice) {
             var res = [];
@@ -552,124 +571,133 @@ Jeeel.Dom.Style.Animation.prototype = {
         return a - b;
     },
     
+    /**
+     * CSSを取得する
+     * 
+     * @return {Hash} CSSリスト
+     */
     _getCss: function () {
         var css = {};
         var op = this.constructor.StyleOperator;
         
         for (var i = this._targetStyles.length; i--;) {
             var key = this._targetStyles[i];
-            var prm = this._defaultParams[key];
-            var dtr = this._deltaParams[key];
-            var lim = dtr.limit;
+            var defaultPrm = this._defaultParams[key];
+            var deltaParam = this._deltaParams[key];
+            var limit = deltaParam.limit;
             var res, j, chn = false;
             
-            if (prm.splice) {
+            // 配列の時のループ
+            if (defaultPrm.splice) {
                 res = [];
                 
-                for (j = prm.length; j--;) {
-                    res[j] = dtr.easing(this._ct, prm[j], dtr.value[j], this._duration);
+                for (j = defaultPrm.length; j--;) {
+                    res[j] = deltaParam.easing(this._ct, defaultPrm[j], deltaParam.value[j], this._duration);
                 }
                 
                 // リミットの処理
-                if (lim) {
-                    if (lim.reverse) {
-                        if (lim.useUpper) {
+                if (limit) {
+                    if (limit.reverse) {
+                        if (limit.useUpper) {
                             for (j = res.length; j--;) {
-                                if (res[j] > lim.upper[j]) {
-                                    prm[j] = lim.upper[j] + (lim.upper[j] - prm[j]);
-                                    res[j] = lim.upper[j] - (res[j] - lim.upper[j]);
-                                    dtr.value[j] = -dtr.value[j];
+                                if (res[j] > limit.upper[j]) {
+                                    defaultPrm[j] = limit.upper[j] + (limit.upper[j] - defaultPrm[j]);
+                                    res[j] = limit.upper[j] - (res[j] - limit.upper[j]);
+                                    deltaParam.value[j] = -deltaParam.value[j];
                                     chn = true;
                                 }
                             }
                         }
 
-                        if (lim.useLower) {
+                        if (limit.useLower) {
                             for (j = res.length; j--;) {
-                                if (res[j] < lim.lower[j]) {
-                                    prm[j] = lim.lower[j] - (prm[j] - lim.lower[j]);
-                                    res[j] = lim.lower[j] + (lim.lower[j] - res[j]);
-                                    dtr.value[j] = -dtr.value[j];
+                                if (res[j] < limit.lower[j]) {
+                                    defaultPrm[j] = limit.lower[j] - (defaultPrm[j] - limit.lower[j]);
+                                    res[j] = limit.lower[j] + (limit.lower[j] - res[j]);
+                                    deltaParam.value[j] = -deltaParam.value[j];
                                     chn = true;
                                 }
                             }
                         }
                         
                         if (chn) {
-                            this._endParams[key] = op.unfilter(key, this._add(prm, dtr.value), dtr.unit);
+                            this._endParams[key] = op.unfilter(key, this._add(defaultPrm, deltaParam.value), deltaParam.unit);
                         }
                     } else {
-                        if (lim.useUpper) {
+                        if (limit.useUpper) {
                             for (j = res.length; j--;) {
-                                if (res[j] > lim.upper[j]) {
-                                    res[j] = lim.upper[j];
+                                if (res[j] > limit.upper[j]) {
+                                    res[j] = limit.upper[j];
                                     chn = true;
                                 }
                             }
                         }
 
-                        if (lim.useLower) {
+                        if (limit.useLower) {
                             for (j = res.length; j--;) {
-                                if (res[j] < lim.lower[j]) {
-                                    res[j] = lim.lower[j];
+                                if (res[j] < limit.lower[j]) {
+                                    res[j] = limit.lower[j];
                                     chn = true;
                                 }
                             }
                         }
                         
                         if (chn) {
-                            this._endParams[key] = op.unfilter(key, res, dtr.unit);
+                            this._endParams[key] = op.unfilter(key, res, deltaParam.unit);
                         }
                     }
                 }
                 
             } else {
-                res = dtr.easing(this._ct, prm, dtr.value, this._duration);
+                res = deltaParam.easing(this._ct, defaultPrm, deltaParam.value, this._duration);
                 
                 // リミットの処理
-                if (lim) {
-                    if (lim.reverse) {
-                        if (lim.useUpper && res > lim.upper) {
-                            this._defaultParams[key] = prm = lim.upper + (lim.upper - prm);
-                            res = lim.upper - (res - lim.upper);
-                            dtr.value = -dtr.value;
+                if (limit) {
+                    if (limit.reverse) {
+                        if (limit.useUpper && res > limit.upper) {
+                            this._defaultParams[key] = defaultPrm = limit.upper + (limit.upper - defaultPrm);
+                            res = limit.upper - (res - limit.upper);
+                            deltaParam.value = -deltaParam.value;
                             chn = true;
                         }
 
-                        if (lim.useLower && res < lim.lower) {
-                            this._defaultParams[key] = prm = lim.lower - (prm - lim.lower);
-                            res = lim.lower + (lim.lower - res);
-                            dtr.value = -dtr.value;
+                        if (limit.useLower && res < limit.lower) {
+                            this._defaultParams[key] = defaultPrm = limit.lower - (defaultPrm - limit.lower);
+                            res = limit.lower + (limit.lower - res);
+                            deltaParam.value = -deltaParam.value;
                             chn = true;
                         }
 
                         if (chn) {
-                            this._endParams[key] = op.unfilter(key, this._add(prm, dtr.value), dtr.unit);
+                            this._endParams[key] = op.unfilter(key, this._add(defaultPrm, deltaParam.value), deltaParam.unit);
                         }
                     } else {
-                        if (lim.useUpper && res > lim.upper) {
-                            res = lim.upper;
+                        if (limit.useUpper && res > limit.upper) {
+                            res = limit.upper;
                             chn = true;
                         }
 
-                        if (lim.useLower && res < lim.lower) {
-                            res = lim.lower;
+                        if (limit.useLower && res < limit.lower) {
+                            res = limit.lower;
                             chn = true;
                         }
 
                         if (chn) {
-                            this._endParams[key] = op.unfilter(key, res, dtr.unit);
+                            this._endParams[key] = op.unfilter(key, res, deltaParam.unit);
                         }
                     }
                 }
             }
             
-            css[key] = op.unfilter(key, res, dtr.unit);
+            css[key] = op.unfilter(key, res, deltaParam.unit);
         }
         
         return css;
     },
     
+    /**
+     * 内部で用いるスタイルに変換する
+     */
     _toInnerStyle: function (style) {
         var res = {}, op;
         
@@ -696,6 +724,9 @@ Jeeel.Dom.Style.Animation.prototype = {
         return res;
     },
     
+    /**
+     * オプションの解析
+     */
     _analyzeOption: function (res, option) {
         if ( ! option) {
             return;

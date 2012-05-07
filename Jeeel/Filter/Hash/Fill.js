@@ -72,7 +72,7 @@ Jeeel.Filter.Hash.Fill.prototype = {
     /**
      * @private
      */
-    _filterArray: function (array) {
+    _filterEach: function (array) {
         var result = Jeeel.Method.clone(array);
 
         for (var i = this._index; i < this._length; i++) {

@@ -1,4 +1,10 @@
 
+/**
+ * コンストラクタ
+ * 
+ * @class SVGを管理するクラス
+ * @param {SVGElement} svg SVG要素
+ */
 Jeeel.Graphics.Vector.Svg = function (svg) {
     this._svg = svg;
     this._doc = Jeeel.Dom.Document.create(svg.ownerDocument);

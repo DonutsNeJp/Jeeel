@@ -50,8 +50,8 @@ Jeeel.directory.Jeeel.Dom.Style.Animation.Custom = {
 /**
  * カスタムスタイルを登録する
  * 
- * @param {String} name 
- * @param {Function} get 
+ * @param {String} name 名前
+ * @param {Function} get ゲッター
  */
 Jeeel.Dom.Style.Animation.Custom.register = function (name, get) {
     if (typeof get !== 'function') {
@@ -67,6 +67,7 @@ Jeeel.Dom.Style.Animation.Custom.prototype = {
      * コンストラクタ
      * 
      * @param {Style} style 操作スタイル
+     * @constructor
      */
     constructor: Jeeel.Dom.Style.Animation.Custom
 };

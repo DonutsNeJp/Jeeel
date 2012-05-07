@@ -172,7 +172,7 @@ Jeeel.Dom.Window.Opener.Dialog.prototype = {
             Jeeel: Jeeel,
             parent: Jeeel._global,
             params: this._args.getAll(),
-            callback: callback || function (){}
+            callback: callback || Jeeel.Function.Template.EMPTY
         };
 
         return this._window.showModalDialog(url, prms, options.join(';'));

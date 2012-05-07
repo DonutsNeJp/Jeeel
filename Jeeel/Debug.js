@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Debug = {
 };
 
 /**
- * デバッグ関連の機能を保持するネームスペース
+ * @namespace デバッグ関連の機能を保持するネームスペース
  */
 Jeeel.Debug = {
 

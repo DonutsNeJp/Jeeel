@@ -71,6 +71,19 @@ Jeeel.Number.limit = function (number, min, max) {
 };
 
 /**
+ * 指定した整数の範囲以内の値をランダムで返す
+ * 
+ * @param {Integer} min 最小値(負数も可)
+ * @param {Integer} max 最大値(負数も可)
+ * @return {Integer} ランダム整数値(min &lt;= random &lt;= max)
+ */
+Jeeel.Number.random = function (min, max) {
+    var r = max - min + 1;
+    
+    return Math.floor(min + Math.random() * r);
+};
+
+/**
  * 数値を百分率にして返す
  * 
  * @param {Number} number 対象の数値
@@ -78,6 +91,26 @@ Jeeel.Number.limit = function (number, min, max) {
  */
 Jeeel.Number.percentage = function (number) {
     return number * 100 + '%';
+};
+
+/**
+ * 指定した角度をラジアンに変換する
+ * 
+ * @param {Number} deg 角度
+ * @return {Number} ラジアン
+ */
+Jeeel.Number.degreeToRadian = function (deg) {
+    return deg / 180 * Math.PI;
+};
+
+/**
+ * 指定したラジアンを角度に変換する
+ * 
+ * @param {Number} rad ラジアン
+ * @return {Number} 角度
+ */
+Jeeel.Number.radianToDegree = function (rad) {
+    return rad / Math.PI * 180;
 };
 
 /**

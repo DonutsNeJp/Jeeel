@@ -25,775 +25,778 @@
  *
  * @name Jeeel.js(Javascript Easy Error and Exception handling Library: Japanease Eeel)
  * @author Masato Shimada
- * @version 2.0.0β71
+ * @version 2.0.0 RC4
  * @license <a href="http://ja.wikipedia.org/wiki/MIT_License">MIT License</a>
  * @copylight (c) 2012 Donuts, Masato Shimada
  */
- 
- if (typeof jeeelConfig === 'undefined') {
-    var jeeelConfig = {};
-}
 
-jeeelConfig.manualLoad = true;
+(function (global) {
 
-// Jeeelが定義されていた場合バックアップを取ってから書き換えを行う
-if (typeof window !== 'undefined' && window.Jeeel) {
+    /**
+     * @namespace 汎用メソッド等を提供するネームスペース
+     * @name Jeeel
+     */
+    var Jeeel = {
 
-    (function (backupPrefix, backupValue) {
-        if ( ! arguments.callee.backupPrefix) {
-            arguments.callee.backupPrefix = backupPrefix;
+        /**
+         * 現在のJeeelのバージョン<br />
+         * 1.0.0<br />
+         * | | |<br />
+         * A B C<br />
+         * <br />
+         * Aバージョンは互換性が無いバージョンを示す<br />
+         * Bバージョンは新規機能追加を示す<br />
+         * Cバージョンは既存機能追加・微調整・バグ修正を示す
+         *
+         * @type String
+         * @constant
+         */
+        VERSION: '2.0.0 RC4',
+
+        /**
+         * Jeeelのscriptタグに付くclass名
+         *
+         * @type String
+         * @constant
+         */
+        SCRIPT_CLASS: 'jeeel-script-class',
+
+        /**
+         * Jeeelのscriptタグに付くid名(実際にはこれにインデックス番号が付く)
+         *
+         * @type String
+         * @constant
+         */
+        SCRIPT_ID: 'jeeel-script-id',
+
+        /**
+         * Jeeelファイルが置かれているホスト<br />
+         * 通常は空文字にする
+         *
+         * @type String
+         * @constant
+         */
+        HOST: 'http://localhost',
+
+        /**
+         * Jeeelファイルが置かれている相対URL<br />
+         * 通常は指定しなくても良い
+         *
+         * @type String
+         * @constant
+         */
+        BASE_URL: '',
+
+        /**
+         * Jeeelファイルに渡されているゲットパラメータ<br />
+         * 通常は指定しなくても良い
+         *
+         * @type String
+         * @constant
+         */
+        QUERY: '',
+
+        /**
+         * コンフィグ
+         * 
+         * @type String
+         * @constant
+         */
+        CONFIG: global.jeeelConfig ? global.jeeelConfig : {},
+
+        /**
+         * クロスドメインかどうか
+         * 
+         * @type Boolean
+         * @constant
+         */
+        CROSS_DOMAIN: false,
+
+        /**
+         * サーバー側のevalを使用できる相対URL<br />
+         * 以下のパラメータを受け取り実行した後結果を返す機能をサーバーに実装
+         *
+         * <pre>
+         * パラメータ {
+         * &nbsp;   script: サーバー言語スクリプト,
+         * &nbsp;   params: サーバ側に渡す任意パラメータ
+         * }
+         * </pre>
+         *
+         * @type String
+         * @constant
+         */
+        DEBUG_URL: '/dev/debug/eval/',
+
+        /**
+         * サーバー側でSQLを実行できる相対URL<br />
+         * 以下のパラメータを受け取り実行した後結果を返す機能をサーバーに実装
+         *
+         * <pre>
+         * パラメータ {
+         * &nbsp;   sql: SQL文字列
+         * }
+         * </pre>
+         *
+         * @type String
+         * @constant
+         */
+        SQL_DEBUG_URL: '/dev/debug/eval-sql/',
+
+        /**
+         * サーバー側でメール送信を出来る相対URL<br />
+         * 以下のパラメータを処理してメール送信する機能をサーバーに実装
+         *
+         * <pre>
+         * パラメータ {
+         * &nbsp;   to  : 送信先,
+         * &nbsp;   body: 送信内容,
+         * &nbsp;   type: メールのタイプ
+         * }
+         * </pre>
+         *
+         * @type String
+         * @constant
+         */
+        MAIL_URL: '/dev/debug/mail/',
+
+        /**
+         * サーバー側でパラメータを表記した文字列をファイルとして読み込ませるための相対URL<br />
+         * 以下のパラメータを処理してファイルを渡す機能をサーバーに実装
+         *
+         * <pre>
+         * パラメータ {
+         * &nbsp;   file : ファイル名(省略可能),
+         * &nbsp;   value: ファイルに変換するパラメータ
+         * }
+         * </pre>
+         *
+         * @type String
+         * @constant
+         */
+        FILE_OPEN_URL: '/dev/debug/file-open/',
+
+        /**
+         * Jsonp通信を行うための相対URL<br />
+         * 以下のパラメータを処理してファイルを渡す機能をサーバーに実装
+         *
+         * <pre>
+         * パラメータ {
+         * &nbsp;   exec-action: 実行アクション名,
+         * &nbsp;   callback: コールバック関数名
+         * }
+         * </pre>
+         *
+         * @type String
+         * @constant
+         */
+        JSONP_URL: '/dev/debug/jsonp/',
+
+        /**
+         * このJeeelオブジェクト固有ID
+         * 
+         * @type String
+         * @constant
+         */
+        UNIQUE_ID: null,
+
+        /**
+         * 現在の階層のDocumentで作成したJeeel.Dom.Document
+         *
+         * @type Jeeel.Dom.Document
+         * @readOnly
+         */
+        Document: null,
+
+        /**
+         * 現在の階層のWindowで作成したJeeel.Dom.Window
+         *
+         * @type Jeeel.Dom.Window
+         * @readOnly
+         */
+        Window: null,
+        
+        /**
+         * 内部のURL等に対して制御を行うためのJeeel.Framework.Acl
+         * 
+         * @type Jeeel.Framework.Acl
+         * @readOnly
+         */
+        Acl: null,
+        
+        /**
+         * Jeeelのバックアップ
+         * 
+         * @type Mixied
+         * @private
+         */
+        _backup: global.Jeeel || null,
+
+        /**
+         * Jsonp通信のためのキャッシュ
+         * 
+         * @private
+         * @ignore
+         */
+        _jsp: {
+
+        },
+
+        /**
+         * @namespace Jeeel系のサブクラス保存のための媒体
+         * @private
+         */
+        _Object: {
+            Jeeel: {}
+        },
+
+        /**
+         * IEのための高速化手法
+         * 
+         * @type Document
+         * @readOnly
+         * @private
+         */
+        _doc: (global.document ? global.document : null),
+
+        /**
+         * IEのための高速化手法
+         * 
+         * @type Global
+         * @readOnly
+         * @private
+         */
+        _global: global,
+
+        /**
+         * 様々な判断用途で使用するdivタグ
+         * 
+         * @type Element
+         * @readOnly
+         * @private
+         */
+        _elm: global.document && global.document.createElement('div') || null,
+
+        /**
+         * 自動的にスクリプトを読み込むのを設定に関わらず無効化するかどうか
+         * 
+         * @type Boolean
+         * @readOnly
+         * @private
+         */
+        _disableAuto: true,
+
+        /**
+         * 自動的にスクリプトを読み込むかどうか
+         *
+         * @type Boolean
+         * @readOnly
+         * @private
+         */
+        _auto: !(global.jeeelConfig && global.jeeelConfig.manualLoad),
+
+        /**
+         * グローバル変数をJeeelのみにするかどうか
+         *
+         * @type Boolean
+         * @readOnly
+         * @private
+         */
+        _cleanMode: !!(global.jeeelConfig && global.jeeelConfig.clean),
+
+        /**
+         * デバッグを使用できるようにするかどうか(_cleanModeがtrueの場合はショートカットが作成されない)
+         *
+         * @type Boolean
+         * @readOnly
+         * @private
+         */
+        _debugMode: !!(global.jeeelConfig && (global.jeeelConfig.full || global.jeeelConfig.debug)),
+
+        /**
+         * 拡張機能を機能ごとに使用するかどうかを設定する
+         *
+         * @type Hash
+         * @readOnly
+         * @private
+         */
+        _extendMode: {
+            /**
+             * GUIの拡張機能を使用するかどうか
+             *
+             * @type Boolean
+             * @readOnly
+             * @private
+             */
+            Gui: !!(global.jeeelConfig && (global.jeeelConfig.full || global.jeeelConfig.extend && global.jeeelConfig.extend.gui)),
+
+            /**
+             * Web Storage(localStorage)の拡張機能を使用するかどうか
+             *
+             * @type Boolean
+             * @readOnly
+             * @private
+             */
+            WebStorage: !!(global.jeeelConfig && (global.jeeelConfig.full || global.jeeelConfig.extend && global.jeeelConfig.extend.webStorage)),
+
+            /**
+             * Indexed Database APIの拡張機能を使用するかどうか
+             *
+             * @type Boolean
+             * @readOnly
+             * @private
+             */
+            Database: !!(global.jeeelConfig && (global.jeeelConfig.full || global.jeeelConfig.extend && global.jeeelConfig.extend.database)),
+
+            /**
+             * WebWorkersの拡張機能を使用するかどうか
+             *
+             * @type Boolean
+             * @readOnly
+             * @private
+             */
+            Worker: !!(global.jeeelConfig && (global.jeeelConfig.full || global.jeeelConfig.extend && global.jeeelConfig.extend.worker)),
+
+            /**
+             * Geolocation APIの拡張機能を使用するかどうか
+             *
+             * @type Boolean
+             * @readOnly
+             * @private
+             */
+            Geolocation: !!(global.jeeelConfig && (global.jeeelConfig.full || global.jeeelConfig.extend && global.jeeelConfig.extend.geolocation)),
+
+            /**
+             * File APIの拡張機能を使用するかどうか
+             *
+             * @type Boolean
+             * @readOnly
+             * @private
+             */
+            File: !!(global.jeeelConfig && (global.jeeelConfig.full || global.jeeelConfig.extend && global.jeeelConfig.extend.file)),
+
+            /**
+             * メディア系の拡張機能を使用するかどうか
+             *
+             * @type Boolean
+             * @readOnly
+             * @private
+             */
+            Media: !!(global.jeeelConfig && (global.jeeelConfig.full || global.jeeelConfig.extend && global.jeeelConfig.extend.media)),
+
+            /**
+             * グラフィックス系の拡張機能を使用するかどうか
+             *
+             * @type Boolean
+             * @readOnly
+             * @private
+             */
+            Graphics: !!(global.jeeelConfig && (global.jeeelConfig.full || global.jeeelConfig.extend && global.jeeelConfig.extend.graphics)),
+
+            /**
+             * ネットワーク系の拡張機能を使用するかどうか
+             *
+             * @type Boolean
+             * @readOnly
+             * @private
+             */
+            Net: !!(global.jeeelConfig && (global.jeeelConfig.full || global.jeeelConfig.extend && global.jeeelConfig.extend.net)),
+            
+            /**
+             * 大規模アプリケーションのための機能を使用するかどうか
+             *
+             * @type Boolean
+             * @readOnly
+             * @private
+             */
+            Framework: !!(global.jeeelConfig && (global.jeeelConfig.full || global.jeeelConfig.extend && global.jeeelConfig.extend.framework))
+        },
+
+        /**
+         * 読み込むディレクトリを示す
+         */
+        directory: {
+
+        },
+
+        /**
+         * 読み込むファイルを示す
+         */
+        file: {
+
         }
+    };
 
-        var backupName = backupPrefix + 'Jeeel';
-
-        if (backupName in window) {
-            arguments.callee(backupPrefix + arguments.callee.backupPrefix, window[backupName]);
-        }
-
-        window[backupName] = backupValue;
-    })('_', window.Jeeel);
-}
+    // グローバルに設定
+    global.Jeeel = Jeeel;
+    
+})(typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : (typeof this !== 'undefined' ? this : {})));
 
 /**
- * 汎用メソッド等を提供するネームスペース
+ * @ignore
  */
-var Jeeel = {
+Jeeel._Object.Jeeel.getInputName = function (name) {
+    var names1 = decodeURIComponent(name).split('][');
+    var names2 = names1[0].split('[');
 
-    /**
-     * 現在のJeeelのバージョン<br />
-     * 1.0.0<br />
-     * | | |<br />
-     * A B C<br />
-     * <br />
-     * Aバージョンは互換性が無いバージョンを示す<br />
-     * Bバージョンは新規機能追加を示す<br />
-     * Cバージョンは既存機能追加・微調整・バグ修正を示す
-     *
-     * @type String
-     * @constant
-     */
-    VERSION: '2.0.0β71',
-    
-    /**
-     * Jeeelのscriptタグに付くclass名
-     *
-     * @type String
-     * @constant
-     */
-    SCRIPT_CLASS: 'jeeel-script-class',
-    
-    /**
-     * Jeeelのscriptタグに付くid名(実際にはこれにインデックス番号が付く)
-     *
-     * @type String
-     * @constant
-     */
-    SCRIPT_ID: 'jeeel-script-id',
-
-    /**
-     * Jeeelファイルが置かれているホスト<br />
-     * 通常は空文字にする
-     *
-     * @type String
-     * @constant
-     */
-    HOST: 'http://localhost',
-
-    /**
-     * Jeeelファイルが置かれている相対URL<br />
-     * 通常は指定しなくても良い
-     *
-     * @type String
-     * @constant
-     */
-    BASE_URL: '',
-    
-    /**
-     * Jeeelファイルに渡されているゲットパラメータ<br />
-     * 通常は指定しなくても良い
-     *
-     * @type String
-     * @constant
-     */
-    QUERY: '',
-    
-    /**
-     * コンフィグ
-     * 
-     * @type String
-     * @constant
-     */
-    CONFIG: typeof jeeelConfig !== 'undefined' ? jeeelConfig : {},
-    
-    /**
-     * クロスドメインかどうか
-     * 
-     * @type Boolean
-     * @constant
-     */
-    CROSS_DOMAIN: false,
-    
-    /**
-     * サーバー側のevalを使用できる相対URL<br />
-     * 以下のパラメータを受け取り実行した後結果を返す機能をサーバーに実装
-     *
-     * <pre>
-     * パラメータ {
-     * &nbsp;   script: サーバー言語スクリプト,
-     * &nbsp;   params: サーバ側に渡す任意パラメータ
-     * }
-     * </pre>
-     *
-     * @type String
-     * @constant
-     */
-    DEBUG_URL: '/dev/debug/eval/',
-
-    /**
-     * サーバー側でSQLを実行できる相対URL<br />
-     * 以下のパラメータを受け取り実行した後結果を返す機能をサーバーに実装
-     *
-     * <pre>
-     * パラメータ {
-     * &nbsp;   sql: SQL文字列
-     * }
-     * </pre>
-     *
-     * @type String
-     * @constant
-     */
-    SQL_DEBUG_URL: '/dev/debug/eval-sql/',
-
-    /**
-     * サーバー側でメール送信を出来る相対URL<br />
-     * 以下のパラメータを処理してメール送信する機能をサーバーに実装
-     *
-     * <pre>
-     * パラメータ {
-     * &nbsp;   to  : 送信先,
-     * &nbsp;   body: 送信内容,
-     * &nbsp;   type: メールのタイプ
-     * }
-     * </pre>
-     *
-     * @type String
-     * @constant
-     */
-    MAIL_URL: '/dev/debug/mail/',
-
-    /**
-     * サーバー側でパラメータを表記した文字列をファイルとして読み込ませるための相対URL<br />
-     * 以下のパラメータを処理してファイルを渡す機能をサーバーに実装
-     *
-     * <pre>
-     * パラメータ {
-     * &nbsp;   file : ファイル名(省略可能),
-     * &nbsp;   value: ファイルに変換するパラメータ
-     * }
-     * </pre>
-     *
-     * @type String
-     * @constant
-     */
-    FILE_OPEN_URL: '/dev/debug/file-open/',
-    
-    /**
-     * Jsonp通信を行うための相対URL<br />
-     * 以下のパラメータを処理してファイルを渡す機能をサーバーに実装
-     *
-     * <pre>
-     * パラメータ {
-     * &nbsp;   exec-action: 実行アクション名,
-     * &nbsp;   callback: コールバック関数名
-     * }
-     * </pre>
-     *
-     * @type String
-     * @constant
-     */
-    JSONP_URL: '/dev/debug/jsonp/',
-    
-    /**
-     * このJeeelオブジェクト固有ID
-     * 
-     * @type String
-     * @constant
-     */
-    UNIQUE_ID: null,
-
-    /**
-     * 現在の階層のDocumentで作成したJeeel.Dom.Document
-     *
-     * @type Jeeel.Dom.Document
-     * @readOnly
-     */
-    Document: null,
-    
-    /**
-     * 現在の階層のWindowで作成したJeeel.Dom.Window
-     *
-     * @type Jeeel.Dom.Window
-     * @readOnly
-     */
-    Window: null,
-    
-    /**
-     * Jsonp通信のためのキャッシュ
-     * 
-     * @private
-     */
-    _jsp: {
-        
-    },
-
-    /**
-     * Jeeel系のサブクラス保存のための媒体
-     *
-     * @private
-     */
-    _Object: {
-        Jeeel: {
-            getInputName: function (name) {
-                var names1 = decodeURIComponent(name).split('][');
-                var names2 = names1[0].split('[');
-
-                if (names2.length === 1) {
-                    return [name];
-                }
-
-                var i, l, names = [];
-
-                for (i = 0, l = names2.length; i < l; i++) {
-                    names[names.length] = names2[i];
-                }
-
-                for (i = 1, l = names1.length; i < l; i++) {
-                    names[names.length] = names1[i];
-                }
-
-                names[names.length-1] = names[names.length-1].replace(']', '');
-
-                return names;
-            }
-        }
-    },
-
-    /**
-     * IEのための高速化手法
-     * 
-     * @type Document
-     * @readOnly
-     * @private
-     */
-    _doc: (typeof document !== 'undefined' ? document : null),
-    
-    /**
-     * IEのための高速化手法
-     * 
-     * @type Global
-     * @readOnly
-     * @private
-     */
-    _global: (typeof window !== 'undefined' ? window : this),
-    
-    /**
-     * 様々な判断用途で使用するdivタグ
-     * 
-     * @type Element
-     * @readOnly
-     * @private
-     */
-    _elm: (typeof document !== 'undefined' ? document.createElement('div') : null),
-
-    /**
-     * 自動的にスクリプトを読み込むかどうか
-     *
-     * @type Boolean
-     * @readOnly
-     * @private
-     */
-    _auto: typeof jeeelConfig === 'undefined' ? true : !jeeelConfig.manualLoad,
-
-    /**
-     * グローバル変数をJeeelのみにするかどうか
-     *
-     * @type Boolean
-     * @readOnly
-     * @private
-     */
-    _cleanMode: typeof jeeelConfig === 'undefined' ? false : !!jeeelConfig.clean,
-
-    /**
-     * デバッグを使用できるようにするかどうか(_cleanModeがtrueの場合はショートカットが作成されない)
-     *
-     * @type Boolean
-     * @readOnly
-     * @private
-     */
-    _debugMode: typeof jeeelConfig === 'undefined' ? false : !!(jeeelConfig.full || jeeelConfig.debug),
-
-    /**
-     * 拡張機能を機能ごとに使用するかどうかを設定する
-     *
-     * @type Hash
-     * @readOnly
-     * @private
-     */
-    _extendMode: {
-        /**
-         * GUIの拡張機能を使用するかどうか
-         *
-         * @type Boolean
-         * @readOnly
-         * @private
-         */
-        Gui: typeof jeeelConfig === 'undefined' ? false : !!(jeeelConfig.full || jeeelConfig.extend && jeeelConfig.extend.gui),
-        
-        /**
-         * Web Storage(localStorage)の拡張機能を使用するかどうか
-         *
-         * @type Boolean
-         * @readOnly
-         * @private
-         */
-        WebStorage: typeof jeeelConfig === 'undefined' ? false : !!(jeeelConfig.full || jeeelConfig.extend && jeeelConfig.extend.webStorage),
-
-        /**
-         * Indexed Database APIの拡張機能を使用するかどうか
-         *
-         * @type Boolean
-         * @readOnly
-         * @private
-         */
-        Database: typeof jeeelConfig === 'undefined' ? false : !!(jeeelConfig.full || jeeelConfig.extend && jeeelConfig.extend.database),
-        
-        /**
-         * WebWorkersの拡張機能を使用するかどうか
-         *
-         * @type Boolean
-         * @readOnly
-         * @private
-         */
-        Worker: typeof jeeelConfig === 'undefined' ? false : !!(jeeelConfig.full || jeeelConfig.extend && jeeelConfig.extend.worker),
-        
-        /**
-         * Geolocation APIの拡張機能を使用するかどうか
-         *
-         * @type Boolean
-         * @readOnly
-         * @private
-         */
-        Geolocation: typeof jeeelConfig === 'undefined' ? false : !!(jeeelConfig.full || jeeelConfig.extend && jeeelConfig.extend.geolocation),
-        
-        /**
-         * File APIの拡張機能を使用するかどうか
-         *
-         * @type Boolean
-         * @readOnly
-         * @private
-         */
-        File: typeof jeeelConfig === 'undefined' ? false : !!(jeeelConfig.full || jeeelConfig.extend && jeeelConfig.extend.file),
-        
-        /**
-         * メディア系の拡張機能を使用するかどうか
-         *
-         * @type Boolean
-         * @readOnly
-         * @private
-         */
-        Media: typeof jeeelConfig === 'undefined' ? false : !!(jeeelConfig.full || jeeelConfig.extend && jeeelConfig.extend.media),
-        
-        /**
-         * グラフィックス系の拡張機能を使用するかどうか
-         *
-         * @type Boolean
-         * @readOnly
-         * @private
-         */
-        Graphics: typeof jeeelConfig === 'undefined' ? false : !!(jeeelConfig.full || jeeelConfig.extend && jeeelConfig.extend.graphics),
-        
-        /**
-         * ネットワーク系の拡張機能を使用するかどうか
-         *
-         * @type Boolean
-         * @readOnly
-         * @private
-         */
-        Net: typeof jeeelConfig === 'undefined' ? false : !!(jeeelConfig.full || jeeelConfig.extend && jeeelConfig.extend.net)
-    },
-
-    /**
-     * エラーメッセージを表示するメソッド
-     *
-     * @param {String|Event} message エラーメッセージ
-     * @param {String} file エラーファイル
-     * @param {Integer} line エラー行数
-     * @private
-     */
-    _error: (function (message, file, line) {
-
-        if (typeof console !== 'undefined') {
-            return function (message, file, line) {
-                if (Jeeel.Type.isEvent(message)) {
-                    file = message.target.src;
-                    line = 'undefined';
-                }
-                
-                console.log(file + '(' + line + ')', message);
-            };
-        } else {
-            return function (message, file, line) {
-                if (Jeeel.Type.isEvent(message)) {
-                    file = message.target.src;
-                    line = 'undefined';
-                }
-                
-                Jeeel.errorDump(file + '(' + line + ')\n'+ message);
-            };
-        }
-    })(),
-
-    /**
-     * Jeeel.jsの個別読み込みを行う
-     * 
-     * @param {String} dir ディレクトリ
-     * @param {String} file ソース
-     */
-    _import: function (dir, file) {
-        if ( ! Jeeel._doc) {
-            if (typeof importScripts !== 'undefined') {
-                importScripts(dir + file + '.js');
-            }
-
-            return;
-        }
-        
-        if ( ! arguments.callee.index) {
-            arguments.callee.index = 1;
-        }
-        
-        var index = arguments.callee.index;
-        var src = dir + file + '.js?' + this.QUERY;
-        
-        Jeeel._doc.write('<script type="text/javascript" id="' + this.SCRIPT_ID + '-' + index + '" class="' + this.SCRIPT_CLASS + '" src="' + src + '"></script>\n');
-
-        arguments.callee.index++;
-    },
-    
-    /**
-     * Jeeel.jsのディレクトリ別、自動読み込みを行う
-     * 
-     * @param {String} dir ディレクトリ
-     * @param {Array} files ソースのリスト
-     */
-    _autoImports: function (dir, files) {
-        if (this._auto) {
-            for (var i = 0, l = files.length; i < l; i++) {
-                this._import(dir, files[i]);
-            }
-        }
-    },
-
-    /**
-     * 読み込むディレクトリを示す
-     */
-    directory: {
-
-    },
-
-    /**
-     * ディレクトリに対してのforeach
-     *
-     * @param {Object} directory ディレクトリ
-     * @param {Function} callBack コールバックメソッド(要素、キー、配列)
-     */
-    directoryForEach: function (directory, callBack) {
-        for (var key in directory) {
-            if (key !== 'toString') {
-                callBack.call(this, directory[key], key, directory);
-            }
-        }
-    },
-
-    /**
-     * 読み込むファイルを示す
-     */
-    file: {
-
-    },
-
-    /**
-     * ファイルに対してのforeach
-     *
-     * @param {Array} file ファイル
-     * @param {Function} callBack コールバックメソッド(要素、キー、配列)
-     */
-    fileForEach: function (file, callBack) {
-        for (var key in file) {
-            if (isNaN(key) && key !== 'length') {
-                callBack.call(this, file[key], key, file);
-            }
-        }
-    },
-
-    /**
-     * ファイルの相対パスを全て返す
-     *
-     * @return {String} ファイルパスを示す文字列
-     */
-    getFilePath: function () {
-        var paths = (arguments.length === 0 ? [this.directory.Jeeel + 'Jeeel.js\n'] : []);
-        var directory = (arguments.length === 0 ? this.directory : arguments[0]);
-        var file = (arguments.length === 0 ? this.file : arguments[1]);
-
-        var self = arguments.callee;
-
-        Jeeel.directoryForEach(directory,
-            function (dir, key) {
-
-                for (var i = 0, l = file[key].length; i < l; i++) {
-
-                    var subKey = file[key][i];
-                    
-                    if ( ! this._debugMode && subKey === 'Debug') {
-                        continue;
-                    } else if ( ! this._debugMode && key === 'Technical' && Jeeel.Type.inArray(subKey, ['Information', 'Trace'], true)) {
-                        continue;
-                    } else if ( ! this._extendMode.Gui && subKey === 'Gui') {
-                        continue;
-                    } else if ( ! this._extendMode.WebStorage && subKey === 'WebStorage') {
-                        continue;
-                    } else if ( ! this._extendMode.Database && subKey === 'Database') {
-                        continue;
-                    } else if ( ! this._extendMode.Worker && subKey === 'Worker') {
-                        continue;
-                    } else if ( ! this._extendMode.Geolocation && subKey === 'Geolocation') {
-                        continue;
-                    } else if ( ! this._extendMode.File && subKey === 'File') {
-                        continue;
-                    } else if ( ! this._extendMode.Media && subKey === 'Media') {
-                        continue;
-                    } else if ( ! this._extendMode.Graphics && subKey === 'Graphics') {
-                        continue;
-                    } else if ( ! this._extendMode.Net && Jeeel.Type.inArray(subKey, ['Comet', 'Socket'], true)) {
-                        continue;
-                    }
-
-                    paths[paths.length] = dir + subKey+'.js\n';
-
-                    if (dir[subKey] && file[key][subKey]) {
-                        var dirTmp = {};
-                        var fileTmp = {};
-                        dirTmp[subKey] = dir[subKey];
-                        fileTmp[subKey] = file[key][subKey];
-
-                        paths[paths.length] = self(dirTmp, fileTmp);
-                    }
-                }
-            }
-        );
-
-        return paths.join('');
-    },
-
-    /**
-     * ファイルをスクリプトタグで囲った状態で全て返す
-     *
-     * @return {String} スクリプトタグで囲われたファイルパスを示す文字列
-     */
-    getScript: function () {
-        var paths = (arguments.length === 0 ? ['<script type="text/javascript" class="'+Jeeel.SCRIPT_CLASS+'" src="'+this.directory.Jeeel+'Jeeel.js"></script>\n'] : []);
-        var directory = (arguments.length === 0 ? this.directory : arguments[0]);
-        var file = (arguments.length === 0 ? this.file : arguments[1]);
-
-        var self = arguments.callee;
-
-        Jeeel.directoryForEach(directory,
-            function (dir, key) {
-
-                for (var i = 0, l = file[key].length; i < l; i++) {
-                  
-                    var subKey = file[key][i];
-
-                    if ( ! this._debugMode && subKey === 'Debug') {
-                        continue;
-                    }else if ( ! this._debugMode && key === 'Technical' && Jeeel.Type.inArray(subKey, ['Information', 'Trace'], true)) {
-                        continue;
-                    } else if ( ! this._extendMode.Gui && subKey === 'Gui') {
-                        continue;
-                    } else if ( ! this._extendMode.WebStorage && subKey === 'WebStorage') {
-                        continue;
-                    } else if ( ! this._extendMode.Database && subKey === 'Database') {
-                        continue;
-                    } else if ( ! this._extendMode.Worker && subKey === 'Worker') {
-                        continue;
-                    }else if ( ! this._extendMode.Geolocation && subKey === 'Geolocation') {
-                        continue;
-                    } else if ( ! this._extendMode.File && subKey === 'File') {
-                        continue;
-                    } else if ( ! this._extendMode.Media && subKey === 'Media') {
-                        continue;
-                    } else if ( ! this._extendMode.Graphics && subKey === 'Graphics') {
-                        continue;
-                    } else if ( ! this._extendMode.Net && Jeeel.Type.inArray(subKey, ['Comet', 'Socket'], true)) {
-                        continue;
-                    }
-
-                    paths[paths.length] = '<script type="text/javascript" class="'+Jeeel.SCRIPT_CLASS+'" src="'+dir + subKey+'.js"></script>\n';
-
-                    if (dir[subKey] && file[key][subKey]) {
-                        var dirTmp = {};
-                        var fileTmp = {};
-                        dirTmp[subKey] = dir[subKey];
-                        fileTmp[subKey] = file[key][subKey];
-
-                        paths[paths.length] = self(dirTmp, fileTmp);
-                    }
-                }
-            }
-        );
-
-        return paths.join('');
-    },
-
-    /**
-     * 全てのファイルを接続した状態で返す
-     *
-     * @param {Boolean} [minimize] 必要最小限のファイルのみ接続するかどうか
-     * @param {Boolean} [disableDebug] デバッグ関連のファイル読み込みを無効にするかどうか
-     * @param {Boolean} [disableExtend] 追加関連のファイル読み込みを無効にするかどうか
-     * @return {String} 全てのファイルを接続した文字列
-     */
-    getJoinScript: function (minimize, disableDebug, disableExtend) {
-        var debugTmp = this._debugMode;
-        var geneTmp  = this._extendMode;
-
-        if (minimize) {
-            this._debugMode = false;
-            this._extendMode = {};
-        }
-        
-        if (disableDebug) {
-            this._debugMode = false;
-        }
-        
-        if (disableExtend) {
-            this._extendMode = {};
-        }
-
-        var files = this.getFilePath().replace(/\n$/g, '').split('\n');
-        var script = [];
-
-        for (var i = 0, l = files.length; i < l; i++) {
-            script[i] = Jeeel.Net.Ajax.serverResponse(files[i]);
-        }
-
-        this._debugMode  = debugTmp;
-        this._extendMode = geneTmp;
-        
-        if (typeof jeeelConfig === 'undefined') {var jeeelConfig = {};}jeeelConfig.manualLoad = true;
-        
-        var url = Jeeel.UserAgent.getProtocol() + '://' + Jeeel.UserAgent.getHost();
-
-        return 'if (typeof jeeelConfig === \'undefined\') {\n    var jeeelConfig = {};\n}\n\njeeelConfig.manualLoad = true;\n' + script.join('').replace("HOST: ''", "HOST: '" + url + "'");
-    },
-    
-    getCompressScript: function (minimize, disableDebug, disableExtend) {
-        return Jeeel.Debug.Compressor.compress(this.getJoinScript(minimize, disableDebug, disableExtend), true);
-    },
-
-    /**
-     * デバッグモードが有効である場合に限りエラーをダンプする
-     *
-     * @param {Mixied} var_args エラー出力する値の可変引数
-     * @return {Boolean} エラーをダンプしたかどうか
-     */
-    errorDump: function (var_args) {
-        if ( ! Jeeel._debugMode || ! Jeeel.Debug) {
-            return false;
-        }
-
-        Jeeel.Debug.ErrorMessage.dump.apply(null, arguments);
-        return true;
-    },
-
-    /**
-     * デバッグモードが有効である場合に限りエラーをHTMLとしてダンプする
-     *
-     * @param {Mixied} var_args エラー出力する値の可変引数
-     * @return {Boolean} エラーをダンプしたかどうか
-     */
-    errorHtmlDump: function (var_args) {
-        if ( ! Jeeel._debugMode || ! Jeeel.Debug) {
-            return false;
-        }
-
-        Jeeel.Debug.ErrorMessage.dumpHtml.apply(null, arguments);
-        return true;
-    },
-
-    /**
-     * デバッグモードが有効である場合に限りエラーをConsoleにダンプする
-     *
-     * @param {Mixied} var_args エラー出力する値の可変引数
-     * @return {Boolean} エラーをダンプしたかどうか
-     */
-    errorDumpConsole: function (var_args) {
-        if ( ! Jeeel._debugMode || ! Jeeel.Debug) {
-            return false;
-        }
-
-        Jeeel.Debug.Console.log.apply(null, arguments);
-        return true;
-    },
-    
-    /**
-     * Domが完成した時に呼び出されるイベントの登録を行う
-     *
-     * @param {Function} listener 登録イベント
-     * @param {Mixied} [thisArg] コールバック中のthisに相当する値(デフォルトはJeeel.Windowになる)
-     */
-    addLoadEvent: function (listener, thisArg) {
-        Jeeel.Window.addEventListener(Jeeel.Dom.Event.Type.LOAD, listener, thisArg);
+    if (names2.length === 1) {
+        return [name];
     }
+
+    var i, l, names = [];
+
+    for (i = 0, l = names2.length; i < l; i++) {
+        names[names.length] = names2[i];
+    }
+
+    for (i = 1, l = names1.length; i < l; i++) {
+        names[names.length] = names1[i];
+    }
+
+    names[names.length-1] = names[names.length-1].replace(']', '');
+
+    return names;
+};
+
+/**
+ * Jeeel.jsの個別読み込みを行う
+ * 
+ * @param {String} dir ディレクトリ
+ * @param {String} file ソース
+ */
+Jeeel._import = function (dir, file) {
+    if ( ! Jeeel._doc) {
+        if (typeof importScripts !== 'undefined') {
+            importScripts(dir + file + '.js');
+        }
+
+        return;
+    }
+
+    if ( ! this._import.index) {
+        this._import.index = 1;
+    }
+
+    var index = this._import.index;
+    var src = dir + file + '.js?' + this.QUERY;
+
+    Jeeel._doc.write('<script type="text/javascript" id="' + this.SCRIPT_ID + '-' + index + '" class="' + this.SCRIPT_CLASS + '" src="' + src + '"></script>\n');
+
+    this._import.index++;
+};
+
+/**
+ * Jeeel.jsのディレクトリ別、自動読み込みを行う
+ * 
+ * @param {String} dir ディレクトリ
+ * @param {Array} files ソースのリスト
+ */
+Jeeel._autoImports = function (dir, files) {
+    if (this._auto) {
+        for (var i = 0, l = files.length; i < l; i++) {
+            this._import(dir, files[i]);
+        }
+    }
+};
+
+/**
+ * Jeeelの名前で衝突していた値を取得する
+ * 
+ * @return {Mixied} 衝突値
+ */
+Jeeel.getConflictValue = function () {
+    return this._backup;
+};
+
+/**
+ * ディレクトリに対してのforeach
+ *
+ * @param {Object} directory ディレクトリ
+ * @param {Function} callBack コールバックメソッド(要素、キー、配列)
+ */
+Jeeel.directoryForEach = function (directory, callBack) {
+    for (var key in directory) {
+        if (key !== 'toString') {
+            callBack.call(this, directory[key], key, directory);
+        }
+    }
+};
+
+/**
+ * ファイルに対してのforeach
+ *
+ * @param {Array} file ファイル
+ * @param {Function} callBack コールバックメソッド(要素、キー、配列)
+ */
+Jeeel.fileForEach = function (file, callBack) {
+    for (var key in file) {
+        if (isNaN(key) && key !== 'length') {
+            callBack.call(this, file[key], key, file);
+        }
+    }
+};
+
+/**
+ * ファイルの相対パスを全て返す
+ *
+ * @return {String} ファイルパスを示す文字列
+ */
+Jeeel.getFilePath = function () {
+    var paths = (arguments.length === 0 ? [this.directory.Jeeel + 'Jeeel.js\n'] : []);
+    var directory = (arguments.length === 0 ? this.directory : arguments[0]);
+    var file = (arguments.length === 0 ? this.file : arguments[1]);
+
+    Jeeel.directoryForEach(directory,
+        function (dir, key) {
+
+            for (var i = 0, l = file[key].length; i < l; i++) {
+
+                var subKey = file[key][i];
+
+                if ( ! this._debugMode && subKey === 'Debug') {
+                    continue;
+                } else if ( ! this._debugMode && key === 'Technical' && Jeeel.Type.inArray(subKey, ['Information', 'Trace'], true)) {
+                    continue;
+                } else if ( ! this._extendMode.Gui && subKey === 'Gui') {
+                    continue;
+                } else if ( ! this._extendMode.WebStorage && subKey === 'WebStorage') {
+                    continue;
+                } else if ( ! this._extendMode.Database && subKey === 'Database') {
+                    continue;
+                } else if ( ! this._extendMode.Worker && subKey === 'Worker') {
+                    continue;
+                } else if ( ! this._extendMode.Geolocation && subKey === 'Geolocation') {
+                    continue;
+                } else if ( ! this._extendMode.File && subKey === 'File') {
+                    continue;
+                } else if ( ! this._extendMode.Media && subKey === 'Media') {
+                    continue;
+                } else if ( ! this._extendMode.Graphics && subKey === 'Graphics') {
+                    continue;
+                } else if ( ! this._extendMode.Framework && subKey === 'Framework') {
+                    continue;
+                } else if ( ! this._extendMode.Net && Jeeel.Type.inArray(subKey, ['Comet', 'Socket'], true)) {
+                    continue;
+                }
+
+                paths[paths.length] = dir + subKey+'.js\n';
+
+                if (dir[subKey] && file[key][subKey]) {
+                    var dirTmp = {};
+                    var fileTmp = {};
+                    dirTmp[subKey] = dir[subKey];
+                    fileTmp[subKey] = file[key][subKey];
+
+                    paths[paths.length] = this.getFilePath(dirTmp, fileTmp);
+                }
+            }
+        }
+    );
+
+    return paths.join('');
+};
+
+/**
+ * ファイルをスクリプトタグで囲った状態で全て返す
+ *
+ * @return {String} スクリプトタグで囲われたファイルパスを示す文字列
+ */
+Jeeel.getScript = function () {
+    var paths = (arguments.length === 0 ? ['<script type="text/javascript" class="'+Jeeel.SCRIPT_CLASS+'" src="'+this.directory.Jeeel+'Jeeel.js"></script>\n'] : []);
+    var directory = (arguments.length === 0 ? this.directory : arguments[0]);
+    var file = (arguments.length === 0 ? this.file : arguments[1]);
+
+    Jeeel.directoryForEach(directory,
+        function (dir, key) {
+
+            for (var i = 0, l = file[key].length; i < l; i++) {
+
+                var subKey = file[key][i];
+
+                if ( ! this._debugMode && subKey === 'Debug') {
+                    continue;
+                }else if ( ! this._debugMode && key === 'Technical' && Jeeel.Type.inArray(subKey, ['Information', 'Trace'], true)) {
+                    continue;
+                } else if ( ! this._extendMode.Gui && subKey === 'Gui') {
+                    continue;
+                } else if ( ! this._extendMode.WebStorage && subKey === 'WebStorage') {
+                    continue;
+                } else if ( ! this._extendMode.Database && subKey === 'Database') {
+                    continue;
+                } else if ( ! this._extendMode.Worker && subKey === 'Worker') {
+                    continue;
+                }else if ( ! this._extendMode.Geolocation && subKey === 'Geolocation') {
+                    continue;
+                } else if ( ! this._extendMode.File && subKey === 'File') {
+                    continue;
+                } else if ( ! this._extendMode.Media && subKey === 'Media') {
+                    continue;
+                } else if ( ! this._extendMode.Graphics && subKey === 'Graphics') {
+                    continue;
+                } else if ( ! this._extendMode.Framework && subKey === 'Framework') {
+                    continue;
+                } else if ( ! this._extendMode.Net && Jeeel.Type.inArray(subKey, ['Comet', 'Socket'], true)) {
+                    continue;
+                }
+
+                paths[paths.length] = '<script type="text/javascript" class="'+Jeeel.SCRIPT_CLASS+'" src="'+dir + subKey+'.js"></script>\n';
+
+                if (dir[subKey] && file[key][subKey]) {
+                    var dirTmp = {};
+                    var fileTmp = {};
+                    dirTmp[subKey] = dir[subKey];
+                    fileTmp[subKey] = file[key][subKey];
+
+                    paths[paths.length] = this.getScript(dirTmp, fileTmp);
+                }
+            }
+        }
+    );
+
+    return paths.join('');
+};
+
+/**
+ * 全てのファイルを接続した状態で返す
+ *
+ * @param {Boolean} [minimize] 必要最小限のファイルのみ接続するかどうか
+ * @param {Boolean} [disableDebug] デバッグ関連のファイル読み込みを無効にするかどうか
+ * @param {Boolean} [disableExtend] 追加関連のファイル読み込みを無効にするかどうか
+ * @return {String} 全てのファイルを接続した文字列
+ */
+Jeeel.getJoinScript = function (minimize, disableDebug, disableExtend) {
+    var debugTmp = this._debugMode;
+    var geneTmp  = this._extendMode;
+
+    if (minimize) {
+        this._debugMode = false;
+        this._extendMode = {};
+    }
+
+    if (disableDebug) {
+        this._debugMode = false;
+    }
+
+    if (disableExtend) {
+        this._extendMode = {};
+    }
+
+    var files = this.getFilePath().replace(/\n$/g, '').split('\n');
+    var script = [];
+
+    for (var i = 0, l = files.length; i < l; i++) {
+        script[i] = Jeeel.Net.Ajax.serverResponse(files[i]);
+    }
+
+    this._debugMode  = debugTmp;
+    this._extendMode = geneTmp;
+
+    var url = Jeeel.UserAgent.getBaseUrl();
+
+    return script.join('').replace('_disableAuto: false', '_disableAuto: true').replace("HOST: ''", "HOST: '" + url + "'");
+};
+
+/**
+ * 全てのファイルを接続し、圧縮した状態で返す
+ *
+ * @param {Boolean} [minimize] 必要最小限のファイルのみ接続するかどうか
+ * @param {Boolean} [disableDebug] デバッグ関連のファイル読み込みを無効にするかどうか
+ * @param {Boolean} [disableExtend] 追加関連のファイル読み込みを無効にするかどうか
+ * @return {String} 全てのファイルを接続・圧縮した文字列
+ */
+Jeeel.getCompressScript = function (minimize, disableDebug, disableExtend) {
+    return Jeeel.Debug.Compressor.compress(this.getJoinScript(minimize, disableDebug, disableExtend), true);
+};
+
+/**
+ * デバッグモードが有効である場合に限りエラーをダンプする
+ *
+ * @param {Mixied} var_args エラー出力する値の可変引数
+ * @return {Boolean} エラーをダンプしたかどうか
+ */
+Jeeel.errorDump = function (var_args) {
+    if ( ! Jeeel._debugMode || ! Jeeel.Debug) {
+        return false;
+    }
+
+    Jeeel.Debug.ErrorMessage.dump.apply(null, arguments);
+    return true;
+};
+
+/**
+ * デバッグモードが有効である場合に限りエラーをHTMLとしてダンプする
+ *
+ * @param {Mixied} var_args エラー出力する値の可変引数
+ * @return {Boolean} エラーをダンプしたかどうか
+ */
+Jeeel.errorHtmlDump = function (var_args) {
+    if ( ! Jeeel._debugMode || ! Jeeel.Debug) {
+        return false;
+    }
+
+    Jeeel.Debug.ErrorMessage.dumpHtml.apply(null, arguments);
+    return true;
+};
+
+/**
+ * デバッグモードが有効である場合に限りエラーをConsoleにダンプする
+ *
+ * @param {Mixied} var_args エラー出力する値の可変引数
+ * @return {Boolean} エラーをダンプしたかどうか
+ */
+Jeeel.errorDumpConsole = function (var_args) {
+    if ( ! Jeeel._debugMode || ! Jeeel.Debug) {
+        return false;
+    }
+
+    Jeeel.Debug.Console.log.apply(null, arguments);
+    return true;
+};
+
+/**
+ * Domが完成した時に呼び出されるイベントの登録を行う
+ *
+ * @param {Function} listener 登録イベント
+ * @param {Mixied} [thisArg] コールバック中のthisに相当する値(デフォルトはJeeel.Windowになる)
+ */
+Jeeel.addLoadEvent = function (listener, thisArg) {
+    Jeeel.Window.addEventListener(Jeeel.Dom.Event.Type.LOAD, listener, thisArg);
 };
 
 Jeeel.directory.Jeeel = {
 
     /**
-     * 自身を文字列参照された場合の変換
-     *
-     * @return {String} 自身のディレクトリ
-     * @private
-     */
+      * 自身を文字列参照された場合の変換
+      *
+      * @return {String} 自身のディレクトリ
+      * @private
+      */
     toString: function () {
-        return Jeeel.HOST + Jeeel.BASE_URL + 'Jeeel/';
+        return Jeeel.BASE_URL + 'Jeeel/';
     }
 };
 
-(function () {
-    
-    // 基本デバッグの有効化
-    if (Jeeel._global && Jeeel._debugMode) {
-        Jeeel._global.onerror = Jeeel._error;
+(function (global) {
+    if (typeof Jeeel === 'undefined') {
+        return;
     }
-    
+
     // クロスドメインの判定
-    if (Jeeel.HOST && Jeeel.HOST.match(/^https?:\/\//) && typeof location !== 'undefined') {
-        var host = (location.protocol + '//' + location.host).replace(/([\/()\[\]{}|*+-.,\^$?\\])/g, '\\$1');
+    if (Jeeel.HOST && Jeeel.HOST.match(/^https?:\/\//) && global.location) {
+        var host = (global.location.protocol + '//' + global.location.host).replace(/([\/()\[\]{}|*+-.,\^$?\\])/g, '\\$1');
 
         if ( ! Jeeel.HOST.match(new RegExp('^' + host))) {
             Jeeel.CROSS_DOMAIN = true;
         }
     }
-    
+
     // ユニークIDを設定する
     Jeeel.UNIQUE_ID = 'Jeeel-' + (Jeeel.VERSION + Math.random()).replace(/\D/g, '');
     Jeeel.SCRIPT_ID = Jeeel.SCRIPT_ID + '-' + Jeeel.UNIQUE_ID;
-    
+
     // ベースURLとクラス、IDの設定
     if (Jeeel._doc) {
-        
+
         var scripts = Jeeel._doc.getElementsByTagName('script');
         var jeeelRegExp = /^(.*)\/Jeeel\/Jeeel(?:-Set(?:-Min)?)?\.js(\?.*)?$/i,
             jeeelMatch;
@@ -808,139 +811,151 @@ Jeeel.directory.Jeeel = {
 
             script.className = Jeeel.SCRIPT_CLASS;
             script.id = Jeeel.SCRIPT_ID + '-0';
-            
+
             Jeeel.BASE_URL = jeeelMatch[1] + '/';
             Jeeel.QUERY = jeeelMatch[2] && jeeelMatch[2].replace(/^\?/, '') || '';
+            
+            break;
+        }
+        
+        // クエリから設定内容の取得
+        if (Jeeel.QUERY) {
+            var config = Jeeel.QUERY.split('&');
+            var full = false;
 
-            // クエリから設定内容の取得
-            if (Jeeel.QUERY) {
-                var config = Jeeel.QUERY.split('&');
-                var full = false;
-                
-                for (var j = config.length; j--;) {
-                    var tmp = config[j].split('=');
-                    var names = Jeeel._Object.Jeeel.getInputName(tmp[0]);
-                    
-                    switch (names[0]) {
-                        case 'ml':
-                            Jeeel._auto = !(+tmp[1]);
-                            break;
-                        
-                        case 'cl':
-                            Jeeel._cleanMode = !!(+tmp[1]);
-                            break;
-                            
-                        case 'dbg':
-                            Jeeel._debugMode = !!(+tmp[1]);
-                            break;
-                            
-                        case 'ext':
-                            switch (names[1]) {
-                                case 'gui':
-                                    Jeeel._extendMode.Gui = !!(+tmp[1]);
-                                    break;
-                                    
-                                case 'ws':
-                                    Jeeel._extendMode.WebStorage = !!(+tmp[1]);
-                                    break;
-                                    
-                                case 'db':
-                                    Jeeel._extendMode.Database = !!(+tmp[1]);
-                                    break;
-                                    
-                                case 'wk':
-                                    Jeeel._extendMode.Worker = !!(+tmp[1]);
-                                    break;
-                                    
-                                case 'geo':
-                                    Jeeel._extendMode.Geolocation = !!(+tmp[1]);
-                                    break;
-                                    
-                                case 'file':
-                                    Jeeel._extendMode.File = !!(+tmp[1]);
-                                    break;
-                                    
-                                case 'md':
-                                    Jeeel._extendMode.Media = !!(+tmp[1]);
-                                    break;
-                                    
-                                case 'grp':
-                                    Jeeel._extendMode.Graphics = !!(+tmp[1]);
-                                    break;
-                                    
-                                case 'net':
-                                    Jeeel._extendMode.Net = !!(+tmp[1]);
-                                    break;
-                            }
-                            break;
-                        
-                        case 'full':
-                            full = !!(+tmp[1]);
-                            break;
-                    }
-                }
-                
-                // FULLモードの際は全て上書きする
-                if (full) {
-                    Jeeel._debugMode = Jeeel._extendMode.Gui
-                                     = Jeeel._extendMode.WebStorage
-                                     = Jeeel._extendMode.Database
-                                     = Jeeel._extendMode.Worker
-                                     = Jeeel._extendMode.Geolocation
-                                     = Jeeel._extendMode.File
-                                     = Jeeel._extendMode.Media
-                                     = Jeeel._extendMode.Graphics
-                                     = Jeeel._extendMode.Net
-                                     = true;
+            for (var j = config.length; j--;) {
+                var tmp = config[j].split('=');
+                var names = Jeeel._Object.Jeeel.getInputName(tmp[0]);
+
+                switch (names[0]) {
+                    case 'ml':
+                        Jeeel._auto = !(+tmp[1]);
+                        break;
+
+                    case 'cl':
+                        Jeeel._cleanMode = !!(+tmp[1]);
+                        break;
+
+                    case 'dbg':
+                        Jeeel._debugMode = !!(+tmp[1]);
+                        break;
+
+                    case 'ext':
+                        switch (names[1]) {
+                            case 'gui':
+                                Jeeel._extendMode.Gui = !!(+tmp[1]);
+                                break;
+
+                            case 'ws':
+                                Jeeel._extendMode.WebStorage = !!(+tmp[1]);
+                                break;
+
+                            case 'db':
+                                Jeeel._extendMode.Database = !!(+tmp[1]);
+                                break;
+
+                            case 'wk':
+                                Jeeel._extendMode.Worker = !!(+tmp[1]);
+                                break;
+
+                            case 'geo':
+                                Jeeel._extendMode.Geolocation = !!(+tmp[1]);
+                                break;
+
+                            case 'file':
+                                Jeeel._extendMode.File = !!(+tmp[1]);
+                                break;
+
+                            case 'md':
+                                Jeeel._extendMode.Media = !!(+tmp[1]);
+                                break;
+
+                            case 'grp':
+                                Jeeel._extendMode.Graphics = !!(+tmp[1]);
+                                break;
+
+                            case 'net':
+                                Jeeel._extendMode.Net = !!(+tmp[1]);
+                                break;
+                                
+                            case 'fw':
+                                Jeeel._extendMode.Framework = !!(+tmp[1]);
+                                break;
+                        }
+                        break;
+
+                    case 'full':
+                        full = !!(+tmp[1]);
+                        break;
                 }
             }
 
-            break;
+            // FULLモードの際は全て上書きする
+            if (full) {
+                Jeeel._debugMode = Jeeel._extendMode.Gui
+                                 = Jeeel._extendMode.WebStorage
+                                 = Jeeel._extendMode.Database
+                                 = Jeeel._extendMode.Worker
+                                 = Jeeel._extendMode.Geolocation
+                                 = Jeeel._extendMode.File
+                                 = Jeeel._extendMode.Media
+                                 = Jeeel._extendMode.Graphics
+                                 = Jeeel._extendMode.Net
+                                 = Jeeel._extendMode.Framework
+                                 = true;
+            }
         }
+        
+        // 不要な物を廃棄する
+        script = scripts = jeeelMatch = jeeelRegExp = full = config = tmp = names = host = null;
     }
-    
-    if (Jeeel._global) {
-        Jeeel._global.Jeeel = Jeeel;
+
+    if (Jeeel._disableAuto) {
+        Jeeel._auto = false;
     }
-    
-    Jeeel.file.Jeeel = ['Class', 'Type', 'Method', 'Filter', 'Hash', 'String', 'Number', 'Code', 'Loader', 'Function', 'UserAgent', 'Json', 'Session', 'Dom', 'Net', 'Evaluator', 'Template', 'Timer', 'DataStructure', 'Object', 'Parameter', 'Validator', 'Storage', 'External', 'Deferred', 'Framework', 'Config', 'Util'];
-   
+
+    Jeeel.file.Jeeel = ['Class', 'Function', 'Type', 'Method', 'Filter', 'Hash', 'String', 'Number', 'Code', 'Loader', 'UserAgent', 'Json', 'Session', 'Dom', 'Net', 'Template', 'Timer', 'DataStructure', 'Object', 'Parameter', 'Validator', 'Storage', 'External', 'Deferred', 'Config', 'Error', 'Util'];
+
     if (Jeeel._extendMode.Gui && Jeeel._doc) {
         Jeeel.file.Jeeel[Jeeel.file.Jeeel.length] = 'Gui';
     }
-    
-    if (Jeeel._extendMode.Worker && Jeeel._global && Jeeel._global.Worker) {
+
+    if (Jeeel._extendMode.Worker && global && global.Worker) {
         Jeeel.file.Jeeel[Jeeel.file.Jeeel.length] = 'Worker';
     }
-    
-    if (Jeeel._extendMode.Database && Jeeel._global && Jeeel._global.openDatabase) {
+
+    if (Jeeel._extendMode.Database && global && global.openDatabase) {
         Jeeel.file.Jeeel[Jeeel.file.Jeeel.length] = 'Database';
     }
-    
-    if (Jeeel._extendMode.File && Jeeel._global && Jeeel._global.FileReader) {
+
+    if (Jeeel._extendMode.File && global && global.FileReader) {
         Jeeel.file.Jeeel[Jeeel.file.Jeeel.length] = 'File';
     }
-    
-    if (Jeeel._extendMode.Media && Jeeel._global && Jeeel._global.Audio) {
+
+    if (Jeeel._extendMode.Media && global && global.Audio) {
         Jeeel.file.Jeeel[Jeeel.file.Jeeel.length] = 'Media';
     }
-    
+
     if (Jeeel._extendMode.Graphics) {
         Jeeel.file.Jeeel[Jeeel.file.Jeeel.length] = 'Graphics';
+    }
+    
+    if (Jeeel._extendMode.Framework) {
+        Jeeel.file.Jeeel[Jeeel.file.Jeeel.length] = 'Framework';
     }
 
     if (Jeeel._debugMode) {
         if ( ! Jeeel._extendMode.Gui && Jeeel._doc) {
             Jeeel.file.Jeeel[Jeeel.file.Jeeel.length] = 'Gui';
         }
-        
+
         Jeeel.file.Jeeel[Jeeel.file.Jeeel.length] = 'Debug';
     }
 
     // 自動ロードを始動
     if (Jeeel._auto) {
         Jeeel._tmp = function () {
-            for (var i = 4, l = Jeeel.file.Jeeel.length; i < l; i++) {
+            for (var i = 5, l = Jeeel.file.Jeeel.length; i < l; i++) {
                 Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[i]);
             }
 
@@ -951,23 +966,24 @@ Jeeel.directory.Jeeel = {
         Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[1]);
         Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[2]);
         Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[3]);
+        Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[4]);
     }
-})();
 
-// グローバル関数・変数の設定
-(function () {
-    if ( ! Jeeel._global) {
-        return;
-    } else if (Jeeel._cleanMode) {
+    // グローバル関数・変数の設定
+    if (Jeeel._cleanMode) {
         return;
     }
-    
+
     // undefinedが未定義の特殊なブラウザに対してundefinedを定義する
-    if ( ! ('undefined' in Jeeel._global)) {
-        Jeeel._global.undefined = void 0;
-    }
+    if ( ! ('undefined' in global)) {
       
-    if (Jeeel._debugMode && (typeof Jeeel.DEBUG_URL === 'string') && (typeof Jeeel._global.evalServer === 'undefined')) {
+        /**
+         * @ignore
+         */
+        global.undefined = void 0;
+    }
+
+    if (Jeeel._debugMode && (typeof Jeeel.DEBUG_URL === 'string') && (typeof global.evalServer === 'undefined')) {
 
         /**
          * サーバ側のスクリプトを走らせる
@@ -976,13 +992,17 @@ Jeeel.directory.Jeeel = {
          * @param {Hash} [params] サーバー側に渡すパラメータ
          * @param {Function} [callback] クロスドメイン時のコールバック
          * @return {Mixied} サーバー側からの戻り値をデコードしたもの
+         * @name evalServer
+         * @function
          */
-        Jeeel._global.evalServer = function evalServer(script, params, callback) {
+        function evalServer(script, params, callback) {
             return Jeeel.Debug.Debugger.evalServer(script, params, callback);
-        };
+        }
+        
+        global.evalServer = evalServer;
     }
 
-    if (Jeeel._debugMode && (typeof Jeeel.SQL_DEBUG_URL === 'string') && (typeof Jeeel._global.evalSql === 'undefined')) {
+    if (Jeeel._debugMode && (typeof Jeeel.SQL_DEBUG_URL === 'string') && (typeof global.evalSql === 'undefined')) {
 
         /**
          * サーバー側でSQLを実行する
@@ -990,13 +1010,17 @@ Jeeel.directory.Jeeel = {
          * @param {String} sql サーバー側実行するSQL文字列
          * @param {Function} [callback] クロスドメイン時のコールバック
          * @return {Mixied} サーバー側からの戻り値をデコードしたもの
+         * @name evalSql
+         * @function
          */
-        Jeeel._global.evalSql = function evalSql(sql, callback) {
+        function evalSql(sql, callback) {
             return Jeeel.Debug.Debugger.evalSql(sql, callback);
-        };
+        }
+        
+        global.evalSql = evalSql;
     }
 
-    if (Jeeel._debugMode && (typeof Jeeel.MAIL_URL === 'string') && (typeof Jeeel._global.sendMail === 'undefined')) {
+    if (Jeeel._debugMode && (typeof Jeeel.MAIL_URL === 'string') && (typeof global.sendMail === 'undefined')) {
 
         /**
          * メールを送信する
@@ -1006,36 +1030,49 @@ Jeeel.directory.Jeeel = {
          * @param {Boolean} [isHtml] HTMLメールとして送信を行うかどうかを示す(デフォルトはfalse)
          * @param {Function} [callback] クロスドメイン時のコールバック
          * @return {Boolean} メール送信が成功ならばtrueそれ以外はfalseを返す
+         * @name sendMail
+         * @function
          */
-        Jeeel._global.sendMail = function sendMail(to, body, isHtml, callback) {
+        function sendMail(to, body, isHtml, callback) {
             return Jeeel.Debug.Debugger.sendMail(to, body, isHtml, callback);
-        };
+        }
+        
+        global.sendMail = sendMail;
     }
 
-    if (Jeeel._debugMode && (typeof Jeeel.FILE_OPEN_URL === 'string') && (typeof Jeeel._global.fileOpen === 'undefined')) {
+    if (Jeeel._debugMode && (typeof Jeeel.FILE_OPEN_URL === 'string') && (typeof global.fileOpen === 'undefined')) {
 
         /**
          * 識別子をファイルとしてブラウザに読み込ませる
          *
          * @param {Mixied} value 読み込ませる値
          * @param {String} [fileName] 指定した名前で認識させたい時に指定する
+         * @name fileOpen
+         * @function
          */
-        Jeeel._global.fileOpen = function fileOpen(value, fileName) {
+        function fileOpen(value, fileName) {
             return Jeeel.Debug.Debugger.fileOpen(value, fileName);
-        };
+        }
+        
+        global.fileOpen = fileOpen;
     }
 
-    if (Jeeel._debugMode && (typeof Jeeel._global.createConsole === 'undefined')) {
+    if (Jeeel._debugMode && (typeof global.createConsole === 'undefined')) {
 
         /**
          * コンソールを生成する
+         * 
+         * @name createConsole
+         * @function
          */
-        Jeeel._global.createConsole = function createConsole() {
+        function createConsole() {
             Jeeel.Debug.Console.create();
-        };
+        }
+        
+        global.createConsole = createConsole;
     }
 
-    if (typeof Jeeel._global.$ID === 'undefined') {
+    if (typeof global.$ID === 'undefined') {
 
         /**
          * idからElementを取得する
@@ -1043,8 +1080,10 @@ Jeeel.directory.Jeeel = {
          * @param {String} id 検索ID
          * @param {Document|Element} [target] 検索対象(省略時は現階層のDocument)
          * @return {Element} 取得したElement
+         * @name $ID
+         * @function
          */
-        Jeeel._global.$ID = function $ID(id, target) {
+        function $ID(id, target) {
 
             if (Jeeel.Type.isDocument(target) && Jeeel._doc !== target) {
                 return Jeeel.Dom.Document.create(target).getElementById(id);
@@ -1053,10 +1092,12 @@ Jeeel.directory.Jeeel = {
             }
 
             return Jeeel.Document.getElementById(id);
-        };
+        }
+        
+        global.$ID = $ID;
     }
 
-    if (typeof Jeeel._global.$CLASS === 'undefined') {
+    if (typeof global.$CLASS === 'undefined') {
 
         /**
          * classからElementを全て取得する
@@ -1064,8 +1105,10 @@ Jeeel.directory.Jeeel = {
          * @param {String} className 検索Class
          * @param {Document|Element} [target] 検索対象(省略時は現階層のDocument)
          * @return {Element[]} 取得したElement配列
+         * @name $CLASS
+         * @function
          */
-        Jeeel._global.$CLASS = function $CLASS(className, target) {
+        function $CLASS(className, target) {
 
             if (Jeeel.Type.isDocument(target) && Jeeel._doc !== target) {
                 return Jeeel.Dom.Document.create(target).getElementsByClassName(className);
@@ -1074,10 +1117,12 @@ Jeeel.directory.Jeeel = {
             }
 
             return Jeeel.Document.getElementsByClassName(className);
-        };
+        }
+        
+        global.$CLASS = $CLASS;
     }
 
-    if (typeof Jeeel._global.$NAME === 'undefined') {
+    if (typeof global.$NAME === 'undefined') {
 
         /**
          * nameからElementを全て取得する
@@ -1085,8 +1130,10 @@ Jeeel.directory.Jeeel = {
          * @param {String} name 検索Name
          * @param {Document|Element} [target] 検索対象(省略時は現階層のDocument)
          * @return {Element[]} 取得したElement配列
+         * @name $NAME
+         * @function
          */
-        Jeeel._global.$NAME = function $NAME(name, target) {
+        function $NAME(name, target) {
 
             if (Jeeel.Type.isDocument(target) && Jeeel._doc !== target) {
                 return Jeeel.Dom.Document.create(target).getElementsByName(name);
@@ -1095,10 +1142,12 @@ Jeeel.directory.Jeeel = {
             }
 
             return Jeeel.Document.getElementsByName(name);
-        };
+        }
+        
+        global.$NAME = $NAME;
     }
 
-    if (typeof Jeeel._global.$TAG === 'undefined') {
+    if (typeof global.$TAG === 'undefined') {
 
         /**
          * タグ名からElementを全て取得する
@@ -1106,8 +1155,10 @@ Jeeel.directory.Jeeel = {
          * @param {String} tagName 検索Tag
          * @param {Document|Element} [target] 検索対象(省略時は現階層のDocument)
          * @return {Element[]} 取得したElement配列
+         * @name $TAG
+         * @function
          */
-        Jeeel._global.$TAG = function $TAG(tagName, target) {
+        function $TAG(tagName, target) {
 
             if (Jeeel.Type.isDocument(target) && Jeeel._doc !== target) {
                 return Jeeel.Dom.Document.create(target).getElementsByTagName(tagName);
@@ -1116,10 +1167,38 @@ Jeeel.directory.Jeeel = {
             }
 
             return Jeeel.Document.getElementsByTagName(tagName);
-        };
+        }
+        
+        global.$TAG = $TAG;
+    }
+    
+    if (typeof global.$QUERY === 'undefined') {
+
+        /**
+         * セレクタからElementを全て取得する
+         *
+         * @param {String} selector 検索セレクタ
+         * @param {Document|Element} [target] 検索対象(省略時は現階層のDocument)
+         * @return {Element[]} 取得したElement配列
+         * @see Jeeel.Dom.Selector
+         * @name $QUERY
+         * @function
+         */
+        function $QUERY(selector, target) {
+
+            if (Jeeel.Type.isDocument(target) && Jeeel._doc !== target) {
+                return Jeeel.Dom.Document.create(target).getElementsBySelector(selector);
+            } else if (Jeeel.Type.isElement(target)) {
+                return Jeeel.Dom.Element.create(target).getElementsBySelector(selector);
+            }
+
+            return Jeeel.Document.getElementsBySelector(selector);
+        }
+        
+        global.$QUERY = $QUERY;
     }
 
-    if (typeof Jeeel._global.$PRM === 'undefined') {
+    if (typeof global.$PRM === 'undefined') {
 
         /**
          * Jeeel.Parameterインスタンスの作成
@@ -1127,39 +1206,51 @@ Jeeel.directory.Jeeel = {
          * @param {Hash} [params] 入力パラメータ
          * @return {Jeeel.Parameter} インスタンス
          * @throws {Error} paramsが配列式でない場合に起こる
+         * @name $PRM
+         * @function
          */
-        Jeeel._global.$PRM = function $PRM(params) {
+        function $PRM(params) {
             return new Jeeel.Parameter(params);
-        };
+        }
+        
+        global.$PRM = $PRM;
     }
 
-    if (typeof Jeeel._global.$ELM === 'undefined') {
+    if (typeof global.$ELM === 'undefined') {
 
         /**
          * Jeeel.Dom.Elementインスタンスの作成
          *
          * @param {Element} element 対象Element
          * @return {Jeeel.Dom.Element} 作成したインスタンス
+         * @name $ELM
+         * @function
          */
-        Jeeel._global.$ELM = function $ELM(element) {
+        function $ELM(element) {
             return new Jeeel.Dom.Element(element);
-        };
+        }
+        
+        global.$ELM = $ELM;
     }
 
-    if (typeof Jeeel._global.$ELMOP === 'undefined') {
+    if (typeof global.$ELMOP === 'undefined') {
 
         /**
          * Jeeel.Dom.ElementOperatorインスタンスの作成
          *
-         * @param {Element|Element[]} elementList 対象Elementまたは複数のElementリスト
+         * @param {String|Element|Element[]} elementList セレクタ文字列、対象Elementまたは複数のElementリスト
          * @return {Jeeel.Dom.ElementOperator} 作成したインスタンス
+         * @name $ELMOP
+         * @function
          */
-        Jeeel._global.$ELMOP = function $ELMOP(elementList) {
+        function $ELMOP(elementList) {
             return new Jeeel.Dom.ElementOperator(elementList);
-        };
+        }
+        
+        global.$ELMOP = $ELMOP;
     }
-    
-    if (typeof Jeeel._global.$BIND === 'undefined') {
+
+    if (typeof global.$BIND === 'undefined') {
 
         /**
          * Jeeel.Functionを使用したthisのバインド
@@ -1167,13 +1258,17 @@ Jeeel.directory.Jeeel = {
          * @param {Function} func 対象の関数
          * @param {Mixied} [thisArg] バインドするthis
          * @return {Jeeel.Function} 作成したインスタンス
+         * @name $BIND
+         * @function
          */
-        Jeeel._global.$BIND = function $BIND(func, thisArg) {
+        function $BIND(func, thisArg) {
             return Jeeel.Function.create(func).bind(thisArg);
-        };
+        }
+        
+        global.$BIND = $BIND;
     }
-    
-    if (typeof Jeeel._global.$AJAX === 'undefined') {
+
+    if (typeof global.$AJAX === 'undefined') {
 
         /**
          * Jeeel.Net.Ajaxインスタンスの作成
@@ -1181,25 +1276,33 @@ Jeeel.directory.Jeeel = {
          * @param {String} url Ajax対象URL文字列
          * @param {String} [method] HTTPメソッド(getまたはpost、大文字小文字は問わない、初期値はPOST)
          * @return {Jeeel.Net.Ajax} 作成したインスタンス
+         * @name $AJAX
+         * @function
          */
-        Jeeel._global.$AJAX = function $AJAX(url, method) {
+        function $AJAX(url, method) {
             return new Jeeel.Net.Ajax(url, method);
-        };
+        }
+        
+        global.$AJAX = $AJAX;
     }
-    
-    if (typeof Jeeel._global.$FORM === 'undefined') {
+
+    if (typeof global.$FORM === 'undefined') {
 
         /**
          * Jeeel.Net.Formインスタンスの作成
          *
          * @param {String|Element} form フォームを示すIDもしくはフォーム自身
          * @return {Jeeel.Net.Form} 作成したインスタンス
+         * @name $FORM
+         * @function
          */
-        Jeeel._global.$FORM = function $FORM(form) {
+        function $FORM(form) {
             return new Jeeel.Net.Form(form);
-        };
+        }
+        
+        global.$FORM = $FORM;
     }
-})();
+})(Jeeel._global);
 Jeeel.directory.Jeeel.Class = {
 
     /**
@@ -1214,7 +1317,7 @@ Jeeel.directory.Jeeel.Class = {
 };
 
 /**
- * クラスに関するネームスペース 
+ * @namespace クラスに関するネームスペース
  */
 Jeeel.Class = {
     
@@ -1516,6 +1619,514 @@ Jeeel.Class.Mixin.prototype = {
         
         return this;
     }
+};Jeeel.directory.Jeeel.Function = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel + 'Function/';
+    }
+};
+
+/**
+ * コンストラクタ
+ *
+ * @class メソッドを拡張するクラス(name, length等の部分は初期化される)
+ * @param {Function} target 基となるメソッド
+ * @throws {Error} targetがメソッドでない場合に起こる
+ * @example
+ * var base = function (name, id) {
+ * &nbsp;   return 'id: ' + id + ' name: ' + name + this;
+ * }
+ * var func = Jeeel.Function.create(base);
+ * func.bind(' hello!!');
+ *
+ * var b = func('devid', 22);
+ * //b = 'id: 22 name: devid hello!!'
+ */
+Jeeel.Function = function (target) {
+
+    if ( ! Jeeel.Type.isFunction(target)) {
+        throw new Error('targetがメソッドではありません。');
+    }
+
+    /**
+     * @ignore
+     */
+    var f = function () {
+        return arguments.callee._cnvTarget.apply(this, arguments);
+    };
+
+    for (var key in Jeeel.Function.prototype) {
+        f[key] = Jeeel.Function.prototype[key];
+    }
+    
+    /**
+     * 対象のメソッド
+     *
+     * @type Function
+     * @private
+     */
+    f._target = target;
+
+    /**
+     * 変換後のメソッド
+     *
+     * @type Function
+     * @private
+     */
+    f._cnvTarget = target;
+    
+    target = null;
+
+    try {
+        return f;
+    } finally {
+        f = null;
+    }
+};
+
+/**
+ * インスタンスの作成を行う
+ *
+ * @param {Function} target 基となるメソッド
+ * @return {Jeeel.Function} 作成したインスタンス
+ */
+Jeeel.Function.create = function (target) {
+    return new this(target);
+};
+
+/**
+ * 関数ネイティブ化を行う<br />
+ * コンストラクタやapplyのないIEのためのメソッド
+ * 
+ * @param {Mixied} obj 親オブジェクト
+ * @param {String} methodName ネイティブにしたいメソッドの名前
+ * @param {Boolean} [useNew] インスタンス化するかどうか
+ * @return {Function} ネイティブ化した関数
+ */
+Jeeel.Function.toNative = function (obj, methodName, useNew) {
+    methodName = (useNew ? 'new' : '') + ' this["' + methodName + '"]';
+    
+    return function () {
+        var params = [];
+        
+        for (var i = arguments.length; i--;) {
+            params[i] = "_" + i;
+        }
+        
+        params = params.join(',');
+        
+        return Function(
+            params,
+            'return ' + methodName + '(' + params + ')'
+        ).apply(obj, arguments);
+    };
+};
+
+/**
+ * 単にthisをbindするメソッド<br />
+ * メモリ消費等が少ないがエラー処理等は一切しない
+ * 
+ * @param {Function} target bind対象のメソッド
+ * @param {Mixied} thisArg thisの部分にあたる値
+ * @return {Function} bind後のメソッド
+ */
+Jeeel.Function.simpleBind = function (target, thisArg) {
+    return function () {
+        return target.apply(thisArg, arguments);
+    };
+};
+
+Jeeel.Function.prototype = {
+  
+    /**
+     * 対象のメソッド
+     *
+     * @type Function
+     * @private
+     */
+    _target: null,
+    
+    /**
+     * 変換後のメソッド
+     *
+     * @type Function
+     * @private
+     */
+    _cnvTarget: null,
+    
+    /**
+     * メソッドないのthisの部分を定義する<br />
+     * 一度しか意味がない
+     *
+     * @param {Mixied} thisArg thisの部分にあたる値
+     * @return {Jeeel.Function} 自インスタンス
+     */
+    bind: function (thisArg) {
+        var target = this._cnvTarget;
+
+        this._cnvTarget = function () {
+            return target.apply(thisArg, arguments);
+        };
+
+        return this;
+    },
+
+    /**
+     * メソッドの遅延実行を定義する<br />
+     * メソッドの戻り値はタイムアウトIDに変更される
+     *
+     * @param {Integer} delayTime 遅延時間(ミリ秒)
+     * @return {Jeeel.Function} 自インスタンス
+     */
+    delay: function (delayTime) {
+
+        var func = function () {
+            Array.prototype.unshift.call(arguments, arguments.callee._target, arguments.callee._delayTime);
+
+            return Jeeel.Timer.setTimeout.apply(null, arguments);
+        };
+
+        func._target = this._cnvTarget;
+        func._delayTime = delayTime;
+
+        this._cnvTarget = func;
+        
+        func = null;
+
+        return this;
+    },
+
+    /**
+     * メソッドを複数回実行する<br />
+     * メソッドの戻り値はJeeel.Timerのインスタンスになる<br />
+     * メソッド内部のthisはこのメソッド前にbindしていない限りJeeel.Timerのインスタンスになる
+     *
+     * @param {Integer} interval 実行間隔(ミリ秒)
+     * @param {Integer} count 実行回数
+     * @return {Jeeel.Function} 自インスタンス
+     */
+    repeat: function (interval, count) {
+
+        var func = function () {
+            Array.prototype.unshift.call(arguments, arguments.callee._target, interval, count);
+
+            return Jeeel.Timer.setLimitInterval.apply(null, arguments);
+        };
+
+        func._target = this._cnvTarget;
+
+        this._cnvTarget = func;
+
+        return this;
+    },
+
+    /**
+     * 複数のメソッドを結合する<br />
+     * 現在のメソッドが最初に実行される<br />
+     * メソッドの戻り値は複数のメソッドの戻り値のリストになる
+     *
+     * @param {Mixied} var_args 結合するメソッドを順に渡す
+     * @return {Jeeel.Function} 自インスタンス
+     * @throws {Error} 引数にメソッド以外を渡した場合に起こる
+     * @example
+     * <pre>
+     * var f1 = function (n) {
+     * &nbsp;   return a + 1;
+     * };
+     * var f2 = function (n) {
+     * &nbsp;   return a + 2;
+     * };
+     * var f3 = function (n) {
+     * &nbsp;   return a + 3;
+     * };
+     * var sf = Jeeel.Function.create(f1);
+     * sf.join(f2, f3);
+     *
+     * var res = sf(2);
+     *
+     * //res = [3, 4, 5]
+     * </pre>
+     */
+    join: function (var_args) {
+        var funcs = Array.prototype.slice.call(arguments, 0, arguments.length);
+
+        for (var i = 0, l = funcs.length; i < l; i++) {
+            if ( ! Jeeel.Type.isFunction(funcs[i])) {
+                throw new Error('引数にメソッド以外が含まれています。');
+            }
+        }
+
+        var func = function () {
+            var res = [];
+
+            res[res.length] = arguments.callee._target.apply(this, arguments);
+
+            for (var i = 0, l = funcs.length; i < l; i++) {
+                res[res.length] = funcs[i].apply(this, arguments);
+            }
+
+            return res;
+        };
+
+        func._target = this._cnvTarget;
+
+        this._cnvTarget = func;
+
+        return this;
+    },
+
+    /**
+     * 複数のメソッドを切り替えて実行する機能を付加する<br />
+     * 現在のメソッドを起点として、引数に指定したメソッドを呼び出す毎に切り替えて実行する<br />
+     * 最後まで実行したら自動的に最初に戻る
+     *
+     * @param {Mixied} var_args 順次実行するメソッドを順に渡す
+     * @return {Jeeel.Function} 自インスタンス
+     * @throws {Error} 引数にメソッド以外を渡した場合に起こる
+     * @example
+     * <pre>
+     * var f1 = function (n) {
+     * &nbsp;   return a + 1;
+     * };
+     * var f2 = function (n) {
+     * &nbsp;   return a + 2;
+     * };
+     * var f3 = function (n) {
+     * &nbsp;   return a + 3;
+     * };
+     * var sf = Jeeel.Function.create(f1);
+     * sf.iterate(f2, f3);
+     *
+     * var res = [];
+     *
+     * for (var i = 0; i &lt; 3; i++) {
+     * &nbsp;   res[i] = sf(i);
+     * }
+     *
+     * //res = [1, 3, 5]
+     * </pre>
+     */
+    iterate: function (var_args) {
+        var funcs = Array.prototype.slice.call(arguments, 0, arguments.length);
+
+        for (var i = 0, l = funcs.length; i < l; i++) {
+            if ( ! Jeeel.Type.isFunction(funcs[i])) {
+                throw new Error('引数にメソッド以外が含まれています。');
+            }
+        }
+
+        var func = function () {
+
+            var res = funcs[arguments.callee._cnt].apply(this, arguments);
+
+            arguments.callee._cnt++;
+
+            if (funcs.length <= arguments.callee._cnt) {
+                arguments.callee._cnt = 0;
+            }
+
+            return res;
+        };
+
+        funcs.unshift(this._cnvTarget);
+        func._cnt = 0;
+
+        this._cnvTarget = func;
+
+        return this;
+    },
+
+    /**
+     * パラメータを定義づける
+     *
+     * @param {Mixied} var_args 定義づけるパラメータを左から順に渡す
+     * @return {Jeeel.Function} 自インスタンス
+     * @example
+     * <pre>
+     * var f = function (a, b, c) {
+     * &nbsp;   return a + b + c;
+     * };
+     * var sf = Jeeel.Function.create(f);
+     * sf.curry('Hello! ', 'World ');
+     *
+     * var res = sf('Jhon!!');
+     * //res = 'Hello! World Jhon!!'
+     * </pre>
+     */
+    curry: function (var_args) {
+        var slice = Array.prototype.slice;
+        var args = slice.call(arguments);
+
+        var func = function () {
+            var prms = slice.call(arguments);
+            prms = args.concat(prms);
+
+            return arguments.callee._target.apply(this, prms);
+        };
+
+        func._target = this._cnvTarget;
+
+        this._cnvTarget = func;
+
+        return this;
+    },
+
+    /**
+     * メソッドの変更を元に戻す
+     * 
+     * @return {Jeeel.Function} 自インスタンス
+     */
+    reset: function () {
+        this._cnvTarget = this._target;
+
+        return this;
+    },
+
+    /**
+     * ベースとなったメソッドを取得する
+     *
+     * @return {Function} ベースになったメソッド
+     */
+    getBaseMethod: function () {
+        return this._target;
+    }
+};
+
+Jeeel.file.Jeeel.Function = ['Template'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Function, Jeeel.file.Jeeel.Function);
+
+/**
+ * @namespace 様々な箇所で汎用的に使用する関数を保有するネームスペース
+ */
+Jeeel.Function.Template = {
+    
+    /**
+     * 何もしない関数
+     * 
+     * @type Function
+     * @field
+     * @constant
+     */
+    EMPTY: function () {
+        
+    },
+    
+    /**
+     * nullを返すだけの関数
+     * 
+     * @type Function
+     * @field
+     * @constant
+     */
+    RETURN_NULL: function () {
+        return null;
+    },
+    
+    /**
+     * trueを返すだけの関数
+     * 
+     * @type Function
+     * @field
+     * @constant
+     */
+    RETURN_TRUE: function () {
+        return true;
+    },
+    
+    /**
+     * falseを返すだけの関数
+     * 
+     * @type Function
+     * @field
+     * @constant
+     */
+    RETURN_FALSE: function () {
+        return false;
+    },
+    
+    /**
+     * 0を返すだけの関数
+     * 
+     * @type Function
+     * @field
+     * @constant
+     */
+    RETURN_ZERO: function () {
+        return 0;
+    },
+    
+    /**
+     * 空文字列を返すだけの関数
+     * 
+     * @type Function
+     * @field
+     * @constant
+     */
+    RETURN_EMPTY_STRING: function () {
+        return '';
+    },
+    
+    /**
+     * 空配列を返すだけの関数
+     * 
+     * @type Function
+     * @field
+     * @constant
+     */
+    RETURN_EMPTY_ARRAY: function () {
+        return [];
+    },
+    
+    /**
+     * 空連想配列を返すだけの関数
+     * 
+     * @type Function
+     * @field
+     * @constant
+     */
+    RETURN_EMPTY_HASH: function () {
+        return {};
+    },
+    
+    /**
+     * 引数返すだけの関数
+     * 
+     * @type Function
+     * @field
+     * @constant
+     */
+    RETURN_ARGUMENT: function (value) {
+        return value;
+    },
+    
+    /**
+     * thisを返すだけの関数
+     * 
+     * @type Function
+     * @field
+     * @constant
+     */
+    RETURN_THIS: function () {
+        return this;
+    },
+    
+    /**
+     * 引数を例外として投げる関数
+     * 
+     * @type Function
+     * @field
+     * @constant
+     */
+    THROW_ARGUMENT: function (value) {
+        throw value;
+    }
 };
 Jeeel.directory.Jeeel.Type = {
 
@@ -1531,7 +2142,7 @@ Jeeel.directory.Jeeel.Type = {
 };
 
 /**
- * 型に関する関数や定数を保持するスタティッククラス
+ * @staticClass 型に関する関数や定数を保持するスタティッククラス
  */
 Jeeel.Type = {
 
@@ -2002,14 +2613,14 @@ Jeeel.Type = {
      * @param {Mixied} val 判定値
      * @return {Boolean} 判定結果
      */
-    isElementCollection: function (val) {
+    isHtmlCollection: function (val) {
         if ( ! this.isHash(val)) {
             return false;
         }
         
         var member = ['length', 'item', 'namedItem'];
 
-        for (var i = 0, l = member.length; i < l; i++) {
+        for (var i = member.length; i--;) {
             if ( ! (member[i] in val)) {
                 return false;
             }
@@ -2031,7 +2642,29 @@ Jeeel.Type = {
         
         var member = ['length', 'item'];
 
-        for (var i = 0, l = member.length; i < l; i++) {
+        for (var i = member.length; i--;) {
+            if ( ! (member[i] in val)) {
+                return false;
+            }
+        }
+
+        return true;
+    },
+    
+    /**
+     * Node型かどうかを返す
+     *
+     * @param {Mixied} val 判定値
+     * @return {Boolean} 判定結果
+     */
+    isNode: function (val) {
+        if ( ! this.isHash(val)) {
+            return false;
+        }
+        
+        var member = ['attributes', 'nodeType', 'nodeName', 'nodeValue'];
+
+        for (var i = member.length; i--;) {
             if ( ! (member[i] in val)) {
                 return false;
             }
@@ -2173,7 +2806,7 @@ Jeeel.Type = {
         
         var member = ['Object', 'Array', 'String', 'Number', 'Boolean', 'Function'];
 
-        for (var i = 0, l = member.length; i < l; i++) {
+        for (var i = member.length; i--;) {
             if ( ! (member[i] in val)) {
                 return false;
             }
@@ -2233,7 +2866,7 @@ Jeeel.Type = {
         
         var member = ['callee', 'length'];
 
-        for (var i = 0, l = member.length; i < l; i++) {
+        for (var i = member.length; i--;) {
             if ( ! (member[i] in val)) {
                 return false;
             }
@@ -2275,7 +2908,7 @@ Jeeel.Type = {
         
         var member = ['key', 'getItem', 'setItem', 'removeItem', 'clear'];
 
-        for (var i = 0, l = member.length; i < l; i++) {
+        for (var i = member.length; i--;) {
             if ( ! (member[i] in val)) {
                 return false;
             }
@@ -2384,12 +3017,22 @@ Jeeel.Type = {
     }
 };
 
+if (Jeeel._global && Jeeel._global.Array && Jeeel._global.Array.isArray) {
+  
+    /**
+     * @ignore
+     */
+    Jeeel.Type.isArray = function (val) {
+        return Array.isArray(val);
+    };
+}
+
 Jeeel.file.Jeeel.Type = ['ObjectType', 'ObjectKeys'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Type, Jeeel.file.Jeeel.Type);
 
 /**
- * オブジェクトの型の種類を示す列挙体
+ * @namespace オブジェクトの型の種類を示す列挙体
  */
 Jeeel.Type.ObjectType = {
     /**
@@ -2586,7 +3229,7 @@ Jeeel.Type.ObjectType = {
 };
 
 /**
- * オブジェクトが元々保持しているキーのリストの列挙体
+ * @namespace オブジェクトが元々保持しているキーのリストの列挙体
  */
 Jeeel.Type.ObjectKeys = {
 
@@ -2676,7 +3319,7 @@ Jeeel.Type.ObjectKeys = {
      * @type String[]
      * @constant
      */
-    ELEMENT: ['name', 'id', 'className', 'tagName', 'nodeName', 'nodeType', 'firstChild', 'lastChild', 'nextSibling', 'previousSibling', 'parentNode', 'children', 'childNodes', 'hasChildNodes', 'style', 'appendChild', 'removeChild', 'replaceChild', 'insertBefore', 'setAttribute', 'getAttribute', 'removeAttribute', 'blur', 'focus', 'cloneNode', 'tabIndex', 'innerHTML'],
+    ELEMENT: ['name', 'id', 'className', 'tagName', 'nodeName', 'nodeType', 'firstChild', 'lastChild', 'nextSibling', 'previousSibling', 'parentNode', 'children', 'childNodes', 'hasChildNodes', 'style', 'appendChild', 'removeChild', 'replaceChild', 'insertBefore', 'setAttribute', 'getAttribute', 'removeAttribute', 'blur', 'focus', 'cloneNode', 'tabIndex', 'innerHTML', 'onabort', 'onbeforecopy', 'onbeforecut', 'onbeforepaste', 'onbeforeunload', 'onblur', 'onchange', 'onclick', 'oncontextmenu', 'oncopy', 'oncut', 'ondblclick', 'ondrag', 'ondragend', 'ondragenter', 'ondragleave', 'ondragover', 'ondragstart', 'ondrop', 'onerror', 'onfocus', 'onhashchange', 'oninput', 'oninvalid', 'onkeydown', 'onkeypress', 'onkeyup', 'onload', 'onmessage', 'onmousedown', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup', 'onmousewheel', 'onoffline', 'ononline', 'onpaste', 'onpopstate', 'onreset', 'onresize', 'onscroll', 'onsearch', 'onselect', 'onselectstart', 'onstorage', 'onsubmit', 'onunload'],
 
     /**
      * Attribute型のキーリスト
@@ -2740,7 +3383,7 @@ Jeeel.Type.ObjectKeys = {
      * @type String[]
      * @constant
      */
-    ERROR: ['name', 'message', 'toString'],
+    ERROR: ['name', 'message', 'stack', 'toString'],
     
     /**
      * Math型のキーリスト
@@ -2767,7 +3410,7 @@ Jeeel.Type.ObjectKeys = {
     STORAGE: ['length', 'key', 'getItem', 'setItem', 'removeItem', 'clear']
 };
 /**
- * 汎用的なメソッドを保持するネームスペース
+ * @namespace 汎用的なメソッドを保持するネームスペース
  */
 Jeeel.Method = {
     
@@ -2817,6 +3460,9 @@ Jeeel.directory.Jeeel.Filter = {
     }
 };
 
+/**
+ * @namespace フィルターに関するネームスペース
+ */
 Jeeel.Filter = {
 
     /**
@@ -2837,7 +3483,7 @@ Jeeel.Filter.Abstract.prototype = {
      */
     filter: function (val) {
         if (Jeeel.Type.isHash(val)) {
-            val = this._filterArray(val);
+            val = this._filterEach(val);
         } else {
             val = this._filter(val);
         }
@@ -2865,7 +3511,7 @@ Jeeel.Filter.Abstract.prototype = {
      * @return {Mixied} フィルターを掛けた後の値
      * @protected
      */
-    _filterArray: function (arr) {
+    _filterEach: function (arr) {
         var result = {};
 
         Jeeel.Hash.forEach(arr,
@@ -3001,7 +3647,7 @@ Jeeel.Filter.Each.prototype = {
     /**
      * @private
      */
-    _filterArray: function (params) {
+    _filterEach: function (params) {
         var result = {};
         var filter = this.getInnerFilter();
 
@@ -3117,7 +3763,7 @@ Jeeel.Filter.Chain.prototype = {
     /**
      * @private
      */
-    _filterArray: function (params) {
+    _filterEach: function (params) {
         var log = {};
 
         for (var i = 0, l = this._filters.length; i < l; i++) {
@@ -3192,7 +3838,7 @@ Jeeel.Filter.Join.prototype = {
     /**
      * @private
      */
-    _filterArray: function (array) {
+    _filterEach: function (array) {
         var keys = this._keys || Jeeel.Hash.getKeys(array);
 
         var params = Jeeel.Parameter.create(array)
@@ -3271,7 +3917,7 @@ Jeeel.Filter.Subset.prototype = {
     /**
      * @private
      */
-    _filterArray: function (array) {
+    _filterEach: function (array) {
 
         var globalDefault = null;
         var defaults;
@@ -3364,7 +4010,7 @@ Jeeel.Filter.Map.prototype = {
     /**
      * @private
      */
-    _filterArray: function (vals) {
+    _filterEach: function (vals) {
         var res = {};
         
         Jeeel.Hash.forEach(vals,
@@ -3392,7 +4038,7 @@ Jeeel.directory.Jeeel.Filter.Cast = {
 };
 
 /**
- * キャスト系のネームスペース
+ * @namespace キャスト系のネームスペース
  */
 Jeeel.Filter.Cast = {
     
@@ -3477,7 +4123,7 @@ Jeeel.directory.Jeeel.Filter.Hash = {
 };
 
 /**
- * 配列・連想配列関連のフィルター管理ネームスペース
+ * @namespace 配列・連想配列関連のフィルター管理ネームスペース
  */
 Jeeel.Filter.Hash = {
 
@@ -3541,7 +4187,7 @@ Jeeel.Filter.Hash.Reduce.prototype = {
     /**
      * @private
      */
-    _filterArray: function (val) {
+    _filterEach: function (val) {
         var res = {};
 
         Jeeel.Hash.forEach(val,
@@ -3613,7 +4259,7 @@ Jeeel.Filter.Hash.Bundle.prototype = {
     /**
      * @private
      */
-    _filterArray: function (array) {
+    _filterEach: function (array) {
         var res = {};
         
         Jeeel.Hash.forEach(array,
@@ -3696,7 +4342,7 @@ Jeeel.Filter.Hash.Key.prototype = {
     /**
      * @private
      */
-    _filterArray: function (array) {
+    _filterEach: function (array) {
 
         var res = {};
 
@@ -3794,7 +4440,7 @@ Jeeel.Filter.Hash.Flat.prototype = {
     /**
      * @private
      */
-    _filterArray: function (rows) {
+    _filterEach: function (rows) {
         var result = this._arrayWhile(0, rows);
 
         return result;
@@ -3899,7 +4545,7 @@ Jeeel.Filter.Hash.KeySpecify.prototype = {
     /**
      * @private
      */
-    _filterArray: function (array) {
+    _filterEach: function (array) {
 
         var res = {};
 
@@ -3988,7 +4634,7 @@ Jeeel.Filter.Hash.Fill.prototype = {
     /**
      * @private
      */
-    _filterArray: function (array) {
+    _filterEach: function (array) {
         var result = Jeeel.Method.clone(array);
 
         for (var i = this._index; i < this._length; i++) {
@@ -4056,7 +4702,7 @@ Jeeel.Filter.Hash.Unique.prototype = {
     /**
      * @private
      */
-    _filterArray: function (array) {
+    _filterEach: function (array) {
       
         array = Jeeel.Hash.create(array);
 
@@ -4131,7 +4777,7 @@ Jeeel.Filter.Hash.Difference.prototype = {
     /**
      * @private
      */
-    _filterArray: function (array) {
+    _filterEach: function (array) {
       
         array = new Jeeel.Hash(array);
 
@@ -4231,8 +4877,8 @@ Jeeel.Filter.Hash.CopyKey.prototype = {
     /**
      * @private
      */
-    _filterArray: function (vals) {
-      
+    _filterEach: function (vals) {
+        
         var res = {};
         var map = this.getCopyMap();
 
@@ -4306,7 +4952,7 @@ Jeeel.Filter.Hash.DeleteKey.prototype = {
     /**
      * @private
      */
-    _filterArray: function (vals) {
+    _filterEach: function (vals) {
         var res = {};
 
         Jeeel.Hash.forEach(vals,
@@ -4337,7 +4983,7 @@ Jeeel.directory.Jeeel.Filter.String = {
 };
 
 /**
- * 文字列関連のフィルター管理ネームスペース
+ * @namespace 文字列関連のフィルター管理ネームスペース
  */
 Jeeel.Filter.String = {
 
@@ -4526,13 +5172,13 @@ Jeeel.directory.Jeeel.Filter.Url = {
 };
 
 /**
- * Url関連のフィルター管理ネームスペース
+ * @namespace Url関連のフィルター管理ネームスペース
  */
 Jeeel.Filter.Url = {
 
 };
 
-Jeeel.file.Jeeel.Filter.Url = ['Escape', 'QueryString', 'QueryParameter'];
+Jeeel.file.Jeeel.Filter.Url = ['Escape', 'QueryString', 'QueryParameter', 'Parser'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Filter.Url, Jeeel.file.Jeeel.Filter.Url);
 /**
@@ -4621,7 +5267,7 @@ Jeeel.Filter.Url.QueryString.prototype = {
         throw new Error('valは配列式でなければなりません。');
     },
 
-    _filterArray: function (params) {
+    _filterEach: function (params) {
         var tmp, res = [];
 
         for (var key in params) {
@@ -4808,6 +5454,69 @@ Jeeel.Filter.Url.QueryParameter.prototype = {
 };
 
 Jeeel.Class.extend(Jeeel.Filter.Url.QueryParameter, Jeeel.Filter.Abstract);
+
+/**
+ * コンストラクタ
+ *
+ * @class URL解析クラス
+ * @augments Jeeel.Filter.Abstract
+ */
+Jeeel.Filter.Url.Parser = function () {
+    Jeeel.Filter.Abstract.call(this);
+};
+
+/**
+ * インスタンスの作成を行う
+ *
+ * @return {Jeeel.Filter.Url.Parser} 作成したインスタンス
+ */
+Jeeel.Filter.Url.Parser.create = function () {
+    return new this();
+};
+
+Jeeel.Filter.Url.Parser.prototype = {
+    /**
+     * URLをパースするための正規表現
+     * 
+     * @type RegExp
+     * @private
+     */
+    _parseReg: /^(https?|ftp):\/\/(?:([^@:]+)(?::([^@]+))?@)?([^:\/]+)(?::([0-9]+))?(\/[^?]*)?(?:\?([^#]*))?(?:#(.*))?$/,
+    
+    /**
+     * URLを解析して返す
+     * 
+     * @param {String} url URL
+     * @return {Hash} 連想配列(URL以外を指定された場合はnullを返す)
+     */
+    parse: function (url) {
+        return this.filter(url);
+    },
+  
+    /**
+     * @private
+     */
+    _filter: function (val) {
+        var match = ('' + val).match(this._parseReg);
+        
+        if ( ! match) {
+            return null;
+        }
+        
+        return {
+            scheme: match[1],
+            user: match[2] || '',
+            pass: match[3] || '',
+            host: match[4],
+            port: +match[5] || null,
+            path: match[6] || '',
+            query: match[7] || '',
+            fragment: match[8] || ''
+        };
+    }
+};
+
+Jeeel.Class.extend(Jeeel.Filter.Url.Parser, Jeeel.Filter.Abstract);
 Jeeel.directory.Jeeel.Filter.Html = {
 
     /**
@@ -4822,13 +5531,13 @@ Jeeel.directory.Jeeel.Filter.Html = {
 };
 
 /**
- * Html関連のフィルター管理ネームスペース
+ * @namespace Html関連のフィルター管理ネームスペース
  */
 Jeeel.Filter.Html = {
 
 };
 
-Jeeel.file.Jeeel.Filter.Html = ['Escape', 'Unescape', 'Form', 'FormValue', 'Hidden', 'HiddenString', 'ElementTagBundle', 'ElementAttributeReduce'];
+Jeeel.file.Jeeel.Filter.Html = ['Escape', 'Unescape', 'Form', 'FormValue', 'Hidden', 'HiddenString'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Filter.Html, Jeeel.file.Jeeel.Filter.Html);
 
@@ -4874,8 +5583,17 @@ Jeeel.Filter.Html.Escape.prototype = {
                  .replace(/>/g, '&gt;');
 
         if (this._replaceSpaceAndLineFeed) {
-            val = val.replace(/ /g, '&nbsp;')
-                     .replace(/\n/g, '<br />');
+          
+            // IEではスペースが入らない改行後に文字が入らないとその改行を無視するのでスペースを挿入
+            if (Jeeel.UserAgent.isInternetExplorer()) {
+                val = val.replace(/ /g, '&nbsp;')
+                         .replace(/\r\n/g, '\n')
+                         .replace(/\n\n/g, '<br />&nbsp;<br />')
+                         .replace(/\n/g, '<br />');
+            } else {
+                val = val.replace(/ /g, '&nbsp;')
+                         .replace(/\n/g, '<br />');
+            }
         }
 
         return val;
@@ -5017,7 +5735,7 @@ Jeeel.Filter.Html.Form.prototype = {
     /**
      * @private
      */
-    _filterArray: function (vals) {
+    _filterEach: function (vals) {
 
         if (Jeeel.Type.isElement(vals)) {
             return this._filter(vals);
@@ -5203,7 +5921,7 @@ Jeeel.Filter.Html.FormValue.prototype = {
     /**
      * @private
      */
-    _filterArray: function (vals) {
+    _filterEach: function (vals) {
 
         if (Jeeel.Type.isElement(vals)) {
             return this._filter(vals);
@@ -5256,14 +5974,28 @@ Jeeel.Filter.Html.FormValue.prototype = {
     },
     
     _getProp: function (elm, propName) {
+        var tag, res, ops, i, l;
+        
         if (this._useDefaultValue) {
             if (propName === 'value') {
-                var tag = elm.tagName.toUpperCase();
+                tag = elm.tagName.toUpperCase();
                 
                 if (tag === 'SELECT') {
-                    var ops = elm.options;
+                    ops = elm.options;
 
-                    for (var i = 0, l = ops.length; i < l; i++) {
+                    if (elm.getAttribute('multiple')) {
+                        res = [];
+
+                        for (i = 0, l = ops.length; i < l; i++) {
+                            if (ops[i].getAttribute('selected')) {
+                                res[res.length] = ops[i].getAttribute(propName);
+                            }
+                        }
+                        
+                        return res;
+                    }
+                    
+                    for (i = 0, l = ops.length; i < l; i++) {
                         if (ops[i].getAttribute('selected')) {
                             return ops[i].getAttribute(propName);
                         }
@@ -5278,6 +6010,28 @@ Jeeel.Filter.Html.FormValue.prototype = {
             return elm.getAttribute(propName);
         }
         
+        if (propName === 'value') {
+            if (Jeeel.Dom.Behavior.Placeholder.isHolded(elm)) {
+                return '';
+            }
+            
+            tag = elm.tagName.toUpperCase();
+            
+            if (tag === 'SELECT' && elm.multiple) {
+                ops = elm.options;
+                
+                res = [];
+                
+                for (i = 0, l = ops.length; i < l; i++) {
+                    if (ops[i].selected) {
+                        res[res.length] = ops[i].value;
+                    }
+                }
+                
+                return res;
+            }
+        }
+        
         return elm[propName];
     },
     
@@ -5290,7 +6044,11 @@ Jeeel.Filter.Html.FormValue.prototype = {
                 return;
             }
         } else if (element.tagName.toLowerCase() === 'select') {
-            if (element.selectedIndex < 0) {
+            
+            var multiple = (this._useDefaultValue && element.getAttribute('multiple'))
+                        || ( ! this._useDefaultValue && element.multiple);
+            
+            if (element.selectedIndex < 0 && ! multiple) {
                 return;
             }
         }
@@ -5379,7 +6137,7 @@ Jeeel.Filter.Html.Hidden.prototype = {
         throw new Error('keyを作成時に指定せずに配列式が使えない値に対しては対応していません。');
     },
 
-    _filterArray: function (vals) {
+    _filterEach: function (vals) {
 
         if (this._key) {
             return this._scanArray(this._key, vals);
@@ -5487,7 +6245,7 @@ Jeeel.Filter.Html.HiddenString.prototype = {
         throw new Error('keyを作成時に指定せずに配列式が使えない値に対しては対応していません。');
     },
 
-    _filterArray: function (vals) {
+    _filterEach: function (vals) {
 
         if (this._key) {
             return this._scanArray(this._key, vals);
@@ -5550,121 +6308,6 @@ Jeeel.Filter.Html.HiddenString.prototype = {
 };
 
 Jeeel.Class.extend(Jeeel.Filter.Html.HiddenString, Jeeel.Filter.Abstract);
-
-/**
- * コンストラクタ
- *
- * @class HTML要素のリストをタグ名にて纏め上げる
- * @augments Jeeel.Filter.Abstract
- */
-Jeeel.Filter.Html.ElementTagBundle = function () {
-    Jeeel.Filter.Abstract.call(this);
-};
-
-/**
- * インスタンスの作成を行う
- *
- * @return {Jeeel.Filter.Html.ElementTagBundle} 作成したインスタンス
- */
-Jeeel.Filter.Html.ElementTagBundle.create = function () {
-    return new this();
-};
-
-Jeeel.Filter.Html.ElementTagBundle.prototype = {
-  
-    /**
-     * @private
-     */
-    _filter: function () {
-        throw new Error('このフィルターは配列形式のオブジェクトにしか対応していません。');
-    },
-
-    /**
-     * @private
-     */
-    _filterArray: function (vals) {
-
-        var res = {};
-
-        Jeeel.Hash.forEach(vals,
-            function (val) {
-                
-                if ( ! Jeeel.Type.isElement(val)) {
-                    throw new Error('このフィルターはHTML要素のリストのみにしか対応していません。');
-                }
-
-                var name = val.tagName.toLowerCase();
-
-                if ( ! (name in res)) {
-                    res[name] = [];
-                }
-
-                res[name].push(val);
-            }
-        );
-
-        return res;
-    }
-};
-
-Jeeel.Class.extend(Jeeel.Filter.Html.ElementTagBundle, Jeeel.Filter.Abstract);
-
-/**
- * コンストラクタ
- *
- * @class HTML要素のリストから指定した属性の値をリスト化する
- * @augments Jeeel.Filter.Abstract
- */
-Jeeel.Filter.Html.ElementAttributeReduce = function (attribute) {
-    Jeeel.Filter.Abstract.call(this);
-    
-    this._attribute = attribute;
-};
-
-/**
- * インスタンスの作成を行う
- *
- * @return {Jeeel.Filter.Html.ElementAttributeReduce} 作成したインスタンス
- */
-Jeeel.Filter.Html.ElementAttributeReduce.create = function (attribute) {
-    return new this(attribute);
-};
-
-Jeeel.Filter.Html.ElementAttributeReduce.prototype = {
-    _attribute: null,
-    
-    /**
-     * @private
-     */
-    _filter: function () {
-        throw new Error('このフィルターは配列形式のオブジェクトにしか対応していません。');
-    },
-
-    /**
-     * @private
-     */
-    _filterArray: function (vals) {
-
-        var result = [];
-
-        Jeeel.Hash.forEach(vals,
-            function (val) {
-                
-                if ( ! Jeeel.Type.isElement(val)) {
-                    throw new Error('このフィルターはHTML要素のリストのみにしか対応していません。');
-                }
-
-                var attr = val.getAttribute(this._attribute);
-
-                result.push(attr);
-            }, this
-        );
-
-        return result;
-    }
-};
-
-Jeeel.Class.extend(Jeeel.Filter.Html.ElementAttributeReduce, Jeeel.Filter.Abstract);
 
 if (Jeeel._auto) {
     Jeeel._tmp();
@@ -5742,7 +6385,7 @@ Jeeel.Hash.getKeys = function (hash, value, strict) {
     var valSet = Jeeel.Type.isSet(value);
     var res = [];
 
-    if (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash) || Jeeel.Type.isElementCollection(hash) || Jeeel.Type.isNodeList(hash)) {
+    if (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash) || Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash)) {
         for (var i = 0, l = hash.length; i < l; i++) {
             
             if (valSet) {
@@ -5785,12 +6428,22 @@ Jeeel.Hash.getValues = function (hash) {
     if ( ! Jeeel.Type.isHash(hash)) {
         throw new Error('hashが配列・連想配列ではありません');
     }
+    
+    var res;
 
     if (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash)) {
         return Array.prototype.slice.call(hash, 0, hash.length);
+    } else if (Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash)) {
+        res = [];
+        
+        for (var i = hash.length; i--;) {
+            res[i] = hash[i];
+        }
+        
+        return res;
     }
 
-    var res = [];
+    res = [];
 
     for (var key in hash) {
         res[res.length] = hash[key];
@@ -5804,11 +6457,12 @@ Jeeel.Hash.getValues = function (hash) {
  * 配列等に関しても全て返す
  *
  * @param {Hash} hash 配列・連想配列
+ * @param {Boolean} [sort] ソートするかどうか
  * @param {Boolean} [enableChainKey] プロトタイプチェーンのキーを全て参照するかどうか(__proto__が定義されていないブラウザには意味がない)
  * @return {Jeeel.Object.Item[]} キーと値のリスト(valueはセキュリティ系のエラーの場合、値ではなくエラーオブジェクトを代入する)
  * @throws {Error} hashが配列式でない場合に起こる
  */
-Jeeel.Hash.getPairs = function (hash, enableChainKey) {
+Jeeel.Hash.getPairs = function (hash, sort, enableChainKey) {
     
     if (Jeeel.Type.isEmpty(hash)) {
         throw new Error('hashが配列・連想配列ではありません');
@@ -5862,6 +6516,18 @@ Jeeel.Hash.getPairs = function (hash, enableChainKey) {
     
     if ( ! ('__proto__' in hash) && Object.getPrototypeOf) {
         pair[pair.length] = new Jeeel.Object.Item('__proto__', Object.getPrototypeOf(hash));
+    }
+    
+    if (sort) {
+        pair.sort(function (a, b) {
+            if (a.key > b.key) {
+                return 1;
+            } else if(a.key < b.key) {
+                return -1;
+            }
+            
+            return 0;
+        });
     }
 
     return pair;
@@ -5960,10 +6626,10 @@ Jeeel.Hash.toArray = function (hash) {
     else if (Jeeel.Type.isArguments(hash)) {
         return (hash.length === 1 ? [hash[0]] : Array.apply(null, hash));
     }
-    else if (Jeeel.Type.isElementCollection(hash) || Jeeel.Type.isNodeList(hash)) {
+    else if (Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash)) {
         var arr = [];
 
-        for (var i = 0, l = hash.length; i < l; i++) {
+        for (var i = hash.length; i--;) {
             arr[i] = hash[i];
         }
 
@@ -6797,6 +7463,10 @@ Jeeel.Hash.prototype = {
      */
     sort: function (compareFunction) {
         if ( ! compareFunction ) {
+          
+            /**
+             * @ignore
+             */
             compareFunction = function (a, b) {
                 a = '' + a;
                 b = '' + b;
@@ -6805,6 +7475,9 @@ Jeeel.Hash.prototype = {
             };
         }
         
+        /**
+         * @ignore
+         */
         var middle = function (h, t) {
             return h + ((t - h) >>> 1);
         };
@@ -7042,7 +7715,7 @@ Jeeel.Hash.prototype = {
         
         var keys = [], vals = [];
         
-        if ('length' in hash && (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash) || Jeeel.Type.isElementCollection(hash) || Jeeel.Type.isNodeList(hash))) {
+        if ('length' in hash && (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash) || Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash))) {
             for (var i = 0, l = hash.length; i < l; i++) {
                 keys[i] = '' + i;
                 vals[i] = hash[i];
@@ -7096,6 +7769,9 @@ Jeeel.Hash.prototype = {
         return res;
     },
     
+    /**
+     * 
+     */
     _resetLastIndex: function (key, set) {
         
         if ( ! Jeeel.Type.isSet(key)) {
@@ -7256,11 +7932,17 @@ Jeeel.String.trim = function (str) {
     if ( ! str) {
         return '';
     }
+    
+    str = str.toString();
+    
+    if (str.trim) {
+        return str.trim();
+    }
 
     var trimLeft  = /^\s+/;
-    var trimRight = /\s+$/;
+    var trimRight = /\s\s*$/;
 
-    return str.toString().replace(trimLeft, '').replace(trimRight, '');
+    return str.replace(trimLeft, '').replace(trimRight, '');
 };
 
 /**
@@ -7271,7 +7953,7 @@ Jeeel.String.trim = function (str) {
  * @return {String} 変換後の文字列
  */
 Jeeel.String.toCamelCase = function (str) {
-    return ('' + str).replace(/(-|_)([a-z])/g, function (str, p1, p2){return p2.toUpperCase();});
+    return ('' + str).replace(/(?:-|_)([a-z])/g, function (str, p){return p.toUpperCase();});
 };
 
 /**
@@ -7294,6 +7976,16 @@ Jeeel.String.toSnakeCase = function (str) {
  */
 Jeeel.String.toHyphenation = function (str) {
     return ('' + str).replace(/([A-Z])/g, '-$1').replace(/_/g, '-').toLowerCase();
+};
+
+/**
+ * 対象文字列の単語の先頭をだけを大文字にする
+ * 
+ * @param {String} str 対象文字列
+ * @return {String} 変換後の文字列
+ */
+Jeeel.String.toTitleCase = function (str) {
+    return ('' + str).toLowerCase().replace(/(^|\s)([a-z])/g, function (str, p1, p2){return p1 + p2.toUpperCase();});
 };
 
 /**
@@ -7366,6 +8058,68 @@ Jeeel.String.multiInsert = function (str, indexArr, insertStrArr) {
     return res.join('');
 };
 
+/**
+ * テキストのサイズを取得する
+ * 
+ * @param {String} text サイズを知りたいテキスト
+ * @param {Hash} [styleList] スタイルのキーと値のリスト
+ * @return {Jeeel.Object.Size} ピクセル単位のテキストのサイズ
+ */
+Jeeel.String.getTextSize = function (text, styleList) {
+    var span;
+    
+    if (this.getTextWidth._span) {
+        span = this.getTextWidth._span;
+    } else {
+        span = Jeeel.Document.createElement('span');
+        span.style.cssText = 'display: inline; position: absolute; top: 0px; margin: 0; white-space: nowrap; border: none; visibility: hidden;';
+        
+        Jeeel.Document.appendToBody(span);
+        
+        span = new Jeeel.Dom.Element(span);
+        
+        this.getTextWidth._span = span;
+    }
+    
+    if ( ! styleList) {
+        styleList = {};
+    }
+    
+    delete styleList.visibility;
+    delete styleList.position;
+    
+    span.setStyleList(styleList);
+    
+    if (text.charAt(text.length - 1) === '\n') {
+        text += ' ';
+    }
+    
+    span.setText(text);
+    
+    return span.getSize();
+};
+
+/**
+ * テキストの幅を取得する
+ * 
+ * @param {String} text 幅を知りたいテキスト
+ * @param {Hash} [styleList] スタイルのキーと値のリスト
+ * @return {Integer} ピクセル単位のテキストの幅
+ */
+Jeeel.String.getTextWidth = function (text, styleList) {
+    return this.getTextSize(text, styleList).width;
+};
+
+/**
+ * テキストの高さを取得する
+ * 
+ * @param {String} text 高さを知りたいテキスト
+ * @param {Hash} [styleList] スタイルのキーと値のリスト
+ * @return {Integer} ピクセル単位のテキストの高さ
+ */
+Jeeel.String.getTextHeight = function (text, styleList) {
+    return this.getTextSize(text, styleList).height;
+};
 
 Jeeel.String.prototype = {
   
@@ -7381,6 +8135,7 @@ Jeeel.String.prototype = {
      * 行数
      * 
      * @type Integer
+     * @private
      */
     _lineCount: null,
     
@@ -7388,6 +8143,7 @@ Jeeel.String.prototype = {
      * 改行部分のインデックス配列
      * 
      * @type Integer[]
+     * @private
      */
     _lineIndex: null,
     
@@ -7427,6 +8183,36 @@ Jeeel.String.prototype = {
         var last  = this._lineIndex[line];
         
         return this._str.slice(first, last);
+    },
+    
+    /**
+     * 文字列のサイズを取得する
+     * 
+     * @param {Hash} [styleList] スタイルのキーと値のリスト
+     * @return {Jeeel.Object.Size} ピクセル単位のテキストのサイズ
+     */
+    getTextSize: function (styleList) {
+        return this.constructor.getTextSize(this._str, styleList);
+    },
+    
+    /**
+     * 文字列の幅を取得する
+     * 
+     * @param {Hash} [styleList] スタイルのキーと値のリスト
+     * @return {Integer} ピクセル単位のテキストの幅
+     */
+    getTextWidth: function (styleList) {
+        return this.constructor.getTextWidth(this._str, styleList);
+    },
+    
+    /**
+     * 文字列の高さを取得する
+     * 
+     * @param {Hash} [styleList] スタイルのキーと値のリスト
+     * @return {Integer} ピクセル単位のテキストの高さ
+     */
+    getTextHeight: function (styleList) {
+        return this.constructor.getTextHeight(this._str, styleList);
     },
     
     /**
@@ -7586,6 +8372,17 @@ Jeeel.String.prototype = {
      */
     hyphenation: function () {
         this._str = this.constructor.toHyphenation(this._str);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列をタイトルケースに変更する
+     * 
+     * @return {Jeeel.String} 自インスタンス
+     */
+    titleCase: function () {
+        this._str = this.constructor.toTitleCase(this._str);
         
         return this._reset();
     },
@@ -7799,8 +8596,14 @@ Jeeel.String.sprintf = function (format, var_args) {
     return res.join('');
 };
 
+/**
+ * @ignore
+ */
 Jeeel._Object.JeeelString.PLACEHOLDER_REGS = /%([+\-# 0]*)?([1-9][0-9]*)?(?:\.(|[0-9]*))?([^0-9]|$)/;
 
+/**
+ * @ignore
+ */
 Jeeel._Object.JeeelString.PLACEHOLDERS = {
     
     /**
@@ -8160,6 +8963,9 @@ Jeeel._Object.JeeelString.PLACEHOLDERS = {
     }
 };
 
+/**
+ * @ignore
+ */
 Jeeel._Object.JeeelString.convertPlaceholder = function (placeholder, value, res) {
   
     placeholder = placeholder.match(this.PLACEHOLDER_REGS);
@@ -8226,12 +9032,15 @@ Jeeel.directory.Jeeel.String.Hash = {
 };
 
 /**
- * Hash関数関連のネームスペース
+ * @namespace Hash関数関連のネームスペース
  */
 Jeeel.String.Hash = {
 
 };
 
+/**
+ * @ignore
+ */
 Jeeel._Object.JeeelStringHash = {
     
 };
@@ -8253,7 +9062,7 @@ Jeeel.directory.Jeeel.String.Hash.Base64 = {
 };
 
 /**
- * Base64関連のモジュール
+ * @namespace Base64関連のモジュール
  */
 Jeeel.String.Hash.Base64 = {
     
@@ -8420,6 +9229,9 @@ Jeeel.String.Hash.md5 = function (data) {
     return Jeeel._Object.JeeelStringHash.Md5.hexHash('' + data);
 };
 
+/**
+ * @ignore
+ */
 Jeeel._Object.JeeelStringHash.Md5 = {
   
     /**
@@ -8575,11 +9387,11 @@ Jeeel._Object.JeeelStringHash.Md5 = {
     },
     
     init: function () {
-        if (arguments.callee.ignore) {
+        if (this.init.ignore) {
             return;
         }
         
-        arguments.callee.ignore = true;
+        this.init.ignore = true;
         
         var merge = {
             T: [
@@ -8646,9 +9458,24 @@ Jeeel._Object.JeeelStringHash.Md5 = {
                 [ 2,15,63], [ 9,21,64]
             ],
 
+            /**
+             * @ignore
+             */
             F: function (x, y, z) {return (x & y) | (~x & z);},
+            
+            /**
+             * @ignore
+             */
             G: function (x, y, z) {return (x & z) | (y & ~z);},
+            
+            /**
+             * @ignore
+             */
             H: function (x, y, z) {return x ^ y ^ z;},
+            
+            /**
+             * @ignore
+             */
             I: function (x, y, z) {return y ^ (x | ~z);}
         };
     
@@ -8733,6 +9560,19 @@ Jeeel.Number.limit = function (number, min, max) {
 };
 
 /**
+ * 指定した整数の範囲以内の値をランダムで返す
+ * 
+ * @param {Integer} min 最小値(負数も可)
+ * @param {Integer} max 最大値(負数も可)
+ * @return {Integer} ランダム整数値(min &lt;= random &lt;= max)
+ */
+Jeeel.Number.random = function (min, max) {
+    var r = max - min + 1;
+    
+    return Math.floor(min + Math.random() * r);
+};
+
+/**
  * 数値を百分率にして返す
  * 
  * @param {Number} number 対象の数値
@@ -8740,6 +9580,26 @@ Jeeel.Number.limit = function (number, min, max) {
  */
 Jeeel.Number.percentage = function (number) {
     return number * 100 + '%';
+};
+
+/**
+ * 指定した角度をラジアンに変換する
+ * 
+ * @param {Number} deg 角度
+ * @return {Number} ラジアン
+ */
+Jeeel.Number.degreeToRadian = function (deg) {
+    return deg / 180 * Math.PI;
+};
+
+/**
+ * 指定したラジアンを角度に変換する
+ * 
+ * @param {Number} rad ラジアン
+ * @return {Number} 角度
+ */
+Jeeel.Number.radianToDegree = function (rad) {
+    return rad / Math.PI * 180;
 };
 
 /**
@@ -8933,828 +9793,18 @@ Jeeel.directory.Jeeel.Code = {
 };
 
 /**
- * コード関連のネームスペース
+ * @namespace コード関連のネームスペース
  */
 Jeeel.Code = {
 
 };
 
-Jeeel.file.Jeeel.Code = ['KeyCode', 'CharCode', 'CharEncoding', 'HtmlCode'];
+Jeeel.file.Jeeel.Code = ['CharCode', 'CharEncoding', 'HtmlCode'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Code, Jeeel.file.Jeeel.Code);
 
 /**
- * キーボードのコードに関する列挙体
- */
-Jeeel.Code.KeyCode = {
-
-    /**
-     * A
-     *
-     * @type Integer
-     * @constant
-     */
-    A: 65,
-
-    /**
-     * B
-     *
-     * @type Integer
-     * @constant
-     */
-    B: 66,
-
-    /**
-     * C
-     *
-     * @type Integer
-     * @constant
-     */
-    C: 67,
-
-    /**
-     * D
-     *
-     * @type Integer
-     * @constant
-     */
-    D: 68,
-
-    /**
-     * E
-     *
-     * @type Integer
-     * @constant
-     */
-    E: 69,
-
-    /**
-     * F
-     *
-     * @type Integer
-     * @constant
-     */
-    F: 70,
-
-    /**
-     * G
-     *
-     * @type Integer
-     * @constant
-     */
-    G: 71,
-
-    /**
-     * H
-     *
-     * @type Integer
-     * @constant
-     */
-    H: 72,
-
-    /**
-     * I
-     *
-     * @type Integer
-     * @constant
-     */
-    I: 73,
-
-    /**
-     * J
-     *
-     * @type Integer
-     * @constant
-     */
-    J: 74,
-
-    /**
-     * K
-     *
-     * @type Integer
-     * @constant
-     */
-    K: 75,
-
-    /**
-     * L
-     *
-     * @type Integer
-     * @constant
-     */
-    L: 76,
-
-    /**
-     * M
-     *
-     * @type Integer
-     * @constant
-     */
-    M: 77,
-
-    /**
-     * N
-     *
-     * @type Integer
-     * @constant
-     */
-    N: 78,
-
-    /**
-     * O
-     *
-     * @type Integer
-     * @constant
-     */
-    O: 79,
-
-    /**
-     * P
-     *
-     * @type Integer
-     * @constant
-     */
-    P: 80,
-
-    /**
-     * Q
-     *
-     * @type Integer
-     * @constant
-     */
-    Q: 81,
-
-    /**
-     * R
-     *
-     * @type Integer
-     * @constant
-     */
-    R: 82,
-
-    /**
-     * S
-     *
-     * @type Integer
-     * @constant
-     */
-    S: 83,
-
-    /**
-     * T
-     *
-     * @type Integer
-     * @constant
-     */
-    T: 84,
-
-    /**
-     * U
-     *
-     * @type Integer
-     * @constant
-     */
-    U: 85,
-
-    /**
-     * V
-     *
-     * @type Integer
-     * @constant
-     */
-    V: 86,
-
-    /**
-     * W
-     *
-     * @type Integer
-     * @constant
-     */
-    W: 87,
-
-    /**
-     * X
-     *
-     * @type Integer
-     * @constant
-     */
-    X: 88,
-
-    /**
-     * Y
-     *
-     * @type Integer
-     * @constant
-     */
-    Y: 89,
-
-    /**
-     * Z
-     *
-     * @type Integer
-     * @constant
-     */
-    Z: 90,
-
-    /**
-     * 0
-     *
-     * @type Integer
-     * @constant
-     */
-    0: 48,
-
-    /**
-     * 1
-     *
-     * @type Integer
-     * @constant
-     */
-    1: 49,
-
-    /**
-     * 2
-     *
-     * @type Integer
-     * @constant
-     */
-    2: 50,
-
-    /**
-     * 3
-     *
-     * @type Integer
-     * @constant
-     */
-    3: 51,
-
-    /**
-     * 4
-     *
-     * @type Integer
-     * @constant
-     */
-    4: 52,
-
-    /**
-     * 5
-     *
-     * @type Integer
-     * @constant
-     */
-    5: 53,
-
-    /**
-     * 6
-     *
-     * @type Integer
-     * @constant
-     */
-    6: 54,
-
-    /**
-     * 7
-     *
-     * @type Integer
-     * @constant
-     */
-    7: 55,
-
-    /**
-     * 8
-     *
-     * @type Integer
-     * @constant
-     */
-    8: 56,
-
-    /**
-     * 9
-     *
-     * @type Integer
-     * @constant
-     */
-    9: 57,
-
-    /**
-     * テンキー0
-     *
-     * @type Integer
-     * @constant
-     */
-    T0: 96,
-
-    /**
-     * テンキー1
-     *
-     * @type Integer
-     * @constant
-     */
-    T1: 97,
-
-    /**
-     * テンキー2
-     *
-     * @type Integer
-     * @constant
-     */
-    T2: 98,
-
-    /**
-     * テンキー3
-     *
-     * @type Integer
-     * @constant
-     */
-    T3: 99,
-
-    /**
-     * テンキー4
-     *
-     * @type Integer
-     * @constant
-     */
-    T4: 100,
-
-    /**
-     * テンキー5
-     *
-     * @type Integer
-     * @constant
-     */
-    T5: 101,
-
-    /**
-     * テンキー6
-     *
-     * @type Integer
-     * @constant
-     */
-    T6: 102,
-
-    /**
-     * テンキー7
-     *
-     * @type Integer
-     * @constant
-     */
-    T7: 103,
-
-    /**
-     * テンキー8
-     *
-     * @type Integer
-     * @constant
-     */
-    T8: 104,
-
-    /**
-     * テンキー9
-     *
-     * @type Integer
-     * @constant
-     */
-    T9: 105,
-
-    /**
-     * テンキー&lowast;
-     *
-     * @type Integer
-     * @constant
-     */
-    TMultiplicationSign: 106,
-
-    /**
-     * テンキー+
-     *
-     * @type Integer
-     * @constant
-     */
-    TAdditionSign: 107,
-
-    /**
-     * テンキー-
-     *
-     * @type Integer
-     * @constant
-     */
-    TSubtractionSign: 109,
-
-    /**
-     * テンキー.
-     *
-     * @type Integer
-     * @constant
-     */
-    TPeriod: 110,
-
-    /**
-     * テンキー/
-     *
-     * @type Integer
-     * @constant
-     */
-    TDivisionSign: 111,
-
-    /**
-     * F1
-     *
-     * @type Integer
-     * @constant
-     */
-    F1: 112,
-
-    /**
-     * F2
-     *
-     * @type Integer
-     * @constant
-     */
-    F2: 113,
-
-    /**
-     * F3
-     *
-     * @type Integer
-     * @constant
-     */
-    F3: 114,
-
-    /**
-     * F4
-     *
-     * @type Integer
-     * @constant
-     */
-    F4: 115,
-
-    /**
-     * F5
-     *
-     * @type Integer
-     * @constant
-     */
-    F5: 116,
-
-    /**
-     * F6
-     *
-     * @type Integer
-     * @constant
-     */
-    F6: 117,
-
-    /**
-     * F7
-     *
-     * @type Integer
-     * @constant
-     */
-    F7: 118,
-
-    /**
-     * F8
-     *
-     * @type Integer
-     * @constant
-     */
-    F8: 119,
-
-    /**
-     * F9
-     *
-     * @type Integer
-     * @constant
-     */
-    F9: 120,
-
-    /**
-     * F10
-     *
-     * @type Integer
-     * @constant
-     */
-    F10: 121,
-
-    /**
-     * F11
-     *
-     * @type Integer
-     * @constant
-     */
-    F11: 122,
-
-    /**
-     * F12
-     *
-     * @type Integer
-     * @constant
-     */
-    F12: 123,
-
-    /**
-     * BackSpace
-     *
-     * @type Integer
-     * @constant
-     */
-    BackSpace: 8,
-
-    /**
-     * Enter
-     *
-     * @type Integer
-     * @constant
-     */
-    Enter: 13,
-
-    /**
-     * Shift
-     *
-     * @type Integer
-     * @constant
-     */
-    Shift: 16,
-
-    /**
-     * Ctrl
-     *
-     * @type Integer
-     * @constant
-     */
-    Ctrl: 17,
-
-    /**
-     * Alt
-     *
-     * @type Integer
-     * @constant
-     */
-    Alt: 18,
-
-    /**
-     * Pause
-     *
-     * @type Integer
-     * @constant
-     */
-    Pause: 19,
-
-    /**
-     * 変換
-     *
-     * @type Integer
-     * @constant
-     */
-    Change: 28,
-
-    /**
-     * 無変換
-     *
-     * @type Integer
-     * @constant
-     */
-    NonChange: 29,
-
-    /**
-     * スペース
-     *
-     * @type Integer
-     * @constant
-     */
-    Space: 32,
-
-    /**
-     * PageUp
-     *
-     * @type Integer
-     * @constant
-     */
-    PageUp: 33,
-
-    /**
-     * PageDown
-     *
-     * @type Integer
-     * @constant
-     */
-    PageDown: 34,
-
-    /**
-     * End
-     *
-     * @type Integer
-     * @constant
-     */
-    End: 35,
-
-    /**
-     * Home
-     *
-     * @type Integer
-     * @constant
-     */
-    Home: 36,
-
-    /**
-     * ←
-     *
-     * @type Integer
-     * @constant
-     */
-    Left: 37,
-
-    /**
-     * ↑
-     *
-     * @type Integer
-     * @constant
-     */
-    Up: 38,
-
-    /**
-     * →
-     *
-     * @type Integer
-     * @constant
-     */
-    Right: 39,
-
-    /**
-     * ↓
-     *
-     * @type Integer
-     * @constant
-     */
-    Down: 40,
-
-    /**
-     * Insert
-     *
-     * @type Integer
-     * @constant
-     */
-    Insert: 45,
-
-    /**
-     * Delete
-     *
-     * @type Integer
-     * @constant
-     */
-    Delete: 46,
-
-    /**
-     * Windowsキー
-     *
-     * @type Integer
-     * @constant
-     */
-    Windows: 91,
-
-    /**
-     * Esc
-     *
-     * @type Integer
-     * @constant
-     */
-    Esc: 243,
-
-    /**
-     * Tab
-     *
-     * @type Integer
-     * @constant
-     */
-    Tab: 9,
-
-    /**
-     * Applicationキー
-     *
-     * @type Integer
-     * @constant
-     */
-    Application: 93,
-
-    /**
-     * NumLock
-     *
-     * @type Integer
-     * @constant
-     */
-    NumLock: 144,
-
-    /**
-     * ScrollLock
-     *
-     * @type Integer
-     * @constant
-     */
-    ScrollLock: 145,
-
-    /**
-     * &lowast;
-     *
-     * @type Integer
-     * @constant
-     */
-    MultiplicationSign: 186,
-
-    /**
-     * +
-     *
-     * @type Integer
-     * @constant
-     */
-    AdditionSign: 187,
-
-    /**
-     * ,
-     *
-     * @type Integer
-     * @constant
-     */
-    Comma: 188,
-
-    /**
-     * -
-     *
-     * @type Integer
-     * @constant
-     */
-    SubtractionSign: 189,
-
-    /**
-     * .
-     *
-     * @type Integer
-     * @constant
-     */
-    Period: 190,
-
-    /**
-     * &frasl;
-     *
-     * @type Integer
-     * @constant
-     */
-    DivisionSign: 191,
-
-    /**
-     * &#64;
-     *
-     * @type Integer
-     * @constant
-     */
-    Atmark: 192,
-
-    /**
-     * [
-     *
-     * @type Integer
-     * @constant
-     */
-    LeftBracket: 219,
-
-    /**
-     * \
-     *
-     * @type Integer
-     * @constant
-     */
-    YenMark: 220,
-
-    /**
-     * ]
-     *
-     * @type Integer
-     * @constant
-     */
-    RightBracket: 221,
-
-    /**
-     * ^
-     *
-     * @type Integer
-     * @constant
-     */
-    Caret: 222,
-
-    /**
-     * _
-     *
-     * @type Integer
-     * @constant
-     */
-    Underscore: 226
-};
-
-Jeeel.Code.KeyCode.getKey = function (keyCode) {
-    return Jeeel.Hash.search(keyCode, this, true);
-};
-
-/**
- * 文字コードに関する列挙体
+ * @namespace 文字コードに関する列挙体
  */
 Jeeel.Code.CharCode = {
 
@@ -10784,15 +10834,18 @@ Jeeel.Code.CharCode = {
 };
 
 Jeeel.Code.CharCode.getChar = function (charCode) {
-    var res = Jeeel.Hash.getKeys(this, charCode, true);
     
-    if (res.length < 1) {
-        return null;
-    } else if (res.length == 1) {
-        return res[0];
+    var hash;
+    
+    if (this.getChar._hash) {
+        hash = this.getChar._hash;
     } else {
-        return (res[0].length < res[1].length ? res[1] : res[0]);
+        hash = new Jeeel.Hash(this);
+        
+        this.getChar._hash = hash;
     }
+
+    return hash.search(charCode, true);
 };
 
 (function () {
@@ -10806,7 +10859,7 @@ Jeeel.Code.CharCode.getChar = function (charCode) {
 })();
 
 /**
- * 文字のエンコーディングに関する列挙体
+ * @namespace 文字のエンコーディングに関する列挙体
  */
 Jeeel.Code.CharEncoding = {
 
@@ -10844,16 +10897,72 @@ Jeeel.Code.CharEncoding = {
 };
 
 /**
- * HTML特殊文字に関する列挙体
+ * @namespace HTML特殊文字に関する列挙体
  */
 Jeeel.Code.HtmlCode = {
+  
+    /**
+     * (&nbsp;)半角空白
+     * 
+     * @type String
+     * @constant
+     */
     HalfWidthSpace: '&nbsp;',
+    
+    /**
+     * (&emsp;)全角空白
+     * 
+     * @type String
+     * @constant
+     */
     FullWidthSpace: '&emsp;',
+    
+    /**
+     * "
+     * 
+     * @type String
+     * @constant
+     */
     DoubleQuote: '&quot;',
+    
+    /**
+     * &amp;
+     * 
+     * @type String
+     * @constant
+     */
     Ampersand: '&amp;',
+    
+    /**
+     * &lt;
+     * 
+     * @type String
+     * @constant
+     */
     LessThan: '&lt;',
+    
+    /**
+     * &gt;
+     * 
+     * @type String
+     * @constant
+     */
     GreaterThan: '&gt;',
+    
+    /**
+     * &crarr;
+     * 
+     * @type String
+     * @constant
+     */
     CarriageReturn: '&crarr;',
+    
+    /**
+     * &copy;
+     * 
+     * @type String
+     * @constant
+     */
     Copyright: '&copy;',
     TradeMark: '&trade;',
     RegisteredTrademark : '&reg;',
@@ -10945,7 +11054,7 @@ Jeeel.Code.HtmlCode = {
 };
 
 /**
- * 読み込み関連のメソッドを提供するModule
+ * @namespace 読み込み関連のメソッドを提供するModule
  */
 Jeeel.Loader = {
 
@@ -10998,6 +11107,11 @@ Jeeel.Loader = {
      * @see Jeeel.Code.CharEncoding
      */
     loadScript: function (url, callback, charCode) {
+      
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
         var script  = Jeeel.Document.createElement('script');
         script.type = 'text/javascript';
 
@@ -11037,6 +11151,11 @@ Jeeel.Loader = {
      * @see Jeeel.Code.CharEncoding
      */
     loadStyle: function (url, charCode) {
+      
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+      
         var style  = Jeeel.Document.createElement('link');
         style.type = 'text/css';
         style.rel  = 'stylesheet';
@@ -11104,12 +11223,12 @@ Jeeel.Loader = {
      * 読み込み中のJavaScript内から呼ばないと意味がない
      *
      * @return {Element} scriptタグのElement
+     * @deprecated 今後削除予定
      */
     getCurrentScript: function () {
-        return (
-            function (e) {
-                return (e.nodeName.toLowerCase() === 'script' ? e : arguments.callee(e.lastChild));
-            })(Jeeel._doc);
+        return (function (e) {
+            return (e.nodeName.toUpperCase() === 'SCRIPT' ? e : arguments.callee(e.lastChild));
+        })(Jeeel._doc);
     },
 
     /**
@@ -11119,6 +11238,11 @@ Jeeel.Loader = {
      * @return {Boolean} ファイルが存在するかどうか
      */
     existsFile: function (url) {
+      
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+      
         var file = Jeeel.Net.Ajax.serverResponse(url);
 
         if (Jeeel.Type.isString(file)) {
@@ -11128,14 +11252,28 @@ Jeeel.Loader = {
         return false;
     },
     
+    /**
+     * @ignore
+     */
     _init: function () {
       
         if (/*@cc_on!@*/false) {
+            /**
+             * @ignore
+             */
             this.preloadFile = function (url) {
                 new Image().src = url;
             };
         } else {
+            /**
+             * @ignore
+             */
             this.preloadFile = function (url) {
+              
+                if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+                    Jeeel.Acl.throwError('Access Error', 404);
+                }
+                
                 var obj = Jeeel.Document.createElement('object');
                 
                 obj.width  = 0;
@@ -11149,371 +11287,7 @@ Jeeel.Loader = {
     }
 };
 
-Jeeel.Loader._init();
-/**
- * コンストラクタ
- *
- * @class メソッドを拡張するクラス(name, length等の部分は初期化される)
- * @augments Function
- * @param {Function} target 基となるメソッド
- * @throws {Error} targetがメソッドでない場合に起こる
- * @example
- * var base = function (name, id) {
- * &nbsp;   return 'id: ' + id + ' name: ' + name + this;
- * }
- * var func = Jeeel.Function.create(base);
- * func.bind(' hello!!');
- *
- * var b = func('devid', 22);
- * //b = 'id: 22 name: devid hello!!'
- */
-Jeeel.Function = function (target) {
-
-    if ( ! Jeeel.Type.isFunction(target)) {
-        throw new Error('targetがメソッドではありません。');
-    }
-
-    var f = function () {
-        return arguments.callee._cnvTarget.apply(this, arguments);
-    };
-
-    for (var key in Jeeel.Function.prototype) {
-        f[key] = Jeeel.Function.prototype[key];
-    }
-    
-    /**
-     * 対象のメソッド
-     *
-     * @type Function
-     * @private
-     */
-    f._target = target;
-
-    /**
-     * 変換後のメソッド
-     *
-     * @type Function
-     * @private
-     */
-    f._cnvTarget = target;
-    
-    target = null;
-
-    try {
-        return f;
-    } finally {
-        f = null;
-    }
-};
-
-/**
- * インスタンスの作成を行う
- *
- * @param {Function} target 基となるメソッド
- * @return {Jeeel.Function} 作成したインスタンス
- */
-Jeeel.Function.create = function (target) {
-    return new this(target);
-};
-
-/**
- * 関数ネイティブ化を行う<br />
- * コンストラクタやapplyのないIEのためのメソッド
- * 
- * @param {Mixied} obj 親オブジェクト
- * @param {String} methodName ネイティブにしたいメソッドの名前
- * @param {Boolean} [useNew] インスタンス化するかどうか
- * @return {Function} ネイティブ化した関数
- */
-Jeeel.Function.toNative = function (obj, methodName, useNew) {
-    methodName = (useNew ? 'new' : '') + ' this["' + methodName + '"]';
-    
-    return function () {
-        var params = [];
-        
-        for (var i = arguments.length; i--;) {
-            params[i] = "_" + i;
-        }
-        
-        params = params.join(',');
-        
-        return Function(
-            params,
-            'return ' + methodName + '(' + params + ')'
-        ).apply(obj, arguments);
-    };
-};
-
-/**
- * 単にthisをbindするメソッド<br />
- * メモリ消費等が少ないがエラー処理等は一切しない
- * 
- * @param {Function} target bind対象のメソッド
- * @param {Mixied} thisArg thisの部分にあたる値
- * @return {Function} bind後のメソッド
- */
-Jeeel.Function.simpleBind = function (target, thisArg) {
-    return function () {
-        return target.apply(thisArg, arguments);
-    };
-};
-
-Jeeel.Function.prototype = {
-  
-    /**
-     * 対象のメソッド
-     *
-     * @type Function
-     * @private
-     */
-    _target: null,
-    
-    /**
-     * 変換後のメソッド
-     *
-     * @type Function
-     * @private
-     */
-    _cnvTarget: null,
-    
-    /**
-     * メソッドないのthisの部分を定義する<br />
-     * 一度しか意味がない
-     *
-     * @param {Mixied} thisArg thisの部分にあたる値
-     * @return {Jeeel.Function} 自インスタンス
-     */
-    bind: function (thisArg) {
-        var target = this._cnvTarget;
-
-        this._cnvTarget = function () {
-            return target.apply(thisArg, arguments);
-        };
-
-        return this;
-    },
-
-    /**
-     * メソッドの遅延実行を定義する<br />
-     * メソッドの戻り値はタイムアウトIDに変更される
-     *
-     * @param {Integer} delayTime 遅延時間(ミリ秒)
-     * @return {Jeeel.Function} 自インスタンス
-     */
-    delay: function (delayTime) {
-
-        var func = function () {
-            Array.prototype.unshift.call(arguments, arguments.callee._target, arguments.callee._delayTime);
-
-            return Jeeel.Timer.setTimeout.apply(null, arguments);
-        };
-
-        func._target = this._cnvTarget;
-        func._delayTime = delayTime;
-
-        this._cnvTarget = func;
-        
-        func = null;
-
-        return this;
-    },
-
-    /**
-     * メソッドを複数回実行する<br />
-     * メソッドの戻り値はJeeel.Timerのインスタンスになる<br />
-     * メソッド内部のthisはこのメソッド前にbindしていない限りJeeel.Timerのインスタンスになる
-     *
-     * @param {Integer} interval 実行間隔(ミリ秒)
-     * @param {Integer} count 実行回数
-     * @return {Jeeel.Function} 自インスタンス
-     */
-    repeat: function (interval, count) {
-
-        var func = function () {
-            Array.prototype.unshift.call(arguments, arguments.callee._target, interval, count);
-
-            return Jeeel.Timer.setLimitInterval.apply(null, arguments);
-        };
-
-        func._target = this._cnvTarget;
-
-        this._cnvTarget = func;
-
-        return this;
-    },
-
-    /**
-     * 複数のメソッドを結合する<br />
-     * 現在のメソッドが最初に実行される<br />
-     * メソッドの戻り値は複数のメソッドの戻り値のリストになる
-     *
-     * @param {Mixied} var_args 結合するメソッドを順に渡す
-     * @return {Jeeel.Function} 自インスタンス
-     * @throws {Error} 引数にメソッド以外を渡した場合に起こる
-     * @example
-     * <pre>
-     * var f1 = function (n) {
-     * &nbsp;   return a + 1;
-     * };
-     * var f2 = function (n) {
-     * &nbsp;   return a + 2;
-     * };
-     * var f3 = function (n) {
-     * &nbsp;   return a + 3;
-     * };
-     * var sf = Jeeel.Function.create(f1);
-     * sf.join(f2, f3);
-     *
-     * var res = sf(2);
-     *
-     * //res = [3, 4, 5]
-     * </pre>
-     */
-    join: function (var_args) {
-        var funcs = Array.prototype.slice.call(arguments, 0, arguments.length);
-
-        for (var i = 0, l = funcs.length; i < l; i++) {
-            if ( ! Jeeel.Type.isFunction(funcs[i])) {
-                throw new Error('引数にメソッド以外が含まれています。');
-            }
-        }
-
-        var func = function () {
-            var res = [];
-
-            res[res.length] = arguments.callee._target.apply(this, arguments);
-
-            for (var i = 0, l = funcs.length; i < l; i++) {
-                res[res.length] = funcs[i].apply(this, arguments);
-            }
-
-            return res;
-        };
-
-        func._target = this._cnvTarget;
-
-        this._cnvTarget = func;
-
-        return this;
-    },
-
-    /**
-     * 複数のメソッドを切り替えて実行する機能を付加する<br />
-     * 現在のメソッドを起点として、引数に指定したメソッドを呼び出す毎に切り替えて実行する<br />
-     * 最後まで実行したら自動的に最初に戻る
-     *
-     * @param {Mixied} var_args 順次実行するメソッドを順に渡す
-     * @return {Jeeel.Function} 自インスタンス
-     * @throws {Error} 引数にメソッド以外を渡した場合に起こる
-     * @example
-     * <pre>
-     * var f1 = function (n) {
-     * &nbsp;   return a + 1;
-     * };
-     * var f2 = function (n) {
-     * &nbsp;   return a + 2;
-     * };
-     * var f3 = function (n) {
-     * &nbsp;   return a + 3;
-     * };
-     * var sf = Jeeel.Function.create(f1);
-     * sf.iterate(f2, f3);
-     *
-     * var res = [];
-     *
-     * for (var i = 0; i &lt; 3; i++) {
-     * &nbsp;   res[i] = sf(i);
-     * }
-     *
-     * //res = [1, 3, 5]
-     * </pre>
-     */
-    iterate: function (var_args) {
-        var funcs = Array.prototype.slice.call(arguments, 0, arguments.length);
-
-        for (var i = 0, l = funcs.length; i < l; i++) {
-            if ( ! Jeeel.Type.isFunction(funcs[i])) {
-                throw new Error('引数にメソッド以外が含まれています。');
-            }
-        }
-
-        var func = function () {
-
-            var res = funcs[arguments.callee._cnt].apply(this, arguments);
-
-            arguments.callee._cnt++;
-
-            if (funcs.length <= arguments.callee._cnt) {
-                arguments.callee._cnt = 0;
-            }
-
-            return res;
-        };
-
-        funcs.unshift(this._cnvTarget);
-        func._cnt = 0;
-
-        this._cnvTarget = func;
-
-        return this;
-    },
-
-    /**
-     * パラメータを定義づける
-     *
-     * @param {Mixied} var_args 定義づけるパラメータを左から順に渡す
-     * @return {Jeeel.Function} 自インスタンス
-     * @example
-     * <pre>
-     * var f = function (a, b, c) {
-     * &nbsp;   return a + b + c;
-     * };
-     * var sf = Jeeel.Function.create(f);
-     * sf.curry('Hello! ', 'World ');
-     *
-     * var res = sf('Jhon!!');
-     * //res = 'Hello! World Jhon!!'
-     * </pre>
-     */
-    curry: function (var_args) {
-        var slice = Array.prototype.slice;
-        var args = slice.call(arguments);
-
-        var func = function () {
-            var prms = slice.call(arguments);
-            prms = args.concat(prms);
-
-            return arguments.callee._target.apply(this, prms);
-        };
-
-        func._target = this._cnvTarget;
-
-        this._cnvTarget = func;
-
-        return this;
-    },
-
-    /**
-     * メソッドの変更を元に戻す
-     * 
-     * @return {Jeeel.Function} 自インスタンス
-     */
-    reset: function () {
-        this._cnvTarget = this._target;
-
-        return this;
-    },
-
-    /**
-     * ベースとなったメソッドを取得する
-     *
-     * @return {Function} ベースになったメソッド
-     */
-    getBaseMethod: function () {
-        return this._target;
-    }
-};
-Jeeel.directory.Jeeel.UserAgent = {
+Jeeel.Loader._init();Jeeel.directory.Jeeel.UserAgent = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -11527,7 +11301,7 @@ Jeeel.directory.Jeeel.UserAgent = {
 };
 
 /**
- * ブラウザの情報を判別するためのクラス
+ * @staticClass ブラウザの情報を判別するためのクラス
  */
 Jeeel.UserAgent = {
 
@@ -11537,57 +11311,80 @@ Jeeel.UserAgent = {
      * @type String
      * @private
      */
-    _info: navigator.userAgent,
+    _ua: Jeeel._global.navigator && Jeeel._global.navigator.userAgent || '',
+    
+    /**
+     * ブラウザのバージョン文字列
+     * 
+     * @type String
+     * @private
+     */
+    _browserVersion: '0',
+    
+    /**
+     * スキーム文字列
+     * 
+     * @type String
+     * @private
+     */
+    _scheme: Jeeel._global.location && Jeeel._global.location.protocol && Jeeel._global.location.protocol.replace(':', '') || '',
+    
+    /**
+     * クエリ文字列
+     * 
+     * @type String
+     * @private
+     */
+    _query: Jeeel._global.location && Jeeel._global.location.search && Jeeel._global.location.search.replace(/^\?/, '') || '',
+    
+    /**
+     * クエリフィルター
+     * 
+     * @type Jeeel.Filter.Url.QueryParameter
+     * @private
+     */
+    _queryFilter: new Jeeel.Filter.Url.QueryParameter(),
+        
+    /**
+     * ブラウザがInternetExplorerかどうかを返す
+     *
+     * @param {Integer|String} [version] バージョンを指定したい場合に指定する(例: 6)
+     * @return {Boolean} InternetExplorerかどうか
+     */
+    isInternetExplorer: function (version) {},
+
+    /**
+     * ブラウザがFirefoxかどうかを返す
+     *
+     * @param {Integer|String} [version] バージョンを指定したい場合に指定する(例: 3)
+     * @return {Boolean} FireFoxかどうか
+     */
+    isFirefox: function (version) {},
+    
+    /**
+     * ブラウザがChromeかどうかを返す
+     *
+     * @param {Integer|String} [version] バージョンを指定したい場合に指定する(例: 13)
+     * @return {Boolean} Chromeかどうか
+     */
+    isChrome: function (version) {},
     
     /**
      * ブラウザがSafariかどうかを返す
      *
+     * @param {Integer|String} [version] バージョンを指定したい場合に指定する(例: 5)
      * @return {Boolean} Safariかどうか
      */
-    isSafari: function () {},
-
-    /**
-     * ブラウザがFireFoxかどうかを返す
-     *
-     * @return {Boolean} FireFoxかどうか
-     */
-    isFireFox: function () {},
+    isSafari: function (version) {},
 
     /**
      * ブラウザがOperaかどうかを返す
      *
+     * @param {Integer|String} [version] バージョンを指定したい場合に指定する(例: 10)
      * @return {Boolean} Operaかどうか
      */
-    isOpera: function () {},
+    isOpera: function (version) {},
 
-    /**
-     * ブラウザがNetscapeかどうかを返す
-     *
-     * @return {Boolean} Netscapeかどうか
-     */
-    isNetscape: function () {},
-    
-    /**
-     * ブラウザがNetscape.4かどうかを返す
-     *
-     * @return {Boolean} Netscape.4かどうか
-     */
-    isNetscape4: function () {},
-
-    /**
-     * ブラウザがInternetExplorerかどうかを返す
-     *
-     * @return {Boolean} InternetExplorerかどうか
-     */
-    isInternetExplorer: function () {},
-
-    /**
-     * ブラウザがInternetExplorer6かどうかを返す
-     *
-     * @return {Boolean} InternetExplorer6かどうか
-     */
-    isInternetExplorer6: function () {},
-    
     /**
      * iPhoneかどうかを返す
      * 
@@ -11661,21 +11458,12 @@ Jeeel.UserAgent = {
     },
 
     /**
-     * ブラウザのコードネームを取得する
-     *
-     * @return {String} ブラウザのコードネーム
-     */
-    getCodeName: function () {
-        return navigator.appCodeName;
-    },
-
-    /**
      * ブラウザのバージョンを取得する
      *
      * @return {String} ブラウザのバージョン
      */
     getVersion: function () {
-        return navigator.appVersion;
+        return this._browserVersion || navigator.appVersion;
     },
 
     /**
@@ -11684,7 +11472,7 @@ Jeeel.UserAgent = {
      * @return {String} ブラウザのユーザエージェント
      */
     getUserAgent: function () {
-        return this._info;
+        return this._ua;
     },
 
     /**
@@ -11713,6 +11501,20 @@ Jeeel.UserAgent = {
     getPath: function () {
         return location.pathname;
     },
+    
+    /**
+     * 現在のベースURLを取得する
+     * 
+     * @return {String} ベースURL
+     */
+    getBaseUrl: function () {
+        var port = this.getPort();
+        
+        return this.getScheme()
+             + '://'
+             + this.getHostname()
+             + (port && ':' + port);
+    },
 
     /**
      * 現在のURLを取得する
@@ -11729,6 +11531,10 @@ Jeeel.UserAgent = {
      * @param {String} url 遷移対象URL
      */
     setUrl: function (url) {
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
         location.href = url;
     },
     
@@ -11760,21 +11566,16 @@ Jeeel.UserAgent = {
     },
 
     /**
-     * 現在のプロトコルを取得する
-     *
-     * @return {String} プロトコル
-     */
-    getProtocol: function () {},
-    
-    /**
-     * 現在のスキーマを取得する
+     * 現在のスキームを取得する
      * 
-     * @return {String} スキーマ
+     * @return {String} スキーム
      */
-    getSchema: function () {},
+    getScheme: function () {
+        return this._scheme;
+    },
 
     /**
-     * 現在のホストを取得する
+     * 現在のホストを取得する(host = hostname + port)
      *
      * @return {String} ホスト
      */
@@ -11783,11 +11584,11 @@ Jeeel.UserAgent = {
     },
 
     /**
-     * 現在のドメインを取得する
+     * 現在のホスト名を取得する
      *
-     * @return {String} ドメイン
+     * @return {String} ホスト名
      */
-    getDomain: function () {
+    getHostname: function () {
         return location.hostname;
     },
 
@@ -11798,7 +11599,7 @@ Jeeel.UserAgent = {
      * @return {String} Urlパラメータを示す文字列
      */
     getQueryString: function () {
-        return '';
+        return this._query;
     },
 
     /**
@@ -11818,8 +11619,28 @@ Jeeel.UserAgent = {
      * @param {String} [overwriteName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はJeeel.Object.Item[]になる)
      * @return {Hash} URLパラメータの連想配列
      */
-    getQueryParameters: function (overwriteName) {
-        return {};
+    getQuery: function (overwriteName) {
+        return (overwriteName ? new Jeeel.Filter.Url.QueryParameter(overwriteName) : this._queryFilter).filter(this._query);
+    },
+    
+    /**
+     * 現在のURLを解析して結果を返す
+     * 
+     * @return {Hash} URL解析結果の連想配列
+     */
+    parseUrl: function () {
+        var parser = Jeeel.Filter.Url.Parser.create();
+        
+        return parser.parse(this.getUrl());
+    },
+    
+    /**
+     * 現在のURLの履歴を残さずに次のURLに移行する
+     * 
+     * @param {String} url 移行先URL
+     */
+    redirect: function (url) {
+        location.replace(url);
     },
 
     /**
@@ -11894,66 +11715,171 @@ Jeeel.UserAgent = {
         }
     },
     
+    /**
+     * @ignore
+     */
     _init: function () {
         
-        var uao = navigator && navigator.userAgent;
-        var ua = navigator && navigator.userAgent && navigator.userAgent.toLowerCase();
-        
-        if ( ! ua) {
+        var uao = this._ua;
+
+        if ( ! uao) {
             delete this._init;
             return;
         }
         
-        var trueF = function () {
-            return true;
-        };
+        var trueF  = Jeeel.Function.Template.RETURN_TRUE;
+        var falseF = Jeeel.Function.Template.RETURN_FALSE;
         
-        var falseF = function () {
-            return false;
-        };
+        this.isSecure = (this._scheme === 'https' ? trueF : falseF);
         
-        var pro = location && location.protocol && location.protocol.replace(':', '');
-        var scm = pro && (pro + '://');
-        var qs  = location && location.search && location.search.replace(/^\?/, '');
-        var qsf = new Jeeel.Filter.Url.QueryParameter();
+        if ( ! this._query) {
+            this.getQuery = Jeeel.Function.Template.RETURN_EMPTY_HASH;
+        }
+
+        var idx;
         
-        this.isSafari = (ua.indexOf("safari") !== -1 ? trueF : falseF);
-        this.isFireFox = (ua.indexOf("firefox") !== -1 ? trueF : falseF);
-        this.isOpera = (ua.indexOf("opera") !== -1 ? trueF : falseF);
-        this.isNetscape = (ua.indexOf("netscape") !== -1 ? trueF : falseF);
-        this.isNetscape4 = (ua.indexOf("mozilla/4") !== -1 ? trueF : falseF);
-        this.isInternetExplorer = (ua.indexOf("msie") !== -1 ? trueF : falseF);
-        this.isInternetExplorer6 = (ua.indexOf("msie 6") !== -1 ? trueF : falseF);
         this.isIPhone = (uao.indexOf("(iPhone;") !== -1 ? trueF : falseF);
         this.isIPad = (uao.indexOf("(iPad;") !== -1 ? trueF : falseF);
         this.isIPod = (uao.indexOf("(iPod;") !== -1 ? trueF : falseF);
         this.isMobile = (uao.indexOf("Mobile") !== -1 ? trueF : falseF);
         this.isAndroid = (uao.indexOf("Android") !== -1 ? trueF : falseF);
-        
-        this.isTridentEngine = (this.isInternetExplorer() || ua.indexOf("trident/") !== -1 ? trueF : falseF);
-        this.isGeckoEngine = (ua.match(/gecko\/(\d{4})/) !== -1 ? trueF : falseF);
-        this.isWebkitEngine = (ua.indexOf("applewebkit/") !== -1 ? trueF : falseF);
-        this.isPrestoEngine = (ua.indexOf("presto/") !== -1 ? trueF : falseF);
 
-        if (pro) {
-            this.isSecure = (pro === 'https' ? trueF : falseF);
-            this.getProtocol = function () {
-                return pro;
-            };
-            this.getSchema = function () {
-                return scm;
-            };
-        }
+        idx = uao.indexOf("Firefox");
         
-        if (qs) {
-            this.getQueryString = function () {
-                return qs;
+        if (idx !== -1) {
+            
+            this._browserVersion = uao.substring(idx + 8, uao.length);
+            
+            /**
+             * @ignore
+             */
+            this.isFirefox = function (version) {
+                if (version) {
+                    return this._ua.indexOf("Firefox/" + version + '.') !== -1;
+                }
+                
+                return true;
             };
             
-            this.getQueryParameters = function (overwriteName) {
-                return (overwriteName ? new Jeeel.Filter.Url.QueryParameter(overwriteName) : qsf).filter(qs);
+            /**
+             * @ignore
+             */
+            this.getBrowserName = function () {
+                return 'Mozilla Firefox';
             };
+        } else {
+            this.isFirefox = falseF;
         }
+        
+        idx = uao.indexOf("MSIE");
+        
+        if (idx !== -1) {
+            
+            this._browserVersion = uao.substring(idx + 5, uao.indexOf(';', idx));
+            
+            /**
+             * @ignore
+             */
+            this.isInternetExplorer = function (version) {
+                if (version) {
+                    return this._ua.indexOf("MSIE " + version + '.') !== -1;
+                }
+                
+                return true;
+            };
+            
+            /**
+             * @ignore
+             */
+            this.getBrowserName = function () {
+                return 'Microsoft Internet Explorer';
+            };
+        } else {
+            this.isInternetExplorer = falseF;
+        }
+        
+        idx = uao.indexOf("Chrome");
+        
+        if (idx !== -1) {
+            this._browserVersion = uao.substring(idx + 7, uao.indexOf(' ', idx));
+            
+            /**
+             * @ignore
+             */
+            this.isChrome = function (version) {
+                if (version) {
+                    return this._ua.indexOf("Chrome/" + version + '.') !== -1;
+                }
+                
+                return true;
+            };
+            
+            /**
+             * @ignore
+             */
+            this.getBrowserName = function () {
+                return 'Google Chrome';
+            };
+        } else {
+            this.isChrome = falseF;
+        }
+        
+        if (uao.indexOf("Safari") !== -1 && idx === -1) {
+            idx = uao.indexOf("Version");
+            
+            this._browserVersion = uao.substring(idx + 8, uao.indexOf(' ', idx));
+            
+            /**
+             * @ignore
+             */
+            this.isSafari = function (version) {
+                if (version) {
+                    return this._ua.indexOf("Version/" + version + '.') !== -1;
+                }
+                
+                return true;
+            };
+            
+            /**
+             * @ignore
+             */
+            this.getBrowserName = function () {
+                return 'Apple Safari';
+            };
+        } else {
+            this.isSafari = falseF;
+        }
+        
+        if (uao.indexOf("Opera") !== -1) {
+            idx = uao.indexOf("Version");
+            
+            this._browserVersion = uao.substring(idx + 8, uao.length);
+            
+            /**
+             * @ignore
+             */
+            this.isOpera = function (version) {
+                if (version) {
+                    return this._ua.indexOf("Version/" + version + '.') !== -1;
+                }
+                
+                return true;
+            };
+            
+            /**
+             * @ignore
+             */
+            this.getBrowserName = function () {
+                return 'ASA Opera';
+            };
+        } else {
+            this.isOpera = falseF;
+        }
+        
+        this.isTridentEngine = (this.isInternetExplorer() || uao.indexOf("Trident/") !== -1 ? trueF : falseF);
+        this.isGeckoEngine = (uao.indexOf("Gecko/") !== -1 ? trueF : falseF);
+        this.isWebkitEngine = (uao.indexOf("AppleWebKit/") !== -1 ? trueF : falseF);
+        this.isPrestoEngine = (uao.indexOf("Presto/") !== -1 ? trueF : falseF);
         
         delete this._init;
     }
@@ -11963,7 +11889,7 @@ Jeeel.UserAgent._init();
 
 Jeeel.file.Jeeel.UserAgent = [];
 
-if (Jeeel._extendMode.Geolocation && typeof navigator !== 'undefined' && navigator.geolocation) {
+if (Jeeel._extendMode.Geolocation && Jeeel._global.navigator && Jeeel._global.navigator.geolocation) {
     Jeeel.file.Jeeel.UserAgent[Jeeel.file.Jeeel.UserAgent.length] = 'Geolocation';
 }
 
@@ -11987,6 +11913,7 @@ Jeeel.directory.Jeeel.UserAgent.Geolocation = {
  * @class 位置情報について操作するクラス
  */
 Jeeel.UserAgent.Geolocation = function () {
+    
 };
 
 /**
@@ -12352,7 +12279,7 @@ Jeeel.UserAgent.Geolocation.Position.prototype = {
 };
 
 /**
- * Json関連のモジュール
+ * @staticClass Json関連のモジュール
  */
 Jeeel.Json = {
     
@@ -12530,7 +12457,7 @@ Jeeel.directory.Jeeel.Session = {
 };
 
 /**
- * Session関連のネームスペース
+ * @namespace Session関連のネームスペース
  */
 Jeeel.Session = {
 
@@ -12641,7 +12568,7 @@ Jeeel.Session.Core = function (params, expires, domain, path) {
     this.created = (arguments[4] ? new Date(arguments[4]) : new Date());
     this.expires = (Jeeel.Type.isInteger(expires) ? expires : 1440);
     this.path    = (Jeeel.Type.isString(path) ? path : '/');
-    this.domain  = (Jeeel.Type.isString(domain) ? domain : Jeeel.UserAgent.getDomain());
+    this.domain  = (Jeeel.Type.isString(domain) ? domain : Jeeel.UserAgent.getHostname());
 };
 
 /**
@@ -12690,7 +12617,7 @@ Jeeel.Session.Core.isSessionObject = function (val) {
  * @return {Boolean} 許可されたドメインならばtrueそれ以外はfalseを返す
  */
 Jeeel.Session.Core.isAllowDomain = function (target) {
-    var domain = Jeeel.UserAgent.getDomain();
+    var domain = Jeeel.UserAgent.getHostname();
 
     var reg = new RegExp('^'+target.replace('.', '\\.'));
 
@@ -12814,7 +12741,7 @@ Jeeel.Session.Core.expires = 1440;
  *
  * @type String
  */
-Jeeel.Session.Core.domain = Jeeel.UserAgent.getDomain();
+Jeeel.Session.Core.domain = Jeeel.UserAgent.getHostname();
 
 if (Jeeel.Session.Core.domain === 'localhost') {
     Jeeel.Session.Core.domain = '';
@@ -12979,7 +12906,7 @@ Jeeel.Session.Core.prototype = {
      * @return {Boolean} 許可されたドメインならばtrueそれ以外はfalseを返す
      */
     isAllowDomain: function () {
-        var domain = Jeeel.UserAgent.getDomain();
+        var domain = Jeeel.UserAgent.getHostname();
 
         var reg = new RegExp('^'+this.domain.replace('.', '\\.'));
 
@@ -13398,13 +13325,13 @@ Jeeel.directory.Jeeel.Dom = {
 };
 
 /**
- * Domに関するネームスペース
+ * @namespace Domに関するネームスペース
  */
 Jeeel.Dom = {
 
 };
 
-Jeeel.file.Jeeel.Dom = ['Core', 'Node', 'Window', 'Document', 'Xml', 'Event', 'Style', 'Element', 'ElementOperator', 'SearchOption'];
+Jeeel.file.Jeeel.Dom = ['Core', 'Node', 'Window', 'Document', 'Xml', 'Event', 'Style', 'Element', 'ElementOperator', 'Selector', 'Behavior', 'SearchOption'];
 
 if (Jeeel._auto) {
     Jeeel.Dom._tmp = function () {
@@ -13430,6 +13357,9 @@ Jeeel.directory.Jeeel.Dom.Core = {
     }
 };
 
+/**
+ * @namespace DOMの関連のクラスの核になる機能を保有
+ */
 Jeeel.Dom.Core = {
     
 };
@@ -13583,8 +13513,19 @@ Jeeel.Dom.Core.Searcher.prototype = {
         return Jeeel.Hash.toArray(res);
     },
     
+    /**
+     * このElement内から指定IDのHTML要素を取得する<br />
+     * この際既存のAPIに頼らずに検索を実行する
+     *
+     * @param {String} id 検索ID
+     * @return {Element} 取得したElement
+     */
     searchElementById: function (id) {
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        
+        /**
+         * @ignore
+         */
         var search = function (elm, id, f) {
             if ( ! f && elm.id === id) {
                 return elm;
@@ -13608,6 +13549,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             return null;
         };
         
+        /**
+         * @ignore
+         */
         this.searchElementById = function (id) {
             return id && search(this._target, id, true) || null;
         };
@@ -13619,8 +13563,19 @@ Jeeel.Dom.Core.Searcher.prototype = {
         return this.searchElementById(id);
     },
     
+    /**
+     * このElement内から指定ClassのHTML要素を取得する<br />
+     * この際既存のAPIに頼らずに検索を実行する
+     *
+     * @param {String|String[]} className 検索Class
+     * @return {Element[]} 取得したElement配列
+     */
     searchElementsByClassName: function (className) {
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        
+        /**
+         * @ignore
+         */
         var search = function (res, target, reg, f) {
 
             var className = target.className;
@@ -13641,6 +13596,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             }
         };
         
+        /**
+         * @ignore
+         */
         this.searchElementsByClassName = function (className) {
             var res = [];
             
@@ -13675,9 +13633,24 @@ Jeeel.Dom.Core.Searcher.prototype = {
         return this.searchElementsByClassName(className);
     },
 
+    /**
+     * このElement内から指定NameのHTML要素を取得する<br />
+     * この際既存のAPIに頼らずに検索を実行する
+     * なおsubmitSearchを指定すると<br />
+     * この動作は一部本来のgetElementsByNameと違い、<br />
+     * c[]等で配列指定した値に対してもヒットする
+     *
+     * @param {String|String[]} name 検索Name
+     * @param {Boolean} [submitSearch=false] 送信時と同じようにc[]等の配列指定をヒットさせるかどうか
+     * @return {Element[]} 取得したElement配列
+     */
     searchElementsByName: function (name, submitSearch) {
         var rf = new Jeeel.Filter.String.RegularExpressionEscape();
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        
+        /**
+         * @ignore
+         */
         var search = function (res, target, reg, s, f) {
 
             var name = target.name;
@@ -13706,6 +13679,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             }
         };
         
+        /**
+         * @ignore
+         */
         var multiSearch = function (res, target, regs, s, f) {
 
             var name = target.name;
@@ -13737,6 +13713,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             }
         };
         
+        /**
+         * @ignore
+         */
         this.searchElementsByName = function (name, submitSearch) {
             var res = [];
             
@@ -13781,11 +13760,22 @@ Jeeel.Dom.Core.Searcher.prototype = {
         return this.searchElementsByName(name, submitSearch);
     },
 
+    /**
+     * このElement内から指定TagのHTML要素を取得する<br />
+     * この際既存のAPIに頼らずに検索を実行する
+     *
+     * @param {String|String[]} tagName 検索Tag
+     * @return {Element[]} 取得したElement配列
+     */
     searchElementsByTagName: function (tagName) {
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        
+        /**
+         * @ignore
+         */
         var search = function (res, target, tag, f) {
 
-            if ( ! f && tag === '*' || target.nodeName.toUpperCase() === tag) {
+            if ( ! f && (tag === '*' || target.nodeName.toUpperCase() === tag)) {
                 res[res.length] = target;
             }
 
@@ -13801,6 +13791,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             }
         };
         
+        /**
+         * @ignore
+         */
         var multiSearch = function (res, target, tags, f) {
 
             if ( ! f && Jeeel.Type.inArray(target.nodeName.toUpperCase(), tags, true)) {
@@ -13819,6 +13812,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             }
         };
         
+        /**
+         * @ignore
+         */
         this.searchElementsByTagName = function (tagName) {
             var res = [];
             
@@ -13859,8 +13855,20 @@ Jeeel.Dom.Core.Searcher.prototype = {
         return this.searchElementsByTagName(tagName);
     },
 
+    /**
+     * このElement内から指定属性が指定値のHTML要素を取得する<br />
+     * この際既存のAPIに頼らずに検索を実行する
+     *
+     * @param {String} attribute 属性名
+     * @param {String} value 属性値('*'を指定すると任意の値の意味になる)
+     * @return {Element[]} 取得したElement配列
+     */
     searchElementsByAttribute: function (attribute, value) {
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        
+        /**
+         * @ignore
+         */
         var search = function (res, target, attr, value, f) {
 
             if ( ! f && target.getAttribute) {
@@ -13883,6 +13891,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             }
         };
         
+        /**
+         * @ignore
+         */
         this.searchElementsByAttribute = function (attribute, value) {
             var res = [];
             
@@ -13902,8 +13913,21 @@ Jeeel.Dom.Core.Searcher.prototype = {
         return this.searchElementsByAttribute(attribute, value);
     },
     
+    /**
+     * このElement内から指定プロパティが指定値のHTML要素を取得する<br />
+     * この際既存のAPIに頼らずに検索を実行する<br />
+     * Elementのプロパティである事に注意
+     *
+     * @param {String} property プロパティ名
+     * @param {Mixied} value プロパティ値('*'を指定すると任意の値の意味になる)
+     * @return {Element[]} 取得したElement配列
+     */
     searchElementsByProperty: function (property, value) {
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        
+        /**
+         * @ignore
+         */
         var search = function (res, target, prop, value, f) {
 
             if ( ! f && prop in target) {
@@ -13926,6 +13950,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
             }
         };
         
+        /**
+         * @ignore
+         */
         this.searchElementsByProperty = function (property, value) {
             var res = [];
             
@@ -13945,24 +13972,24 @@ Jeeel.Dom.Core.Searcher.prototype = {
         return this.searchElementsByProperty(property, value);
     },
     
+    /**
+     * このElement内部に絞り込みを掛ける<br />
+     * この際既存のAPIに頼らずに検索を実行する<br />
+     * 現在のHTML内に存在しない要素は取れない
+     *
+     * @param {String} selector CSSと同じ絞り込みセレクタ
+     * @return {Element[]} 絞り込んだElement配列
+     */
     searchElementsBySelector: function (selector) {
-        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
-        var search = function (res, target, selector, f) {
-
-        };
-        
+        /**
+         * @ignore
+         */
         this.searchElementsBySelector = function (selector) {
-            var res = [];
-            
-            return res;
-            
             if ( ! selector) {
-                return res;
+                return [];
             }
             
-            search(res, this._target, selector, true);
-            
-            return res;
+            return Jeeel.Dom.Selector.create(selector).search(this._target);
         };
         
         if (arguments.callee === this.getElementsBySelector) {
@@ -13979,6 +14006,9 @@ Jeeel.Dom.Core.Searcher.prototype = {
      */
     constructor: Jeeel.Dom.Core.Searcher,
     
+    /**
+     * @ignore
+     */
     _init: function () {
         
         var key, cache = this.constructor.caches[this._target.nodeType];
@@ -14032,7 +14062,7 @@ Jeeel.Dom.Core.Searcher.prototype = {
     }
 };
 /**
- * Nodeに関する事を保持するネームスペース
+ * @namespace Nodeに関する事を保持するネームスペース
  */
 Jeeel.Dom.Node = {
     
@@ -14393,7 +14423,7 @@ Jeeel.Dom.Window.prototype = {
             width: size.width + 'px',
             height: size.height + 'px',
             opacity: styles.opacity ||0.75
-        }).setBackgroundIframe();
+        }).setShim();
         
         doc.appendToBody(overlay.getElement());
         
@@ -14408,6 +14438,9 @@ Jeeel.Dom.Window.prototype = {
      */
     constructor: Jeeel.Dom.Window,
     
+    /**
+     * @ignore
+     */
     _init: function () {
       
         var doc = Jeeel._doc,
@@ -14418,51 +14451,78 @@ Jeeel.Dom.Window.prototype = {
             return;
         }
         
-        var self = this,
-            body;
+        var body;
         
         if (win.innerWidth) {
-            self.getWindowSize = function () {
+          
+            /**
+             * @ignore
+             */
+            this.getWindowSize = function () {
                 var win = this._window;
 
                 return new Jeeel.Object.Size(win.innerWidth, win.innerHeight);
             };
             
-            self.getScrollPosition = function () {
+            /**
+             * @ignore
+             */
+            this.getScrollPosition = function () {
                 var win = this._window;
                 
                 return new Jeeel.Object.Point(win.pageXOffset, win.pageYOffset);
             };
         } else if (doc.documentElement && doc.documentElement.clientWidth) {
-            self.getWindowSize = function () {
+          
+            /**
+             * @ignore
+             */
+            this.getWindowSize = function () {
                 var root = this._document.getDocumentElement();
 
                 return new Jeeel.Object.Size(root.clientWidth, root.clientHeight);
             };
             
-            self.getScrollPosition = function () {
+            /**
+             * @ignore
+             */
+            this.getScrollPosition = function () {
                 var root = this._document.getDocumentElement();
                 
                 return new Jeeel.Object.Point(root.scrollLeft, root.scrollTop);
             };
         } else if ((body = doc.body || doc.createElement('body')) && 'clientWidth' in body) {
-            self.getWindowSize = function () {
+          
+            /**
+             * @ignore
+             */
+            this.getWindowSize = function () {
                 var root = this._document.getBody();
 
                 return new Jeeel.Object.Size(root.clientWidth, root.clientHeight);
             };
             
-            self.getScrollPosition = function () {
+            /**
+             * @ignore
+             */
+            this.getScrollPosition = function () {
                 var root = this._document.getBody();
                 
                 return new Jeeel.Object.Point(root.scrollLeft, root.scrollTop);
             };
         } else {
-            self.getWindowSize = function () {
+          
+            /**
+             * @ignore
+             */
+            this.getWindowSize = function () {
                 return new Jeeel.Object.Size(0, 0);
             };
             
-            self.getScrollPosition = function () {
+            /**
+             * @ignore
+             */
+            this.getScrollPosition = function () {
                 return new Jeeel.Object.Point(0, 0);
             };
         }
@@ -14489,7 +14549,7 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Window, Jeeel.file.Jeeel.Dom.Window
 };
 
 /**
- * ウィンドウやダイアログを開くためのクラスがあるネームスペース
+ * @namespace ウィンドウやダイアログを開くためのクラスがあるネームスペース
  */
 Jeeel.Dom.Window.Opener = {
 
@@ -14809,7 +14869,7 @@ Jeeel.Dom.Window.Opener.Window.prototype = {
         var window = this._window.open('', markerName, options.join(','));
         
         if ( ! window) {
-            throw Error('ウィンドウを作成出来ませんでした。');
+            throw new Error('ウィンドウを作成出来ませんでした。');
         }
         
         var submitter = Jeeel.Net.Form.newForm(this._url, this._method);
@@ -15007,7 +15067,7 @@ Jeeel.Dom.Window.Opener.Dialog.prototype = {
             Jeeel: Jeeel,
             parent: Jeeel._global,
             params: this._args.getAll(),
-            callback: callback || function (){}
+            callback: callback || Jeeel.Function.Template.EMPTY
         };
 
         return this._window.showModalDialog(url, prms, options.join(';'));
@@ -15050,6 +15110,9 @@ Jeeel.Dom.Window.Interval = function (window) {
     
     var self = this, interval = this.interval;
     
+    /**
+     * @ignore
+     */
     this.interval = function () {
         interval.call(self);
     };
@@ -15501,6 +15564,9 @@ Jeeel.Dom.Document.prototype = {
             depth = wrap[0];
 
             div = this.createElement('div');
+            div.style.display = 'none';
+            
+            this.appendToBody(div);
 
             // Go to html and back, then peel off extra wrappers
             div.innerHTML = wrap[1] + html + wrap[2];
@@ -15539,8 +15605,20 @@ Jeeel.Dom.Document.prototype = {
 
         var children = div.childNodes;
 
-        for (var i = 0, l = children.length; i < l; i++) {
+        for (var i = children.length; i--;) {
             res[i] = children[i];
+        }
+        
+        var child;
+        
+        while (child = div.firstChild) {
+            div.removeChild(child);
+        }
+        
+        if (div.parentNode) {
+            var parent = div.parentNode;
+            
+            parent.removeChild(div);
         }
 
         return res;
@@ -15685,7 +15763,7 @@ Jeeel.Dom.Document.prototype = {
      *
      * @param {String} selector CSSセレクタ
      * @return {Element[]} 取得したElement配列
-     * @ignore
+     * @see Jeeel.Dom.Selector
      */
     getElementsBySelector: function (selector) {
         return this._searcher.getElementsBySelector(selector);
@@ -15781,23 +15859,6 @@ Jeeel.Dom.Document.prototype = {
     },
 
     /**
-     * イメージ全てに対してロールオーバー動作を定義づける
-     * 
-     * @return {Jeeel.Dom.Document} 自インスタンス
-     * @ignore
-     */
-    rolloverImages: function () {
-        var inputs = this.getElementsByTagName('input');
-        var images = this.getElementsByTagName('img');
-        
-        var rollover = new Jeeel.Dom.Event.Rollover.Image();
-        
-        rollover.rollover(inputs.concat(images));
-        
-        return this;
-    },
-
-    /**
      * コンストラクタ
      * 
      * @param {Document} [document] 対象のドキュメント(iframe等で階層が違う場合に指定)
@@ -15805,6 +15866,9 @@ Jeeel.Dom.Document.prototype = {
      */
     constructor: Jeeel.Dom.Document,
     
+    /**
+     * @ignore
+     */
     _init: function () {
       
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
@@ -15817,6 +15881,9 @@ Jeeel.Dom.Document.prototype = {
         
         var _option, _rect;
 
+        /**
+         * @ignore
+         */
         function _searchRange(res, target) {
             var trect = Jeeel.Dom.Element.create(target).getRect();
 
@@ -15836,9 +15903,10 @@ Jeeel.Dom.Document.prototype = {
             }
         }
         
-        var self = this;
-        
-        self.searchElementsByRange = function (rect, option) {
+        /**
+         * @ignore
+         */
+        this.searchElementsByRange = function (rect, option) {
             if ( ! rect) {
                 return [];
             }
@@ -15858,12 +15926,19 @@ Jeeel.Dom.Document.prototype = {
         };
         
         if ('scrollWidth' in doc.documentElement) {
+            
+            /**
+             * @ignore
+             */
             this.getDocumentSize = function () {
                 var root = this.getDocumentElement();
                 
                 return new Jeeel.Object.Size(root.scrollWidth, root.scrollHeight);
             };
         } else {
+            /**
+             * @ignore
+             */
             this.getDocumentSize = function () {
                 var root = this.getBody();
                 
@@ -15873,7 +15948,11 @@ Jeeel.Dom.Document.prototype = {
         
         // createElementNSが存在しないブラウザはネームスペースを無視
         if ( ! doc.createElementNS) {
-            self.createElementNS = function (namespaceUri, tagName) {
+          
+            /**
+             * @ignore
+             */
+            this.createElementNS = function (namespaceUri, tagName) {
                 return this.createElement(tagName);
             };
         }
@@ -15905,6 +15984,9 @@ if (Jeeel._doc) {
     div.setAttribute("className", "t");
     div.innerHTML = "   <link/><table></table><a href='/a' style='top:1px;float:left;opacity:.55;'>a</a><input type='checkbox'/>";
 
+    /**
+     * @namespace サポート用ネームスペース
+     */
     Jeeel.Dom.Document.Supports = ({
         leadingWhitespace: ( div.firstChild.nodeType === 3 ),
 
@@ -15933,6 +16015,9 @@ if (Jeeel._doc) {
         rxhtmlTag: /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
         rtagName: /<([\w:]+)/,
         
+        /**
+         * @ignore
+         */
         _init: function () {
             this.wrapMap.optgroup = this.wrapMap.option;
             this.wrapMap.tbody = this.wrapMap.tfoot = this.wrapMap.colgroup = this.wrapMap.caption = this.wrapMap.thead;
@@ -16022,8 +16107,7 @@ Jeeel.Dom.Xml.create = function (xmlDocument) {
 };
 
 /**
- * XMLを読み込んでインスタンスの作成を行う<br />
- * 同期的に読み込むので注意
+ * XMLを読み込んでインスタンスの作成を同期的行う
  * 
  * @param {String} url XMLのURL
  * @param {Hash} [params] XML取得の際にサーバーに渡すパラメータ
@@ -16036,6 +16120,28 @@ Jeeel.Dom.Xml.load = function (url, params) {
                     .execute();
     
     return new this(ajax.getResponse().responseXML);
+};
+
+/**
+ * XMLを読み込んでインスタンスの作成を非同期で行う
+ * 
+ * @param {String} url XMLのURL
+ * @param {Function} callback 指定すると非同期読み込みになり引数にXMLが渡される<br />
+ *                             void callback(Jeeel.Dom.Xml xml)
+ * @param {Hash} [params] XML取得の際にサーバーに渡すパラメータ
+ */
+Jeeel.Dom.Xml.loadAsync = function (url, callback, params) {
+  
+    if ( ! callback) {
+        return;
+    }
+  
+    var ajax = Jeeel.Net.Ajax.create(url);
+    
+    ajax.setAll(params || {})
+        .setSuccessMethod(function (response) {
+            callback(new this(response.responseXML));
+        }, this).execute();
 };
 
 Jeeel.Dom.Xml.prototype = {
@@ -16815,10 +16921,10 @@ Jeeel.Dom.Event.prototype = {
         if (this.type != 'keypress') {
             keyCode = this.keyCode;
 
-            if (Jeeel.Code.KeyCode.T0 <= keyCode && keyCode <= Jeeel.Code.KeyCode.T9) {
-                keyCode += Jeeel.Code.KeyCode[0] - Jeeel.Code.KeyCode.T0;
-            } else if (Jeeel.Code.KeyCode.TMultiplicationSign <= keyCode && keyCode <= Jeeel.Code.KeyCode.TDivisionSign) {
-                keyCode += Jeeel.Code.KeyCode.MultiplicationSign - Jeeel.Code.KeyCode.TMultiplicationSign;
+            if (Jeeel.Dom.Event.KeyCode.T0 <= keyCode && keyCode <= Jeeel.Dom.Event.KeyCode.T9) {
+                keyCode += Jeeel.Dom.Event.KeyCode[0] - Jeeel.Dom.Event.KeyCode.T0;
+            } else if (Jeeel.Dom.Event.KeyCode.TMultiplicationSign <= keyCode && keyCode <= Jeeel.Dom.Event.KeyCode.TDivisionSign) {
+                keyCode += Jeeel.Dom.Event.KeyCode.MultiplicationSign - Jeeel.Dom.Event.KeyCode.TMultiplicationSign;
             }
 
             return keyCode;
@@ -16831,71 +16937,71 @@ Jeeel.Dom.Event.prototype = {
             switch (keyCode) {
 
                 case Jeeel.Code.CharCode.RightParenthesis:
-                    keyCode = Jeeel.Code.KeyCode[9];
+                    keyCode = Jeeel.Dom.Event.KeyCode[9];
                     break;
 
                 case Jeeel.Code.CharCode.SubtractionSign:
                 case Jeeel.Code.CharCode.EqualsSign:
-                    keyCode = Jeeel.Code.KeyCode.SubtractionSign;
+                    keyCode = Jeeel.Dom.Event.KeyCode.SubtractionSign;
                     break;
 
                 case Jeeel.Code.CharCode.Caret:
                 case Jeeel.Code.CharCode.Tilde:
-                    keyCode = Jeeel.Code.KeyCode.Caret;
+                    keyCode = Jeeel.Dom.Event.KeyCode.Caret;
                     break;
 
                 case Jeeel.Code.CharCode.YenMark:
                 case Jeeel.Code.CharCode.VerticalBar:
-                    keyCode = Jeeel.Code.KeyCode.YenMark;
+                    keyCode = Jeeel.Dom.Event.KeyCode.YenMark;
                     break;
 
                 case Jeeel.Code.CharCode.Atmark:
                 case Jeeel.Code.CharCode.BackQuote:
-                    keyCode = Jeeel.Code.KeyCode.Atmark;
+                    keyCode = Jeeel.Dom.Event.KeyCode.Atmark;
                     break;
 
                 case Jeeel.Code.CharCode.LeftBracket:
                 case Jeeel.Code.CharCode.LeftBrace:
-                    keyCode = Jeeel.Code.KeyCode.LeftBracket;
+                    keyCode = Jeeel.Dom.Event.KeyCode.LeftBracket;
                     break;
 
                 case Jeeel.Code.CharCode.Semicolon:
                 case Jeeel.Code.CharCode.AdditionSign:
-                    keyCode = Jeeel.Code.KeyCode.AdditionSign;
+                    keyCode = Jeeel.Dom.Event.KeyCode.AdditionSign;
                     break;
 
                 case Jeeel.Code.CharCode.Colon:
                 case Jeeel.Code.CharCode.MultiplicationSign:
-                    keyCode = Jeeel.Code.KeyCode.MultiplicationSign;
+                    keyCode = Jeeel.Dom.Event.KeyCode.MultiplicationSign;
                     break;
 
                 case Jeeel.Code.CharCode.RightBracket:
                 case Jeeel.Code.CharCode.RightBrace:
-                    keyCode = Jeeel.Code.KeyCode.RightBracket;
+                    keyCode = Jeeel.Dom.Event.KeyCode.RightBracket;
                     break;
 
                 case Jeeel.Code.CharCode.Comma:
                 case Jeeel.Code.CharCode.LessThan:
-                    keyCode = Jeeel.Code.KeyCode.Comma;
+                    keyCode = Jeeel.Dom.Event.KeyCode.Comma;
                     break;
 
                 case Jeeel.Code.CharCode.Period:
                 case Jeeel.Code.CharCode.GreaterThan:
-                    keyCode = Jeeel.Code.KeyCode.Period;
+                    keyCode = Jeeel.Dom.Event.KeyCode.Period;
                     break;
 
                 case Jeeel.Code.CharCode.DivisionSign:
                 case Jeeel.Code.CharCode.QuestionMark:
-                    keyCode = Jeeel.Code.KeyCode.DivisionSign;
+                    keyCode = Jeeel.Dom.Event.KeyCode.DivisionSign;
                     break;
 
                 case Jeeel.Code.CharCode.YenMark:
                 case Jeeel.Code.CharCode.Underscore:
-                    keyCode = Jeeel.Code.KeyCode.Underscore;
+                    keyCode = Jeeel.Dom.Event.KeyCode.Underscore;
                     break;
 
                 case 0:
-                    keyCode = Jeeel.Code.KeyCode.Application;
+                    keyCode = Jeeel.Dom.Event.KeyCode.Application;
                     break;
             }
         }
@@ -16986,11 +17092,11 @@ Jeeel.Dom.Event.prototype = {
  * </script>
  */
 Jeeel.Dom.Event.getEventObject = function (nestCount) {
-    nestCount = nestCount || 0;
+    nestCount = +nestCount || 0;
     
     var caller = arguments.callee.caller;
     
-    while (nestCount--) {
+    while (caller && nestCount--) {
         caller = caller.caller;
     }
     
@@ -17230,17 +17336,15 @@ Jeeel.Dom.Event._disableMouse = function () {
  * @param {Element} element 対象のElement
  */
 Jeeel.Dom.Event.disableMouseEvent = function (element) {
-    var f = this._disableMouse;
-    
-    element.onmousedown = f;
-    element.onmouseup = f;
-    element.onmouseover = f;
-    element.ondrag = f;
-    element.ondragstart = f;
-    element.ondragend = f;
+    element.onmousedown = element.onmouseup
+                        = element.onmouseover
+                        = element.ondrag
+                        = element.ondragstart
+                        = element.ondragend
+                        = this._disableMouse;
 };
 
-Jeeel.file.Jeeel.Dom.Event = ['Type', 'Listener', 'Manager', 'Option', 'Rollover'];
+Jeeel.file.Jeeel.Dom.Event = ['Type', 'KeyCode', 'Listener', 'Manager', 'Option'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Event, Jeeel.file.Jeeel.Dom.Event);
 
@@ -17645,11 +17749,821 @@ Jeeel.Dom.Event.Type = {
 (function () {
     var wheel = 'on' + Jeeel.Dom.Event.Type.MOUSE_WHEEL;
     
-    // FireFoxのホイールイベント
+    // Firefoxのホイールイベント
     if (Jeeel._doc && ! (wheel in Jeeel._global || wheel in Jeeel._doc)) {
         Jeeel.Dom.Event.Type.MOUSE_WHEEL = 'DOMMouseScroll';
     }
 })();
+/**
+ * キーボードのコードに関する列挙体
+ */
+Jeeel.Dom.Event.KeyCode = {
+
+    /**
+     * A
+     *
+     * @type Integer
+     * @constant
+     */
+    A: 65,
+
+    /**
+     * B
+     *
+     * @type Integer
+     * @constant
+     */
+    B: 66,
+
+    /**
+     * C
+     *
+     * @type Integer
+     * @constant
+     */
+    C: 67,
+
+    /**
+     * D
+     *
+     * @type Integer
+     * @constant
+     */
+    D: 68,
+
+    /**
+     * E
+     *
+     * @type Integer
+     * @constant
+     */
+    E: 69,
+
+    /**
+     * F
+     *
+     * @type Integer
+     * @constant
+     */
+    F: 70,
+
+    /**
+     * G
+     *
+     * @type Integer
+     * @constant
+     */
+    G: 71,
+
+    /**
+     * H
+     *
+     * @type Integer
+     * @constant
+     */
+    H: 72,
+
+    /**
+     * I
+     *
+     * @type Integer
+     * @constant
+     */
+    I: 73,
+
+    /**
+     * J
+     *
+     * @type Integer
+     * @constant
+     */
+    J: 74,
+
+    /**
+     * K
+     *
+     * @type Integer
+     * @constant
+     */
+    K: 75,
+
+    /**
+     * L
+     *
+     * @type Integer
+     * @constant
+     */
+    L: 76,
+
+    /**
+     * M
+     *
+     * @type Integer
+     * @constant
+     */
+    M: 77,
+
+    /**
+     * N
+     *
+     * @type Integer
+     * @constant
+     */
+    N: 78,
+
+    /**
+     * O
+     *
+     * @type Integer
+     * @constant
+     */
+    O: 79,
+
+    /**
+     * P
+     *
+     * @type Integer
+     * @constant
+     */
+    P: 80,
+
+    /**
+     * Q
+     *
+     * @type Integer
+     * @constant
+     */
+    Q: 81,
+
+    /**
+     * R
+     *
+     * @type Integer
+     * @constant
+     */
+    R: 82,
+
+    /**
+     * S
+     *
+     * @type Integer
+     * @constant
+     */
+    S: 83,
+
+    /**
+     * T
+     *
+     * @type Integer
+     * @constant
+     */
+    T: 84,
+
+    /**
+     * U
+     *
+     * @type Integer
+     * @constant
+     */
+    U: 85,
+
+    /**
+     * V
+     *
+     * @type Integer
+     * @constant
+     */
+    V: 86,
+
+    /**
+     * W
+     *
+     * @type Integer
+     * @constant
+     */
+    W: 87,
+
+    /**
+     * X
+     *
+     * @type Integer
+     * @constant
+     */
+    X: 88,
+
+    /**
+     * Y
+     *
+     * @type Integer
+     * @constant
+     */
+    Y: 89,
+
+    /**
+     * Z
+     *
+     * @type Integer
+     * @constant
+     */
+    Z: 90,
+
+    /**
+     * 0
+     *
+     * @type Integer
+     * @constant
+     */
+    0: 48,
+
+    /**
+     * 1
+     *
+     * @type Integer
+     * @constant
+     */
+    1: 49,
+
+    /**
+     * 2
+     *
+     * @type Integer
+     * @constant
+     */
+    2: 50,
+
+    /**
+     * 3
+     *
+     * @type Integer
+     * @constant
+     */
+    3: 51,
+
+    /**
+     * 4
+     *
+     * @type Integer
+     * @constant
+     */
+    4: 52,
+
+    /**
+     * 5
+     *
+     * @type Integer
+     * @constant
+     */
+    5: 53,
+
+    /**
+     * 6
+     *
+     * @type Integer
+     * @constant
+     */
+    6: 54,
+
+    /**
+     * 7
+     *
+     * @type Integer
+     * @constant
+     */
+    7: 55,
+
+    /**
+     * 8
+     *
+     * @type Integer
+     * @constant
+     */
+    8: 56,
+
+    /**
+     * 9
+     *
+     * @type Integer
+     * @constant
+     */
+    9: 57,
+
+    /**
+     * テンキー0
+     *
+     * @type Integer
+     * @constant
+     */
+    T0: 96,
+
+    /**
+     * テンキー1
+     *
+     * @type Integer
+     * @constant
+     */
+    T1: 97,
+
+    /**
+     * テンキー2
+     *
+     * @type Integer
+     * @constant
+     */
+    T2: 98,
+
+    /**
+     * テンキー3
+     *
+     * @type Integer
+     * @constant
+     */
+    T3: 99,
+
+    /**
+     * テンキー4
+     *
+     * @type Integer
+     * @constant
+     */
+    T4: 100,
+
+    /**
+     * テンキー5
+     *
+     * @type Integer
+     * @constant
+     */
+    T5: 101,
+
+    /**
+     * テンキー6
+     *
+     * @type Integer
+     * @constant
+     */
+    T6: 102,
+
+    /**
+     * テンキー7
+     *
+     * @type Integer
+     * @constant
+     */
+    T7: 103,
+
+    /**
+     * テンキー8
+     *
+     * @type Integer
+     * @constant
+     */
+    T8: 104,
+
+    /**
+     * テンキー9
+     *
+     * @type Integer
+     * @constant
+     */
+    T9: 105,
+
+    /**
+     * テンキー&lowast;
+     *
+     * @type Integer
+     * @constant
+     */
+    TMultiplicationSign: 106,
+
+    /**
+     * テンキー+
+     *
+     * @type Integer
+     * @constant
+     */
+    TAdditionSign: 107,
+
+    /**
+     * テンキー-
+     *
+     * @type Integer
+     * @constant
+     */
+    TSubtractionSign: 109,
+
+    /**
+     * テンキー.
+     *
+     * @type Integer
+     * @constant
+     */
+    TPeriod: 110,
+
+    /**
+     * テンキー/
+     *
+     * @type Integer
+     * @constant
+     */
+    TDivisionSign: 111,
+
+    /**
+     * F1
+     *
+     * @type Integer
+     * @constant
+     */
+    F1: 112,
+
+    /**
+     * F2
+     *
+     * @type Integer
+     * @constant
+     */
+    F2: 113,
+
+    /**
+     * F3
+     *
+     * @type Integer
+     * @constant
+     */
+    F3: 114,
+
+    /**
+     * F4
+     *
+     * @type Integer
+     * @constant
+     */
+    F4: 115,
+
+    /**
+     * F5
+     *
+     * @type Integer
+     * @constant
+     */
+    F5: 116,
+
+    /**
+     * F6
+     *
+     * @type Integer
+     * @constant
+     */
+    F6: 117,
+
+    /**
+     * F7
+     *
+     * @type Integer
+     * @constant
+     */
+    F7: 118,
+
+    /**
+     * F8
+     *
+     * @type Integer
+     * @constant
+     */
+    F8: 119,
+
+    /**
+     * F9
+     *
+     * @type Integer
+     * @constant
+     */
+    F9: 120,
+
+    /**
+     * F10
+     *
+     * @type Integer
+     * @constant
+     */
+    F10: 121,
+
+    /**
+     * F11
+     *
+     * @type Integer
+     * @constant
+     */
+    F11: 122,
+
+    /**
+     * F12
+     *
+     * @type Integer
+     * @constant
+     */
+    F12: 123,
+
+    /**
+     * BackSpace
+     *
+     * @type Integer
+     * @constant
+     */
+    BackSpace: 8,
+
+    /**
+     * Enter
+     *
+     * @type Integer
+     * @constant
+     */
+    Enter: 13,
+
+    /**
+     * Shift
+     *
+     * @type Integer
+     * @constant
+     */
+    Shift: 16,
+
+    /**
+     * Ctrl
+     *
+     * @type Integer
+     * @constant
+     */
+    Ctrl: 17,
+
+    /**
+     * Alt
+     *
+     * @type Integer
+     * @constant
+     */
+    Alt: 18,
+
+    /**
+     * Pause
+     *
+     * @type Integer
+     * @constant
+     */
+    Pause: 19,
+
+    /**
+     * 変換
+     *
+     * @type Integer
+     * @constant
+     */
+    Change: 28,
+
+    /**
+     * 無変換
+     *
+     * @type Integer
+     * @constant
+     */
+    NonChange: 29,
+
+    /**
+     * スペース
+     *
+     * @type Integer
+     * @constant
+     */
+    Space: 32,
+
+    /**
+     * PageUp
+     *
+     * @type Integer
+     * @constant
+     */
+    PageUp: 33,
+
+    /**
+     * PageDown
+     *
+     * @type Integer
+     * @constant
+     */
+    PageDown: 34,
+
+    /**
+     * End
+     *
+     * @type Integer
+     * @constant
+     */
+    End: 35,
+
+    /**
+     * Home
+     *
+     * @type Integer
+     * @constant
+     */
+    Home: 36,
+
+    /**
+     * ←
+     *
+     * @type Integer
+     * @constant
+     */
+    Left: 37,
+
+    /**
+     * ↑
+     *
+     * @type Integer
+     * @constant
+     */
+    Up: 38,
+
+    /**
+     * →
+     *
+     * @type Integer
+     * @constant
+     */
+    Right: 39,
+
+    /**
+     * ↓
+     *
+     * @type Integer
+     * @constant
+     */
+    Down: 40,
+
+    /**
+     * Insert
+     *
+     * @type Integer
+     * @constant
+     */
+    Insert: 45,
+
+    /**
+     * Delete
+     *
+     * @type Integer
+     * @constant
+     */
+    Delete: 46,
+
+    /**
+     * Windowsキー
+     *
+     * @type Integer
+     * @constant
+     */
+    Windows: 91,
+
+    /**
+     * Esc
+     *
+     * @type Integer
+     * @constant
+     */
+    Esc: 243,
+
+    /**
+     * Tab
+     *
+     * @type Integer
+     * @constant
+     */
+    Tab: 9,
+
+    /**
+     * Applicationキー
+     *
+     * @type Integer
+     * @constant
+     */
+    Application: 93,
+
+    /**
+     * NumLock
+     *
+     * @type Integer
+     * @constant
+     */
+    NumLock: 144,
+
+    /**
+     * ScrollLock
+     *
+     * @type Integer
+     * @constant
+     */
+    ScrollLock: 145,
+
+    /**
+     * &lowast;
+     *
+     * @type Integer
+     * @constant
+     */
+    MultiplicationSign: 186,
+
+    /**
+     * +
+     *
+     * @type Integer
+     * @constant
+     */
+    AdditionSign: 187,
+
+    /**
+     * ,
+     *
+     * @type Integer
+     * @constant
+     */
+    Comma: 188,
+
+    /**
+     * -
+     *
+     * @type Integer
+     * @constant
+     */
+    SubtractionSign: 189,
+
+    /**
+     * .
+     *
+     * @type Integer
+     * @constant
+     */
+    Period: 190,
+
+    /**
+     * &frasl;
+     *
+     * @type Integer
+     * @constant
+     */
+    DivisionSign: 191,
+
+    /**
+     * &#64;
+     *
+     * @type Integer
+     * @constant
+     */
+    Atmark: 192,
+
+    /**
+     * [
+     *
+     * @type Integer
+     * @constant
+     */
+    LeftBracket: 219,
+
+    /**
+     * \
+     *
+     * @type Integer
+     * @constant
+     */
+    YenMark: 220,
+
+    /**
+     * ]
+     *
+     * @type Integer
+     * @constant
+     */
+    RightBracket: 221,
+
+    /**
+     * ^
+     *
+     * @type Integer
+     * @constant
+     */
+    Caret: 222,
+
+    /**
+     * _
+     *
+     * @type Integer
+     * @constant
+     */
+    Underscore: 226
+};
+
+Jeeel.Dom.Event.KeyCode.getKey = function (keyCode) {
+    return Jeeel.Hash.search(keyCode, this, true);
+};
+
 /**
  * コンストラクタ
  * 
@@ -17958,6 +18872,9 @@ Jeeel.Dom.Event.Listener.prototype = {
                           || Jeeel.UserAgent.isIPod();
 
     if (Jeeel._global && isTouchPanelMobile) {
+        /**
+         * @ignore
+         */
         getType = function (type) {
             switch (type) {
                 case Jeeel.Dom.Event.Type.MOUSE_DOWN:
@@ -17979,26 +18896,41 @@ Jeeel.Dom.Event.Listener.prototype = {
             return type;
         };
     } else {
-        getType = function (type) {
-            return type;
-        };
+        getType = Jeeel.Function.Template.RETURN_ARGUMENT;
     }
     
     if (Jeeel._global && Jeeel._global.addEventListener) {
+        /**
+         * @ignore
+         */
         add = function (type) {
             this._element.addEventListener(type, this.listener, false);
         };
+        
+        /**
+         * @ignore
+         */
         remove = function (type) {
             this._element.removeEventListener(type, this.listener, false);
         };
     } else if (Jeeel._global && Jeeel._global.attachEvent) {
+        /**
+         * @ignore
+         */
         add = function (type) {
             this._element.attachEvent("on" + type, this.listener);
         };
+        
+        /**
+         * @ignore
+         */
         remove = function (type) {
             this._element.detachEvent("on" + type, this.listener);
         };
     } else {
+        /**
+         * @ignore
+         */
         add = remove = function (type) {
             Jeeel.errorDump('このブラウザはイベント登録に対応していません。');
         };
@@ -18521,239 +19453,6 @@ Jeeel.Dom.Event.Option.prototype = {
         return event;
     }
 };
-Jeeel.directory.Jeeel.Dom.Event.Rollover = {
-
-    /**
-     * 自身を文字列参照された場合の変換
-     *
-     * @return {String} 自身のディレクトリ
-     * @private
-     */
-    toString: function () {
-        return Jeeel.directory.Jeeel.Dom.Event + 'Rollover/';
-    }
-};
-
-/**
- * コンストラクタ
- * 
- * @class ロールバーに関するクラス
- */
-Jeeel.Dom.Event.Rollover = function () {
-    
-};
-
-/**
- * インスタンスの作成を行う
- * 
- * @return {Jeeel.Dom.Event.Rollover} 作成したインスタンス
- */
-Jeeel.Dom.Event.Rollover.create = function () {
-    return new this();
-};
-
-Jeeel.Dom.Event.Rollover.prototype = {
-  
-    /**
-     * ロールオーバーハンドラ
-     * 
-     * @type Function
-     * @private
-     */
-    _on: null,
-    
-    /**
-     * ロールアウトハンドラ
-     * 
-     * @type Function
-     * @private
-     */
-    _off: null,
-    
-    /**
-     * ロールオーバー時のハンドラを設定する
-     * 
-     * @param {Function} handler ハンドラ
-     * @return {Jeeel.Dom.Event.Rollover} 自インスタンス
-     */
-    setRollover: function (handler) {
-        this._on = handler;
-        
-        return this;
-    },
-    
-    /**
-     * ロールアウト時のハンドラを設定する
-     * 
-     * @param {Function} handler ハンドラ
-     * @return {Jeeel.Dom.Event.Rollover} 自インスタンス
-     */
-    setRollout: function (handler) {
-        this._off = handler;
-        
-        return this;
-    },
-    
-    /**
-     * ロールオーバーを指定したElementに適用する
-     * 
-     * @param {Element|Element[]} elements ElementまたはElementリスト
-     * @return {Jeeel.Dom.Event.Rollover} 自インスタンス
-     */
-    rollover: function (elements) {
-        if (Jeeel.Type.isElement(elements)) {
-            elements = [elements];
-        }
-        
-        if ( ! Jeeel.Type.isArray(elements)) {
-            throw new Error('引数が間違っています。');
-        }
-        
-        for (var i = elements.length; i--;) {
-            
-            elements[i].onmouseover = this._on;
-            elements[i].onmouseout = this._off;
-        }
-        
-        return this;
-    }
-};
-
-Jeeel.file.Jeeel.Dom.Event.Rollover = ['Image'];
-
-Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Event.Rollover, Jeeel.file.Jeeel.Dom.Event.Rollover);
-
-/**
- * コンストラクタ
- * 
- * @class イメージのロールオーバーに関するクラス
- */
-Jeeel.Dom.Event.Rollover.Image = function () {
-
-};
-
-/**
- * インスタンスの作成を行う
- * 
- * @return {Jeeel.Dom.Event.Rollover.Image} 作成したインスタンス
- */
-Jeeel.Dom.Event.Rollover.Image.create = function () {
-    return new this();
-};
-
-Jeeel.Dom.Event.Rollover.Image.prototype = {
-    _prefix: {
-        on: '',
-        off: ''
-    },
-    
-    _suffix: {
-        on: '_on',
-        off: '_off'
-    },
-    
-    /**
-     * 先頭のロールオーバーパターンを設定する
-     * 
-     * @param {String} prefixOn ロールオーバー時の先頭パターン
-     * @param {String} prefixOff ロールアウト時の先頭パターン
-     * @return {Jeeel.Dom.Event.Rollover.Image} 自インスタンス
-     */
-    setPrefixPattern: function (prefixOn, prefixOff) {
-        this._prefix = {
-            on: prefixOn,
-            off: prefixOff
-        };
-        
-        return this;
-    },
-    
-    /**
-     * 後尾のロールオーバーパターンを設定する
-     * 
-     * @param {String} suffixOn ロールオーバー時の後尾パターン
-     * @param {String} suffixOff ロールアウト時の後尾パターン
-     * @return {Jeeel.Dom.Event.Rollover.Image} 自インスタンス
-     */
-    setSuffixPattern: function (suffixOn, suffixOff) {
-        this._suffix = {
-            on: suffixOn,
-            off: suffixOff
-        };
-        
-        return this;
-    },
-    
-    /**
-     * イメージのロールオーバーを行う
-     * 
-     * @param {Element|Element[]} elements イメージもしくはイメージリスト(内部に他のElementが入っていた場合無視する)
-     * @return {Jeeel.Dom.Event.Rollover.Image} 自インスタンス
-     */
-    rollover: function (elements) {
-        if (Jeeel.Type.isElement(elements)) {
-            elements = [elements];
-        }
-        
-        if ( ! Jeeel.Type.isArray(elements)) {
-            throw new Error('引数が間違っています。');
-        }
-        
-        var over, out;
-        
-        var regFilter = new Jeeel.Filter.String.RegularExpressionEscape();
-        
-        (function (pover, pout, sover, sout) {
-            
-            over = function () {
-                var src = this.src;
-                
-                if (pout || pover) {
-                    src = src.replace(new RegExp('/?' + regFilter.filter(pout) + '([^/]*)$'), '/' + pover + '$1');
-                }
-                
-                if (sout || sover) {
-                    src = src.replace(sout + '.', sover + '.');
-                }
-                
-                this.src = src;
-            };
-
-            out = function () {
-                var src = this.src;
-                
-                if (pover || pout) {
-                    src = src.replace(new RegExp('/?' + regFilter.filter(pover) + '([^/]*)$'), '/' + pout + '$1');
-                }
-                
-                if (sover || sout) {
-                    src = src.replace(sover + '.', sout + '.');
-                }
-                
-                this.src = src;
-            };
-        })(this._prefix.on, this._prefix.off, this._suffix.on, this._suffix.off);
-        
-        var reg = new RegExp('\\/?' + regFilter.filter(this._prefix.off) + '[^/]*' + regFilter.filter(this._suffix.off) + '\\.[^.]+$');
-        
-        for (var i = elements.length; i--;) {
-            var element = elements[i];
-            var tagName = element.tagName && element.tagName.toUpperCase();
-            
-            if (tagName === 'IMG' || tagName === 'INPUT' && element.type.toUpperCase() === 'IMAGE') {
-                
-                if ( ! element.src.match(reg)) {
-                    continue;
-                }
-                
-                elements[i].onmouseover = over;
-                elements[i].onmouseout = out;
-            }
-        }
-        
-        return this;
-    }
-};
 Jeeel.directory.Jeeel.Dom.Style = {
 
     /**
@@ -18772,19 +19471,56 @@ Jeeel.directory.Jeeel.Dom.Style = {
  * 
  * @class スタイルを扱うクラス
  * @param {Element} element スタイルの操作対象Element
+ * @example
+ * 通常のスタイルに加え以下のクロスブラウザ実装と疑似実装を行っている
+ * なおキャメルケースで記述しているがハイフネーション形式でも問題なく動作する
+ * opacity
+ * backgroundPositionX
+ * backgroundPositionY
+ * perspective
+ * backfaceVisibility
+ * transformOrigin
+ * transformStyle
+ * transform
+ * rotate
+ * rotateX
+ * rotateY
+ * rotateZ
+ * rotate3d
+ * translate
+ * translateX
+ * translateY
+ * translateZ
+ * translate3d
+ * scale
+ * scaleX
+ * scaleY
+ * scaleZ
+ * scale3d
+ * skew
+ * skewX
+ * skewY
+ * matrix
+ * matrix3d
+ * transition
+ * transitionProperty
+ * transitionDuration
+ * transitionTimingFunction
+ * transitionDelay
  */
 Jeeel.Dom.Style = function (element) {
     this._style = element && element.style || null;
-    this._hook = element && new this.constructor.Hook(element, this);
-    this._customStyle = this._style &&  new this.constructor.Custom(this._style);
-    this._bundler = this._customStyle && new this.constructor.Bundler(this._customStyle);
-    this._defaultDisplay = this.constructor.getDefaultDisplay(element && element.nodeName);
-    this._animationQueue = [];
-    this._nextAnimate = Jeeel.Function.simpleBind(this._nextAnimate, this);
     
     if (element) {
         this._computedStyle = element.parentNode && Jeeel.Document.getComputedStyle(element) || null;
     }
+    
+    this._hook = element && new this.constructor.Hook(element, this);
+    this._customStyle = this._style &&  new this.constructor.Custom(this._style, this._computedStyle);
+    this._bundler = this._customStyle && new this.constructor.Bundler(this._customStyle);
+    this._defaultDisplay = this.constructor.getDefaultDisplay(element && element.nodeName);
+    this._animationQueue = [];
+    this._nextAnimate = Jeeel.Function.simpleBind(this._nextAnimate, this);
 };
 
 /**
@@ -18939,7 +19675,7 @@ Jeeel.Dom.Style.prototype = {
         
         // まずフックを参照し、続いて通常のスタイル、カスタムスタイル、計算済みスタイルから参照する
         return (this._hook[style] && this._hook[style]()) 
-            || this._style[style] 
+            || this._style[style]
             || (this._customStyle[style] && this._customStyle[style]()) 
             || (this._computedStyle && this._computedStyle[style])
             || null;
@@ -18980,7 +19716,6 @@ Jeeel.Dom.Style.prototype = {
         styles = this._bundler.bundle(styles);
         
         for (var style in styles) {
-            
             var styleName  = Jeeel.String.toCamelCase(style);
             var styleValue = styles[style];
 
@@ -19491,14 +20226,17 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Hook, Jeeel.file.Jeeel.Dom.St
     var cssWidth = ['Left', 'Right'],
         cssHeight = ['Top', 'Bottom'];
     
+    /**
+     * @ignore
+     */
     function getWidth(elm, style) {
         var val = elm.offsetWidth;
         
-        if ( val > 0 ) {
-            for (var i = 0, l = cssWidth.length; i < l; i++) {
+        if (val > 0) {
+            for (var i = cssWidth.length; i--;) {
                 val -= parseFloat(style.getStyle('padding' + cssWidth[i])) || 0;
 
-                val -= parseFloat(style.getStyle('border' + cssWidth[i] + 'Width') ) || 0;
+                val -= parseFloat(style.getStyle('border' + cssWidth[i] + 'Width')) || 0;
             }
 
             return val + 'px';
@@ -19507,14 +20245,17 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Hook, Jeeel.file.Jeeel.Dom.St
         return 0 + 'px';
     }
     
+    /**
+     * @ignore
+     */
     function getHeight(elm, style) {
         var val = elm.offsetHeight;
         
-        if ( val > 0 ) {
-            for (var i = 0, l = cssHeight.length; i < l; i++) {
+        if (val > 0) {
+            for (var i = cssHeight.length; i--;) {
                 val -= parseFloat(style.getStyle('padding' + cssHeight[i])) || 0;
 
-                val -= parseFloat(style.getStyle('border' + cssHeight[i] + 'Width') ) || 0;
+                val -= parseFloat(style.getStyle('border' + cssHeight[i] + 'Width')) || 0;
             }
 
             return val + 'px';
@@ -19586,9 +20327,11 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Hook, Jeeel.file.Jeeel.Dom.St
  * 
  * @class カスタムスタイルに対して操作を行うクラス
  * @param {Style} style 要素のスタイル
+ * @param {Style} [computedStyle] 計算済みスタイル
  */
-Jeeel.Dom.Style.Custom = function (style) {
+Jeeel.Dom.Style.Custom = function (style, computedStyle) {
     this._style = style;
+    this._computedStyle = computedStyle || {};
 };
 
 /**
@@ -19625,6 +20368,8 @@ Jeeel.Dom.Style.Custom.createPart = function (name, get, set, originName, filter
         return set.call(this, val);
     };
 
+    f.get = get;
+    f.set = set;
     f.partName = name;
     f.originName = originName || null;
     f.usableFilter = !!filter;
@@ -19635,6 +20380,8 @@ Jeeel.Dom.Style.Custom.createPart = function (name, get, set, originName, filter
 Jeeel.Dom.Style.Custom.prototype = {
     
     _style: null,
+    
+    _computedStyle: null,
     
     /**
      * コンストラクタ
@@ -19661,38 +20408,56 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // opacityの登録
     parts[i] = {name: 'opacity'};
     
-    if ('MozOpacity' in style) {
-        name = '-moz-opacity';
+    if ('opacity' in style) {
+        name = 'opacity';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozOpacity || '1.0';
+            return this._style.opacity || this._computedStyle.opacity || '1.0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (opacity) {
-            this._style.MozOpacity = opacity;
+            this._style.opacity = opacity;
         };
         
         filter = null;
-    } else if ('opacity' in style) {
-        name = 'opacity';
+    } else if ('MozOpacity' in style) {
+        name = '-moz-opacity';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.opacity || '1.0';
+            return this._style.MozOpacity || this._computedStyle.MozOpacity || '1.0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (opacity) {
-            this._style.opacity = opacity;
+            this._style.MozOpacity = opacity;
         };
         
         filter = null;
     } else if ('filter' in style) {
         name = 'filter';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            var match = this._style.filter.match(/alpha\(.*opacity=(-?[0-9.]+).*\)/i);
+            var match = (this._style.filter || this._computedStyle.filter).match(/(?:progid:DXImageTransform\.Microsoft\.)?Alpha\(.*opacity=(-?[0-9.]+).*\)/i);
             return '' + ((match && match[1] || 100) / 100);
         };
         
+        /**
+         * @ignore
+         */
         set = function (opacity) {
 
             var css = this.opacity(opacity, true);
@@ -19700,6 +20465,9 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
             this._style.cssText += ';' + css;
         };
         
+        /**
+         * @ignore
+         */
         filter = function (opacity) {
             opacity = opacity * 100;
 
@@ -19709,14 +20477,14 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
                 hack = '; zoom: 1';
             }
             
-            var filter = this._style.filter;
+            var filter = this._style.filter || this._computedStyle.filter;
 
             if ( ! filter) {
                 filter = 'alpha(opacity=' + opacity + ')';
-            } else if (filter.indexOf('alpha(') < 0) {
+            } else if ( ! filter.match(/(?:progid:DXImageTransform\.Microsoft\.)?Alpha\(/i)) {
                 filter += ' alpha(opacity=' + opacity + ')';
             } else {
-                filter = filter.replace(/alpha\(.*opacity=(-?[0-9.]+).*\)/i, 'alpha(opacity=' + opacity + ')');
+                filter = filter.replace(/(?:progid:DXImageTransform\.Microsoft\.)?Alpha\(.*opacity=(-?[0-9.]+).*\)/i, 'alpha(opacity=' + opacity + ')');
             }
             
             return filter + hack;
@@ -19724,10 +20492,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 1.0;
         };
         
+        /**
+         * @ignore
+         */
         set = function (opacity) {};
         
         filter = null;
@@ -19746,10 +20520,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     if ('backgroundPositionX' in style) {
         name = 'background-position-x';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.backgroundPositionX || '0%';
+            return this._style.backgroundPositionX || this._computedStyle.backgroundPositionX || '0%';
         };
         
+        /**
+         * @ignore
+         */
         set = function (position) {
             this._style.backgroundPositionX = position;
         };
@@ -19758,8 +20538,11 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('backgroundPosition' in style) {
         name = 'backgroundPosition';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            var pos = this._style.backgroundPosition.split(' ');
+            var pos = (this._style.backgroundPosition || this._computedStyle.backgroundPosition).split(' ');
             
             if (pos.length > 1) {
                 return pos[0];
@@ -19768,12 +20551,18 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
             return '0%';
         };
         
+        /**
+         * @ignore
+         */
         set = function (position) {
             this._style.backgroundPosition = this.backgroundPositionX(position, true);
         };
         
+        /**
+         * @ignore
+         */
         filter = function (position) {
-            var pos = this._style.backgroundPosition.split(' ');
+            var pos = (this._style.backgroundPosition || this._computedStyle.backgroundPosition).split(' ');
             
             if (pos.length <= 1) {
                 pos = [
@@ -19789,10 +20578,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return '0%';
         };
         
+        /**
+         * @ignore
+         */
         set = function (position) {};
         
         filter = null;
@@ -19812,10 +20607,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     if ('backgroundPositionY' in style) {
         name = 'background-position-y';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.backgroundPositionY || '0%';
+            return this._style.backgroundPositionY || this._computedStyle.backgroundPositionY || '0%';
         };
         
+        /**
+         * @ignore
+         */
         set = function (position) {
             this._style.backgroundPositionY = position;
         };
@@ -19824,8 +20625,11 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('backgroundPosition' in style) {
         name = 'backgroundPosition';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            var pos = this._style.backgroundPosition.split(' ');
+            var pos = (this._style.backgroundPosition || this._computedStyle.backgroundPosition).split(' ');
             
             if (pos.length > 1) {
                 return pos[1];
@@ -19834,12 +20638,18 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
             return '0%';
         };
         
+        /**
+         * @ignore
+         */
         set = function (position) {
             this._style.backgroundPosition = this.backgroundPositionY(position, true);
         };
         
+        /**
+         * @ignore
+         */
         filter = function (position) {
-            var pos = this._style.backgroundPosition.split(' ');
+            var pos = (this._style.backgroundPosition || this._computedStyle.backgroundPosition).split(' ');
             
             if (pos.length <= 1) {
                 pos = [
@@ -19855,10 +20665,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return '0%';
         };
         
+        /**
+         * @ignore
+         */
         set = function (position) {};
         
         filter = null;
@@ -19875,13 +20691,37 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // perspectiveの登録
     parts[i] = {name: 'perspective'};
     
-    if ('MozPerspective' in style) {
-        name = '-moz-perspective';
+    if ('perspective' in style) {
+        name = 'perspective';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozPerspective || 'none';
+            return this._style.perspective || this._computedStyle.perspective || 'none';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (perspective) {
+            this._style.perspective = perspective;
+        };
+        
+        filter = null;
+    } else if ('MozPerspective' in style) {
+        name = '-moz-perspective';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozPerspective || this._computedStyle.MozPerspective || 'none';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (perspective) {
             this._style.MozPerspective = perspective;
         };
@@ -19890,10 +20730,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('WebkitPerspective' in style) {
         name = '-webkit-perspective';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitPerspective || 'none';
+            return this._style.WebkitPerspective || this._computedStyle.WebkitPerspective || 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (perspective) {
             this._style.WebkitPerspective = perspective;
         };
@@ -19902,10 +20748,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('MsPerspective' in style) {
         name = '-ms-perspective';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsPerspective || 'none';
+            return this._style.MsPerspective || this._computedStyle.MsPerspective || 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (perspective) {
             this._style.MsPerspective = perspective;
         };
@@ -19914,34 +20766,34 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('OPerspective' in style) {
         name = '-o-perspective';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OPerspective || 'none';
+            return this._style.OPerspective || this._computedStyle.OPerspective || 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (perspective) {
             this._style.OPerspective = perspective;
-        };
-        
-        filter = null;
-    } else if ('perspective' in style) {
-        name = 'perspective';
-        
-        get = function () {
-            return this._style.perspective || 'none';
-        };
-        
-        set = function (perspective) {
-            this._style.perspective = perspective;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (perspective) {};
         
         filter = null;
@@ -19958,13 +20810,37 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // backface-visibilityの登録
     parts[i] = {name: 'backfaceVisibility'};
     
-    if ('MozBackfaceVisibility' in style) {
-        name = '-moz-backface-visibility';
+    if ('backfaceVisibility' in style) {
+        name = 'backface-visibility';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozBackfaceVisibility || 'visible';
+            return this._style.backfaceVisibility || this._computedStyle.backfaceVisibility || 'visible';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (backfaceVisibility) {
+            this._style.backfaceVisibility = backfaceVisibility;
+        };
+        
+        filter = null;
+    } else if ('MozBackfaceVisibility' in style) {
+        name = '-moz-backface-visibility';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozBackfaceVisibility || this._computedStyle.MozBackfaceVisibility || 'visible';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (backfaceVisibility) {
             this._style.MozBackfaceVisibility = backfaceVisibility;
         };
@@ -19973,10 +20849,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('WebkitBackfaceVisibility' in style) {
         name = '-webkit-backface-visibility';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitBackfaceVisibility || 'visible';
+            return this._style.WebkitBackfaceVisibility || this._computedStyle.WebkitBackfaceVisibility || 'visible';
         };
         
+        /**
+         * @ignore
+         */
         set = function (backfaceVisibility) {
             this._style.WebkitBackfaceVisibility = backfaceVisibility;
         };
@@ -19985,10 +20867,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('MsBackfaceVisibility' in style) {
         name = '-ms-backface-visibility';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsBackfaceVisibility || 'visible';
+            return this._style.MsBackfaceVisibility || this._computedStyle.MsBackfaceVisibility || 'visible';
         };
         
+        /**
+         * @ignore
+         */
         set = function (backfaceVisibility) {
             this._style.MsBackfaceVisibility = backfaceVisibility;
         };
@@ -19997,34 +20885,34 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('OBackfaceVisibility' in style) {
         name = '-o-backface-visibility';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OBackfaceVisibility || 'visible';
+            return this._style.OBackfaceVisibility || this._computedStyle.OBackfaceVisibility || 'visible';
         };
         
+        /**
+         * @ignore
+         */
         set = function (backfaceVisibility) {
             this._style.OBackfaceVisibility = backfaceVisibility;
-        };
-        
-        filter = null;
-    } else if ('backfaceVisibility' in style) {
-        name = 'backface-visibility';
-        
-        get = function () {
-            return this._style.backfaceVisibility || 'visible';
-        };
-        
-        set = function (backfaceVisibility) {
-            this._style.backfaceVisibility = backfaceVisibility;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 'visible';
         };
         
+        /**
+         * @ignore
+         */
         set = function (backfaceVisibility) {};
         
         filter = null;
@@ -20041,13 +20929,37 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // transform-originの登録
     parts[i] = {name: 'transformOrigin'};
     
-    if ('MozTransformOrigin' in style) {
-        name = '-moz-transform-origin';
+    if ('transformOrigin' in style) {
+        name = 'transform-origin';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransformOrigin || '50% 50% 0';
+            return this._style.transformOrigin || this._computedStyle.transformOrigin || '50% 50% 0';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transformOrigin) {
+            this._style.transformOrigin = transformOrigin;
+        };
+        
+        filter = null;
+    } else if ('MozTransformOrigin' in style) {
+        name = '-moz-transform-origin';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransformOrigin || this._computedStyle.MozTransformOrigin || '50% 50% 0';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transformOrigin) {
             this._style.MozTransformOrigin = transformOrigin;
         };
@@ -20056,10 +20968,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('WebkitTransformOrigin' in style) {
         name = '-webkit-transform-origin';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransformOrigin || '50% 50% 0';
+            return this._style.WebkitTransformOrigin || this._computedStyle.WebkitTransformOrigin || '50% 50% 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformOrigin) {
             this._style.WebkitTransformOrigin = transformOrigin;
         };
@@ -20068,10 +20986,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('MsTransformOrigin' in style) {
         name = '-ms-transform-origin';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransformOrigin || '50% 50% 0';
+            return this._style.MsTransformOrigin || this._computedStyle.MsTransformOrigin || '50% 50% 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformOrigin) {
             this._style.MsTransformOrigin = transformOrigin;
         };
@@ -20080,34 +21004,34 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('OTransformOrigin' in style) {
         name = '-o-transform-origin';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransformOrigin || '50% 50% 0';
+            return this._style.OTransformOrigin || this._computedStyle.OTransformOrigin || '50% 50% 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformOrigin) {
             this._style.OTransformOrigin = transformOrigin;
-        };
-        
-        filter = null;
-    } else if ('transformOrigin' in style) {
-        name = 'transform-origin';
-        
-        get = function () {
-            return this._style.transformOrigin || '50% 50% 0';
-        };
-        
-        set = function (transformOrigin) {
-            this._style.transformOrigin = transformOrigin;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return '50% 50% 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformOrigin) {};
         
         filter = null;
@@ -20124,13 +21048,37 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // transform-styleの登録
     parts[i] = {name: 'transformStyle'};
     
-    if ('MozTransformStyle' in style) {
-        name = '-moz-transform-style';
+    if ('transformStyle' in style) {
+        name = 'transform-style';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransformStyle || 'flat';
+            return this._style.transformStyle || this._computedStyle.transformStyle || 'flat';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transformStyle) {
+            this._style.transformStyle = transformStyle;
+        };
+        
+        filter = null;
+    } else if ('MozTransformStyle' in style) {
+        name = '-moz-transform-style';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransformStyle || this._computedStyle.MozTransformStyle || 'flat';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transformStyle) {
             this._style.MozTransformStyle = transformStyle;
         };
@@ -20139,10 +21087,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('WebkitTransformStyle' in style) {
         name = '-webkit-transform-style';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransformStyle || 'flat';
+            return this._style.WebkitTransformStyle || this._computedStyle.WebkitTransformStyle || 'flat';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformStyle) {
             this._style.WebkitTransformStyle = transformStyle;
         };
@@ -20151,10 +21105,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('MsTransformStyle' in style) {
         name = '-ms-transform-style';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransformStyle || 'flat';
+            return this._style.MsTransformStyle || this._computedStyle.MsTransformStyle || 'flat';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformStyle) {
             this._style.MsTransformStyle = transformStyle;
         };
@@ -20163,34 +21123,34 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('OTransformStyle' in style) {
         name = '-o-transform-style';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransformStyle || 'flat';
+            return this._style.OTransformStyle || this._computedStyle.OTransformStyle || 'flat';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformStyle) {
             this._style.OTransformStyle = transformStyle;
-        };
-        
-        filter = null;
-    } else if ('transformStyle' in style) {
-        name = 'transform-style';
-        
-        get = function () {
-            return this._style.transformStyle || 'flat';
-        };
-        
-        set = function (transformStyle) {
-            this._style.transformStyle = transformStyle;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 'flat';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transformStyle) {};
         
         filter = null;
@@ -20207,13 +21167,37 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // transformの登録
     parts[i] = {name: 'transform'};
     
-    if ('MozTransform' in style) {
-        name = '-moz-transform';
+    if ('transform' in style) {
+        name = 'transform';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransform || 'none';
+            return this._style.transform || this._computedStyle.transform || 'none';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transform) {
+            this._style.transform = transform;
+        };
+        
+        filter = null;
+    } else if ('MozTransform' in style) {
+        name = '-moz-transform';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransform || this._computedStyle.MozTransform || 'none';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transform) {
             this._style.MozTransform = transform;
         };
@@ -20222,10 +21206,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('WebkitTransform' in style) {
         name = '-webkit-transform';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransform || 'none';
+            return this._style.WebkitTransform || this._computedStyle.WebkitTransform || 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transform) {
             this._style.WebkitTransform = transform;
         };
@@ -20234,10 +21224,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('MsTransform' in style) {
         name = '-ms-transform';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransform || 'none';
+            return this._style.MsTransform || this._computedStyle.MsTransform || 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transform) {
             this._style.MsTransform = transform;
         };
@@ -20246,34 +21242,34 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('OTransform' in style) {
         name = '-o-transform';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransform || 'none';
+            return this._style.OTransform || this._computedStyle.OTransform || 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transform) {
             this._style.OTransform = transform;
-        };
-        
-        filter = null;
-    } else if ('transform' in style) {
-        name = 'transform';
-        
-        get = function () {
-            return this._style.transform || 'none';
-        };
-        
-        set = function (transform) {
-            this._style.transform = transform;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 'none';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transform) {};
         
         filter = null;
@@ -20290,15 +21286,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // rotateの登録
     parts[i] = {name: 'rotate'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/rotate\(([^\)]+)\)/i);
         return match && match[1] || '0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (rotate) {
         this.transform(this.rotate(rotate, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (rotate) {
         var trs = this.transform();
         
@@ -20324,15 +21329,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // rotateXの登録
     parts[i] = {name: 'rotateX'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/rotateX\(([^\)]+)\)/i);
         return match && match[1] || '0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (rotateX) {
         this.transform(this.rotateX(rotateX, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (rotateX) {
         var trs = this.transform();
         
@@ -20358,15 +21372,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // rotateYの登録
     parts[i] = {name: 'rotateY'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/rotateY\(([^\)]+)\)/i);
         return match && match[1] || '0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (rotateY) {
         this.transform(this.rotateY(rotateY, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (rotateY) {
         var trs = this.transform();
         
@@ -20389,18 +21412,27 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     i++;
     
     
-    // rotateYの登録
+    // rotateZの登録
     parts[i] = {name: 'rotateZ'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/rotateZ\(([^\)]+)\)/i);
         return match && match[1] || '0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (rotateZ) {
         this.transform(this.rotateZ(rotateZ, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (rotateZ) {
         var trs = this.transform();
         
@@ -20426,15 +21458,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // rotate3dの登録
     parts[i] = {name: 'rotate3d'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/rotate3d\(([^\)]+)\)/i);
         return match && match[1] || '0, 0, 0, 0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (rotate3d) {
         this.transform(this.rotate3d(rotate3d, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (rotate3d) {
         var trs = this.transform();
         
@@ -20460,15 +21501,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // translateの登録
     parts[i] = {name: 'translate'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/translate\(([^\)]+)\)/i);
         return match && match[1] || '0px';
     };
     
+    /**
+     * @ignore
+     */
     set = function (translate) {
         this.transform(this.translate(translate, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (translate) {
         var trs = this.transform();
         
@@ -20494,15 +21544,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // translateXの登録
     parts[i] = {name: 'translateX'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/translateX\(([^\)]+)\)/i);
         return match && match[1] || '0px';
     };
     
+    /**
+     * @ignore
+     */
     set = function (translateX) {
         this.transform(this.translateX(translateX, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (translateX) {
         var trs = this.transform();
         
@@ -20528,15 +21587,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // translateYの登録
     parts[i] = {name: 'translateY'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/translateY\(([^\)]+)\)/i);
         return match && match[1] || '0px';
     };
     
+    /**
+     * @ignore
+     */
     set = function (translateY) {
         this.transform(this.translateY(translateY, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (translateY) {
         var trs = this.transform();
         
@@ -20562,15 +21630,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // translateZの登録
     parts[i] = {name: 'translateZ'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/translateZ\(([^\)]+)\)/i);
         return match && match[1] || '0px';
     };
     
+    /**
+     * @ignore
+     */
     set = function (translateZ) {
         this.transform(this.translateZ(translateZ, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (translateZ) {
         var trs = this.transform();
         
@@ -20596,15 +21673,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // translate3dの登録
     parts[i] = {name: 'translate3d'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/translate3d\(([^\)]+)\)/i);
         return match && match[1] || '0px, 0px, 0px';
     };
     
+    /**
+     * @ignore
+     */
     set = function (translate3d) {
         this.transform(this.translate3d(translate3d, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (translate3d) {
         var trs = this.transform();
         
@@ -20630,15 +21716,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // scaleの登録
     parts[i] = {name: 'scale'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/scale\(([^\)]+)\)/i);
         return match && match[1] || '1';
     };
     
+    /**
+     * @ignore
+     */
     set = function (scale) {
         this.transform(this.scale(scale, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (scale) {
         var trs = this.transform();
         
@@ -20664,15 +21759,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // scaleXの登録
     parts[i] = {name: 'scaleX'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/scaleX\(([^\)]+)\)/i);
         return match && match[1] || '1';
     };
     
+    /**
+     * @ignore
+     */
     set = function (scaleX) {
         this.transform(this.scaleX(scaleX, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (scaleX) {
         var trs = this.transform();
         
@@ -20698,15 +21802,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // scaleYの登録
     parts[i] = {name: 'scaleY'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/scaleY\(([^\)]+)\)/i);
         return match && match[1] || '1';
     };
     
+    /**
+     * @ignore
+     */
     set = function (scaleY) {
         this.transform(this.scaleY(scaleY, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (scaleY) {
         var trs = this.transform();
         
@@ -20732,15 +21845,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // scaleZの登録
     parts[i] = {name: 'scaleZ'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/scaleZ\(([^\)]+)\)/i);
         return match && match[1] || '1';
     };
     
+    /**
+     * @ignore
+     */
     set = function (scaleZ) {
         this.transform(this.scaleZ(scaleZ, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (scaleZ) {
         var trs = this.transform();
         
@@ -20766,15 +21888,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // scale3dの登録
     parts[i] = {name: 'scale3d'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/scale3d\(([^\)]+)\)/i);
         return match && match[1] || '1, 1, 1';
     };
     
+    /**
+     * @ignore
+     */
     set = function (scale3d) {
         this.transform(this.scale3d(scale3d, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (scale3d) {
         var trs = this.transform();
         
@@ -20800,15 +21931,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // skewの登録
     parts[i] = {name: 'skew'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/skew\(([^\)]+)\)/i);
         return match && match[1] || '0deg, 0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (skew) {
         this.transform(this.skew(skew, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (skew) {
         var trs = this.transform();
         
@@ -20834,15 +21974,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // skewXの登録
     parts[i] = {name: 'skewX'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/skewX\(([^\)]+)\)/i);
         return match && match[1] || '0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (skewX) {
         this.transform(this.skewX(skewX, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (skewX) {
         var trs = this.transform();
         
@@ -20868,15 +22017,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // skewYの登録
     parts[i] = {name: 'skewY'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/skewY\(([^\)]+)\)/i);
         return match && match[1] || '0deg';
     };
     
+    /**
+     * @ignore
+     */
     set = function (skewY) {
         this.transform(this.skewY(skewY, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (skewY) {
         var trs = this.transform();
         
@@ -20902,15 +22060,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // matrixの登録
     parts[i] = {name: 'matrix'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/matrix\(([^\)]+)\)/i);
         return match && match[1] || '1, 0, 0, 1, 0, 0';
     };
     
+    /**
+     * @ignore
+     */
     set = function (matrix) {
         this.transform(this.matrix(matrix, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (matrix) {
         var trs = this.transform();
         
@@ -20936,15 +22103,24 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // matrix3dの登録
     parts[i] = {name: 'matrix3d'};
     
+    /**
+     * @ignore
+     */
     get = function () {
         var match = this.transform().match(/matrix3d\(([^\)]+)\)/i);
         return match && match[1] || '1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1';
     };
     
+    /**
+     * @ignore
+     */
     set = function (matrix3d) {
         this.transform(this.matrix3d(matrix3d, true));
     };
     
+    /**
+     * @ignore
+     */
     filter = function (matrix3d) {
         var trs = this.transform();
         
@@ -20970,13 +22146,37 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // transitionの登録
     parts[i] = {name: 'transition'};
     
-    if ('MozTransition' in style) {
-        name = '-moz-transition';
+    if ('transition' in style) {
+        name = 'transition';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransition || 'all 0 ease 0';
+            return this._style.transition || this._computedStyle.transition || 'all 0 ease 0';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transition) {
+            this._style.transition = transition;
+        };
+        
+        filter = null;
+    } else if ('MozTransition' in style) {
+        name = '-moz-transition';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransition || this._computedStyle.MozTransition || 'all 0 ease 0';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transition) {
             this._style.MozTransition = transition;
         };
@@ -20985,10 +22185,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('WebkitTransition' in style) {
         name = '-webkit-transition';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransition || 'all 0 ease 0';
+            return this._style.WebkitTransition || this._computedStyle.WebkitTransition || 'all 0 ease 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transition) {
             this._style.WebkitTransition = transition;
         };
@@ -20997,10 +22203,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('MsTransition' in style) {
         name = '-ms-transition';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransition || 'all 0 ease 0';
+            return this._style.MsTransition || this._computedStyle.MsTransition || 'all 0 ease 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transition) {
             this._style.MsTransition = transition;
         };
@@ -21009,34 +22221,34 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('OTransition' in style) {
         name = '-o-transition';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransition || 'all 0 ease 0';
+            return this._style.OTransition || this._computedStyle.OTransition || 'all 0 ease 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transition) {
             this._style.OTransition = transition;
-        };
-        
-        filter = null;
-    } else if ('transition' in style) {
-        name = 'transition';
-        
-        get = function () {
-            return this._style.transition || 'all 0 ease 0';
-        };
-        
-        set = function (transition) {
-            this._style.transition = transition;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 'all 0 ease 0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transition) {};
         
         filter = null;
@@ -21053,13 +22265,37 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // transition-propertyの登録
     parts[i] = {name: 'transitionProperty'};
     
-    if ('MozTransitionProperty' in style) {
-        name = '-moz-transition-property';
+    if ('transitionProperty' in style) {
+        name = 'transition-property';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransitionProperty || 'all';
+            return this._style.transitionProperty || this._computedStyle.transitionProperty || 'all';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transitionProperty) {
+            this._style.transitionProperty = transitionProperty;
+        };
+        
+        filter = null;
+    } else if ('MozTransitionProperty' in style) {
+        name = '-moz-transition-property';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransitionProperty || this._computedStyle.MozTransitionProperty || 'all';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transitionProperty) {
             this._style.MozTransitionProperty = transitionProperty;
         };
@@ -21068,10 +22304,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('WebkitTransitionProperty' in style) {
         name = '-webkit-transition-property';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransitionProperty || 'all';
+            return this._style.WebkitTransitionProperty || this._computedStyle.WebkitTransitionProperty || 'all';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionProperty) {
             this._style.WebkitTransitionProperty = transitionProperty;
         };
@@ -21080,10 +22322,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('MsTransitionProperty' in style) {
         name = '-ms-transition-property';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransitionProperty || 'all';
+            return this._style.MsTransitionProperty || this._computedStyle.MsTransitionProperty || 'all';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionProperty) {
             this._style.MsTransitionProperty = transitionProperty;
         };
@@ -21092,34 +22340,34 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('OTransitionProperty' in style) {
         name = '-o-transition-property';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransitionProperty || 'all';
+            return this._style.OTransitionProperty || this._computedStyle.OTransitionProperty || 'all';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionProperty) {
             this._style.OTransitionProperty = transitionProperty;
-        };
-        
-        filter = null;
-    } else if ('transitionProperty' in style) {
-        name = 'transition-property';
-        
-        get = function () {
-            return this._style.transitionProperty || 'all';
-        };
-        
-        set = function (transitionProperty) {
-            this._style.transitionProperty = transitionProperty;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 'all';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionProperty) {};
         
         filter = null;
@@ -21136,13 +22384,37 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // transition-durationの登録
     parts[i] = {name: 'transitionDuration'};
     
-    if ('MozTransitionDuration' in style) {
-        name = '-moz-transition-duration';
+    if ('transitionDuration' in style) {
+        name = 'transition-duration';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransitionDuration || '0';
+            return this._style.transitionDuration || this._computedStyle.transitionDuration || '0';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transitionDuration) {
+            this._style.transitionDuration = transitionDuration;
+        };
+        
+        filter = null;
+    } else if ('MozTransitionDuration' in style) {
+        name = '-moz-transition-duration';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransitionDuration || this._computedStyle.MozTransitionDuration || '0';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transitionDuration) {
             this._style.MozTransitionDuration = transitionDuration;
         };
@@ -21151,10 +22423,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('WebkitTransitionDuration' in style) {
         name = '-webkit-transition-duration';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransitionDuration || '0';
+            return this._style.WebkitTransitionDuration || this._computedStyle.WebkitTransitionDuration || '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDuration) {
             this._style.WebkitTransitionDuration = transitionDuration;
         };
@@ -21163,10 +22441,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('MsTransitionDuration' in style) {
         name = '-ms-transition-duration';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransitionDuration || '0';
+            return this._style.MsTransitionDuration || this._computedStyle.MsTransitionDuration || '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDuration) {
             this._style.MsTransitionDuration = transitionDuration;
         };
@@ -21175,34 +22459,34 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('OTransitionDuration' in style) {
         name = '-o-transition-duration';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransitionDuration || '0';
+            return this._style.OTransitionDuration || this._computedStyle.OTransitionDuration || '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDuration) {
             this._style.OTransitionDuration = transitionDuration;
-        };
-        
-        filter = null;
-    } else if ('transitionDuration' in style) {
-        name = 'transition-duration';
-        
-        get = function () {
-            return this._style.transitionDuration || '0';
-        };
-        
-        set = function (transitionDuration) {
-            this._style.transitionDuration = transitionDuration;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDuration) {};
         
         filter = null;
@@ -21219,13 +22503,37 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // transition-timing-functionの登録
     parts[i] = {name: 'transitionTimingFunction'};
     
-    if ('MozTransitionTimingFunction' in style) {
-        name = '-moz-transition-timing-function';
+    if ('transitionTimingFunction' in style) {
+        name = 'transition-timing-function';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransitionTimingFunction || 'ease';
+            return this._style.transitionTimingFunction || this._computedStyle.transitionTimingFunction || 'ease';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transitionTimingFunction) {
+            this._style.transitionTimingFunction = transitionTimingFunction;
+        };
+        
+        filter = null;
+    } else if ('MozTransitionTimingFunction' in style) {
+        name = '-moz-transition-timing-function';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransitionTimingFunction || this._computedStyle.MozTransitionTimingFunction || 'ease';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transitionTimingFunction) {
             this._style.MozTransitionTimingFunction = transitionTimingFunction;
         };
@@ -21234,10 +22542,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('WebkitTransitionTimingFunction' in style) {
         name = '-webkit-transition-timing-function';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransitionTimingFunction || 'ease';
+            return this._style.WebkitTransitionTimingFunction || this._computedStyle.WebkitTransitionTimingFunction || 'ease';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionTimingFunction) {
             this._style.WebkitTransitionTimingFunction = transitionTimingFunction;
         };
@@ -21246,10 +22560,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('MsTransitionTimingFunction' in style) {
         name = '-ms-transition-timing-function';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransitionTimingFunction || 'ease';
+            return this._style.MsTransitionTimingFunction || this._computedStyle.MsTransitionTimingFunction || 'ease';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionTimingFunction) {
             this._style.MsTransitionTimingFunction = transitionTimingFunction;
         };
@@ -21258,34 +22578,34 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('OTransitionTimingFunction' in style) {
         name = '-o-transition-timing-function';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransitionTimingFunction || 'ease';
+            return this._style.OTransitionTimingFunction || this._computedStyle.OTransitionTimingFunction || 'ease';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionTimingFunction) {
             this._style.OTransitionTimingFunction = transitionTimingFunction;
-        };
-        
-        filter = null;
-    } else if ('transitionTimingFunction' in style) {
-        name = 'transition-timing-function';
-        
-        get = function () {
-            return this._style.transitionTimingFunction || 'ease';
-        };
-        
-        set = function (transitionTimingFunction) {
-            this._style.transitionTimingFunction = transitionTimingFunction;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return 'ease';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionTimingFunction) {};
         
         filter = null;
@@ -21302,13 +22622,37 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     // transition-delayの登録
     parts[i] = {name: 'transitionDelay'};
     
-    if ('MozTransitionDelay' in style) {
-        name = '-moz-transition-delay';
+    if ('transitionDelay' in style) {
+        name = 'transition-delay';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MozTransitionDelay || '0';
+            return this._style.transitionDelay || this._computedStyle.transitionDelay || '0';
         };
         
+        /**
+         * @ignore
+         */
+        set = function (transitionDelay) {
+            this._style.transitionDelay = transitionDelay;
+        };
+        
+        filter = null;
+    } else if ('MozTransitionDelay' in style) {
+        name = '-moz-transition-delay';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.MozTransitionDelay || this._computedStyle.MozTransitionDelay || '0';
+        };
+        
+        /**
+         * @ignore
+         */
         set = function (transitionDelay) {
             this._style.MozTransitionDelay = transitionDelay;
         };
@@ -21317,10 +22661,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('WebkitTransitionDelay' in style) {
         name = '-webkit-transition-delay';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.WebkitTransitionDelay || '0';
+            return this._style.WebkitTransitionDelay || this._computedStyle.WebkitTransitionDelay || '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDelay) {
             this._style.WebkitTransitionDelay = transitionDelay;
         };
@@ -21329,10 +22679,16 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('MsTransitionDelay' in style) {
         name = '-ms-transition-delay';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.MsTransitionDelay || '0';
+            return this._style.MsTransitionDelay || this._computedStyle.MsTransitionDelay || '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDelay) {
             this._style.MsTransitionDelay = transitionDelay;
         };
@@ -21341,34 +22697,34 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     } else if ('OTransitionDelay' in style) {
         name = '-o-transition-delay';
         
+        /**
+         * @ignore
+         */
         get = function () {
-            return this._style.OTransitionDelay || '0';
+            return this._style.OTransitionDelay || this._computedStyle.OTransitionDelay || '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDelay) {
             this._style.OTransitionDelay = transitionDelay;
-        };
-        
-        filter = null;
-    } else if ('transitionDelay' in style) {
-        name = 'transition-delay';
-        
-        get = function () {
-            return this._style.transitionDelay || '0';
-        };
-        
-        set = function (transitionDelay) {
-            this._style.transitionDelay = transitionDelay;
         };
         
         filter = null;
     } else {
         name = null;
         
+        /**
+         * @ignore
+         */
         get = function () {
             return '0';
         };
         
+        /**
+         * @ignore
+         */
         set = function (transitionDelay) {};
         
         filter = null;
@@ -21556,7 +22912,6 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Bundler, Jeeel.file.Jeeel.Dom
  * @param {Function|String} [easing] イージング関数
  * @param {Function} [complete] アニメーション終了時のコールバック
  * @param {Function} [step] アニメーション更新時のコールバック(引数にはeasingでの変化値が渡される)
- * @ignore
  */
 Jeeel.Dom.Style.Animation = function (element, style, params, duration, easing, complete, step) {
   
@@ -21843,6 +23198,7 @@ Jeeel.Dom.Style.Animation.prototype = {
         this._ct = 0;
 
         this._defaultParams = {};
+        this._deltaParams = {};
         this._endParams = {};
         
         var initCss = {};
@@ -22052,8 +23408,20 @@ Jeeel.Dom.Style.Animation.prototype = {
         return this;
     },
     
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
     constructor: Jeeel.Dom.Style.Animation,
     
+    /**
+     * 加算する
+     * 
+     * @param {Number|Number[]} a 加算元
+     * @param {Number|Number[]} b 加算先
+     * @return {Number|Number[]} 加算結果
+     */
     _add: function (a, b) {
         if (a.splice) {
             var res = [];
@@ -22068,6 +23436,13 @@ Jeeel.Dom.Style.Animation.prototype = {
         return a + b;
     },
     
+    /**
+     * 減算する
+     * 
+     * @param {Number|Number[]} a 減算元
+     * @param {Number|Number[]} b 減算先
+     * @return {Number|Number[]} 減算結果
+     */
     _sub: function (a, b) {
         if (a.splice) {
             var res = [];
@@ -22082,124 +23457,133 @@ Jeeel.Dom.Style.Animation.prototype = {
         return a - b;
     },
     
+    /**
+     * CSSを取得する
+     * 
+     * @return {Hash} CSSリスト
+     */
     _getCss: function () {
         var css = {};
         var op = this.constructor.StyleOperator;
         
         for (var i = this._targetStyles.length; i--;) {
             var key = this._targetStyles[i];
-            var prm = this._defaultParams[key];
-            var dtr = this._deltaParams[key];
-            var lim = dtr.limit;
+            var defaultPrm = this._defaultParams[key];
+            var deltaParam = this._deltaParams[key];
+            var limit = deltaParam.limit;
             var res, j, chn = false;
             
-            if (prm.splice) {
+            // 配列の時のループ
+            if (defaultPrm.splice) {
                 res = [];
                 
-                for (j = prm.length; j--;) {
-                    res[j] = dtr.easing(this._ct, prm[j], dtr.value[j], this._duration);
+                for (j = defaultPrm.length; j--;) {
+                    res[j] = deltaParam.easing(this._ct, defaultPrm[j], deltaParam.value[j], this._duration);
                 }
                 
                 // リミットの処理
-                if (lim) {
-                    if (lim.reverse) {
-                        if (lim.useUpper) {
+                if (limit) {
+                    if (limit.reverse) {
+                        if (limit.useUpper) {
                             for (j = res.length; j--;) {
-                                if (res[j] > lim.upper[j]) {
-                                    prm[j] = lim.upper[j] + (lim.upper[j] - prm[j]);
-                                    res[j] = lim.upper[j] - (res[j] - lim.upper[j]);
-                                    dtr.value[j] = -dtr.value[j];
+                                if (res[j] > limit.upper[j]) {
+                                    defaultPrm[j] = limit.upper[j] + (limit.upper[j] - defaultPrm[j]);
+                                    res[j] = limit.upper[j] - (res[j] - limit.upper[j]);
+                                    deltaParam.value[j] = -deltaParam.value[j];
                                     chn = true;
                                 }
                             }
                         }
 
-                        if (lim.useLower) {
+                        if (limit.useLower) {
                             for (j = res.length; j--;) {
-                                if (res[j] < lim.lower[j]) {
-                                    prm[j] = lim.lower[j] - (prm[j] - lim.lower[j]);
-                                    res[j] = lim.lower[j] + (lim.lower[j] - res[j]);
-                                    dtr.value[j] = -dtr.value[j];
+                                if (res[j] < limit.lower[j]) {
+                                    defaultPrm[j] = limit.lower[j] - (defaultPrm[j] - limit.lower[j]);
+                                    res[j] = limit.lower[j] + (limit.lower[j] - res[j]);
+                                    deltaParam.value[j] = -deltaParam.value[j];
                                     chn = true;
                                 }
                             }
                         }
                         
                         if (chn) {
-                            this._endParams[key] = op.unfilter(key, this._add(prm, dtr.value), dtr.unit);
+                            this._endParams[key] = op.unfilter(key, this._add(defaultPrm, deltaParam.value), deltaParam.unit);
                         }
                     } else {
-                        if (lim.useUpper) {
+                        if (limit.useUpper) {
                             for (j = res.length; j--;) {
-                                if (res[j] > lim.upper[j]) {
-                                    res[j] = lim.upper[j];
+                                if (res[j] > limit.upper[j]) {
+                                    res[j] = limit.upper[j];
                                     chn = true;
                                 }
                             }
                         }
 
-                        if (lim.useLower) {
+                        if (limit.useLower) {
                             for (j = res.length; j--;) {
-                                if (res[j] < lim.lower[j]) {
-                                    res[j] = lim.lower[j];
+                                if (res[j] < limit.lower[j]) {
+                                    res[j] = limit.lower[j];
                                     chn = true;
                                 }
                             }
                         }
                         
                         if (chn) {
-                            this._endParams[key] = op.unfilter(key, res, dtr.unit);
+                            this._endParams[key] = op.unfilter(key, res, deltaParam.unit);
                         }
                     }
                 }
                 
             } else {
-                res = dtr.easing(this._ct, prm, dtr.value, this._duration);
+                res = deltaParam.easing(this._ct, defaultPrm, deltaParam.value, this._duration);
                 
                 // リミットの処理
-                if (lim) {
-                    if (lim.reverse) {
-                        if (lim.useUpper && res > lim.upper) {
-                            this._defaultParams[key] = prm = lim.upper + (lim.upper - prm);
-                            res = lim.upper - (res - lim.upper);
-                            dtr.value = -dtr.value;
+                if (limit) {
+                    if (limit.reverse) {
+                        if (limit.useUpper && res > limit.upper) {
+                            this._defaultParams[key] = defaultPrm = limit.upper + (limit.upper - defaultPrm);
+                            res = limit.upper - (res - limit.upper);
+                            deltaParam.value = -deltaParam.value;
                             chn = true;
                         }
 
-                        if (lim.useLower && res < lim.lower) {
-                            this._defaultParams[key] = prm = lim.lower - (prm - lim.lower);
-                            res = lim.lower + (lim.lower - res);
-                            dtr.value = -dtr.value;
+                        if (limit.useLower && res < limit.lower) {
+                            this._defaultParams[key] = defaultPrm = limit.lower - (defaultPrm - limit.lower);
+                            res = limit.lower + (limit.lower - res);
+                            deltaParam.value = -deltaParam.value;
                             chn = true;
                         }
 
                         if (chn) {
-                            this._endParams[key] = op.unfilter(key, this._add(prm, dtr.value), dtr.unit);
+                            this._endParams[key] = op.unfilter(key, this._add(defaultPrm, deltaParam.value), deltaParam.unit);
                         }
                     } else {
-                        if (lim.useUpper && res > lim.upper) {
-                            res = lim.upper;
+                        if (limit.useUpper && res > limit.upper) {
+                            res = limit.upper;
                             chn = true;
                         }
 
-                        if (lim.useLower && res < lim.lower) {
-                            res = lim.lower;
+                        if (limit.useLower && res < limit.lower) {
+                            res = limit.lower;
                             chn = true;
                         }
 
                         if (chn) {
-                            this._endParams[key] = op.unfilter(key, res, dtr.unit);
+                            this._endParams[key] = op.unfilter(key, res, deltaParam.unit);
                         }
                     }
                 }
             }
             
-            css[key] = op.unfilter(key, res, dtr.unit);
+            css[key] = op.unfilter(key, res, deltaParam.unit);
         }
         
         return css;
     },
     
+    /**
+     * 内部で用いるスタイルに変換する
+     */
     _toInnerStyle: function (style) {
         var res = {}, op;
         
@@ -22226,6 +23610,9 @@ Jeeel.Dom.Style.Animation.prototype = {
         return res;
     },
     
+    /**
+     * オプションの解析
+     */
     _analyzeOption: function (res, option) {
         if ( ! option) {
             return;
@@ -22251,16 +23638,125 @@ Jeeel.file.Jeeel.Dom.Style.Animation = ['Frame', 'Hook', 'Custom', 'StyleOperato
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Animation, Jeeel.file.Jeeel.Dom.Style.Animation);
 /**
- * アニメーションフレームを制御するスタティッククラス
+ * @staticClass アニメーションフレームを制御するスタティッククラス
  */
 Jeeel.Dom.Style.Animation.Frame = {
+    
+    /**
+     * FPS
+     * 
+     * @type Integer
+     * @private
+     */
+    _fps: 60,
+    
+    /**
+     * animation/frame
+     * 
+     * @type Number
+     * @private
+     */
+    _apf: 1,
+    
+    /**
+     * frameCount
+     * 
+     * @type Number
+     * @private
+     */
+    _fcount: 0,
+    
+    /**
+     * アニメーションフレーム内でのタスクリスト
+     * 
+     * @type Function[]
+     * @private
+     */
     _tasks: [],
+    
+    /**
+     * アニメーションタスクのIDをキーにしたハッシュマップ
+     * 
+     * @type Hash
+     * @private
+     */
     _taskHashs: {},
+    
+    /**
+     * 現在までに追加したタスク数の合計
+     * 
+     * @type Integer
+     * @private
+     */
     _taskCount: 0,
+    
+    /**
+     * ロック
+     * 
+     * @type Integer
+     * @private
+     */
     _lock: false,
-    _requestAnimationFrame: null,
-    _cancelAnimationFrame: null,
+    
+    /**
+     * requestAnimationFrame関数を使用するかどうか
+     * 
+     * @type Boolean
+     * @private
+     */
+    _useRaf: true,
+    
+    /**
+     * アニメーションフレームのリクエストID
+     * 
+     * @type Integer
+     * @private
+     */
     _requestId: null,
+    
+    /**
+     * アニメーションの1秒間の描画回数を設定する
+     * 
+     * @param {Integer} fps 1秒毎のフレーム描画回数
+     * @return {Jeeel.Dom.Style.Animation.Frame} 自クラス
+     */
+    setFps: function (fps) {
+        var requested = !!this._requestId;
+        
+        if (requested) {
+            this.stop();
+        }
+        
+        this._fps = +fps;
+        this._apf = 60 / this._fps;
+        
+        if (requested) {
+            this.start();
+        }
+        
+        return this;
+    },
+    
+    /**
+     * requestAnimationFrameを使用するかどうかを設定する
+     * 
+     * @param {Boolean} enable 使用するかどうか
+     */
+    useAnimationFrame: function (enable) {
+        var requested = !!this._requestId;
+        
+        if (requested) {
+            this.stop();
+        }
+        
+        this._useRaf = !!enable;
+        
+        if (requested) {
+            this.start();
+        }
+        
+        return this;
+    },
     
     /**
      * アニメーションタスクを追加する
@@ -22318,6 +23814,7 @@ Jeeel.Dom.Style.Animation.Frame = {
             return this;
         }
 
+        this._fcount = 0;
         this._requestId = this._requestAnimationFrame(this.animate);
         
         return this;
@@ -22347,7 +23844,17 @@ Jeeel.Dom.Style.Animation.Frame = {
      * @param {Integer} time タイムスタンプ
      */
     animate: function (time) {
-      
+        
+        this._fcount++;
+        
+        if (this._fcount >= this._apf) {
+            this._fcount -= this._apf;
+        } else {
+            this._requestId = this._requestAnimationFrame(this.animate);
+            
+            return;
+        }
+        
         // setTimeoutで疑似作成している場合のタイムスタンプを作成
         if ( ! time) {
             time = new Date().getTime();
@@ -22363,6 +23870,52 @@ Jeeel.Dom.Style.Animation.Frame = {
         this._requestId = this._requestAnimationFrame(this.animate);
     },
     
+    /**
+     * アニメーションフレームの呼び出しを要求する
+     * 
+     * @param {Function} callback 呼び出し関数
+     * @return {Integer} リクエストID
+     * @private
+     */
+    _requestAnimationFrame: function (callback) {
+        var win = Jeeel._global;
+        
+        if (this._useRaf) {
+            return (win.requestAnimationFrame
+                || win.webkitRequestAnimationFrame
+                || win.mozRequestAnimationFrame
+                || win.oRequestAnimationFrame
+                || win.msRequestAnimationFrame
+                || Jeeel.Timer.setTimeout)(callback, 1000 / 60);
+        }
+        
+        return Jeeel.Timer.setTimeout(callback, 1000 / 60);
+    },
+    
+    /**
+     * アニメーションフレームの呼び出しをキャンセルする
+     * 
+     * @param {Integer} id リクエストID
+     * @private
+     */
+    _cancelAnimationFrame: function (id) {
+        var win = Jeeel._global;
+        
+        if (this._useRaf) {
+            return (win.cancelAnimationFrame
+                || win.webkitCancelRequestAnimationFrame
+                || win.mozCancelRequestAnimationFrame
+                || win.oCancelRequestAnimationFrame
+                || win.msCancelRequestAnimationFrame
+                || Jeeel.Timer.clearTimeout)(id);
+        }
+        
+        return Jeeel.Timer.clearTimeout(id);
+    },
+    
+    /**
+     * 初期化
+     */
     _init: function () {
         delete this._init;
         
@@ -22371,30 +23924,6 @@ Jeeel.Dom.Style.Animation.Frame = {
         }
         
         this.animate = Jeeel.Function.simpleBind(this.animate, this);
-        
-        var win = Jeeel._global;
-        
-        var reqAniFrm = function(callback) {
-            return (win.requestAnimationFrame
-                || win.webkitRequestAnimationFrame
-                || win.mozRequestAnimationFrame
-                || win.oRequestAnimationFrame
-                || win.msRequestAnimationFrame
-                || win.setTimeout)(callback, 1000 / 60);
-        };
-                   
-        var casAniFrm = function(id) { 
-            return (win.cancelAnimationFrame
-                || win.webkitCancelRequestAnimationFrame
-                || win.mozCancelRequestAnimationFrame
-                || win.oCancelRequestAnimationFrame
-                || win.msCancelRequestAnimationFrame
-                || win.clearTimeout
-                )(id);
-        };
-        
-        this._requestAnimationFrame = reqAniFrm;
-        this._cancelAnimationFrame = casAniFrm;
     }
 };
 
@@ -22426,8 +23955,8 @@ Jeeel.Dom.Style.Animation.Hook = function (element, style) {
 /**
  * フックを登録する
  * 
- * @param {String} name 
- * @param {Function} get 
+ * @param {String} name 名前
+ * @param {Function} get 取得メソッド
  */
 Jeeel.Dom.Style.Animation.Hook.register = function (name, get) {
     if (typeof get !== 'function') {
@@ -22446,6 +23975,7 @@ Jeeel.Dom.Style.Animation.Hook.prototype = {
      * コンストラクタ
      * 
      * @param {Style} style 操作スタイル
+     * @constructor
      */
     constructor: Jeeel.Dom.Style.Animation.Hook
 };
@@ -22500,6 +24030,9 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Animation.Hook, Jeeel.file.Je
 
             delta.value = defaultPrm;
             
+            /**
+             * @ignore
+             */
             var res = {
                 init: {},
                 
@@ -22539,6 +24072,9 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Animation.Hook, Jeeel.file.Je
 
             delta.value = -defaultPrm;
             
+            /**
+             * @ignore
+             */
             var res = {
                 init: {},
                 
@@ -22629,8 +24165,8 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Animation.Hook, Jeeel.file.Je
 /**
  * カスタムスタイルを登録する
  * 
- * @param {String} name 
- * @param {Function} get 
+ * @param {String} name 名前
+ * @param {Function} get ゲッター
  */
 Jeeel.Dom.Style.Animation.Custom.register = function (name, get) {
     if (typeof get !== 'function') {
@@ -22646,6 +24182,7 @@ Jeeel.Dom.Style.Animation.Custom.prototype = {
      * コンストラクタ
      * 
      * @param {Style} style 操作スタイル
+     * @constructor
      */
     constructor: Jeeel.Dom.Style.Animation.Custom
 };
@@ -22808,7 +24345,8 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Animation.Custom, Jeeel.file.
 };
 
 /**
- * アニメーションの値に特殊な加工を施して変換するクラス
+ * @class アニメーションの値に特殊な加工を施して変換するクラス
+ * @static
  */
 Jeeel.Dom.Style.Animation.StyleOperator = {
     
@@ -22878,6 +24416,10 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Animation.StyleOperator, Jeee
     
     // rgba形式に対応しているかどうかで振り分ける
     if (elmStyle.color) {
+      
+        /**
+         * @ignore
+         */
         filter = function (val) {
             var color = new Jeeel.Object.Color.Rgb(val);
             return [
@@ -22888,6 +24430,9 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Animation.StyleOperator, Jeee
             ];
         };
 
+        /**
+         * @ignore
+         */
         unfilter = function (val) {
             return 'rgba(' 
                 + limit(Math.floor(val[0]), 0, 255) + ','
@@ -22896,6 +24441,10 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Animation.StyleOperator, Jeee
                 + limit(val[3], 0, 1) + ')';
         };
     } else {
+        
+        /**
+         * @ignore
+         */
         filter = function (val) {
             var color = new Jeeel.Object.Color.Rgb(val);
             return [
@@ -22905,6 +24454,9 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Animation.StyleOperator, Jeee
             ];
         };
 
+        /**
+         * @ignore
+         */
         unfilter = function (val) {
             return 'rgb(' 
                 + limit(Math.floor(val[0]), 0, 255) + ','
@@ -22988,6 +24540,10 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Animation.StyleOperator, Jeee
     }
     
 })();
+/**
+ * @class スピードに関するクラス
+ * @static
+ */
 Jeeel.Dom.Style.Animation.Speed = {
     
     getSpeed: function (duration) {
@@ -23004,7 +24560,7 @@ Jeeel.Dom.Style.Animation.Speed = {
 };
 
 /**
- * 規定の速度を示す列挙体
+ * @namespace 規定の速度を示す列挙体
  */
 Jeeel.Dom.Style.Animation.Speed.SPEEDS = {
     /**
@@ -23032,11 +24588,10 @@ Jeeel.Dom.Style.Animation.Speed.SPEEDS = {
     DEFAULT: 400
 };
 /**
- * イージング関数を保持するネームスペース
- * 
- * t: currentTime(経過時間: 秒)
- * b: beginningValue(初期値)
- * c: changeInValue(変動値)
+ * @namespace イージング関数を保持するネームスペース<br />
+ * t: currentTime(経過時間: 秒)<br />
+ * b: beginningValue(初期値)<br />
+ * c: changeInValue(変動値)<br />
  * d: duration(継続時間: 秒)
  */
 Jeeel.Dom.Style.Animation.Easing = {
@@ -23542,6 +25097,8 @@ Jeeel.Dom.Element.prototype = {
      * @private
      */
     _style: null,
+    
+    _moveCache: [],
 
     /**
      * 基となるElementを取得する
@@ -23644,7 +25201,7 @@ Jeeel.Dom.Element.prototype = {
      *
      * @param {String} selector CSSと同じ絞り込みセレクタ
      * @return {Element[]} 絞り込んだElement配列
-     * @ignore
+     * @see Jeeel.Dom.Selector
      */
     getElementsBySelector: function (selector) {
         return this._searcher.getElementsBySelector(selector);
@@ -23813,6 +25370,10 @@ Jeeel.Dom.Element.prototype = {
      * @return {Mixied} プロパティ値
      */
     getProperty: function (property) {
+        if (property === 'value' && Jeeel.Dom.Behavior.Placeholder.isHolded(this._element)) {
+            return '';
+        }
+      
         return this._element[property];
     },
 
@@ -23834,6 +25395,7 @@ Jeeel.Dom.Element.prototype = {
      *
      * @param {String} style スタイル名
      * @return {String} スタイル値
+     * @see Jeeel.Dom.Style
      */
     getStyle: function (style) {
         return this._style.getStyle(style);
@@ -23845,6 +25407,7 @@ Jeeel.Dom.Element.prototype = {
      * @param {String} style スタイル名
      * @param {String} value スタイル値
      * @return {Jeeel.Dom.Element} 自インスタンス
+     * @see Jeeel.Dom.Style
      */
     setStyle: function (style, value) {
         this._style.setStyle(style, value);
@@ -23861,6 +25424,55 @@ Jeeel.Dom.Element.prototype = {
     setStyleList: function (styles) {
         this._style.setStyleList(styles);
 
+        return this;
+    },
+    
+    /**
+     * DOMの独自データを取得する(属性値data-&#8727;)<br />
+     * IE8以下ではメモリリークを起こす非推奨メソッド
+     * 
+     * @param {String} key データキー
+     * @return {String} データ
+     */
+    getData: function (key) {},
+    
+    /**
+     * DOMの独自データを設定する(属性値data-&#8727;)<br />
+     * IE8以下ではメモリリークを起こす非推奨メソッド
+     * 
+     * @param {String} key データキー
+     * @param {String} data データ
+     * @return {Jeeel.Dom.Element} 自インスタンス
+     */
+    setData: function (key, data) {},
+    
+    /**
+     * Jeeelの独自データを取得する<brr />
+     * IE以外ではプロパティが拡張されるので注意(詳しくはJeeel.Storage.Objectを参照)<br />
+     * またネームスペースは初期値を用いる
+     * 
+     * @param {String} key データキー
+     * @return {Mixied} データ
+     * @see Jeeel.Storage.Object
+     */
+    getCustomData: function (key) {
+        return Jeeel.Storage.Object(this._element).get(key);
+    },
+    
+    /**
+     * Jeeelの独自データを設定する<brr />
+     * IE以外ではプロパティが拡張されるので注意(詳しくはJeeel.Storage.Objectを参照)<br />
+     * またネームスペースは初期値を用いる
+     * 
+     * @param {String} key データキー
+     * @param {Mixied} data データ
+     * @return {Jeeel.Dom.Element} 自インスタンス
+     * @see Jeeel.Storage.Object
+     */
+    setCustomData: function (key, data) {
+        
+        Jeeel.Storage.Object(this._element).set(key, data);
+        
         return this;
     },
 
@@ -24058,7 +25670,7 @@ Jeeel.Dom.Element.prototype = {
         var children = this._element.children;
         var res = [];
 
-        for (var i = 0, l = children.length; i < l; i++) {
+        for (var i = children.length; i--;) {
             res[i] = children[i];
         }
 
@@ -24251,17 +25863,13 @@ Jeeel.Dom.Element.prototype = {
      * @return {Jeeel.Dom.Element} 自インスタンス
      */
     removeChild: function (child) {
-        if (Jeeel.Type.isArray(child)) {
-            var tmp = this._doc.createDocumentFragment();
-            
-            for (var i = 0, l = child.length; i < l; i++) {
-                tmp.appendChild(child[i]);
-            }
-            
-            child = tmp;
+        if ( ! Jeeel.Type.isArray(child)) {
+            child = [child];
         }
 
-        this._element.removeChild(child);
+        for (var i = child.length; i--;) {
+            this._element.removeChild(child[i]);
+        }
 
         return this;
     },
@@ -24492,14 +26100,100 @@ Jeeel.Dom.Element.prototype = {
      * @param {Element|Element[]} dispatchTargets このElement上でマウスを押し込むと移動を始める(デフォルトはこのElement)
      * @return {Jeeel.Dom.Element} 自インスタンス
      */
-    movable: function (dispatchTargets) {},
+    movable: function (dispatchTargets) {
+        var i, l, cache, index = this._searchMoveCacheIndex();
+
+        if ( ! dispatchTargets) {
+            dispatchTargets = [this._element];
+        } else if ( ! Jeeel.Type.isArray(dispatchTargets)) {
+            dispatchTargets = [dispatchTargets];
+        }
+
+        if (index >= 0) {
+            cache = this._moveCache[index];
+
+            for (i = 0, l = cache.dispatch.length; i < l; i++) {
+                Jeeel.Dom.Event.removeEventListener(cache.dispatch[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cache.down, this);
+            }
+
+            for (i = 0, l = dispatchTargets.length; i < l; i++) {
+                Jeeel.Dom.Event.addEventListener(dispatchTargets[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cache.down, this);
+            }
+
+            cache.dispatch = dispatchTargets;
+
+            return this;
+        }
+
+        cache = this._moveCache[this._moveCache.length] = {
+            dispatch: dispatchTargets,
+            target: this._element,
+            position: '',
+            point: null,
+            down: function (ev) {
+                ev.stop();
+
+                this._doc.addEventListener(Jeeel.Dom.Event.Type.MOUSE_MOVE, cache.move, this)
+                          .addEventListener(Jeeel.Dom.Event.Type.MOUSE_UP, cache.up, this);
+
+                cache.point = ev.getRelativeMousePoint(this._element);
+            },
+            move: function (ev) {
+                ev.stop();
+
+                var p = ev.mousePoint;
+
+                var top  = p.y - cache.point.y;
+                var left = p.x - cache.point.x;
+
+                this.setStyleList({
+                    top: top + 'px',
+                    left: left + 'px'
+                });
+            },
+            up: function (ev) {
+                ev.stop();
+
+                this._doc.removeEventListener(Jeeel.Dom.Event.Type.MOUSE_MOVE, cache.move)
+                          .removeEventListener(Jeeel.Dom.Event.Type.MOUSE_UP, cache.up);
+            }
+        };
+
+        for (i = dispatchTargets.length; i--;) {
+            Jeeel.Dom.Event.addEventListener(dispatchTargets[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cache.down, this);
+        }
+
+        cache.position = this.getStyle('position');
+
+        this.setStyle('position', 'absolute');
+
+        return this;
+    },
     
     /**
      * このElementを移動不可能にする
      * 
      * @return {Jeeel.Dom.Element} 自インスタンス
      */
-    immovable: function () {},
+    immovable: function () {
+        var index = this._searchMoveCacheIndex();
+
+        if (index < 0) {
+            return this;
+        }
+
+        var cache = this._moveCache[index];
+
+        for (var i = cache.dispatch.length; i--;) {
+            Jeeel.Dom.Event.removeEventListener(cache.dispatch[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cache.down, this);
+        }
+
+        this.setStyle('position', cache.position);
+
+        this._moveCache.splice(index, 1);
+
+        return this;
+    },
     
     /**
      * IE6のためのバグ回避を簡単に行うメソッド<br />
@@ -24508,7 +26202,7 @@ Jeeel.Dom.Element.prototype = {
      * @param {Hash} [style] BGのiframeのスタイルをカスタムに指定するための値(基本は指定しない)
      * @return {Jeeel.Dom.Element} 自インスタンス
      */
-    setBackgroundIframe: function (style) {},
+    setShim: function (style) {},
     
     /**
      * このElementを指定座標に移動する
@@ -24704,6 +26398,24 @@ Jeeel.Dom.Element.prototype = {
      */
     constructor: Jeeel.Dom.Element,
     
+    /**
+     * 移動のためのキャッシュのインデックスを取得する
+     * 
+     * @return {Integer} インデックス
+     */
+    _searchMoveCacheIndex: function () {
+        for (var i = this._moveCache.length; i--;) {
+            if (this._element === this._moveCache[i].target) {
+                return i;
+            }
+        }
+
+        return -1;
+    },
+    
+    /**
+     * @ignore
+     */
     _init: function () {
         if ( ! Jeeel._doc) {
             delete this._init;
@@ -24718,6 +26430,9 @@ Jeeel.Dom.Element.prototype = {
         var ef = new Jeeel.Filter.Html.Escape(true);
         var slice = Array.prototype.slice;
         
+        /**
+         * @ignore
+         */
         function _searchRange(res, target) {
             var trect = Jeeel.Dom.Element.create(target).getRect();
 
@@ -24739,6 +26454,9 @@ Jeeel.Dom.Element.prototype = {
             }
         }
         
+        /**
+         * @ignore
+         */
         function _searchTxt(res, target) {
             if (target.nodeType === txt) {
                 res[res.length] = target.data;
@@ -24754,9 +26472,10 @@ Jeeel.Dom.Element.prototype = {
             }
         }
         
-        var self = this;
-
-        self.searchElementsByRange = function (rect, option) {
+        /**
+         * @ignore
+         */
+        this.searchElementsByRange = function (rect, option) {
             if ( ! rect) {
                 return [];
             }
@@ -24776,11 +26495,18 @@ Jeeel.Dom.Element.prototype = {
         };
         
         if (div.classList) {
-            self.getClassNames = function () {
+            
+            /**
+             * @ignore
+             */
+            this.getClassNames = function () {
                 return slice.call(this._element.classList);
             };
             
-            self.addClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.addClassName = function (className) {
                 if ( ! className) {
                     return this;
                 }
@@ -24798,7 +26524,10 @@ Jeeel.Dom.Element.prototype = {
                 return this;
             };
             
-            self.removeClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.removeClassName = function (className) {
                 if ( ! className) {
                     return this;
                 }
@@ -24815,7 +26544,10 @@ Jeeel.Dom.Element.prototype = {
                 return this;
             };
             
-            self.toggleClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.toggleClassName = function (className) {
                 if ( ! className) {
                     return this;
                 }
@@ -24832,16 +26564,26 @@ Jeeel.Dom.Element.prototype = {
                 return this;
             };
             
-            self.hasClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.hasClassName = function (className) {
                 return this._element.classList.contains(className);
             };
             
         } else {
-            self.getClassNames = function () {
+          
+            /**
+             * @ignore
+             */
+            this.getClassNames = function () {
                 return this._element.className.split(/\s+/);
             };
             
-            self.addClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.addClassName = function (className) {
                 if ( ! className) {
                     return this;
                 }
@@ -24867,7 +26609,10 @@ Jeeel.Dom.Element.prototype = {
                 return this;
             };
             
-            self.removeClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.removeClassName = function (className) {
                 if ( ! className) {
                     return this;
                 }
@@ -24891,7 +26636,10 @@ Jeeel.Dom.Element.prototype = {
                 return this;
             };
             
-            self.toggleClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.toggleClassName = function (className) {
                 if ( ! className) {
                     return this;
                 }
@@ -24913,7 +26661,10 @@ Jeeel.Dom.Element.prototype = {
                 return this;
             };
             
-            self.hasClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.hasClassName = function (className) {
                 if ( ! className) {
                     return false;
                 }
@@ -24925,7 +26676,59 @@ Jeeel.Dom.Element.prototype = {
             };
         }
         
-        self.getText = function () {
+        if (div.dataset) {
+          
+            /**
+             * @ignore
+             */
+            this.getData = function (key) {
+                key = Jeeel.String.toCamelCase(key);
+                
+                if (key in this._element.dataset) {
+                    return this._element.dataset[key];
+                }
+                
+                return null;
+            };
+            
+            /**
+             * @ignore
+             */
+            this.setData = function (key, data) {
+                key = Jeeel.String.toCamelCase(key);
+                
+                this._element.dataset[key] = data;
+                
+                return this;
+            };
+        } else {
+            
+            /**
+             * @ignore
+             */
+            this.getData = function (key) {
+                key = 'data-' + Jeeel.String.toHyphenation(key);
+                
+                return this._element.getAttribute(key);
+            };
+            
+            /**
+             * @ignore
+             */
+            this.setData = function (key, data) {
+                key = 'data-' + Jeeel.String.toHyphenation(key);
+                data = '' + data;
+                
+                this._element.setAttribute(key, data);
+                
+                return this;
+            };
+        }
+        
+        /**
+         * @ignore
+         */
+        this.getText = function () {
             var res = [];
 
             _searchTxt(res, this._element);
@@ -24933,14 +26736,21 @@ Jeeel.Dom.Element.prototype = {
             return res.join('');
         };
         
-        self.setText = function (text) {
+        /**
+         * @ignore
+         */
+        this.setText = function (text) {
             this._element.innerHTML = ef.filter(text);
 
             return this;
         };
         
-        if (Jeeel.UserAgent.isInternetExplorer6()) {
-            self.setBackgroundIframe = function (style) {
+        if (Jeeel.UserAgent.isInternetExplorer(6)) {
+          
+            /**
+             * @ignore
+             */
+            this.setShim = function (style) {
                 var child = this._element.firstChild;
                 var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
 
@@ -25010,114 +26820,11 @@ Jeeel.Dom.Element.prototype = {
                 return this.insertTop(elm);
             };
         } else {
-            self.setBackgroundIframe = function (style) {
-                return this;
-            };
+            /**
+             * @ignore
+             */
+            this.setShim = Jeeel.Function.Template.RETURN_THIS;
         }
-        
-        var moveCash = [];
-        
-        function _searchMoveCashIndex(self) {
-            for (var i = 0, l = moveCash.length; i < l; i++) {
-                if (self._element === moveCash[i].target) {
-                    return i;
-                }
-            }
-            
-            return -1;
-        }
-        
-        self.movable = function (dispatchTargets) {
-            
-            var i, l, cash, index = _searchMoveCashIndex(this);
-            
-            if ( ! dispatchTargets) {
-                dispatchTargets = [this._element];
-            } else if ( ! Jeeel.Type.isArray(dispatchTargets)) {
-                dispatchTargets = [dispatchTargets];
-            }
-            
-            if (index >= 0) {
-                cash = moveCash[index];
-                
-                for (i = 0, l = cash.dispatch.length; i < l; i++) {
-                    Jeeel.Dom.Event.removeEventListener(cash.dispatch[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cash.down, this);
-                }
-                
-                for (i = 0, l = dispatchTargets.length; i < l; i++) {
-                    Jeeel.Dom.Event.addEventListener(dispatchTargets[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cash.down, this);
-                }
-                
-                cash.dispatch = dispatchTargets;
-                
-                return this;
-            }
-            
-            cash = moveCash[moveCash.length] = {
-                dispatch: dispatchTargets,
-                target: this._element,
-                position: '',
-                point: null,
-                down: function (ev) {
-                    ev.stop();
-                    
-                    this._doc.addEventListener(Jeeel.Dom.Event.Type.MOUSE_MOVE, cash.move, this)
-                             .addEventListener(Jeeel.Dom.Event.Type.MOUSE_UP, cash.up, this);
-                             
-                    cash.point = ev.getRelativeMousePoint(this._element);
-                },
-                move: function (ev) {
-                    ev.stop();
-                    
-                    var p = ev.mousePoint;
-                    
-                    var top  = p.y - cash.point.y;
-                    var left = p.x - cash.point.x;
-                    
-                    this.setStyleList({
-                        top: top + 'px',
-                        left: left + 'px'
-                    });
-                },
-                up: function (ev) {
-                    ev.stop();
-                    
-                    this._doc.removeEventListener(Jeeel.Dom.Event.Type.MOUSE_MOVE, cash.move)
-                             .removeEventListener(Jeeel.Dom.Event.Type.MOUSE_UP, cash.up);
-                }
-            };
-            
-            for (i = 0, l = dispatchTargets.length; i < l; i++) {
-                Jeeel.Dom.Event.addEventListener(dispatchTargets[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cash.down, this);
-            }
-
-            cash.position = this.getStyle('position');
-            
-            this.setStyle('position', 'absolute');
-            
-            return this;
-        };
-        
-        self.immovable = function () {
-            
-            var index = _searchMoveCashIndex(this);
-            
-            if (index < 0) {
-                return this;
-            }
-            
-            var cash = moveCash[index];
-            
-            for (var i = 0, l = cash.dispatch.length; i < l; i++) {
-                Jeeel.Dom.Event.removeEventListener(cash.dispatch[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cash.down, this);
-            }
-            
-            this.setStyle('position', cash.position);
-            
-            moveCash.splice(index, 1);
-            
-            return this;
-        };
  
         delete this._init;
     }
@@ -25226,6 +26933,17 @@ Jeeel.Dom.Element.Animator.prototype = {
         
         return this;
     },
+    
+    /**
+     * アニメーションの対象のスタイルを全て破棄する
+     * 
+     * @return {Jeeel.Dom.Element.Animator} 自インスタンス
+     */
+    clear: function () {
+        this._params = {};
+        
+        return this;
+    },
   
     /**
      * アニメーション完了時間を設定する
@@ -25328,7 +27046,7 @@ Jeeel.Dom.Element.Animator.prototype = {
      * 
      * @return {Jeeel.Dom.Element.Animator} 自インスタンス
      */
-    clear: function () {
+    clearQueue: function () {
         this._style.clear();
         
         return this;
@@ -25939,12 +27657,17 @@ Jeeel.directory.Jeeel.Dom.ElementOperator = {
  * コンストラクタ
  *
  * @class 複数のElementを一度に操作する特殊なクラス
- * @param {Hash} elementList 対象Elementまたは複数のElementリスト(Jeeel.Dom.ElementOperatorやJeeel.Dom.Element自体やリストでも可能)
+ * @param {String|Hash} elementList セレクタ文字列もしくは、対象Element及び複数のElementリスト(Jeeel.Dom.ElementOperatorやJeeel.Dom.Element自体やリストでも可能)
  */
 Jeeel.Dom.ElementOperator = function (elementList) {
-    elementList = this.constructor._flat(elementList);
     
-    for (var i = 0, l = elementList.length; i < l; i++) {
+    if (Jeeel.Type.isString(elementList)) {
+        elementList = Jeeel.Document.getElementsBySelector(elementList);
+    } else {
+        elementList = this.constructor._flat(elementList);
+    }
+    
+    for (var i = elementList.length; i--;) {
         this[i] = elementList[i];
         elementList[i] = new Jeeel.Dom.Element(elementList[i]);
     }
@@ -25962,7 +27685,7 @@ Jeeel.Dom.ElementOperator = function (elementList) {
 /**
  * インスタンスを作成する
  *
- * @param {Hash} elementList 対象Elementまたは複数のElementリスト(Jeeel.Dom.ElementOperatorやJeeel.Dom.Element自体やリストでも可能)
+ * @param {String|Hash} elementList セレクタ文字列もしくは、対象Element及び複数のElementリスト(Jeeel.Dom.ElementOperatorやJeeel.Dom.Element自体やリストでも可能)
  * @return {Jeeel.Dom.ElementOperator} 作成したインスタンス
  */
 Jeeel.Dom.ElementOperator.create = function (elementList) {
@@ -25995,57 +27718,36 @@ Jeeel.Dom.ElementOperator._flat = (function (elementList) {
  */
 Jeeel.Dom.ElementOperator._flatExec = function (elementList) {
 
-    var Type = Jeeel.Type;
-    var Element = Jeeel.Dom.Element, Submit = Jeeel.Net.Form;
-    var getValues = Jeeel.Hash.getValues;
-    
-    var res = [], stack = [], idxStack = [], stackLen = 0, target = [elementList], i = 0, l = 1, cnt = 0, node;
-    
-    while (true) {
-        
-        if (i >= l) {
-            
-            if ( ! stackLen) {
-                break;
-            }
-            
-            stackLen--;
-            
-            target = stack[stackLen];
-            i = idxStack[stackLen];
-            l = target.length;
-        }
-        
-        node = target[i++];
-        
-        if (Type.isElement(node)) {
-            res[cnt++] = node;
-            continue;
-        }
-        else if ( ! Type.isHash(node)) {
-            continue;
-        }
-        else if (node instanceof this) {
-            node = node.getAll();
-        }
-        else if (node instanceof Element) {
-            node = [node.getElement()];
-        }
-        else if (node instanceof Submit) {
-            node = [node.getForm()];
-        }
-        else {
-            node = getValues(node);
-        }
-        
-        stack[stackLen] = target;
-        idxStack[stackLen] = i;
-        stackLen++;
-        target = node;
-        l = target.length;
-        i = 0;
+    if (Jeeel.Type.isNode(elementList)) {
+        return [elementList];
     }
-    
+    else if (elementList instanceof this) {
+        return elementList.getAll();
+    }
+    else if (elementList instanceof Jeeel.Dom.Element) {
+        return [elementList.getElement()];
+    }
+    else if (elementList instanceof Jeeel.Net.Form) {
+        return [elementList.getForm()];
+    }
+    else if ( ! Jeeel.Type.isHash(elementList)) {
+        return [];
+    }
+    else if ( ! Jeeel.Type.isArray(elementList)) {
+        elementList = Jeeel.Hash.getValues(elementList);
+    }
+
+    var res = [];
+
+    for (var i = 0, l = elementList.length; i < l; i++) {
+        if (Jeeel.Type.isNode(elementList[i])) {
+            res[res.length] = elementList[i];
+        } else if (Jeeel.Type.isHash(elementList[i])) {
+            var tmp = this._flatExec(elementList[i]);
+            res = res.concat(tmp);
+        }
+    }
+
     return res;
 };
 
@@ -26101,7 +27803,7 @@ Jeeel.Dom.ElementOperator.prototype = {
     getAll: function () {
         var res = [];
         
-        for (var i = 0; i < this.length; i++) {
+        for (var i = this.length; i--;) {
             res[i] = this[i];
         }
         
@@ -26117,7 +27819,7 @@ Jeeel.Dom.ElementOperator.prototype = {
     getIndex: function (element) {
         var res = -1;
         
-        for (var i = 0; i < this.length; i++) {
+        for (var i = this.length; i--;) {
             if (this[i] === element) {
                 res = i;
             }
@@ -26223,7 +27925,7 @@ Jeeel.Dom.ElementOperator.prototype = {
     /**
      * 全ての要素の子供を全て削除する
      *
-     * @return {Jeeel.Dom.Element} 自インスタンス
+     * @return {Jeeel.Dom.ElementOperator} 自インスタンス
      */
     clearChildNodes: function () {
         return this._callMethod('clearChildNodes');
@@ -26428,6 +28130,7 @@ Jeeel.Dom.ElementOperator.prototype = {
      * @param {String} css スタイル名
      * @param {Integer} [index] インデックス(省略は0)
      * @return {String} スタイル値
+     * @see Jeeel.Dom.Style
      */
     getCss: function (css, index) {
         return this._getCall(index, 'getStyle', [css]);
@@ -26439,6 +28142,7 @@ Jeeel.Dom.ElementOperator.prototype = {
      * @param {String} css スタイル名
      * @param {String} value スタイル値
      * @return {Jeeel.Dom.ElementOperator} 自インスタンス
+     * @see Jeeel.Dom.Style
      */
     setCss: function (css, value) {
         return this._callMethod('setStyle', [css, value]);
@@ -26452,6 +28156,58 @@ Jeeel.Dom.ElementOperator.prototype = {
      */
     setCssList: function (cssList) {
         return this._callMethod('setStyleList', [cssList]);
+    },
+    
+    /**
+     * 指定要素からDOMの独自データを取得する(属性値data-&#8727;)<br />
+     * IE8以下ではメモリリークを起こす非推奨メソッド
+     * 
+     * @param {String} key データキー
+     * @param {Integer} [index] インデックス(省略は0)
+     * @return {String} データ
+     */
+    getData: function (key, index) {
+        return this._getCall(index, 'getData', [key]);
+    },
+    
+    /**
+     * DOMの独自データを全ての要素に設定する(属性値data-&#8727;)<br />
+     * IE8以下ではメモリリークを起こす非推奨メソッド
+     * 
+     * @param {String} key データキー
+     * @param {String} data データ
+     * @return {Jeeel.Dom.ElementOperator} 自インスタンス
+     */
+    setData: function (key, data) {
+        return this._callMethod('setData', [key, data]);
+    },
+    
+    /**
+     * 指定要素からJeeelの独自データを取得する<brr />
+     * IE以外ではプロパティが拡張されるので注意(詳しくはJeeel.Storage.Objectを参照)<br />
+     * またネームスペースは初期値を用いる
+     * 
+     * @param {String} key データキー
+     * @param {Integer} [index] インデックス(省略は0)
+     * @return {Mixied} データ
+     * @see Jeeel.Storage.Object
+     */
+    getCustomData: function (key, index) {
+        return this._getCall(index, 'getCustomData', [key]);
+    },
+    
+    /**
+     * Jeeelの独自データを全ての要素に設定する<brr />
+     * IE以外ではプロパティが拡張されるので注意(詳しくはJeeel.Storage.Objectを参照)<br />
+     * またネームスペースは初期値を用いる
+     * 
+     * @param {String} key データキー
+     * @param {Mixied} data データ
+     * @return {Jeeel.Dom.ElementOperator} 自インスタンス
+     * @see Jeeel.Storage.Object
+     */
+    setCustomData: function (key, data) {
+        return this._callMethod('setCustomData', [key, data]);
     },
     
     /**
@@ -26482,6 +28238,16 @@ Jeeel.Dom.ElementOperator.prototype = {
      */
     getRect: function (index) {
         return this._getCall(index, 'getRect');
+    },
+    
+    /**
+     * 指定要素のスクロール位置を取得する
+     * 
+     * @param {Integer} [index] インデックス(省略は0)
+     * @return {Jeeel.Object.Point} スクロール位置
+     */
+    getScrollPos: function (index) {
+        return this._getCall(index, 'getScrollPosition');
     },
 
     /**
@@ -26543,7 +28309,7 @@ Jeeel.Dom.ElementOperator.prototype = {
     getValAll: function () {
         var res = [];
 
-        for (var i = 0; i < this.length; i++) {
+        for (var i = this.length; i--;) {
             res[i] = this.getVal(i);
         }
 
@@ -27193,6 +28959,76 @@ Jeeel.Dom.ElementOperator.prototype = {
     },
     
     /**
+     * 全ての要素の子リストからセレクタにヒットするのHTML要素を取得する
+     *
+     * @param {String} selector CSSと同じ絞り込みセレクタ
+     * @return {Jeeel.Dom.ElementOperator} 取得したElement配列ラッパー
+     * @see Jeeel.Dom.Selector
+     */
+    $QUERY: function (selector) {
+        if ( ! selector) {
+            return this.constructor.create([], this);
+        }
+
+        var res = [];
+
+        this._each(
+            function () {
+                var tmp = this.getElementsBySelector(selector);
+
+                if (tmp.length) {
+                    res = Jeeel.Hash.merge(res, tmp);
+                }
+            }
+        );
+
+        return this.constructor.create(res, this);
+    },
+    
+    /**
+     * 全ての要素の次の要素を検索取得する
+     * 
+     * @param {Integer} [nextCount] いくつ次を参照するか
+     * @return {Jeeel.Dom.ElementOperator} 取得したElement配列ラッパー
+     */
+    $NEXT: function (nextCount) {
+        if (nextCount === 0) {
+            return this.clone(false);
+        }
+
+        var res = this._getCalls('getNextNode', [nextCount]);
+
+        return this.constructor.create(res, this);
+    },
+    
+    /**
+     * 全ての要素の前の要素を検索取得する
+     * 
+     * @param {Integer} [prevCount] いくつ前を参照するか
+     * @return {Jeeel.Dom.ElementOperator} 取得したElement配列ラッパー
+     */
+    $PREV: function (prevCount) {
+        if (prevCount === 0) {
+            return this.clone(false);
+        }
+
+        var res = this._getCalls('getPrevNode', [prevCount]);
+
+        return this.constructor.create(res, this);
+    },
+    
+    /**
+     * 全ての要素の子要素を取得する
+     * 
+     * @return {Jeeel.Dom.ElementOperator} 取得したElement配列ラッパー
+     */
+    $CHILDREN: function () {
+        var res = this._getCalls('getChildren');
+
+        return this.constructor.create(res, this);
+    },
+    
+    /**
      * 全ての要素の子リストからHTML要素を指定範囲検索する
      *
      * @param {Jeeel.Object.Rect} rect 対象範囲
@@ -27257,7 +29093,7 @@ Jeeel.Dom.ElementOperator.prototype = {
         
         return this;
     },
-
+    
     /**
      * 全ての要素をDom上から取り除く
      *
@@ -27427,6 +29263,18 @@ Jeeel.Dom.ElementOperator.prototype = {
      */
     shiftTo: function (x, y) {
         return this._callMethod('shiftTo', [x, y]);
+    },
+    
+    /**
+     * 全ての要素のスクロールを行う
+     * 
+     * @param {Integer} x X座標
+     * @param {Integer} y Y座標
+     * @return {Jeeel.Dom.ElementOperator} 自インスタンス
+     * @ignore
+     */
+    scroll: function (x, y) {
+        return this._callMethod('scroll', [x, y]);
     },
 
     /**
@@ -27681,12 +29529,18 @@ Jeeel.Dom.ElementOperator.prototype = {
     },
     
     /**
-     * このインスタンスの複製を作る
+     * インスタンスを複製する
      *
-     * @return {Jeeel.Dom.ElementOperator} 複製したインスタンス
+     * @param {Boolean} [isDeep] 要素まで複製するかどうか
+     * @return {Jeeel.Dom.ElementOperator} 複製後のインスタンス
      */
-    clone: function () {
-        return this.constructor.create(this._elementList, this._prev);
+    clone: function (isDeep) {
+        
+        if (isDeep) {
+            return new this.constructor(this._getCalls('clone', [true]), this._prev);
+        }
+        
+        return new this.constructor(this._elementList, this._prev);
     },
     
     /**
@@ -27781,12 +29635,18 @@ Jeeel.Dom.ElementOperator.prototype = {
         return res;
     },
     
+    /**
+     * @ignore
+     */
     _init: function () {
         var ief = new Jeeel.Filter.Html.Form(),
             ivf = new Jeeel.Filter.Html.FormValue(),
             ref = new Jeeel.Filter.String.RegularExpressionEscape(),
             auf = new Jeeel.Filter.Hash.Unique(true, true);
         
+        /**
+         * @ignore
+         */
         this.filterName = function (name, submitSearch) {
             if ( ! Jeeel.Type.isArray(name)) {
                 name = [name];
@@ -27825,6 +29685,9 @@ Jeeel.Dom.ElementOperator.prototype = {
             return this.constructor.create(res, this);
         };
         
+        /**
+         * @ignore
+         */
         this.revFilterName = function (name, submitSearch) {
             if ( ! Jeeel.Type.isArray(name)) {
                 name = [name];
@@ -27863,6 +29726,9 @@ Jeeel.Dom.ElementOperator.prototype = {
             return this.constructor.create(res, this);
         };
         
+        /**
+         * @ignore
+         */
         this.getInput = function (index) {
             if ( ! index) {
                 index = 0;
@@ -27873,6 +29739,9 @@ Jeeel.Dom.ElementOperator.prototype = {
             return ief.filter(this[index]);
         };
         
+        /**
+         * @ignore
+         */
         this.getInputVal = function (index) {
             if ( ! index) {
                 index = 0;
@@ -27883,6 +29752,9 @@ Jeeel.Dom.ElementOperator.prototype = {
             return ivf.filter(this[index]);
         };
         
+        /**
+         * @ignore
+         */
         this.getCommonParent = function () {
             var elms = this._elementList,
                 min = -1,
@@ -27976,6 +29848,15 @@ Jeeel.Dom.ElementOperator.Animator.prototype = {
     setAll: function (params) {
         return this._callMethod('setAll', [params]);
     },
+    
+    /**
+     * アニメーションの対象のスタイルを全て破棄する
+     * 
+     * @return {Jeeel.Dom.ElementOperator.Animator} 自インスタンス
+     */
+    clear: function () {
+        return this._callMethod('clear');
+    },
   
     /**
      * アニメーション完了時間を設定する
@@ -28062,8 +29943,8 @@ Jeeel.Dom.ElementOperator.Animator.prototype = {
      * 
      * @return {Jeeel.Dom.ElementOperator.Animator} 自インスタンス
      */
-    clear: function () {
-        return this._callMethod('clear');
+    clearQueue: function () {
+        return this._callMethod('clearQueue');
     },
     
     /**
@@ -28093,9 +29974,2841 @@ Jeeel.Dom.ElementOperator.Animator.prototype = {
      * @constructor
      */
     constructor: Jeeel.Dom.ElementOperator.Animator
+};Jeeel.directory.Jeeel.Dom.Selector = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel.Dom + 'Selector/';
+    }
+};
+
+/**
+ * コンストラクタ
+ *
+ * @class セレクタを扱うクラス
+ * @param {String} selector CSSセレクタ
+ * @example
+ * 以下が対応もしくは認識するセレクタの一覧
+ * *
+ * E
+ * E[foo]
+ * E[foo="bar"]
+ * E[foo~="bar"]
+ * E[foo^="bar"]
+ * E[foo$="bar"]
+ * E[foo*="bar"]
+ * E[foo|="en"]
+ * E:root
+ * E:nth-child(n)
+ * E:nth-last-child(n)
+ * E:nth-of-type(n)
+ * E:nth-last-of-type(n)
+ * E:first-child
+ * E:last-child
+ * E:first-of-type
+ * E:last-of-type
+ * E:only-child
+ * E:only-of-type
+ * E:empty
+ * E:link
+ * E:visited
+ * E:active
+ * E:hover
+ * E:focus
+ * E:target
+ * E:lang(fr)
+ * E:enabled
+ * E:disabled
+ * E:checked
+ * E:first-line
+ * E:first-letter
+ * E:before
+ * E:after
+ * E.warning
+ * E#myid
+ * E:not(s)
+ * E F
+ * E > F
+ * E + F
+ * E ~ F
+ * ただし、:link, :visitedはセキュリティ上の理由でCSSと違った挙動をし、:before, :after, :first-line, :first-letterは完全に無視される。
+ * また、:active, :hover, :focusは今のところ全て空になる
+ */
+Jeeel.Dom.Selector = function (selector) {
+    this._selector = selector;
+    
+    this._compile();
+};
+
+/**
+ * インスタンスの作成を行う
+ *
+ * @param {String} selector CSSセレクタ
+ * @return {Jeeel.Dom.Selector} 作成したインスタンス
+ */
+Jeeel.Dom.Selector.create = function (selector) {
+    return new this(selector);
+};
+
+Jeeel.Dom.Selector.prototype = {
+
+    /**
+     * CSSセレクタ
+     *
+     * @type String
+     * @private
+     */
+    _selector: '',
+
+    /**
+     * CSSセレクタの対象別リスト
+     *
+     * @type Jeeel.Dom.Selector.NodeList[]
+     * @private
+     */
+    _nodeLists: [],
+
+    /**
+     * セレクタの情報からElementのリストを得る
+     *
+     * @param {Element} root 検索ルート要素
+     * @return {Element[]} Elementリスト
+     */
+    search: function (root) {
+        
+        if (Jeeel.Type.isDocument(root)) {
+            root = root.documentElement;
+        }
+        
+        if (root.uniqueID) {
+            return this._quickSearch(root);
+        }
+        
+        return this._search(root);
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Dom.Selector,
+    
+    /**
+     * 通常検索を行う
+     * 
+     * @param {Element} root 検索のルートノード
+     * @return {Element[]} 検索結果のリスト
+     */
+    _search: function (root) {
+        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        var nodeLists = this._nodeLists;
+        
+        var i, l = 0, res = [];
+        
+        for (i = nodeLists.length; i--;) {
+            res[i] = [];
+        }
+        
+        var search = function (target) {
+            
+            for (var i = nodeLists.length; i--;) {
+                if (nodeLists[i][0].isMatch(target)) {
+                    res[i].push(target);
+                }
+            }
+
+            var child = target.firstChild;
+
+            while(child) {
+
+                if (child.nodeType === nodeType) {
+                    search(child);
+                }
+
+                child = child.nextSibling;
+            }
+        };
+      
+        search(root);
+        
+        for (i = nodeLists.length; i--;) {
+            
+            if (l < nodeLists[i].length) {
+                l = nodeLists[i].length;
+            }
+            
+            nodeLists[i].init(nodeLists[i][0].filter(res[i]));
+        }
+        
+        while (--l) {
+            for (i = nodeLists.length; i--;) {
+                res[i] = nodeLists[i].search();
+                
+                nodeLists[i].next();
+            }
+        }
+        
+        var tmp = res;
+        
+        res = [];
+        
+        for (i = nodeLists.length; i--;) {
+            res = tmp[i].concat(res);
+        }
+
+        return this._uniqueSort(root, res);
+    },
+    
+    /**
+     * IEのuniqueIDを使用して検索速度を速めた検索を行う(正確にはソーティングを高速化する)
+     * 
+     * @param {Element} root 検索のルートノード
+     * @return {Element[]} 検索結果のリスト
+     */
+    _quickSearch: function (root) {
+        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        var nodeLists = this._nodeLists;
+        
+        var idx = 0, indexes = {};
+        var i, l = 0, res = [];
+        
+        for (i = nodeLists.length; i--;) {
+            res[i] = [];
+        }
+        
+        var search = function (target) {
+            
+            indexes[target.uniqueID] = idx++;
+            
+            for (var i = nodeLists.length; i--;) {
+                if (nodeLists[i][0].isMatch(target)) {
+                    res[i].push(target);
+                }
+            }
+
+            var child = target.firstChild;
+
+            while(child) {
+
+                if (child.nodeType === nodeType) {
+                    search(child);
+                }
+
+                child = child.nextSibling;
+            }
+        };
+      
+        search(root);
+        
+        for (i = nodeLists.length; i--;) {
+            
+            if (l < nodeLists[i].length) {
+                l = nodeLists[i].length;
+            }
+            
+            nodeLists[i].init(nodeLists[i][0].filter(res[i]));
+        }
+        
+        while (--l) {
+            for (i = nodeLists.length; i--;) {
+                res[i] = nodeLists[i].search();
+                
+                nodeLists[i].next();
+            }
+        }
+        
+        var tmp = res;
+        
+        res = [];
+        
+        for (i = nodeLists.length; i--;) {
+            res = tmp[i].concat(res);
+        }
+        
+        res.sort(function (a, b) {
+            var aIdx = indexes[a.uniqueID], bIdx = indexes[b.uniqueID];
+            
+            if (aIdx < bIdx) {
+                return -1;
+            } else if (aIdx > bIdx) {
+                return 1;
+            }
+            
+            return 0;
+        });
+        
+        tmp = res;
+        
+        res = [];
+        
+        var belm;
+        
+        for (i = 0, l = tmp.length; i < l; i++) {
+            if (belm !== tmp[i]) {
+                res.push(tmp[i]);
+            }
+            
+            belm = tmp[i];
+        }
+        
+        return res;
+    },
+    
+    /**
+     * 指定した要素のリストをソーティングし、且重複を削除してする
+     * 
+     * @param {Element} root ルートノード
+     * @param {Element[]} elements 要素リスト
+     * @param {Element[]} ソート・フィルタ後の要素リスト
+     */
+    _uniqueSort: function (root, elements) {
+        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        var i, l, p, cnt, element, nodes = [];
+        var idxLength = 0;
+        
+        for (i = 0, l = elements.length; i < l; i++) {
+            element = elements[i];
+            nodes[i] = {
+                node: element,
+                idxs: []
+            };
+            
+            while (element && element !== root) {
+                p = element.previousSibling;
+                cnt = 1;
+
+                while (p) {
+                    if (p.nodeType === nodeType) {
+                        cnt++;
+                    }
+
+                    p = p.previousSibling;
+                }
+
+                nodes[i].idxs.push(cnt);
+                
+                element = element.parentNode;
+            }
+            
+            nodes[i].idxs.reverse();
+            
+            if (idxLength < nodes[i].idxs.length) {
+                idxLength = nodes[i].idxs.length;
+            }
+        }
+        
+        nodes.sort(function (a, b) {
+            var aidxs = a.idxs;
+            var bidxs = b.idxs;
+            
+            for (var i = 0; i < idxLength; i++) {
+                if ( ! aidxs[i] && ! bidxs[i]) {
+                    break;
+                } else if ( ! aidxs[i]) {
+                    return -1;
+                } else if ( ! bidxs[i]) {
+                    return 1;
+                }
+                
+                if (aidxs[i] < bidxs[i]) {
+                    return -1;
+                } else if (aidxs[i] > bidxs[i]) {
+                    return 1;
+                }
+            }
+            
+            return 0;
+        });
+        
+        var belm, res = [];
+        
+        for (i = 0, l = nodes.length; i < l; i++) {
+            
+            if (belm !== nodes[i].node) {
+                res.push(nodes[i].node);
+            }
+            
+            belm = nodes[i].node;
+        }
+        
+        return res;
+    },
+
+    /**
+     * CSSセレクタから対象となるDataのリストを作成する
+     *
+     * @private
+     */
+    _compile: function () {
+        this._nodeLists = this.constructor.Compiler.compile(this._selector);
+    }
+};
+
+Jeeel.file.Jeeel.Dom.Selector = ['Compiler', 'NodeList', 'Node', 'Mock'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Selector, Jeeel.file.Jeeel.Dom.Selector);
+
+/**
+ * @staticClass セレクタをコンパイルするためのクラス
+ */
+Jeeel.Dom.Selector.Compiler = {
+    
+    /**
+     * セレクタのコンパイルを行う
+     * 
+     * @param {String} selector セレクタ
+     * @return {Jeeel.Dom.Selector.NodeList[]} コンパイル結果
+     */
+    compile: function (selector) {
+      
+        // 余分なコメント、前後のスペースの削除
+        selector = selector.replace(/\/\*[\s\S]*?\*\//g, '')
+                           .replace(/^\s+/g, '')
+                           .replace(/\s\s*$/g, '');
+        
+        var parenthesisCount = 0;
+        var bracketCount = 0;
+        var quoteIn = false;
+        var i, j, l, $continue, chr, bchr = null, filtered = [];
+        
+        var res = [];
+        
+        for (i = 0, l = selector.length; i < l; i++) {
+            chr = selector.charAt(i);
+            
+            switch (chr) {
+                case '[':
+                    bracketCount++;
+                    $continue = true;
+                    break;
+                    
+                case ']':
+                    bracketCount--;
+                    $continue = true;
+                    break;
+                    
+                case '(':
+                    parenthesisCount++;
+                    $continue = true;
+                    break;
+                    
+                case ')':
+                    parenthesisCount--;
+                    $continue = true;
+                    break;
+                  
+                case "'":
+                case '"':
+                    quoteIn = !quoteIn;
+                    $continue = true;
+                    break;
+                    
+                default:
+                    $continue = false;
+                    break;
+            }
+            
+            if ($continue) {
+                bchr = chr;
+                filtered.push(chr);
+                continue;
+            }
+            
+            switch (chr) {
+                case ' ':
+                    if (quoteIn) {
+                        filtered.push(chr);
+                    } else if (bchr !== chr) {
+                        
+                        switch (bchr) {
+                            case '+':
+                            case '~':
+                            case '>':
+                                break;
+                            
+                            default:
+                                filtered.push(chr);
+                                break;
+                        }
+                    }
+                    break;
+                
+                case '+':
+                case '~':
+                case '>':
+                    if ( ! quoteIn && bchr === ' ') {
+                        filtered.pop();
+                    }
+                    
+                    filtered.push(chr);
+                    break;
+                    
+                case ',':
+                    if ( ! parenthesisCount && ! bracketCount && ! quoteIn) {
+                        j = 0;
+                        
+                        while (filtered[j] && filtered[j] === ' ') {
+                            filtered[j++] = '';
+                        }
+                        
+                        while (filtered[filtered.length - 1] === ' ') {
+                            filtered.pop();
+                        }
+                        
+                        res[res.length] = this.compileNodeList(filtered.join(''));
+                        filtered = [];
+                    }
+                    break;
+
+                default:
+                    filtered.push(chr);
+                    break;
+            }
+            
+            bchr = chr;
+        }
+        
+        if ( ! parenthesisCount && ! bracketCount && ! quoteIn) {
+            
+            j = 0;
+            
+            while (filtered[j] && filtered[j] === ' ') {
+                filtered[j++] = '';
+            }
+            
+            while (filtered[filtered.length - 1] === ' ') {
+                filtered.pop();
+            }
+
+            res[res.length] = this.compileNodeList(filtered.join(''));
+        }
+        
+        return res;
+    },
+    
+    /**
+     * ノードリストのコンパイルを行う
+     * 
+     * @param {String} selector セレクタ
+     * @return {Jeeel.Dom.Selector.NodeList} コンパイル結果
+     */
+    compileNodeList: function (selector) {
+        
+        if (Jeeel.Dom.Selector.NodeList.caches[selector]) {
+            return Jeeel.Dom.Selector.NodeList.caches[selector];
+        }
+        
+        var nodeList = new Jeeel.Dom.Selector.NodeList(selector);
+        
+        var parenthesisCount = 0;
+        var bracketCount = 0;
+        var quoteIn = false;
+        var i, l, type = null, newType = null;
+        var beforeIndex = -1;
+
+        for (i = 0, l = selector.length; i < l; i++) {
+            var chr = selector.charAt(i);
+            
+            switch (chr) {
+                case '[':
+                    bracketCount++;
+                    continue;
+                    break;
+                    
+                case ']':
+                    bracketCount--;
+                    continue;
+                    break;
+                    
+                case '(':
+                    parenthesisCount++;
+                    continue;
+                    break;
+                    
+                case ')':
+                    parenthesisCount--;
+                    continue;
+                    break;
+                
+                case "'":
+                case '"':
+                    quoteIn = !quoteIn;
+                    continue;
+                    break;
+                    
+            }
+            
+            if (parenthesisCount || bracketCount || quoteIn) {
+                continue;
+            }
+            
+            switch (chr) {
+                case ' ':
+                    newType = 'default';
+                    break;
+                    
+                case '>':
+                    newType = 'child';
+                    break;
+                    
+                case '+':
+                    newType = 'next';
+                    break;
+                    
+                case '~':
+                    newType = 'sbrother';
+                    break;
+                    
+                default:
+                    continue;
+                    break;
+            }
+            
+            nodeList[nodeList.length++] = this.compileNode(selector.substring(beforeIndex + 1, i), type);
+            beforeIndex = i;
+            type = newType;
+        }
+        
+        if (parenthesisCount || bracketCount || quoteIn) {
+            throw new Error('Compile error.');
+        }
+        
+        nodeList[nodeList.length++] = this.compileNode(selector.substring(beforeIndex + 1, l), type);
+        
+        return nodeList;
+    },
+    
+    /**
+     * ノードのコンパイルを行う
+     * 
+     * @param {String} selector セレクタ
+     * @param {String} relationType このノードと他ノードの関係を示す文字列
+     * @return {Jeeel.Dom.Selector.Node} コンパイル結果
+     */
+    compileNode: function (selector, relationType) {
+        
+        var cache = Jeeel.Dom.Selector.Node.caches[selector];
+        
+        if (cache && cache[relationType]) {
+            return cache[relationType];
+        }
+        
+        var node = new Jeeel.Dom.Selector.Node(selector, relationType);
+        
+        var parenthesisCount = 0;
+        var bracketCount = 0;
+        var quoteIn = false;
+        var attrs = [];
+        var beforeIndex = -1;
+        var type = 'tag', newType;
+        var i, l, chr, bchar, sp;
+        
+        for (i = 0, l = selector.length; i < l; i++) {
+            chr = selector.charAt(i);
+            
+            sp = false;
+            
+            switch (chr) {
+                case '#':
+                    if ( ! parenthesisCount || ! bracketCount || ! quoteIn) {
+                        newType = 'id';
+                    }
+                    break;
+                    
+                case '.':
+                    if ( ! parenthesisCount || ! bracketCount || ! quoteIn) {
+                        newType = 'class';
+                    }
+                    break;
+                    
+                case ':':
+                    if (bchar === ':') {
+                        continue;
+                    } else if ( ! parenthesisCount || ! bracketCount || ! quoteIn) {
+                        newType = 'mock';
+                    }
+                    break;
+                    
+                case '[':
+                    if ( ! parenthesisCount || ! bracketCount || ! quoteIn) {
+                        newType = 'attr';
+                        sp = true;
+                    }
+                    bracketCount++;
+                    break;
+                    
+                case ']':
+                    bracketCount--;
+                    bchar = chr;
+                    continue;
+                    break;
+                    
+                case '(':
+                    parenthesisCount++;
+                    break;
+                    
+                case ')':
+                    parenthesisCount--;
+                    bchar = chr;
+                    continue;
+                    break;
+                    
+                case "'":
+                case '"':
+                    quoteIn = !quoteIn;
+                    bchar = chr;
+                    continue;
+                    break;
+                    
+                default:
+                    continue;
+                    break;
+            }
+            
+            bchar = chr;
+            
+            sp = sp && bracketCount && ( ! parenthesisCount && ! quoteIn);
+            
+            if ( ! sp && (parenthesisCount || bracketCount || quoteIn)) {
+                continue;
+            }
+            
+            switch (type) {
+                case 'tag':
+                    node.tag = selector.substring(beforeIndex + 1, i).toUpperCase() || '*';
+                    break;
+                    
+                case 'id':
+                    node.id = selector.substring(beforeIndex + 1, i);
+                    break;
+                    
+                case 'class':
+                    node.classes.push(selector.substring(beforeIndex + 1, i));
+                    break;
+                    
+                case 'attr':
+                    attrs.push(selector.substring(beforeIndex + 1, i - 1));
+                    break;
+                    
+                case 'mock':
+                    node.mocks.push(this.compileMock(node, selector.substring(beforeIndex + 1, i)));
+                    break;
+            }
+            
+            type = newType;
+            beforeIndex = i;
+        }
+        
+        switch (type) {
+            case 'tag':
+                node.tag = selector.substring(beforeIndex + 1, l).toUpperCase();
+                break;
+
+            case 'id':
+                node.id = selector.substring(beforeIndex + 1, l);
+                break;
+
+            case 'class':
+                node.classes.push(selector.substring(beforeIndex + 1, l));
+                break;
+
+            case 'attr':
+                attrs.push(selector.substring(beforeIndex + 1, l - 1));
+                break;
+
+            case 'mock':
+                node.mocks.push(this.compileMock(node, selector.substring(beforeIndex + 1, l)));
+                break;
+        }
+        
+        node.attrs = this.compileAttribute(attrs);
+        
+        return node;
+    },
+    
+    /**
+     * 属性のコンパイルを行う
+     * 
+     * @param {String[]} selectors セレクタリスト
+     * @return {Hash[]} コンパイル後の属性リスト
+     */
+    compileAttribute: function (selectors) {
+        var regFilter = new Jeeel.Filter.String.RegularExpressionEscape();
+        var attrReg = /([a-z0-9_\-]+)(?:((?:\^|\$|\*)?=)([\s\S]*))?/gi;
+        var attrs = [];
+        
+        for (var i = 0, l = selectors.length; i < l; i++) {
+            selectors[i].replace(attrReg, function (match, name, eq, value) {
+                if (eq) {
+
+                    value = value.replace(/^(["'])([\s\S]*)\1$/g, '$2');
+
+                    switch (eq.charAt(0)) {
+                        case '=':
+                            attrs[attrs.length] = {
+                                name: name,
+                                reg: new RegExp('^' + regFilter.filter(value) + '$', 'g')
+                            };
+                            break;
+
+                        case '|':
+                            attrs[attrs.length] = {
+                                name: name,
+                                reg: new RegExp('^' + regFilter.filter(value) + '-?', 'g')
+                            };
+                            break;
+
+                        case '^':
+                            attrs[attrs.length] = {
+                                name: name,
+                                reg: new RegExp('^' + regFilter.filter(value), 'g')
+                            };
+                            break;
+
+                        case '$':
+                            attrs[attrs.length] = {
+                                name: name,
+                                reg: new RegExp(regFilter.filter(value) + '$', 'g')
+                            };
+                            break;
+
+                        case '*':
+                            attrs[attrs.length] = {
+                                name: name,
+                                reg: new RegExp(regFilter.filter(value), 'g')
+                            };
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    return '';
+                }
+
+                attrs[attrs.length] = {
+                    name: name,
+                    reg: '*'
+                };
+
+                return '';
+            });
+        }
+        
+        return attrs;
+    },
+    
+    /**
+     * 疑似クラスのコンパイルを行う
+     * 
+     * @param {Jeeel.Dom.Selector.Node} node 疑似クラスを所有するノード
+     * @param {String} selector セレクタ
+     * @return {Jeeel.Dom.Selector.Mock} コンパイル後の疑似クラス
+     */
+    compileMock: function (node, selector) {
+        var mock = new Jeeel.Dom.Selector.Mock(node, selector);
+        
+        var reg = /^([a-z0-9_\-]+)(?:\((.+)\))?$/i;
+        
+        selector.replace(reg, function (match, name, args) {
+            mock.name = name;
+            
+            if (args) {
+                mock.args = args;
+            }
+        });
+        
+        return mock.compile();
+    }
+};
+Jeeel.Dom.Selector.NodeList = function (selector) {
+    this.selector = selector;
+    
+    this.constructor.caches[selector] = this;
+};
+
+Jeeel.Dom.Selector.NodeList.caches = {};
+
+Jeeel.Dom.Selector.NodeList.prototype = {
+    
+    /**
+     * 元のselector
+     * 
+     * @type String
+     */
+    selector: '',
+    
+    /**
+     * 要素数
+     * 
+     * @type Integer
+     */
+    length: 0,
+    
+    _elements: null,
+    
+    _currentIndex: 0,
+    
+    init: function (elements) {
+        this._elements = elements;
+        this._currentIndex = 1;
+        
+        return this;
+    },
+    
+    next: function () {
+        this._currentIndex++;
+        
+        return this;
+    },
+    
+    search: function () {
+        if (this.length <= this._currentIndex) {
+            return this._elements;
+        }
+        
+        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        var res = [], node = this[this._currentIndex];
+        
+        var search = function (target, f) {
+            if ( ! f && node.isMatch(target)) {
+                res.push(target);
+            }
+
+            var child;
+
+            switch (node.relationType) {
+              
+                case 'default':
+                    child = target.firstChild;
+                    
+                    while(child) {
+
+                        if (child.nodeType === nodeType) {
+                            search(child, false);
+                        }
+
+                        child = child.nextSibling;
+                    }
+                    break;
+              
+                case 'child':
+                    child = target.firstChild;
+                    
+                    while(f && child) {
+
+                        if (child.nodeType === nodeType) {
+                            search(child, false);
+                        }
+
+                        child = child.nextSibling;
+                    }
+                    break;
+                    
+                case 'next':
+                    child = target.nextSibling;
+                    
+                    while(f && child) {
+
+                        if (child.nodeType === nodeType) {
+                            search(child, false);
+                            break;
+                        }
+
+                        child = child.nextSibling;
+                    }
+                    break;
+                    
+                case 'sbrother':
+                    child = target.nextSibling;
+                    
+                    while(f && child) {
+
+                        if (child.nodeType === nodeType) {
+                            search(child, false);
+                        }
+
+                        child = child.nextSibling;
+                    }
+                    break;
+            }
+        };
+        
+        for (var i = 0, l = this._elements.length; i < l; i++) {
+            search(this._elements[i], true);
+        }
+        
+        this._elements = node.filter(res);
+        
+        return this._elements;
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Dom.Selector.NodeList
 };
 /**
- * 特殊検索に使用する列挙体
+ * コンストラクタ
+ * 
+ * @class セレクタの中で要素を示すクラス(スペース, ~, +, > などを除いたセレクタ)
+ * @param {String} selector セレクタ
+ * @param {String} relationType 一つ前のノードとの関係性を示す文字列
+ */
+Jeeel.Dom.Selector.Node = function (selector, relationType) {
+    this.selector = selector;
+    this.relationType = relationType || null;
+    this.classes = [];
+    this.mocks = [];
+    
+    if ( ! this.constructor.caches[selector]) {
+        this.constructor.caches[selector] = {};
+    }
+    
+    this.constructor.caches[selector][relationType] = this;
+};
+
+/**
+ * キャッシュ
+ * 
+ * @type Hash
+ */
+Jeeel.Dom.Selector.Node.caches = {};
+
+Jeeel.Dom.Selector.Node.prototype = {
+    
+    /**
+     * セレクタ
+     * 
+     * @type String
+     */
+    selector: '',
+    
+    /**
+     * 関係文字列
+     * 
+     * @type String
+     */
+    relationType: null,
+    
+    /**
+     * タグ名
+     * 
+     * @type String
+     */
+    tag: '*',
+    
+    /**
+     * ID名
+     * 
+     * @type String
+     */
+    id: '',
+    
+    /**
+     * クラス名のリスト
+     * 
+     * @type String[]
+     */
+    classes: [],
+    
+    /**
+     * 属性リスト
+     * 
+     * @type Hash[]
+     */
+    attrs: [],
+    
+    /**
+     * 疑似クラスリスト
+     * 
+     * @type Jeeel.Dom.Selector.Mock[]
+     */
+    mocks: [],
+    
+    /**
+     * 指定した要素がセレクタと一致するかどうか返す
+     * 
+     * @param {Element} element 調べる要素
+     * @return {Boolean} 一致したかどうか
+     */
+    isMatch: function (element) {
+        
+        var i, l;
+        
+        // MOCK
+        for (i = 0, l = this.mocks.length; i < l; i++) {
+            if ( ! this.mocks[i].isMatch(element)) {
+                return false;
+            }
+        }
+        
+        var nodeName = element.nodeName.toUpperCase();
+        
+        // TAG
+        if (this.tag !== '*' && this.tag !== nodeName) {
+            return false;
+        }
+        
+        // ID
+        if (this.id && this.id !== element.id) {
+            return false;
+        }
+        
+        var tmp, name, reg, val, classes;
+        
+        // CLASS
+        if (this.classes.length) {
+            tmp = element.classList;
+
+            if (tmp) {
+                classes = [];
+
+                for (i = tmp.length; i--;) {
+                    classes[i] = tmp.item(i);
+                }
+            } else {
+                classes = element.className.split(/\s+/g);
+            }
+
+            for (i = this.classes.length; i--;) {
+                if ( ! Jeeel.Type.inArray(this.classes[i], classes, true)) {
+                    return false;
+                }
+            }
+        }
+        
+        // ATTR
+        if (this.attrs.length) {
+            for (i = this.attrs.length; i--;) {
+                name = this.attrs[i].name;
+                reg = this.attrs[i].reg;
+                val = element.getAttribute(name);
+                
+                if (val === null) {
+                    return false;
+                } else if (reg === '*') {
+                    continue;
+                } else if ( ! val.match(reg)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    },
+    
+    /**
+     * 指定した要素リストをフィルタリングする
+     * 
+     * @param {Element[]} elements 要素リスト
+     * @return {Element[]} フィルタリング後の要素リスト
+     */
+    filter: function (elements) {
+        
+        // MOCK
+        for (var i = 0, l = this.mocks.length; i < l; i++) {
+            elements = this.mocks[i].filter(elements);
+        }
+        
+        return elements;
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Dom.Selector.Node
+};
+/**
+ * コンストラクタ
+ * 
+ * @class 疑似クラスを扱うクラス
+ * @param {Jeeel.Dom.Selector.Node} 親ノード
+ * @param {String} selector セレクタ
+ */
+Jeeel.Dom.Selector.Mock = function (node, selector) {
+    this.node = node;
+    this.selector = selector;
+};
+
+/**
+ * @namespace 疑似クラスのロジックを保有するネームスペース
+ */
+Jeeel.Dom.Selector.Mock.LOGIC = {
+  
+    /**
+     * 否定疑似クラスを解析するロジック(:not)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    not: function (args) {
+        var node = Jeeel.Dom.Selector.Compiler.compileNode(args);
+        
+        return {
+            isMatch: function (element) {
+                return ! node.isMatch(element);
+            },
+            
+            filter: function (elements) {
+                var matches = node.filter(elements);
+                var res = [];
+                
+                for (var i = 0, l = elements.length; i < l; i++) {
+                    
+                    var element = elements[i];
+                    var $continue = false;
+                    
+                    for (var j = matches.length; j--;) {
+                        if (element === matches[j]) {
+                            $continue = true;
+                            break;
+                        }
+                    }
+                    
+                    if ($continue) {
+                        continue;
+                    }
+                    
+                    res.puh(element);
+                }
+                
+                return res;
+            }
+        };
+    },
+    
+    /**
+     * :link疑似クラスを解析するロジック(:link)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    link: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.nodeName.toUpperCase() === 'A';
+            }
+        };
+    },
+    
+    /**
+     * :visited疑似クラスを解析するロジック(:visited)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    visited: function (args) {
+        return {
+            isMatch: Jeeel.Function.Template.RETURN_FALSE
+        };
+    },
+    
+    /**
+     * :hover疑似クラスを解析するロジック(:hover)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    hover: function (args) {
+        return {
+            isMatch: Jeeel.Function.Template.RETURN_FALSE
+        };
+    },
+    
+    /**
+     * :active疑似クラスを解析するロジック(:active)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    active: function (args) {
+        return {
+            isMatch: Jeeel.Function.Template.RETURN_FALSE
+        };
+    },
+    
+    /**
+     * :first-line疑似クラスを解析するロジック(:first-line)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    firstLine: function (args) {
+        return {};
+    },
+    
+    /**
+     * :first-letter疑似クラスを解析するロジック(:first-letter)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    firstLetter: function (args) {
+        return {};
+    },
+    
+    /**
+     * ターゲット疑似クラスを解析するロジック(:target)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    target: function (args) {
+        return {
+            isMatch: function (element) {
+                var fragment = Jeeel.UserAgent.getFragment();
+                
+                if (element.id === fragment) {
+                    return element;
+                }
+                
+                return element.nodeName.toUpperCase() === 'A' && element.name === fragment;
+            }
+        };
+    },
+    
+    /**
+     * :focus疑似クラスを解析するロジック(:focus)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    focus: function (args) {
+        return {
+            isMatch: Jeeel.Function.Template.RETURN_FALSE
+        };
+    },
+    
+    /**
+     * 言語疑似クラスを解析するロジック(:lang)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    lang: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.lang === args;
+            }
+        };
+    },
+    
+    /**
+     * :first-child疑似クラスを解析するロジック(:first-child)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    firstChild: function (args) {
+        return {
+            isMatch: function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                var p = element.previousSibling;
+                  
+                while (p) {
+                    if (p.nodeType === type) {
+                        return false;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+                
+                return true;
+            }
+        };
+    },
+    
+    /**
+     * :last-child疑似クラスを解析するロジック(:last-child)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    lastChild: function (args) {
+        return {
+            isMatch: function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                var n = element.nextSibling;
+                  
+                while (n) {
+                    if (n.nodeType === type) {
+                        return false;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                return true;
+            }
+        };
+    },
+    
+    /**
+     * :before疑似クラスを解析するロジック(:before)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    before: function (args) {
+        return {};
+    },
+    
+    /**
+     * :after疑似クラスを解析するロジック(:after)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    after: function (args) {
+        return {};
+    },
+    
+    /**
+     * :root疑似クラスを解析するロジック(:root)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    root: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.ownerDocument.documentElement === element;
+            }
+        };
+    },
+    
+    /**
+     * :nth-child疑似クラスを解析するロジック(:nth-child)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    nthChild: function (args) {
+        var val = +args;
+        
+        var filter, isNth;
+        
+        if (val) {
+            filter = function (elements) {
+                return elements[val] && [elements[val]] || [];
+            };
+        } else if (args === 'odd') {
+            filter = function (elements) {
+                
+                var res = [];
+                
+                for (var i = 0, l = elements.length; i < l; i++) {
+                    if (i & 1) {
+                        res[res.length] = elements[i];
+                    }
+                }
+                
+                return res;
+            };
+        } else if (args === 'even') {
+            filter = function (elements) {
+                
+                var res = [];
+                
+                for (var i = 0, l = elements.length; i < l; i++) {
+                    if ( ! (i & 1)) {
+                        res[res.length] = elements[i];
+                    }
+                }
+                
+                return res;
+            };
+        } else {
+            isNth = new Function('n', 'return n % (' + args.replace(/([0-9]+)n/g, '$1*n') + ') === 0;');
+            
+            filter = function (elements) {
+                
+                var res = [];
+                
+                for (var i = 0, l = elements.length; i <l; i++) {
+                    if (isNth(i)) {
+                        res[res.length] = elements[i];
+                    }
+                }
+                
+                return res;
+            };
+        }
+        
+        return {
+            filter: filter
+        };
+    },
+    
+    /**
+     * :nth-last-child疑似クラスを解析するロジック(:nth-last-child)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    nthLastChild: function (args) {
+        var val = +args;
+        
+        var filter, isNth;
+        
+        if (val) {
+            filter = function (elements) {
+                return elements[elements.length - val - 1] && [elements[elements.length - val - 1]] || [];
+            };
+        } else if (args === 'odd') {
+            filter = function (elements) {
+                
+                var res = [], lidx = elements.length - 1;
+                
+                for (var i = 0, l = elements.length; i < l; i++) {
+                    if ((lidx - i) & 1) {
+                        res[res.length] = elements[i];
+                    }
+                }
+                
+                return res;
+            };
+        } else if (args === 'even') {
+            filter = function (elements) {
+                
+                var res = [], lidx = elements.length - 1;
+                
+                for (var i = 0, l = elements.length; i < l; i++) {
+                    if ( ! ((lidx - i) & 1)) {
+                        res[res.length] = elements[i];
+                    }
+                }
+                
+                return res;
+            };
+        } else {
+            isNth = new Function('n', 'return n % (' + args.replace(/([0-9]+)n/g, '$1*n') + ') === 0;');
+            
+            filter = function (elements) {
+                
+                var res = [], lidx = elements.length - 1;
+                
+                for (var i = 0, l = elements.length; i <l; i++) {
+                    if (isNth(lidx - i)) {
+                        res[res.length] = elements[i];
+                    }
+                }
+                
+                return res;
+            };
+        }
+        
+        return {
+            filter: filter
+        };
+    },
+    
+    /**
+     * :first-of-type疑似クラスを解析するロジック(:first-of-type)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    firstOfType: function (args) {
+        return {
+            isMatch: function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var isMatch = this.isMatch;
+                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
+                
+                var p = element.previousSibling;
+                  
+                while (p) {
+                    if (p.nodeType === type && this.node.isMatch(p)) {
+                        this.isMatch = isMatch;
+                        return false;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+                
+                this.isMatch = isMatch;
+                
+                return true;
+            }
+        };
+    },
+    
+    /**
+     * :last-of-type疑似クラスを解析するロジック(:last-of-type)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    lastOfType: function (args) {
+        return {
+            isMatch: function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var isMatch = this.isMatch;
+                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
+                
+                var n = element.nextSibling;
+                  
+                while (n) {
+                    if (n.nodeType === type && this.node.isMatch(n)) {
+                        this.isMatch = isMatch;
+                        return false;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                this.isMatch = isMatch;
+                
+                return true;
+            }
+        };
+    },
+    
+    /**
+     * :nth-of-type疑似クラスを解析するロジック(:nth-of-type)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    nthOfType: function (args) {
+        var val = +args;
+        
+        var isMatch, isNth;
+        
+        if (val) {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                var isMatch = this.isMatch;
+                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
+                  
+                var p = element.previousSibling;
+                  
+                while (p) {
+                    if (p.nodeType === type && this.node.isMatch(p)) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+                
+                this.isMatch = isMatch;
+                
+                return val === cnt;
+            };
+        } else if (args === 'odd') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                var isMatch = this.isMatch;
+                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
+                
+                var p = element.previousSibling;
+                  
+                while (p) {
+                    if (p.nodeType === type && this.node.isMatch(p)) {
+                        cnt++;
+                    }
+
+                    p = p.previousSibling;
+                }
+                
+                this.isMatch = isMatch;
+                
+                return !!(cnt & 1);
+            };
+        } else if (args === 'even') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                var isMatch = this.isMatch;
+                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
+                  
+                var p = element.previousSibling;
+                  
+                while (p) {
+                    if (p.nodeType === type && this.node.isMatch(p)) {
+                        cnt++;
+                    }
+
+                    p = p.previousSibling;
+                }
+                
+                this.isMatch = isMatch;
+                
+                return !(cnt & 1);
+            };
+        } else {
+            isNth = new Function('i,n', 'return (i === ' + args.replace(/([0-9]+)n/g, '$1*n') + ') || (i > ' + args.replace(/([0-9]+)n/g, '$1*n') + ' ? arguments.callee(i, n + 1) : false);');
+            
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                var isMatch = this.isMatch;
+                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
+                  
+                var p = element.previousSibling;
+                  
+                while (p) {
+                    if (p.nodeType === type && this.node.isMatch(p)) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+                
+                this.isMatch = isMatch;
+                
+                return isNth(cnt, 0);
+            };
+        }
+        
+        return {
+            isMatch: isMatch
+        };
+    },
+    
+    /**
+     * :nth-last-of-type疑似クラスを解析するロジック(:nth-last-of-type)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    nthLastOfType: function (args) {
+        var val = +args;
+        
+        var isMatch, isNth;
+        
+        if (val) {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                var isMatch = this.isMatch;
+                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
+                  
+                var n = element.nextSibling;
+                  
+                while (n) {
+                    if (n.nodeType === type && this.node.isMatch(n)) {
+                        cnt++;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                this.isMatch = isMatch;
+                
+                return val === cnt;
+            };
+        } else if (args === 'odd') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                var isMatch = this.isMatch;
+                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
+                  
+                var n = element.nextSibling;
+                  
+                while (n) {
+                    if (n.nodeType === type && this.node.isMatch(n)) {
+                        cnt++;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                this.isMatch = isMatch;
+                
+                return !!(cnt & 1);
+            };
+        } else if (args === 'even') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                var isMatch = this.isMatch;
+                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
+                  
+                var n = element.nextSibling;
+                  
+                while (n) {
+                    if (n.nodeType === type && this.node.isMatch(n)) {
+                        cnt++;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                this.isMatch = isMatch;
+                
+                return !(cnt & 1);
+            };
+        } else {
+            isNth = new Function('i,n', 'return (i === ' + args.replace(/([0-9]+)n/g, '$1*n') + ') || (i > ' + args.replace(/([0-9]+)n/g, '$1*n') + ' ? arguments.callee(i, n + 1) : false);');
+            
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                var isMatch = this.isMatch;
+                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
+                  
+                var n = element.nextSibling;
+                  
+                while (n) {
+                    if (n.nodeType === type && this.node.isMatch(n)) {
+                        cnt++;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                this.isMatch = isMatch;
+                
+                return isNth(cnt, 0);
+            };
+        }
+        
+        return {
+            isMatch: isMatch
+        };
+    },
+    
+    /**
+     * :only-child疑似クラスを解析するロジック(:only-child)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    onlyChild: function (args) {
+        return {
+            isMatch: function (element) {
+                
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 0;
+                  
+                var n = element.parentNode.firstChild.nextSibling;
+                  
+                while (n) {
+                    if (n.nodeType === type) {
+                        cnt++;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                return cnt === 1;
+            }
+        };
+    },
+    
+    /**
+     * :only-of-type疑似クラスを解析するロジック(:only-of-type)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    onlyOfType: function (args) {
+        return {
+            isMatch: function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var isMatch = this.isMatch;
+                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
+                
+                var n = element.parentNode.firstChild;
+                  
+                while (n) {
+                    if (n.nodeType === type && n !== element && this.node.isMatch(n)) {
+                        this.isMatch = isMatch;
+                        return false;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                this.isMatch = isMatch;
+                
+                return true;
+            }
+        };
+    },
+    
+    /**
+     * :empty疑似クラスを解析するロジック(:empty)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    empty: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.childNodes.length === 0;
+            }
+        };
+    },
+    
+    /**
+     * :enabled疑似クラスを解析するロジック(:enabled)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    enabled: function (args) {
+        return {
+            isMatch: function (element) {
+                return ! element.disabled;
+            }
+        };
+    },
+    
+    /**
+     * :disabled疑似クラスを解析するロジック(:disabled)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    disabled: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.disabled;
+            }
+        };
+    },
+    
+    /**
+     * :checked疑似クラスを解析するロジック(:checked)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    checked: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.checked;
+            }
+        };
+    }
+};
+
+Jeeel.Dom.Selector.Mock.prototype = {
+  
+    /**
+     * 疑似クラスセレクタ
+     * 
+     * @type String
+     */
+    selector: '',
+    
+    /**
+     * 親ノード
+     * 
+     * @type Jeeel.Dom.Selector.Node
+     */
+    node: null,
+    
+    /**
+     * 疑似クラスの名前
+     * 
+     * @type String
+     */
+    name: '',
+    
+    /**
+     * 疑似クラスの引数
+     * 
+     * @type String
+     */
+    args: '',
+    
+    /**
+     * 指定した要素がセレクタと一致するかどうか返す
+     * 
+     * @param {Element} element 調べる要素
+     * @return {Boolean} 一致したかどうか
+     */
+    isMatch: function (element) {
+        return true;
+    },
+    
+    /**
+     * 指定した要素リストをフィルタリングする
+     * 
+     * @param {Element[]} elements 要素リスト
+     * @return {Element[]} フィルタリング後の要素リスト
+     */
+    filter: function (elements) {
+        return elements;
+    },
+    
+    /**
+     * 現在の情報を元にロジックを構築する
+     * 
+     * @return {Jeeel.Dom.Selector.Mock} 自インスタンス
+     */
+    compile: function () {
+        
+        var type = Jeeel.String.toCamelCase(this.name);
+        var tmp = this.constructor.LOGIC[type] && this.constructor.LOGIC[type](this.args);
+        
+        if ( ! tmp) {
+            return this;
+        }
+
+        if (tmp.isMatch) {
+            this.isMatch = tmp.isMatch;
+        }
+        
+        if (tmp.filter) {
+            this.filter = tmp.filter;
+        }
+        
+        return this;
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Dom.Selector.Mock
+};Jeeel.directory.Jeeel.Dom.Behavior = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel.Dom + 'Behavior/';
+    }
+};
+
+/**
+ * @namespace DOMの挙動を変更するためのネームスペース
+ */
+Jeeel.Dom.Behavior = {
+    
+};
+
+Jeeel.file.Jeeel.Dom.Behavior = ['Rollover', 'Placeholder', 'Autofocus', 'EditInplace', 'Autoresize'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Behavior, Jeeel.file.Jeeel.Dom.Behavior);
+/**
+ * ロールオーバーを有効にする
+ * 
+ * @return {Jeeel.Dom.Behavior} 自クラス
+ */
+Jeeel.Dom.Behavior.enableRollover = function () {
+  
+    Jeeel.Dom.Behavior.Rollover.addLoadEvent();
+    
+    return this;
+};
+
+/**
+ * ロールオーバーを実現するためのクラス
+ */
+Jeeel.Dom.Behavior.Rollover = {
+    
+    _prefix: {
+        on: '',
+        off: ''
+    },
+    
+    _suffix: {
+        on: '_on',
+        off: '_off'
+    },
+    
+    /**
+     * 読み込み時のイベントに登録する
+     * 
+     * @return {Jeeel.Dom.Behavior.Rollover} 自クラス
+     */
+    addLoadEvent: function () {
+        Jeeel.addLoadEvent(function () {
+            var elms = Jeeel.Document.getElementsByTagName('input');
+
+            this.rollover(elms.concat(Jeeel.Document.getElementsByTagName('img')));
+
+            elms = null;
+        }, this);
+        
+        return this;
+    },
+    
+    /**
+     * 先頭のロールオーバーパターンを設定する
+     * 
+     * @param {String} prefixOn ロールオーバー時の先頭パターン
+     * @param {String} prefixOff ロールアウト時の先頭パターン
+     * @return {Jeeel.Dom.Behavior.Rollover} 自クラス
+     */
+    setPrefixPattern: function (prefixOn, prefixOff) {
+        this._prefix = {
+            on: prefixOn,
+            off: prefixOff
+        };
+        
+        return this;
+    },
+    
+    /**
+     * 後尾のロールオーバーパターンを設定する
+     * 
+     * @param {String} suffixOn ロールオーバー時の後尾パターン
+     * @param {String} suffixOff ロールアウト時の後尾パターン
+     * @return {Jeeel.Dom.Behavior.Rollover} 自クラス
+     */
+    setSuffixPattern: function (suffixOn, suffixOff) {
+        this._suffix = {
+            on: suffixOn,
+            off: suffixOff
+        };
+        
+        return this;
+    },
+    
+    /**
+     * イメージのロールオーバーを行う
+     * 
+     * @param {Element|Element[]} elements イメージもしくはイメージリスト(内部に他のElementが入っていた場合無視する)
+     * @return {Jeeel.Dom.Behavior.Rollover} 自クラス
+     */
+    rollover: function (elements) {
+        if (Jeeel.Type.isElement(elements)) {
+            elements = [elements];
+        }
+        
+        if ( ! Jeeel.Type.isArray(elements)) {
+            throw new Error('引数が間違っています。');
+        }
+        
+        var over, out;
+        
+        var regFilter = new Jeeel.Filter.String.RegularExpressionEscape();
+        
+        (function (pover, pout, sover, sout) {
+            
+            /**
+             * @ignore
+             */
+            over = function () {
+                var src = this.src;
+                
+                if (pout || pover) {
+                    src = src.replace(new RegExp('/?' + regFilter.filter(pout) + '([^/]*)$'), '/' + pover + '$1');
+                }
+                
+                if (sout || sover) {
+                    src = src.replace(sout + '.', sover + '.');
+                }
+                
+                this.src = src;
+            };
+
+            /**
+             * @ignore
+             */
+            out = function () {
+                var src = this.src;
+                
+                if (pover || pout) {
+                    src = src.replace(new RegExp('/?' + regFilter.filter(pover) + '([^/]*)$'), '/' + pout + '$1');
+                }
+                
+                if (sover || sout) {
+                    src = src.replace(sover + '.', sout + '.');
+                }
+                
+                this.src = src;
+            };
+        })(this._prefix.on, this._prefix.off, this._suffix.on, this._suffix.off);
+        
+        var reg = new RegExp('\\/?' + regFilter.filter(this._prefix.off) + '[^/]*' + regFilter.filter(this._suffix.off) + '\\.[^.]+$');
+        
+        for (var i = elements.length; i--;) {
+            var element = elements[i];
+            var tagName = element.tagName && element.tagName.toUpperCase();
+            
+            if (tagName === 'IMG' || tagName === 'INPUT' && element.type.toLowerCase() === 'image') {
+                
+                if ( ! element.src.match(reg)) {
+                    continue;
+                }
+                
+                elements[i].onmouseover = over;
+                elements[i].onmouseout = out;
+            }
+        }
+        
+        return this;
+    }
+};
+
+/**
+ * プレースホルダを有効にする
+ * 
+ * @return {Jeeel.Dom.Behavior} 自クラス
+ */
+Jeeel.Dom.Behavior.enablePlaceholder = function () {
+  
+    Jeeel.Dom.Behavior.Placeholder.addLoadEvent();
+    
+    return this;
+};
+
+/**
+ * HTML5のプレースホルダを実現するためのクラス
+ */
+Jeeel.Dom.Behavior.Placeholder = {
+  
+    /**
+     * ストレージ取得の際に指定する名前
+     * 
+     * @type String
+     * @constant
+     */
+    STORAGE_NAME: 'jeeel-dom-behavior-placeholder',
+    
+    /**
+     * 使用可能な要素のリスト
+     * 
+     * @type Hash
+     * @constant
+     */
+    USABLE_LIST: {
+        NODES: ['INPUT', 'TEXTAREA'],
+        TYPES: ['text', 'search', 'url', 'tel', 'email', 'password']
+    },
+    
+    /**
+     * 読み込み時のイベントに登録する
+     * 
+     * @return {Jeeel.Dom.Behavior.Placeholder} 自クラス
+     */
+    addLoadEvent: function () {
+        Jeeel.addLoadEvent(function () {
+            var elms = Jeeel.Document.getElementsByTagName('input');
+
+            this.hold(elms.concat(Jeeel.Document.getElementsByTagName('textarea')));
+
+            elms = null;
+        }, this);
+        
+        return this;
+    },
+    
+    /**
+     * プレースホルダを適用する
+     * 
+     * @param {Element|Element[]} inputs プレースホルダを適用する要素
+     * @return {Jeeel.Dom.Behavior.Placeholder} 自クラス
+     */
+    hold: function (inputs) {
+        
+        if (inputs instanceof Jeeel.Dom.ElementOperator) {
+            inputs = inputs.getAll();
+        } else if ( ! Jeeel.Type.isArray(inputs)) {
+            inputs = [inputs];
+        }
+        
+        var forms = [];
+        
+        for (var i = inputs.length; i--;) {
+            
+            var input = inputs[i];
+            var nodeName = input.nodeName.toUpperCase();
+            var plc = input.getAttribute('placeholder');
+            
+            if ( ! plc) {
+                continue;
+            } else if ( ! Jeeel.Type.inArray(nodeName, this.USABLE_LIST.NODES, true)) {
+                continue;
+            } else if (nodeName === 'INPUT' && ! Jeeel.Type.inArray(input.type, this.USABLE_LIST.TYPES, true)) {
+                continue;
+            }
+            
+            // オーナーのフォームに対して送信時にplaceholder用の値を削除するトリガーをセットする
+            if (input.form && ! Jeeel.Type.inArray(input.form, forms, true)) {
+                Jeeel.Dom.Event.addEventListener(input.form, Jeeel.Dom.Event.Type.SUBMIT, this._submit, this);
+                
+                forms[forms.length] = input.form;
+            }
+
+            var storage = Jeeel.Storage.Object(input, this.STORAGE_NAME);
+            
+            storage.set('str', plc)
+                   .set('color', input.style.color)
+                   .set('holded', false);
+            
+            Jeeel.Dom.Event.addEventListener(input, Jeeel.Dom.Event.Type.FOCUS, this._focus, this);
+            Jeeel.Dom.Event.addEventListener(input, Jeeel.Dom.Event.Type.BLUR, this._blur, this);
+            
+            this._blur({currentTarget: input});
+        }
+        
+        return this;
+    },
+    
+    /**
+     * プレースホルダーが表示中かどうかを返す
+     * 
+     * @param {Element} input プレースホルダーの有無を確認する要素
+     * @return {Boolean} プレースホルダーが表示中かどうか
+     */
+    isHolded: function (input) {
+        
+        if ( ! input || ! input.nodeName) {
+            return false;
+        }
+        
+        var nodeName = input.nodeName.toUpperCase();
+        var plc = input.getAttribute('placeholder');
+
+        if ( ! plc) {
+            return false;
+        } else if ( ! Jeeel.Type.inArray(nodeName, this.USABLE_LIST.NODES, true)) {
+            return false;
+        } else if (nodeName === 'INPUT' && ! Jeeel.Type.inArray(input.type, this.USABLE_LIST.TYPES, true)) {
+            return false;
+        } else if ( ! Jeeel.Storage.Object.exists(input, this.STORAGE_NAME)) {
+            return false;
+        }
+
+        var storage = Jeeel.Storage.Object(input, this.STORAGE_NAME);
+
+        return !!storage.get('holded');
+    },
+    
+    _focus: function (e) {
+        var elm = e.currentTarget;
+        var storage = Jeeel.Storage.Object(elm, this.STORAGE_NAME);
+        
+        if (storage.get('holded')) {
+            elm.value = '';
+            
+            elm.style.color = storage.get('color');
+            
+            storage.set('holded', false);
+        }
+    },
+    
+    _blur: function (e) {
+        var elm = e.currentTarget;
+        var storage = Jeeel.Storage.Object(elm, this.STORAGE_NAME);
+        
+        if ( ! elm.value) {
+            var style = elm.style;
+            
+            storage.set('color', style.color)
+                   .set('holded', true);
+            
+            style.color = '#B9AAC7';
+            
+            elm.value = storage.get('str');
+        }
+    },
+    
+    _submit: function (e) {
+        var form = e.currentTarget;
+        var inputs = form.elements;
+
+        for (var i = inputs.length; i--;) {
+            var input = inputs[i];
+            
+            if (this.isHolded(input)) {
+                input.value = '';
+            }
+        }
+    },
+    
+    _init: function () {
+        delete this._init;
+        
+        var input = Jeeel._doc.createElement('input');
+        
+        input.type = 'text';
+        
+        if ('placeholder' in input) {
+            this.hold = Jeeel.Function.Template.RETURN_THIS;
+        }
+        
+        input = null;
+    }
+};
+
+Jeeel.Dom.Behavior.Placeholder._init();
+/**
+ * オートフォーカスを有効にする
+ * 
+ * @return {Jeeel.Dom.Behavior} 自クラス
+ */
+Jeeel.Dom.Behavior.enableAutofocus = function () {
+  
+    Jeeel.Dom.Behavior.Autofocus.addLoadEvent();
+    
+    return this;
+};
+
+/**
+ * HTML5のオートフォーカスを実現するためのクラス
+ */
+Jeeel.Dom.Behavior.Autofocus = {
+    
+    _focused: false,
+    
+    /**
+     * 読み込み時のイベントに登録する
+     * 
+     * @return {Jeeel.Dom.Behavior.Autofocus} 自クラス
+     */
+    addLoadEvent: function () {
+        Jeeel.addLoadEvent(function () {
+            var elms = Jeeel.Document.getElementsByAttribute('autofocus', '*');
+
+            this.focus(elms[0]);
+
+            elms = null;
+        }, this);
+        
+        return this;
+    },
+    
+    /**
+     * フォーカスを当てる
+     * 
+     * @param {Element} element フォーカス対象の要素
+     * @return {Jeeel.Dom.Behavior.Autofocus} 自クラス
+     */
+    focus: function (element) {
+        if ( ! element || this._focused) {
+            return this;
+        }
+        
+        var focus = element.getAttribute && element.getAttribute('autofocus');
+        
+        if ( ! focus) {
+            return this;
+        }
+        
+        element.focus();
+        
+        this._focused = true;
+        
+        return this;
+    },
+    
+    _init: function () {
+        delete this._init;
+        
+        var input = Jeeel._doc.createElement('input');
+        
+        input.type = 'text';
+        
+        if ('autofocus' in input) {
+            this.focus = Jeeel.Function.Template.RETURN_THIS;
+        }
+        
+        input = null;
+    }
+};
+
+Jeeel.Dom.Behavior.Autofocus._init();
+/**
+ * エディットインプレースを有効にする
+ * 
+ * @param {Integer} [type)] 挙動の種類
+ * @return {Jeeel.Dom.Behavior} 自クラス
+ */
+Jeeel.Dom.Behavior.enableEditInplace = function (type) {
+  
+    Jeeel.Dom.Behavior.EditInplace.addLoadEvent(type);
+    
+    return this;
+};
+
+/**
+ * その場編集の機能を実現するためのクラス
+ */
+Jeeel.Dom.Behavior.EditInplace = {
+    
+    /**
+     * ストレージ取得の際に指定する名前
+     * 
+     * @type String
+     * @constant
+     */
+    STORAGE_NAME: 'jeeel-dom-behavior-editinplace',
+    
+    /**
+     * フォーカスが当たった際に編集可能になる挙動を示す
+     * 
+     * @type String
+     * @constant
+     */
+    EDIT_TYPE_FOCUS: 0,
+    
+    /**
+     * マウスオーバーしたら編集可能になる挙動を示す
+     * 
+     * @type String
+     * @constant
+     */
+    EDIT_TYPE_OVER: 1,
+    
+    /**
+     * 使用可能な要素のリスト
+     * 
+     * @type Hash
+     * @constant
+     */
+    USABLE_LIST: {
+        NODES: ['INPUT', 'TEXTAREA'],
+        TYPES: ['text', 'search', 'url', 'tel', 'email', 'password']
+    },
+    
+    /**
+     * 読み込み時のイベントに登録する
+     * 
+     * @param {Integer} [type)] 挙動の種類
+     * @return {Jeeel.Dom.Behavior.EditInplace} 自クラス
+     */
+    addLoadEvent: function (type) {
+        Jeeel.addLoadEvent(function () {
+            var elms = Jeeel.Document.getElementsByTagName('input');
+
+            this.enable(elms.concat(Jeeel.Document.getElementsByTagName('textarea')), type);
+
+            elms = null;
+        }, this);
+        
+        return this;
+    },
+    
+    /**
+     * その場編集を適用する
+     * 
+     * @param {Element|Element[]} inputs その場編集を適用する要素
+     * @param {Integer} [type)] 挙動の種類
+     * @return {Jeeel.Dom.Behavior.EditInplace} 自クラス
+     */
+    enable: function (inputs, type) {
+        if (inputs instanceof Jeeel.Dom.ElementOperator) {
+            inputs = inputs.getAll();
+        } else if ( ! Jeeel.Type.isArray(inputs)) {
+            inputs = [inputs];
+        }
+        
+        for (var i = inputs.length; i--;) {
+            var input = inputs[i];
+            var nodeName = input.nodeName.toUpperCase();
+
+            if ( ! Jeeel.Type.inArray(nodeName, this.USABLE_LIST.NODES, true)) {
+                continue;
+            } else if (nodeName === 'INPUT' && ! Jeeel.Type.inArray(input.type, this.USABLE_LIST.TYPES, true)) {
+                continue;
+            }
+            
+            switch (type) {
+                case this.EDIT_TYPE_OVER:
+                    Jeeel.Dom.Event.addEventListener(input, Jeeel.Dom.Event.Type.MOUSE_OVER, this._over, this);
+                    Jeeel.Dom.Event.addEventListener(input, Jeeel.Dom.Event.Type.MOUSE_OUT, this._out, this);
+                    Jeeel.Dom.Event.addEventListener(input, Jeeel.Dom.Event.Type.FOCUS, this._focus, this);
+                    Jeeel.Dom.Event.addEventListener(input, Jeeel.Dom.Event.Type.BLUR, this._blur, this);
+                    break;
+                    
+                case this.EDIT_TYPE_FOCUS:
+                default:
+                    Jeeel.Dom.Event.addEventListener(input, Jeeel.Dom.Event.Type.FOCUS, this._focus, this);
+                    Jeeel.Dom.Event.addEventListener(input, Jeeel.Dom.Event.Type.BLUR, this._blur, this);
+                    break;
+            }
+            
+            this._hide(input);
+        }
+        
+        return this;
+    },
+    
+    _over: function (e) {
+        var target = e.currentTarget;
+        var storage = Jeeel.Storage.Object(target, this.STORAGE_NAME);
+        
+        if ( ! storage.get('focused')) {
+            this._show(target);
+        }
+    },
+    
+    _out: function (e) {
+        var target = e.currentTarget;
+        var storage = Jeeel.Storage.Object(target, this.STORAGE_NAME);
+        
+        if ( ! storage.get('focused')) {
+            this._hide(target);
+        }
+    },
+    
+    _focus: function (e) {
+        var target = e.currentTarget;
+        var storage = Jeeel.Storage.Object(target, this.STORAGE_NAME);
+        
+        storage.set('focused', true);
+        
+        this._show(target);
+    },
+    
+    _blur: function (e) {
+        var target = e.currentTarget;
+        var storage = Jeeel.Storage.Object(target, this.STORAGE_NAME);
+        
+        storage.set('focused', false);
+        
+        this._hide(target);
+    },
+    
+    _show: function (target) {
+        var style = target.style;
+
+        if ('readOnly' in target) {
+            target.readOnly = false;
+        }
+        
+        style.backgroundColor = '';
+        style.borderStyle = '';
+        style.cursor = '';
+
+        if ('resize' in style) {
+            style.resize = '';
+        }
+    },
+    
+    _hide: function (target) {
+        var style = target.style;
+        var css = [
+            'background-color: transparent',
+            'border-style: none',
+            'cursor: pointer'
+        ];
+        
+        if ('resize' in style) {
+            css[css.length] = 'resize: none';
+        }
+        
+        if ('readOnly' in target) {
+            target.readOnly = true;
+        }
+        
+        style.cssText += ';' + css.join(';');
+    }
+};
+/**
+ * オートリサイズを有効にする
+ * 
+ * @param {Hash} [limit] サイズ制限
+ * @return {Jeeel.Dom.Behavior} 自クラス
+ */
+Jeeel.Dom.Behavior.enableAutoresize = function (limit) {
+  
+    Jeeel.Dom.Behavior.Autoresize.addLoadEvent(limit);
+    
+    return this;
+};
+
+/**
+ * オートリサイズを実現するクラス
+ */
+Jeeel.Dom.Behavior.Autoresize = {
+    
+    /**
+     * サイズ制限
+     * 
+     * @type Hash
+     * @constant
+     */
+    LIMIT: {
+        min: 15,
+        max: -1
+    },
+    
+    /**
+     * ストレージ取得の際に指定する名前
+     * 
+     * @type String
+     * @constant
+     */
+    STORAGE_NAME: 'jeeel-dom-behavior-autoresize',
+    
+    /**
+     * 使用可能な要素のリスト
+     * 
+     * @type Hash
+     * @constant
+     */
+    USABLE_LIST: {
+        NODES: ['INPUT', 'TEXTAREA'],
+        TYPES: ['text', 'search', 'url', 'tel', 'email', 'password']
+    },
+    
+    /**
+     * 読み込み時のイベントに登録する
+     * 
+     * @param {Hash} [limit] サイズ制限
+     * @return {Jeeel.Dom.Behavior.Autoresize} 自クラス
+     */
+    addLoadEvent: function (limit) {
+        Jeeel.addLoadEvent(function () {
+            var elms = Jeeel.Document.getElementsByTagName('input');
+
+            this.resize(elms.concat(Jeeel.Document.getElementsByTagName('textarea')), limit);
+
+            elms = null;
+        }, this);
+        
+        return this;
+    },
+    
+    /**
+     * オートリサイズを有効にする
+     * 
+     * @param {Element|Element[]} inputs オートリサイズを適用する要素
+     * @param {Hash} [limit] サイズ制限
+     * @return {Jeeel.Dom.Behavior.Autoresize} 自クラス
+     */
+    resize: function (inputs, limit) {
+        if (inputs instanceof Jeeel.Dom.ElementOperator) {
+            inputs = inputs.getAll();
+        } else if ( ! Jeeel.Type.isArray(inputs)) {
+            inputs = [inputs];
+        }
+        
+        if ( ! limit) {
+            limit = {};
+        }
+        
+        var keys = ['width', 'height'], 
+            key, i;
+        
+        for (i = keys.length; i--;) {
+            
+            key = keys[i];
+            
+            if ( ! limit[key]) {
+                limit[key] = {};
+            }
+            
+            if ( ! ('min' in limit[key])) {
+                limit[key].min = limit.min || this.LIMIT.min;
+            }
+
+            if ( ! ('max' in limit[key])) {
+                limit[key].max = limit.max || this.LIMIT.max;
+            }
+        }
+        
+        for (i = inputs.length; i--;) {
+            var input = inputs[i];
+            var nodeName = input.nodeName.toUpperCase();
+
+            if ( ! Jeeel.Type.inArray(nodeName, this.USABLE_LIST.NODES, true)) {
+                continue;
+            } else if (nodeName === 'INPUT' && ! Jeeel.Type.inArray(input.type, this.USABLE_LIST.TYPES, true)) {
+                continue;
+            }
+            
+            Jeeel.Dom.Event.addEventListener(input, Jeeel.Dom.Event.Type.KEY_DOWN, this._keyDown, this);
+            Jeeel.Dom.Event.addEventListener(input, Jeeel.Dom.Event.Type.KEY_UP, this._keyUp, this);
+            
+            input.style.overflow = 'hidden';
+            
+            var storage = Jeeel.Storage.Object(input, this.STORAGE_NAME);
+            
+            storage.set('limit', limit);
+        }
+    },
+    
+    _keyDown: function (e) {
+        var target = e.currentTarget;
+        var value = target.value;
+        var charCode = String.fromCharCode(e.getKeyCode()) || '';
+        
+        if (charCode === '\u000D') {
+            charCode = target.nodeName.toUpperCase() === 'TEXTAREA' && '\n' || '';
+        } else if (charCode === '\u0008') {
+            value = value.slice(0, value.length - 1);
+            charCode = '';
+        } else if ( ! e.shiftKey) {
+            charCode = charCode.toLowerCase();
+        }
+        
+        if (charCode.length > 1) {
+            charCode = '';
+        }
+        
+        this._setSize(target, value + (charCode || ''));
+    },
+    
+    _keyUp: function (e) {
+        var target = e.currentTarget;
+        
+        this._setSize(target, target.value);
+    },
+    
+    _setSize: function (target, txt) {
+        var nodeName = target.nodeName.toUpperCase();
+        var isMultiline = nodeName === 'TEXTAREA';
+        var wrapper = new Jeeel.Dom.Element(target);
+        
+        var size = Jeeel.String.getTextSize(txt, {
+            fontSize: wrapper.getStyle('fontSize'),
+            fontFamily: wrapper.getStyle('fontFamily'),
+            whiteSpace: wrapper.getStyle('whiteSpace'),
+            lineHeight: wrapper.getStyle('lineHeight'),
+            border: wrapper.getStyle('border'),
+            padding: wrapper.getStyle('padding')
+        });
+        
+        var storage = Jeeel.Storage.Object(target, this.STORAGE_NAME);
+        var limit = storage.get('limit');
+        
+        var keys = isMultiline ? ['width', 'height'] : ['width'], 
+            key, i;
+        
+        for (i = keys.length; i--;) {
+            key = keys[i];
+            
+            if (limit[key].min > size[key]) {
+                size[key] = limit[key].min;
+            }
+
+            if (limit[key].max >= 0 && limit[key].max < size[key]) {
+                size[key] = limit[key].max;
+            }
+        }
+        
+        wrapper.setStyleList(isMultiline ? {
+            width: size.width + 'px',
+            height: size.height + 'px'
+        } : {
+            width: size.width + 'px'
+        });
+    }
+};
+/**
+ * @namespace 特殊検索に使用する列挙体
  */
 Jeeel.Dom.SearchOption = {
     /**
@@ -28143,13 +32856,13 @@ Jeeel.Dom.SearchOption = {
 };
 
 /**
- * ネット関連のネームスペース
+ * @namespace ネット関連のネームスペース
  */
 Jeeel.Net = {
 
 };
 
-Jeeel.file.Jeeel.Net = ['Form', 'Ajax', 'Jsonp'];
+Jeeel.file.Jeeel.Net = ['Form', 'Ajax', 'Jsonp', 'Beacon'];
 
 if (Jeeel._extendMode.Net && Jeeel._global) {
     if (Jeeel._global.EventSource) {
@@ -28682,6 +33395,39 @@ Jeeel.Net.Form.prototype = {
     getOverwrittenElements: function () {},
     
     /**
+     * selectタグのoptionを全て取得する
+     * 
+     * @param {String} key selectタグのname
+     * @return {Element[]} オプションリスト
+     */
+    getOptions: function (key) {
+        var select = this.getElement(key),
+            nodeName = select && select.nodeName;
+        
+        if ( ! nodeName || nodeName.toUpperCase() !== 'SELECT') {
+            return [];
+        }
+        
+        return Jeeel.Hash.toArray(select.options);
+    },
+    
+    /**
+     * selectタグのoptionの値を全て取得する
+     * 
+     * @param {String} key selectタグのname
+     * @return {String[]} オプションの値のリスト
+     */
+    getOptionValues: function (key) {
+        var options = this.getOptions(key);
+        
+        for (var i = options.length; i--;) {
+            options[i] = options[i].value;
+        }
+        
+        return options;
+    },
+    
+    /**
      * 指定キーのinput要素を破棄する
      *
      * @param {String} key キー
@@ -28702,7 +33448,7 @@ Jeeel.Net.Form.prototype = {
      * @param {Hash} options オプションの値に使う値と表示値のリスト({value1: text1, value2: text2, ...})
      * @return {Jeeel.Net.Form} 自インスタンス
      */
-    replaceSelectOptions: function (key, options) {
+    replaceOptions: function (key, options) {
         var select = this.getElement(key),
             nodeName = select && select.nodeName;
         
@@ -28738,6 +33484,10 @@ Jeeel.Net.Form.prototype = {
      * @return {Jeeel.Net.Form} 自身のインスタンス
      */
     submit: function () {
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(this.getAction(), '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
         if (this._pseudoForm) {
             this._setAllForm(this.getAll());
         }
@@ -28773,31 +33523,47 @@ Jeeel.Net.Form.prototype = {
         var foef = new Jeeel.Filter.Html.Form(false, null, oName);
         var uef  = new Jeeel.Filter.Url.Escape();
         
-        var self = this;
-        
-        self.getAll = function () {
+        /**
+         * @ignore
+         */
+        this.getAll = function () {
             return fnvf.filter(this._pseudoForm || this._form);
         };
         
-        self.getDefaultAll = function () {
+        /**
+         * @ignore
+         */
+        this.getDefaultAll = function () {
             return fdvf.filter(this._pseudoForm || this._form);
         };
         
-        self.getElementAll = function () {
+        /**
+         * @ignore
+         */
+        this.getElementAll = function () {
             return fnef.filter(this._pseudoForm || this._form);
         };
         
-        self.getUnknownElements = function () {
+        /**
+         * @ignore
+         */
+        this.getUnknownElements = function () {
             var parm = fuef.filter(this._pseudoForm || this._form)[uName];
 
             return Jeeel.Hash.getValues(parm || []);
         };
         
-        self.getOverwrittenElements = function () {
+        /**
+         * @ignore
+         */
+        this.getOverwrittenElements = function () {
             return foef.filter(this._pseudoForm || this._form)[oName];
         };
         
-        self._setAllForm = function (vals) {
+        /**
+         * @ignore
+         */
+        this._setAllForm = function (vals) {
             var inputs = fnef.filter(this._form);
 
             Jeeel.Hash.forEach(vals,
@@ -28809,7 +33575,10 @@ Jeeel.Net.Form.prototype = {
             return this;
         };
         
-        self._set = function (key, val, input, toForm) {
+        /**
+         * @ignore
+         */
+        this._set = function (key, val, input, toForm) {
             // inputがElementの場合
             if (Jeeel.Type.isElement(input)) {
 
@@ -28953,6 +33722,10 @@ Jeeel.Net.Ajax.createXMLHttpRequest = function () {
  */
 Jeeel.Net.Ajax.serverResponse = function (url, parameter) {
 
+    if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+        Jeeel.Acl.throwError('Access Error', 404);
+    }
+
     if ( ! Jeeel.Type.isHash(parameter)) {
         parameter = {};
     }
@@ -29024,6 +33797,14 @@ Jeeel.Net.Ajax.prototype = {
      * @private
      */
     _fields: null,
+    
+    /**
+     * リトライ情報
+     * 
+     * @type 
+     * @private
+     */
+    _retry: null,
 
     /**
      * Ajax対象のURL
@@ -29264,6 +34045,36 @@ Jeeel.Net.Ajax.prototype = {
     },
     
     /**
+     * リトライの設定を行う<br />
+     * リトライを行った際は本来呼ばれるメソッドは呼ばれなくなる
+     * 
+     * @param {Integer} limit リトライ回数(0で無制限、-1で無効)
+     * @param {Integer} [delayTime] 遅延秒数(ミリ秒、デフォルトでは30000ミリ秒)
+     * @param {Function} [callback] リトライ時に呼ばれるメソッド<br />
+     *                               コールバックメソッドに渡される引数は存在しない<br />
+     *                               void callback()
+     * @param {Mixied} [thisArg] コールバック中のthisに相当する値(デフォルトはこのインスタンスになる)
+     * @return {Jeeel.Net.Ajax} 自身のインスタンス
+     */
+    setRetry: function (limit, delayTime, callback, thisArg) {
+      
+        if (limit < 0) {
+            this._retry = null;
+            
+            return this;
+        }
+        
+        this._retry = {
+            count: 0,
+            limit: +limit,
+            delayTime: delayTime || 30000,
+            callback: callback && {func: callback, thisArg: thisArg}
+        };
+        
+        return this;
+    },
+    
+    /**
      * 非同期通信時のタイムアウトまでの時間を取得する
      * 
      * @return {Integer} タイムアウト時間、0で無制限(ミリ秒)
@@ -29478,7 +34289,7 @@ Jeeel.Net.Ajax.prototype = {
 
         return this;
     },
-
+    
     /**
      * Ajaxパラメータの全取得
      *
@@ -29681,7 +34492,11 @@ Jeeel.Net.Ajax.prototype = {
      * @return {Jeeel.Net.Ajax} 自インスタンス
      */
     execute: function () {
-      
+        
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(this._url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
         // 通信中だった場合コリジョンポリシーに基づき動作を変える
         if (this._executing) {
             
@@ -29692,8 +34507,18 @@ Jeeel.Net.Ajax.prototype = {
             }
         }
         
+        if (this._retry && this._retry.retrying) {
+            var callback = this._retry.callback;
+            
+            if (callback) {
+                callback.func.call(callback.thisArg || this);
+            }
+            
+            this._retry.retrying = false;
+        }
+        
         var self = this;
-
+        
         this._request = new this.constructor.Request(this._url, {
             method: this._method,
             parameters: this._params.toQueryString(),
@@ -29716,17 +34541,31 @@ Jeeel.Net.Ajax.prototype = {
                 self._callMethod('_success', [response, jsonHeader]);
             },
             onFailure: function (response, jsonHeader){
-                if (self._failure) {
-                    self._callMethod('_failure', [response, jsonHeader]);
+                if (self._retry && ! self._retry.limit || (self._retry.count < self._retry.limit)) {
+                    self._retry.retrying = true;
+                    self._retry.count++;
+                    
+                    Jeeel.Deferred.next(self.execute, self, self._retry.delayTime);
                 } else {
-                    Jeeel.errorHtmlDump('Failure', response.statusText + '(' + response.status + ')', response.responseText);
+                    if (self._failure) {
+                        self._callMethod('_failure', [response, jsonHeader]);
+                    } else {
+                        Jeeel.errorHtmlDump('Failure', response.statusText + '(' + response.status + ')', response.responseText);
+                    }
                 }
             },
             onAbort: function (response, jsonHeader) {
                 self._callMethod('_abort', [response, jsonHeader]);
             },
             onTimeout: function (response, jsonHeader) {
-                self._callMethod('_timeout', [response, jsonHeader]);
+                if (self._retry && ! self._retry.limit || (self._retry.count < self._retry.limit)) {
+                    self._retry.retrying = true;
+                    self._retry.count++;
+                    
+                    Jeeel.Deferred.next(self.execute, self, self._retry.delayTime);
+                } else {
+                    self._callMethod('_timeout', [response, jsonHeader]);
+                }
             },
             onInteractive: function (response, jsonHeader) {
                 self._callMethod('_interactive', [response, jsonHeader]);
@@ -29751,7 +34590,7 @@ Jeeel.Net.Ajax.prototype = {
                 }
             }
         });
-
+        
         return this;
     },
     
@@ -30091,7 +34930,7 @@ Jeeel.Net.Ajax.Request.prototype = {
                 this._complete = true;
                 (this.options['on' + response.status] ||
                  this.options['on' + (this.isSuccess() ? 'Success' : 'Failure')] ||
-                 this.emptyFunction)(response, response.headerJSON);
+                 Jeeel.Function.Template.EMPTY)(response, response.headerJSON);
             } catch (e) {
                 this.dispatchException(e);
             }
@@ -30106,14 +34945,14 @@ Jeeel.Net.Ajax.Request.prototype = {
         }
 
         try {
-            (this.options['on' + state] || this.emptyFunction)(response, response.headerJSON);
+            (this.options['on' + state] || Jeeel.Function.Template.EMPTY)(response, response.headerJSON);
             Jeeel.Net.Ajax.Request.dispatch('on' + state, this, response, response.headerJSON);
         } catch (e) {
             this.dispatchException(e);
         }
 
         if (state == 'Complete') {
-            this.transport.onreadystatechange = this.emptyFunction;
+            this.transport.onreadystatechange = Jeeel.Function.Template.EMPTY;
             clearTimeout(this._timeoutId);
         }
     },
@@ -30166,12 +35005,7 @@ Jeeel.Net.Ajax.Request.prototype = {
      */
     isSameOrigin: function () {
         var m = this.url.match(/^\s*https?:\/\/[^\/]*/);
-        var tpl = Jeeel.Template.create();
-        return !m || (m[0] == tpl.assignAll({
-            protocol: location.protocol,
-            domain: Jeeel._doc.domain,
-            port: location.port ? ':' + location.port : ''
-        }).fetchTemplate('#{protocol}//#{domain}#{port}'));
+        return !m || (m[0] == (location.protocol + '//' + Jeeel._doc.domain + (location.port ? ':' + location.port : '')));
     },
 
     /**
@@ -30186,12 +35020,7 @@ Jeeel.Net.Ajax.Request.prototype = {
         } else {
             throw error;
         }
-    },
-
-    /**
-     * 何もしないメソッド
-     */
-    emptyFunction: function (){}
+    }
 };
 
 /**
@@ -30445,7 +35274,7 @@ Jeeel.Net.Ajax.Response.prototype = {
 };
 
 /**
- * 並列リクエストをした時の動作ポリシー列挙体
+ * @namespace 並列リクエストをした時の動作ポリシー列挙体
  */
 Jeeel.Net.Ajax.CollisionPolicy = {
   
@@ -30690,6 +35519,10 @@ Jeeel.Net.Jsonp.prototype = {
      * @return {Jeeel.Net.Jsonp} 自インスタンス
      */
     execute: function () {
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(this._url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+      
         var url = this._url + '?' + this._params.toQueryString();
         
         this._script = Jeeel.Loader.loadScript(url, this._loaded);
@@ -30723,6 +35556,234 @@ Jeeel.Net.Jsonp.prototype = {
         this._script = null;
     }
 };
+/**
+ * コンストラクタ
+ * 
+ * @class ビーコンを使用した通信を提供するクラス
+ * @param {String} url データ送信先URL
+ */
+Jeeel.Net.Beacon = function (url) {
+    this._url = url;
+    this._params = new Jeeel.Parameter();
+    this._onLoad = Jeeel.Function.simpleBind(this._onLoad, this);
+    this._onError = Jeeel.Function.simpleBind(this._onError, this);
+};
+
+/**
+ * インスタンスの作成を行う
+ * 
+ * @param {String} url データ送信先URL
+ * @return {Jeeel.Net.Beacon} 作成したインスタンス
+ */
+Jeeel.Net.Beacon.create = function (url) {
+    return new this(url);
+};
+
+Jeeel.Net.Beacon.prototype = {
+  
+    /**
+     * ビーコン通信の際にサーバー側に渡すパラメータのハッシュを保持するJeeel.Parameter
+     *
+     * @type Jeeel.Parameter
+     * @private
+     */
+    _params: null,
+
+    /**
+     * ビーコン通信URL
+     *
+     * @type String
+     * @private
+     */
+    _url: '',
+    
+    /**
+     * ビーコン
+     * 
+     * @type Element
+     * @private
+     */
+    _beacon: null,
+    
+    /**
+     * ビーコンの通信成功時のコールバック
+     * 
+     * @type Hash
+     * @private
+     */
+    _loadCallback: null,
+    
+    /**
+     * ビーコンの通信失敗時のコールバック
+     * 
+     * @type Hash
+     * @private
+     */
+    _errorCallback: null,
+    
+    /**
+     * ビーコン通信終了後に呼び出すメソッドを設定する
+     * 
+     * @param {Function} callback 通信終了メソッド<br />
+     *                             コールバックメソッドに渡される引数はビーコンElementになる<br />
+     *                             void callBack(Element script)
+     * @param {Mixied} [thisArg] コールバック中のthisに相当する値(デフォルトはこのインスタンスになる)
+     * @return {Jeeel.Net.Beacon} 自インスタンス
+     */
+    setLoadedMethod: function (callback, thisArg) {
+        this._loadCallback = {func: callback, thisArg: thisArg};
+        
+        return this;
+    },
+    
+    /**
+     * ビーコン通信失敗時に呼び出すメソッドを設定する
+     * 
+     * @param {Function} callback 通信終了メソッド<br />
+     *                             コールバックメソッドに渡される引数はビーコンElementになる<br />
+     *                             void callBack(Element script)
+     * @param {Mixied} [thisArg] コールバック中のthisに相当する値(デフォルトはこのインスタンスになる)
+     * @return {Jeeel.Net.Beacon} 自インスタンス
+     */
+    setErrorMethod: function (callback, thisArg) {
+        this._errorCallback = {func: callback, thisArg: thisArg};
+        
+        return this;
+    },
+    
+    /**
+     * ビーコンパラメータの全取得
+     *
+     * @return {Hash} 値リスト
+     */
+    getAll: function () {
+        return this._params.getAll();
+    },
+
+    /**
+     * ビーコンパラメータの取得
+     *
+     * @param {String} key キー
+     * @param {Mixied} [defaultValue] デフォルト値
+     * @return {Mixied} 値
+     */
+    get: function (key, defaultValue) {
+        return this._params.get(key, defaultValue);
+    },
+
+    /**
+     * ビーコンパラメータを総入れ替えする
+     *
+     * @param {Hash} vals 値リスト
+     * @return {Jeeel.Net.Beacon} 自インスタンス
+     * @throws {Error} valsが配列式でない場合に起こる
+     */
+    setAll: function (vals) {
+
+        if ( ! Jeeel.Type.isHash(vals)) {
+            throw new Error('valsが配列・連想配列ではありあせん。');
+        }
+
+        this._params.setAll({});
+
+        var self = this;
+
+        Jeeel.Hash.forEach(vals,
+            function (val, key) {
+                self._params.set(key, val);
+            }
+        );
+
+        return this;
+    },
+
+    /**
+     * ビーコンパラメータの設定
+     *
+     * @param {String} key キー
+     * @param {Mixied} val 値
+     * @return {Jeeel.Net.Beacon} 自インスタンス
+     */
+    set: function (key, val) {
+        this._params.set(key, val);
+
+        return this;
+    },
+    
+    /**
+     * ビーコンパラメータの指定キーの値を破棄する
+     *
+     * @param {String} key キー
+     * @return {Jeeel.Net.Beacon} 自インスタンス
+     */
+    unset: function (key) {
+        this._params.unset(key);
+
+        return this;
+    },
+
+    /**
+     * ビーコンパラメータの指定キーの値を保持しているかどうかを返す
+     *
+     * @param {String} key キー
+     * @return {Boolean} 値を保持していたらtrueそれ以外はfalseを返す
+     */
+    has: function (key) {
+        return this._params.has(key);
+    },
+    
+    /**
+     * 実際にビーコン通信を実行する
+     *
+     * @return {Jeeel.Net.Beacon} 自インスタンス
+     */
+    execute: function () {
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(this._url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
+        var url = this._url + '?' + this._params.toQueryString();
+        
+        var beacon = new Image();
+        
+        beacon.src = url;
+        
+        beacon.onload = this._onLoad;
+        beacon.onerror = this._onError;
+        
+        this._beacon = beacon;
+        
+        return this;
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @param {String} url データ送信先URL
+     * @constructor
+     */
+    constructor: Jeeel.Net.Beacon,
+    
+    /**
+     * 読み込み完了イベント
+     */
+    _onLoad: function () {
+        if (this._loadCallback) {
+            this._loadCallback.func.call(this._loadCallback.thisArg || this, this._beacon);
+        }
+    },
+    
+    /**
+     * 通信エラーイベント
+     */
+    _onError: function () {
+        if (this._errorCallback) {
+            this._errorCallback.func.call(this._errorCallback.thisArg || this, this._beacon);
+        }
+    }
+};
+
+
 /**
  * コンストラクタ
  * 
@@ -30930,6 +35991,10 @@ Jeeel.Net.Comet.prototype = {
      * @return {Jeeel.Net.Comet} 自インスタンス
      */
     open: function (url) {
+        
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
         
         if ( ! url) {
             return this;
@@ -31178,6 +36243,10 @@ Jeeel.Net.Socket.prototype = {
      */
     open: function (url) {
         
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
         if ( ! url) {
             return this;
         } else if (this._socket) {
@@ -31220,175 +36289,266 @@ Jeeel.Net.Socket.prototype = {
      */
     constructor: Jeeel.Net.Socket
 };
-
 /**
  * コンストラクタ
- *
- * @class evalの遅延実行を可能にするクラス
- * @param {String} script 実行するスクリプト
- * @throws {Error} scriptが文字列でない場合に起こる
- * @deprecated 今後削除される可能性あり
+ * 
+ * @class テンプレートを解析して文字列の置換やスクリプトの実行を行うクラス(所謂JSのテンプレートエンジン)<br />
+ *         実行時にevalを使用するのでセキュアコード以外は実行するべきではない<br />
+ *         また正規表現を多用しているのでIE等の貧弱なブラウザでは実行に時間が掛る可能性も高い
+ *         <ul>
+ *           <li> {+JS+}: JS実行して戻り値を表示する</li>
+ *           <li> {!JS!}: JSを実行する{++}との違いは表示が行われない事と複数行の実行も可能なこと</li>
+ *           <li> {?fetch ATTRIBUTES?}: 他のテンプレートを読み込み出力を行う。この際テンプレート変数を属性に付けて引き渡せる。file='test.tpl'[, var='tpl']などの形式でファイルURLを渡す。その際にvarを渡すと代わりに変数に代入する。</li>
+ *           <li> {?if JS?}, {?elseif JS?}, {?else?}, {?if?}: JSを評価して条件に応じて分岐させる</li>
+ *           <li> {?for JS;JS;JS?}, {?for JS in JS?}, {?/for?}: JSを実行しながらfor繰り返しを行う</li>
+ *           <li> {?while JS?}, {?/while?}: JSを実行しながらwhile繰り返しを行う</li>
+ *           <li> {?capture NAME?}, {?/capture?}: タグで囲まれたテンプレートの出力を出力せずにNAMEで指定した変数に格納する</li>
+ *           <li> {?function NAME?}TEMPLATE{?/function?}: タグで囲まれたテンプレート部分を解析せずに保持し、NAME(Hash args)で呼び出した際に動的に解析を行う argsは内部で使用する変数のリスト</li>
+ *           <li> {?strip?}, {?/strip?}: タグで囲まれたテンプレートの出力の空白・タブ・改行を全て取り除いて表示する</li>
+ *           <li> {?escape?}, {?/escape?}: タグで囲まれたテンプレートの出力のHTMLタグ等を全てエスケープして表示する</li>
+ *           <li> {#COMMENT#}: 表示も実行もされないコメント</li>
+ *         </ul>
  */
-Jeeel.Evaluator = function (script) {
-
-    if ( ! Jeeel.Type.isString(script)) {
-        throw new Error('実行スクリプトは必ず指定しなければなりません。');
-    }
-
-    /**
-     * evalで解析するスクリプト文字列
-     * 
-     * @type String
-     * @private
-     */
-    this._script = script;
-
-    /**
-     * 実行する際に必要な変数名と値のペアリスト
-     * 
-     * @type Hash
-     * @private
-     */
+Jeeel.Template = function () {
     this._params = {};
-};
-
-/**
- * インスタンスの作成
- *
- * @param {String} script 実行するスクリプト
- * @return {Jeeel.Evaluator} 作成したインスタンス
- */
-Jeeel.Evaluator.create = function (script) {
-    return new this(script);
-};
-
-/**
- * メソッドを呼び出せるようにした文字列を作成する
- *
- * @param {String} methodName メソッド名(window.setTimeout等でもよい)
- * @param {String[]|Primitive[]} params メソッドに渡す変数名(もしくは文字列以外の基本型)のリスト
- * @return {String} eval出来る形に形成した文字列
- */
-Jeeel.Evaluator.createScriptMethod = function (methodName, params) {
-    return methodName + '(' + params.join(', ') + ')';
-};
-
-Jeeel.Evaluator.prototype = {
-
-    /**
-     * evalする際に使用する変数をセットする
-     *
-     * @param {String} key 変数名
-     * @param {Mixed} value 変数の値
-     * @return {Jeeel.Evaluator} 自インスタンス
-     */
-    assign: function (key, value) {
-        this._params[key] = Jeeel.Method.clone(value);
-
-        return this;
-    },
-
-    /**
-     * 指定した連想配列のキーを変数名として全てassignする
-     *
-     * @param {Hash} values 変数名と変数値のペアリスト
-     * @return {Jeeel.Evaluator} 自インスタンス
-     */
-    assignAll: function (values) {
-        if ( ! Jeeel.Type.isHash(values)) {
-            throw new Error('valuesは必ず配列式でなければなりません。');
-        }
-
-        for (var key in values) {
-            this.assign(key, values[key]);
-        }
-
-        return this;
-    },
-
-    /**
-     * セットされた変数の値を破棄する
-     *
-     * @param {String} key 変数名
-     * @return {Jeeel.Evaluator} 自インスタンス
-     */
-    clearAssign: function (key) {
-        delete this._params[key];
-
-        return this;
-    },
-
-    /**
-     * セットされた変数の値をすべて破棄する
-     *
-     * @return {Jeeel.Evaluator} 自インスタンス
-     */
-    clearAssignAll: function () {
-        this._params = {};
-
-        return this;
-    },
-
-    /**
-     * 実際にevalを実行する
-     *
-     * @return {Mixed} 実行結果
-     */
-    eval: function () {
-        var $$__params = this._params;
-
-        for (var key in $$__params) {
-
-            eval('var '+key+' = $$__params[key];');
-        }
-        
-        var $$__self = this;
-
-        return (function () {
-            return eval($$__self._script);
-        })();
-    }
-};
-/**
- * @class テンプレートを解析して文字列の置き換えを行うクラス
- * @param {RegExp} [pattern] 検索パターン
- * @deprecated 今後削除される可能性あり
- */
-Jeeel.Template = function (pattern) {
-    /**
-     * 実行する際に必要な変数名と値のペアリスト
-     * 
-     * @type Hash
-     * @private
-     */
-    this._params = {};
-
-    if (Jeeel.Type.isRegularExpression(pattern)) {
-        this.pattern = pattern;
-    }
+    this._caches = {};
 };
 
 /**
  * インスタンスの作成を行う
  *
- * @param {RegExp} [pattern] 検索パターン
  * @return {Jeeel.Template} 作成したインスタンス
  */
-Jeeel.Template.create = function (pattern) {
-    return new this(pattern);
+Jeeel.Template.create = function () {
+    return new this();
+};
+
+/**
+ * @namespace テンプレート解析のためのパターンリスト
+ */
+Jeeel.Template.PATTERNS = {
+    
+    /**
+     * 属性として扱うパターン
+     * 
+     * @type RegExp
+     * @constant
+     */
+    ATTRIBUTE: /([a-zA-Z_\-\$]+)\s*=\s*(?:([a-zA-Z_\-\$]+)|(("|')[\s\S]+?[^\\]\4))/g,
+    
+    /**
+     * コメントとして扱うパターン{#COMMENT#}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    COMMENT: /\{#[\s\S]+?#\}/g,
+    
+    /**
+     * 出力として扱うパターン{+OUTPUT_CODE+}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    OUTPUT: /\{\+\s*([\s\S]+?)\s*\+\}/g,
+    
+    /**
+     * コード実行として扱うパターン{!SCRIPT!}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    SCRIPT: /\{!\s*([\s\S]+?)\s*!\}/g,
+    
+    /**
+     * 別ファイルをインライン展開するパターン{?fetch ATTRIBUTES?}<br />
+     * 必須属性: file='ファイル名'
+     * 任意属性: var='変数名'
+     * 
+     * @type RegExp
+     * @constant
+     */
+    FETCH: /\{\?fetch\s+([\s\S]+?)\?\}/g,
+    
+    /**
+     * if分岐として扱うパターン{?if BOOLEAN?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    IF: /\{\?if\s+([\s\S]+?)\?\}/g,
+    
+    /**
+     * elseif分岐として扱うパターン{?elseif BOOLEAN?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    ELSE_IF: /\{\?elseif\s+([\s\S]+?)\?\}/g,
+    
+    /**
+     * else分岐として扱うパターン{?else?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    ELSE: /\{\?else\?\}/g,
+    
+    /**
+     * if分岐の終了タグとして扱うパターン{?/if?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    END_IF: /\{\?\/if\?\}/g,
+    
+    /**
+     * forループとして扱うパターン{?for A;B;C?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    FOR: /\{\?for\s+([^;]*);([^;]*);([\s\S]*?)\?\}/g,
+    
+    /**
+     * for-inループとして扱うパターン{?for A in B?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    FOREACH: /\{\?for\s+([\s\S]*?)\s+in\s+([\s\S]*?)\?\}/g,
+    
+    /**
+     * forループの終了タグとして扱うパターン{?/for?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    END_FOR: /\{\?\/for\?\}/g,
+    
+    /**
+     * whileループとして扱うパターン{?while BOOLEAN?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    WHILE: /\{\?while\s+([\s\S]+?)\?\}/g,
+    
+    /**
+     * whileループの終了タグとして扱うパターン{?/while?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    END_WHILE: /\{\?\/while\?\}/g,
+    
+    /**
+     * テンプレート内容を変数に格納するcaptureとして扱うパターン{?capture NAME?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    CAPTURE: /\{\?capture\s+("|')([\s\S]+)\1\?\}/g,
+    
+    /**
+     * captureの終了タグとして扱うパターン{?/capture?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    END_CAPTURE: /\{\?\/capture\?\}/g,
+    
+    /**
+     * テンプレート内容を動的に解析するfunctionのタグとして扱うパターン{?function?}{?/function?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    FUNCTION: /\{\?function\s+("|')([\s\S]+)\1\?\}([\s\S]*?)\{\?\/function\?\}/g,
+    
+    /**
+     * 空白や改行を取り除くstripタグとして扱うパターン{?strip?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    STRIP: /\{\?strip\?\}/g,
+    
+    /**
+     * stripの終了タグとして扱うパターン{?/strip?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    END_STRIP: /\{\?\/strip\?\}/g,
+    
+    /**
+     * HTMLタグのエスケープを行うescapeとして扱うパターン{?escape?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    ESCAPE: /\{\?escape\?\}/g,
+    
+    /**
+     * escapeの終了タグとして扱うパターン{?/escape?}
+     * 
+     * @type RegExp
+     * @constant
+     */
+    END_ESCAPE: /\{\?\/escape\?\}/g
 };
 
 Jeeel.Template.prototype = {
-
-    /**
-     * 検索するパターン<br />
-     * デフォルトで#[NAME]
-     *
-     * @type RegExp
-     * @readOnly
-     */
-    pattern: /(^|.|\r|\n)(#\[(.*?)\])/,
     
+    /**
+     * 現在テンプレートを解析中かどうか
+     * 
+     * @type Boolean
+     * @private
+     */
+    _fetching: false,
+    
+    /**
+     * 現在解析中のテンプレートのキャッシュキー
+     * 
+     * @type String
+     * @private
+     */
+    _cacheKey: null,
+    
+    /**
+     * 実行する際に必要な変数名と値のペアリスト
+     * 
+     * @type Hash
+     * @private
+     */
+    _params: {},
+    
+    /**
+     * functionタグのキャッシュを格納する変数
+     * 
+     * @type Hash
+     * @private
+     */
+    _functions: {},
+    
+    /**
+     * テンプレートファイルのキャッシュ
+     * 
+     * @type Hash
+     * @private
+     */
+    _caches: {},
+    
+    /**
+     * include等を行う際に使用する内部インスタンス
+     * 
+     * @type Jeeel.Template
+     * @private
+     */
+    _fetcher: null,
+
     /**
      * 実行する際に使用する変数をセットする
      *
@@ -31397,7 +36557,7 @@ Jeeel.Template.prototype = {
      * @return {Jeeel.Template} 自インスタンス
      */
     assign: function (key, value) {
-        this._params[key] = Jeeel.Method.clone(value);
+        this._params[key] = value;
 
         return this;
     },
@@ -31426,7 +36586,7 @@ Jeeel.Template.prototype = {
      * @param {String} key 変数名
      * @return {Jeeel.Template} 自インスタンス
      */
-    clearAssign: function (key) {
+    unassign: function (key) {
         delete this._params[key];
 
         return this;
@@ -31437,9 +36597,141 @@ Jeeel.Template.prototype = {
      *
      * @return {Jeeel.Template} 自インスタンス
      */
-    clearAssignAll: function () {
+    unassignAll: function () {
         this._params = {};
 
+        return this;
+    },
+    
+    /**
+     * 指定したキャッシュを消去する
+     * 
+     * @param {String} cacheKey キャッシュキー
+     * @return {Jeeel.Template} 自インスタンス
+     */
+    clearCache: function (cacheKey) {
+        delete this._caches[cacheKey];
+        
+        return this;
+    },
+    
+    /**
+     * キャッシュを全て消去する
+     * 
+     * @return {Jeeel.Template} 自インスタンス
+     */
+    clearCacheAll: function () {
+        this._caches = {};
+        
+        return this;
+    },
+    
+    /**
+     * 指定したファイル内容を解析し、文字列置換して返す
+     *
+     * @param {String} url ファイルを示すURL
+     * @param {String} [cacheKey] キャッシュするキーを明示的に指定したい場合に使用する<br />
+     *                             また明示的にnullを渡すとキャッシュなしで動作する
+     * @return {String} 解析後の文字列
+     * @throws {Error} ファイルが見当たらないかサーバーエラー時に発生する
+     */
+    fetchFile: function (url, cacheKey) {
+        this._fetching = true;
+        
+        if (cacheKey === null) {
+            this._cacheKey = null;
+        } else {
+            this._cacheKey = cacheKey || url;
+        }
+        
+        var res;
+        
+        if ( ! this._caches[this._cacheKey]) {
+            res = Jeeel.Net.Ajax.serverResponse(url);
+
+            if ( ! Jeeel.Type.isString(res)) {
+                this._fetching = false;
+                this._cacheKey = null;
+
+                throw new Error('ファイルが見当たらないかサーバーエラーを返しました。');
+            }
+        }
+
+        try {
+            res = this._replaceTemplate(res);
+        } catch (e) {
+            throw e;
+        } finally {
+            this._fetching = false;
+            this._cacheKey = null;
+        }
+
+        return res;
+    },
+    
+    /**
+     * 指定したファイル内容を非同期で解析しコールバックに引き渡す
+     *
+     * @param {String} url ファイルを示すURL
+     * @param {Function} callback コールバック
+     * @param {String} [cacheKey] キャッシュするキーを明示的に指定したい場合に使用する<br />
+     *                             また明示的にnullを渡すとキャッシュなしで動作する
+     * @return {Jeeel.Template} 自インスタンス
+     * @throws {Error} callbackを指定しなかった場合に発生する
+     * @throws {Error} 現在他のテンプレートを解析中だった場合に発生する
+     * @throws {Error} ファイルが見当たらないかサーバーエラー時に発生する
+     */
+    fetchFileAsync: function (url, callback, cacheKey) {
+        
+        if ( ! Jeeel.Type.isFunction(callback)) {
+            throw new Error('callbackは必ず指定しなければなりません。');
+        } else if (this._fetching) {
+            throw new Error('同時に複数のテンプレートの解析はできません。');
+        }
+        
+        this._fetching = true;
+        
+        if (cacheKey === null) {
+            this._cacheKey = null;
+        } else {
+            this._cacheKey = cacheKey || url;
+        }
+        
+        if ( ! this._caches[this._cacheKey]) {
+            var ajax = new Jeeel.Net.Ajax(url);
+
+            ajax.setSuccessMethod(function (response) {
+                var res;
+
+                try {
+                    res = this._replaceTemplate(response.responseText);
+                } catch (e) {
+                    throw e;
+                } finally {
+                    this._fetching = false;
+                    this._cacheKey = null;
+                }
+
+                callback(res);
+            }, this).setFailureMethod(function (response) {
+                this._fetching = false;
+                this._cacheKey = null;
+
+                throw new Error('ファイルが見当たらないかサーバーエラーを返しました。');
+            }, this).setExceptionMethod(function (r, e) {
+                throw e;
+            }, this).execute();
+        } else {
+            try {
+                callback(this._replaceTemplate());
+            } catch (e) {
+                throw e;
+            } finally {
+                this._fetching = false;
+                this._cacheKey = null;
+            }
+        }
+        
         return this;
     },
 
@@ -31447,36 +36739,318 @@ Jeeel.Template.prototype = {
      * 指定した文字列をテンプレートして扱い文字列置換を行う
      *
      * @param {String} template テンプレート文字列
+     * @param {String} [cacheKey] キャッシュする際に指定する
      * @return {String} 解析後の文字列
      */
-    fetchTemplate: function (template) {
-
-        var pattern = this.pattern;
-        var match = pattern.exec(template);
-
-        while(match) {
-            template = template.replace(match[2], this._params[match[3]]);
-            match = pattern.exec(template);
+    fetchTemplate: function (template, cacheKey) {
+        this._fetching = true;
+        
+        this._cacheKey = cacheKey || null;
+        
+        try {
+            var res = this._replaceTemplate(template);
+        } catch (e) {
+            throw e;
+        } finally {
+            this._fetching = false;
         }
 
-        return template;
+        return res;
     },
-
+    
     /**
-     * 指定したファイル内容を解析し、文字列置換して返す
+     * 指定したキャッシュをテンプレートして扱い文字列置換を行う
      *
-     * @param {String} url ファイルを示すURL
+     * @param {String} cacheKey 取得したいキャッシュ名
      * @return {String} 解析後の文字列
-     * @throws {Error} ファイルが見当たらないかサーバーエラー時に発生する
      */
-    fetchFile: function (url) {
-        var res = Jeeel.Net.Ajax.serverResponse(url);
-
-        if ( ! Jeeel.Type.isString(res)) {
-            throw new Error('ファイルが見当たらないかサーバーエラーを返しました。');
+    fetchCache: function (cacheKey) {
+        this._fetching = true;
+        
+        this._cacheKey = cacheKey;
+        
+        try {
+            var res = this._replaceTemplate('');
+        } catch (e) {
+            throw e;
+        } finally {
+            this._fetching = false;
         }
 
-        return this.fetchTemplate(res);
+        return res;
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Template,
+    
+    /**
+     * テンプレートを実際に解析する
+     * 
+     * @param {String} $__template__$ テンプレート
+     * @return {String} 解析後のテンプレート
+     * @private
+     */
+    _replaceTemplate: function ($__template__$) {
+        
+        if ( ! this._fetcher) {
+            this._fetcher = Jeeel.Template.create();
+        } 
+        
+        var $__out__$, $__code__$, $__striptmp__$, $__escapetmp__$, $__this__$ = this, $__creator__$ = this._fetcher;
+        
+        this._functions = {};
+        
+        var $__compile__$ = function ($__template__$, args) {
+            var $__out__$, $__code__$, $__striptmp__$, $__escapetmp__$;
+            
+            args = args || {};
+            
+            for (var $__key__$ in args) {
+                eval("var " + $__key__$ + " = args[$__key__$];");
+            }
+            
+            $__code__$ = $__template__$.replace($__this__$.constructor.PATTERNS.COMMENT, '');
+
+            $__code__$ = $__this__$._replaceFunction($__code__$);
+            $__code__$ = $__this__$._replaceOutput($__code__$);
+            $__code__$ = $__this__$._replaceScript($__code__$);
+            $__code__$ = $__this__$.replaceRequest($__code__$);
+            $__code__$ = $__this__$._replaceBranch($__code__$);
+            $__code__$ = $__this__$._replaceLoop($__code__$);
+            $__code__$ = $__this__$._replaceCapture($__code__$);
+            $__code__$ = $__this__$._replaceStrip($__code__$);
+            $__code__$ = $__this__$._replaceEscape($__code__$);
+            
+            $__code__$ = "$__out__$ = \u001e" + $__code__$ + "\u001e";
+
+            $__code__$ = $__code__$.replace(/\r?\n/g, '\\n')
+                                   .replace(/\r/g, '')
+                                   .replace(/"/g, '\\"')
+                                   .replace(/\u001e/g, '"');
+            
+            (function () {
+                eval($__code__$);
+            })();
+
+            return $__out__$;
+        };
+        
+        if (this._cacheKey && this._caches[this._cacheKey]) {
+            $__code__$ = this._caches[this._cacheKey].code;
+            this._functions = this._caches[this._cacheKey].func;
+        } else {
+            $__code__$ = $__template__$.replace(this.constructor.PATTERNS.COMMENT, '');
+
+            $__code__$ = this._replaceFunction($__code__$);
+            $__code__$ = this._replaceOutput($__code__$);
+            $__code__$ = this._replaceScript($__code__$);
+            $__code__$ = this.replaceRequest($__code__$);
+            $__code__$ = this._replaceBranch($__code__$);
+            $__code__$ = this._replaceLoop($__code__$);
+            $__code__$ = this._replaceCapture($__code__$);
+            $__code__$ = this._replaceStrip($__code__$);
+            $__code__$ = this._replaceEscape($__code__$);
+
+            $__code__$ = "$__out__$ = \u001e" + $__code__$ + "\u001e";
+
+            $__code__$ = $__code__$.replace(/\r?\n/g, '\\n')
+                                   .replace(/\r/g, '')
+                                   .replace(/"/g, '\\"')
+                                   .replace(/\u001e/g, '"');
+
+            if (this._cacheKey) {
+                this._caches[this._cacheKey] = {
+                    tpl: $__template__$,
+                    code: $__code__$,
+                    func: this._functions
+                };
+            }
+        }
+        
+        var $__key__$;
+
+        // 使用変数の動的定義
+        for ($__key__$ in this._params) {
+            eval('var ' + $__key__$ + ' = this._params[$__key__$];');
+        }
+        
+        for ($__key__$ in this._functions) {
+            eval('var ' + $__key__$ + ' = function (args) { return $__compile__$("' + this._functions[$__key__$] + '", args);};');
+        }
+
+        (function () {
+            eval($__code__$);
+        })();
+        
+        return $__out__$;
+    },
+    
+    /**
+     * テンプレートの出力パターンの置き換えを行う
+     * 
+     * @param {String} template テンプレート
+     * @return {String} 置換後のテンプレート
+     * @private
+     */
+    _replaceOutput: function (template) {
+        return template.replace(this.constructor.PATTERNS.OUTPUT, function (match, output) {
+            output = output.replace(/"/g, "\u001e")
+                           .replace(/(\r?\n)/g, " ");
+
+            return "\u001e + (" + output + ") +\u001e";
+        });
+    },
+    
+    /**
+     * テンプレートの実行スクリプトパターンの置き換えを行う
+     * 
+     * @param {String} template テンプレート
+     * @return {String} 置換後のテンプレート
+     * @private
+     */
+    _replaceScript: function (template) {
+        return template.replace(this.constructor.PATTERNS.SCRIPT, function (match, script) {
+            script = script.replace(/"/g, "\u001e")
+                           .replace(/(\r?\n)/g, " ");
+
+            return "\u001e; " + script + "; $__out__$ += \u001e";
+        });
+    },
+    
+    /**
+     * テンプレートの外部読み込みパターンの置き換えを行う
+     * 
+     * @param {String} template テンプレート
+     * @return {String} 置換後のテンプレート
+     * @private
+     */
+    replaceRequest: function (template) {
+        var self = this;
+        
+        return template.replace(this.constructor.PATTERNS.FETCH, function (match, values) {
+            
+            var prms = {};
+            
+            values.replace(self.constructor.PATTERNS.ATTRIBUTE, function (match, key, variable, str) {
+                prms[key] = variable || str;
+            });
+            
+            var variable, file = prms.file;
+            var isInclude = true;
+            
+            delete prms.file;
+            
+            if (prms['var']) {
+                variable = ('' + prms['var']).replace(/^("|')([\s\S]+)\1$/g, '$2');
+                
+                isInclude = false;
+                
+                delete prms['var'];
+            }
+            
+            var tpl = '(function () {$__creator__$.unassignAll();';
+            
+            for (var key in prms) {
+                tpl += '$__creator__$.assign(\u001e' + key + '\u001e, ' + prms[key] + ');';
+            }
+            
+            tpl += 'return $__creator__$.fetchFile(' + file + ');})()';
+            
+            if (isInclude) {
+                return "\u001e + " + tpl + " + \u001e";
+            }
+            
+            return "\u001e; var  " + variable + ' = ' + tpl + "; $__out__$ += \u001e";
+        });
+    },
+    
+    /**
+     * テンプレートの条件分岐パターンの置き換えを行う
+     * 
+     * @param {String} template テンプレート
+     * @return {String} 置換後のテンプレート
+     * @private
+     */
+    _replaceBranch: function (template) {
+        return template.replace(this.constructor.PATTERNS.IF, "\u001e; if ($1) { $$__out__$$ += \u001e")
+                       .replace(this.constructor.PATTERNS.ELSE_IF, "\u001e;} else if ($1) { $$__out__$$ += \u001e")
+                       .replace(this.constructor.PATTERNS.ELSE, "\u001e;} else { $$__out__$$ += \u001e")
+                       .replace(this.constructor.PATTERNS.END_IF, "\u001e;} $$__out__$$ += \u001e");
+    },
+    
+    /**
+     * テンプレートの繰り返しパターンの置き換えを行う
+     * 
+     * @param {String} template テンプレート
+     * @return {String} 置換後のテンプレート
+     * @private
+     */
+    _replaceLoop: function (template) {
+        return template.replace(this.constructor.PATTERNS.FOR, "\u001e; for ($1;$2;$3) { $$__out__$$ += \u001e")
+                       .replace(this.constructor.PATTERNS.FOREACH, "\u001e; for ($1 in $2) { $$__out__$$ += \u001e")
+                       .replace(this.constructor.PATTERNS.END_FOR, "\u001e;} $$__out__$$ += \u001e")
+                       .replace(this.constructor.PATTERNS.WHILE, "\u001e; while ($1) { $$__out__$$ += \u001e")
+                       .replace(this.constructor.PATTERNS.END_WHILE, "\u001e;} $$__out__$$ += \u001e");
+    },
+    
+    /**
+     * テンプレートのcaptureパターンの置き換えを行う
+     * 
+     * @param {String} template テンプレート
+     * @return {String} 置換後のテンプレート
+     * @private
+     */
+    _replaceCapture: function (template) {
+        return template.replace(this.constructor.PATTERNS.CAPTURE, "\u001e; var $2 = \u001e")
+                       .replace(this.constructor.PATTERNS.END_CAPTURE, "\u001e; $$__out__$$ += \u001e");
+    },
+    
+    /**
+     * テンプレートのfunctionパターンの置き換えを行う
+     * 
+     * @param {String} template テンプレート
+     * @return {String} 置換後のテンプレート
+     * @private
+     */
+    _replaceFunction: function (template) {
+        var self = this;
+        
+        return template.replace(this.constructor.PATTERNS.FUNCTION, function (match, quotation, name, value) {
+            value = value.replace(/"/g, '\\"')
+                         .replace(/(\r?\n)/g, "\\n");
+            
+            self._functions[name] = value;
+
+            return "";
+        });
+    },
+    
+    /**
+     * テンプレートのstripパターンの置き換えを行う
+     * 
+     * @param {String} template テンプレート
+     * @return {String} 置換後のテンプレート
+     * @private
+     */
+    _replaceStrip: function (template) {
+        return template.replace(this.constructor.PATTERNS.STRIP, "\u001e; if ( ! $$__striptmp__$$) { $$__striptmp__$$ = $$__out__$$; $$__out__$$ = \u001e")
+                       .replace(this.constructor.PATTERNS.END_STRIP, "\u001e; $$__out__$$ = $$__striptmp__$$ + $$__out__$$.replace(/\\s+/g, \u001e\u001e); $$__striptmp__$$ = null;} $$__out__$$ += \u001e");
+    },
+    
+    /**
+     * テンプレートのescapeパターンの置き換えを行う
+     * 
+     * @param {String} template テンプレート
+     * @return {String} 置換後のテンプレート
+     * @private
+     */
+    _replaceEscape: function (template) {
+        return template.replace(this.constructor.PATTERNS.ESCAPE, "\u001e; if ( ! $$__escapetmp__$$) { $$__escapetmp__$$ = $$__out__$$; $$__out__$$ = \u001e")
+                       .replace(this.constructor.PATTERNS.END_ESCAPE, "\u001e; $$__out__$$ = $$__escapetmp__$$ + Jeeel.Filter.Html.Escape.create().filter($$__out__$$); $$__escapetmp__$$ = null;} $$__out__$$ += \u001e");
     }
 };
 
@@ -31546,6 +37120,9 @@ Jeeel.Timer.create = function (func, interval, var_args) {
 Jeeel.Timer.setLimitInterval = function (func, interval, limit, var_args) {
     var baseFunc = func;
     
+    /**
+     * @ignore
+     */
     func = function () {
         if (arguments[0]) {
             arguments[0] = this._count;
@@ -31574,6 +37151,9 @@ Jeeel.Timer.setLimitInterval = function (func, interval, limit, var_args) {
 Jeeel.Timer.setTimeout = function (func, delayTime, var_args) {
     var args = Array.prototype.slice.call(arguments, 2, arguments.length);
 
+    /**
+     * @ignore
+     */
     var _func = function () {
         return func.apply(this, args);
     };
@@ -31741,7 +37321,7 @@ Jeeel.directory.Jeeel.DataStructure = {
 };
 
 /**
- * データ構造
+ * @namespace データ構造関するネームスペース
  */
 Jeeel.DataStructure = {
     
@@ -32365,7 +37945,6 @@ Jeeel.DataStructure.List.Node.prototype = {
  * コンストラクタ
  * 
  * @class 木構造を扱うクラス
- * @ignore 未完成
  */
 Jeeel.DataStructure.Tree = function () {
     
@@ -32804,7 +38383,7 @@ Jeeel.DataStructure.Tree.Binary.Order = {
 };
 
 /**
- * 汎用オブジェクト関連のネームスペース
+ * @namespace 汎用オブジェクト関連のネームスペース
  */
 Jeeel.Object = {
 
@@ -34210,11 +39789,19 @@ Jeeel.Object.Color.Code = {
  *
  * @class 日付関係に関する操作を手助けするクラス
  * @param {Date|String|Integer|Jeeel.Object.Date} [date] 基となるDateオブジェクトやDateString(省略は現時刻)
+ * @param {Integer} [offset] 指定した日付を示すタイムゾーンのオフセット(日本なら+540)
  */
-Jeeel.Object.Date = function (date) {
-
+Jeeel.Object.Date = function (date, offset) {
+    
+    var dateOffset;
+    
     if (Jeeel.Type.isString(date)) {
         date = new Date(date.replace(/-/g, '/'));
+        
+        if (offset) {
+            dateOffset = (offset + date.getTimezoneOffset()) * 60000;
+            date = new Date(date.getTime() + dateOffset);
+        }
     } else if (Jeeel.Type.isInteger(date)) {
         date = new Date(date);
     } else if (date instanceof Jeeel.Object.Date) {
@@ -34227,6 +39814,9 @@ Jeeel.Object.Date = function (date) {
 
     this._date = date;
     
+    // ローカルを基準とした表示なのでグリニッジを標準とする
+    this._offset = offset || -date.getTimezoneOffset();
+    
     this._refreshProperty();
     
     this._timestamp = new Date();
@@ -34236,10 +39826,11 @@ Jeeel.Object.Date = function (date) {
  * インスタンスの作成を行う
  *
  * @param {Date|String|Integer|Jeeel.Object.Date} [date] 基となるDateオブジェクトやDateString(省略は現時刻)
+ * @param {Integer} [offset] 指定した日付を示すタイムゾーンのオフセット(日本なら+540)
  * @return {Jeeel.Object.Date} 作成したインスタンス
  */
-Jeeel.Object.Date.create = function (date) {
-    return new this(date);
+Jeeel.Object.Date.create = function (date, offset) {
+    return new this(date, offset);
 };
 
 /**
@@ -34252,9 +39843,10 @@ Jeeel.Object.Date.create = function (date) {
  * @param {Integer} [minute] 分
  * @param {Integer} [second] 秒
  * @param {Integer} [millisecond] ミリ秒
+ * @param {Integer} [offset] 指定した日付を示すタイムゾーンのオフセット(日本なら+540)
  * @return {Jeeel.Object.Date} 作成したインスタンス
  */
-Jeeel.Object.Date.createDate = function (year, month, day, hour, minute, second, millisecond) {
+Jeeel.Object.Date.createDate = function (year, month, day, hour, minute, second, millisecond, offset) {
     var i, l = arguments.length;
     
     for (i = 0; i < l; i++) {
@@ -34270,7 +39862,7 @@ Jeeel.Object.Date.createDate = function (year, month, day, hour, minute, second,
         l++;
     }
     
-    return new this(Jeeel.Function.toNative(Jeeel._global, 'Date', true).apply(null, arguments));
+    return new this(Jeeel.Function.toNative(Jeeel._global, 'Date', true).apply(null, arguments).toGMTString(), offset);
 };
 
 /**
@@ -34296,6 +39888,26 @@ Jeeel.Object.Date.checkDate = function (year, month, day, hour, minute, second, 
         && date.second === (+second || 0)
         && date.millisecond === (+millisecond || 0);
 };
+
+if (Jeeel._global && Jeeel._global.Date && Jeeel._global.Date.now) {
+  
+    /**
+     * 1970年1月1日0時0分0秒(UTC)からの経過ミリ秒を取得する(オフセットを考慮)
+     * 
+     * @return {Integer} 経過ミリ秒
+     */
+    Jeeel.Object.Date.now = function () {
+        return Date.now();
+    };
+} else {
+  
+    /**
+     * @ignore
+     */
+    Jeeel.Object.Date.now = function () {
+        return (new Date()).getTime();
+    };
+}
 
 /**
  * 指定した日付文字列を1970年1月1日0時0分0秒(UTC)からの経過ミリ秒に変換する
@@ -34363,6 +39975,14 @@ Jeeel.Object.Date.prototype = {
      * @type Date
      */
     _date: null,
+    
+    /**
+     * タイムゾーンによるオフセット
+     * 
+     * 
+     * @type Integer
+     */
+    _offset: null,
 
     /**
      * このインスタンスを作成した日付
@@ -34421,6 +40041,13 @@ Jeeel.Object.Date.prototype = {
     millisecond: 0,
     
     /**
+     * 曜日
+     * 
+     * @type Integer
+     */
+    day: 0,
+    
+    /**
      * 1970年1月1日0時0分0秒(UTC)からの経過ミリ秒
      * 
      * @type Integer
@@ -34442,7 +40069,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 年
      */
     getYear: function () {
-        return this._date.getFullYear();
+        return this.year;
     },
     
     /**
@@ -34451,7 +40078,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 月(1～12)
      */
     getMonth: function () {
-        return this._date.getMonth() + 1;
+        return this.month;
     },
     
     /**
@@ -34460,7 +40087,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 日
      */
     getDate: function () {
-        return this._date.getDate();
+        return this.date;
     },
     
     /**
@@ -34469,7 +40096,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 時
      */
     getHour: function () {
-        return this._date.getHours();
+        return this.hour;
     },
     
     /**
@@ -34478,7 +40105,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 分
      */
     getMinute: function () {
-        return this._date.getMinutes();
+        return this.minute;
     },
     
     /**
@@ -34487,7 +40114,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 秒
      */
     getSecond: function () {
-        return this._date.getSeconds();
+        return this.second;
     },
     
     /**
@@ -34496,7 +40123,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} ミリ秒
      */
     getMillisecond: function () {
-        return this._date.getMilliseconds();
+        return this.millisecond;
     },
     
     /**
@@ -34505,7 +40132,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 経過ミリ秒
      */
     getTime: function () {
-        return this._date.getTime();
+        return this.time;
     },
     
     /**
@@ -34523,7 +40150,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 曜日を示す数(0～6)
      */
     getDay: function () {
-        return this._date.getDay();
+        return this.day;
     },
     
     /**
@@ -34532,7 +40159,36 @@ Jeeel.Object.Date.prototype = {
      * @return {String} 曜日の短縮名(日,月,火,...等)
      */
     getDayName: function () {
-        return this.constructor.DAYS[this._date.getDay()];
+        return this.constructor.DAYS[this.day];
+    },
+    
+    /**
+     * このインスタンスのタイムゾーンオフセットを返す
+     * 
+     * @return {Integer} タイムゾーンオフセット(分数で、GMTからの差分: 日本なら+540)
+     */
+    getOffset: function () {
+        return this._offset;
+    },
+    
+    /**
+     * このインスタンスのタイムゾーンオフセットを設定する<br />
+     * 変更した際に自動的にプロパティの値がそのタイムゾーンでの値に書き換わる
+     * 
+     * @param {Integer} offset タイムゾーンオフセット
+     * @return {Jeeel.Object.Date} 自インスタンス
+     */
+    setOffset: function (offset) {
+        offset = +offset;
+        
+        if (offset) {
+            var tmp = this._offset;
+            this._offset = offset;
+            
+            this._refreshProperty(tmp);
+        }
+        
+        return this;
     },
 
     /**
@@ -34578,7 +40234,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer[]} 日リスト
      */
     getDatesOfWeek: function () {
-        var date = new Date(this.year, this._date.getMonth(), this.date - this.getDay());
+        var date = new Date(this.year, this.month - 1, this.date - this.day);
         var res  = [];
 
         do {
@@ -34596,7 +40252,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer[]} 日リスト
      */
     getDatesOfMonth: function () {
-        var month = this._date.getMonth();
+        var month = this.month - 1;
         var date  = new Date(this.year, month, 1);
         var res   = [];
 
@@ -34781,7 +40437,7 @@ Jeeel.Object.Date.prototype = {
         var minute   = this.minute;
         var second   = this.second;
         var unixTime = this.getUnixTime();
-        var day      = this._date.getDay();
+        var day      = this.day;
 
         var lastDate = (new Date(year, month, 0)).getDate();
 
@@ -34861,14 +40517,22 @@ Jeeel.Object.Date.prototype = {
      * @private
      */
     _refreshProperty: function () {
-        this.year  = this.getYear();
-        this.month = this.getMonth();
-        this.date  = this.getDate();
-        this.hour  = this.getHour();
-        this.minute = this.getMinute();
-        this.second = this.getSecond();
-        this.millisecond = this.getMillisecond();
-        this.time = this.getTime();
+        
+        var date = this._date;
+        
+        if (this._offset) {
+            date = new Date(date.getTime() - (this._offset + date.getTimezoneOffset()) * 60000);
+        }
+        
+        this.year  = date.getFullYear();
+        this.month = date.getMonth() + 1;
+        this.date  = date.getDate();
+        this.hour  = date.getHours();
+        this.minute = date.getMinutes();
+        this.second = date.getSeconds();
+        this.millisecond = date.getMilliseconds();
+        this.day = date.getDay();
+        this.time = this._date.getTime();
         
         return this;
     }
@@ -35182,7 +40846,7 @@ Jeeel.directory.Jeeel.Object.Technical = {
 };
 
 /**
- * Jeeel内部で使用している特殊クラスを保持するネームスペース
+ * @namespace Jeeel内部で使用している特殊クラスを保持するネームスペース
  */
 Jeeel.Object.Technical = {
 
@@ -35263,7 +40927,16 @@ Jeeel.Object.Technical.Trace.prototype = {
      *
      * @type Function
      */
-    func: ''
+    func: null,
+    
+    /**
+     * 文字列に変換する
+     * 
+     * @return {String} 文字列
+     */
+    toString: function () {
+        return this.name;
+    }
 };
 
 /**
@@ -35803,7 +41476,7 @@ Jeeel.directory.Jeeel.Validator = {
 };
 
 /**
- * バリデータに関するネームスペース
+ * @namespace バリデータに関するネームスペース
  */
 Jeeel.Validator = {
 
@@ -35835,7 +41508,13 @@ Jeeel.Validator.Abstract.prototype = {
      * @return {Hash} エラーを保持した連想配列リスト
      */
     validate: function (val) {
-        var errors =  this._validate(val);
+        var errors;
+        
+        if (Jeeel.Type.isHash(val)) {
+            errors = this._validateEach(val);
+        } else {
+            errors = this._validate(val);
+        }
 
         return errors;
     },
@@ -35851,6 +41530,25 @@ Jeeel.Validator.Abstract.prototype = {
      */
     _validate: function (val) {
         throw new Error('_validateメソッドが実装されていません。');
+    },
+    
+    /**
+     * 配列式の場合のメソッド
+     *
+     * @param {Hash} arr バリデートを掛ける値のリスト
+     * @return {Hash} エラーを保持した連想配列リスト
+     * @protected
+     */
+    _validateEach: function (arr) {
+        var result = {};
+
+        Jeeel.Hash.forEach(arr,
+            function (val, key) {
+                result[key] = this.validate(val);
+            }, this
+        );
+
+        return result;
     },
     
     /**
@@ -36191,7 +41889,7 @@ Jeeel.directory.Jeeel.Storage = {
 };
 
 /**
- * ストレージ関連のネームスペース
+ * @namespace ストレージ関連のネームスペース
  */
 Jeeel.Storage = {
 
@@ -36247,7 +41945,7 @@ Jeeel.directory.Jeeel.Storage.Session = {
 };
 
 /**
- * Session関連を扱うストレージのネームスペース
+ * @namespace Session関連を扱うストレージのネームスペース
  */
 Jeeel.Storage.Session = {
 
@@ -36575,7 +42273,7 @@ Jeeel.Class.extend(Jeeel.Storage.Session.WebStorage, Jeeel.Storage.Session.Abstr
     var instances = {};
     
     /**
-     * コンストラクタ
+     * コンストラクタ(newなしで呼んでも動作する)
      * 
      * @class Objectストレージ、Objectに対して疑似的に保存を行うクラス(Jeeel.Parameterと合わせても使えるが基本単独で使う)
      * @augments Jeeel.Storage.Abstract
@@ -36610,6 +42308,27 @@ Jeeel.Class.extend(Jeeel.Storage.Session.WebStorage, Jeeel.Storage.Session.Abstr
         instances[name][uniqueId] = this;
         this._params = {};
     };
+    
+    /**
+     * インスタンスが既に作成されているかどうかを返す
+     * 
+     * @param {Object} object 疑似保存対象のObject
+     * @param {String} [name] ネームスペースを指定する場合に指定
+     * @return {Boolean} 既に作成されているかどうか
+     */
+    Jeeel.Storage.Object.exists = function (object, name) {
+        var uniqueId = object.uniqueID || object[Jeeel.UNIQUE_ID];
+        
+        if ( ! uniqueId) {
+            return false;
+        }
+        
+        if ( ! name) {
+            name = defaultName;
+        }
+        
+        return !!(instances[name] && instances[name][uniqueId]);
+    };
 })();
 
 /**
@@ -36622,6 +42341,17 @@ Jeeel.Class.extend(Jeeel.Storage.Session.WebStorage, Jeeel.Storage.Session.Abstr
  */
 Jeeel.Storage.Object.create = function (object, name) {
     return new this(object, name);
+};
+
+/**
+ * 議事保存対象のObjectが既にユニークIDを保持しているかどうかを取得する<br />
+ * この確認作業を行う事で不要な拡張を防ぐことが出来る
+ * 
+ * @param {Object} object 疑似保存対象のObject
+ * @return {Boolean} ユニークIDを持っているかどうか
+ */
+Jeeel.Storage.Object.hasUniqueId = function (object) {
+    return !!(object.uniqueID || object[Jeeel.UNIQUE_ID]);
 };
 
 Jeeel.Storage.Object.prototype = {
@@ -36674,7 +42404,7 @@ Jeeel.Storage.Object.prototype = {
      * @param {Mixed} value 保存値
      * @return {Jeeel.Storage.Object} 自インスタンス
      */
-    saveData: function (key, value) {
+    set: function (key, value) {
         this._params[key] = value;
         
         return this;
@@ -36686,7 +42416,7 @@ Jeeel.Storage.Object.prototype = {
      * @param {String} key 読み込みキー
      * @return {Mixed} 読み込んだデータ
      */
-    loadData: function (key) {
+    get: function (key) {
         return this._params[key];
     },
     
@@ -36704,7 +42434,7 @@ Jeeel.Storage.Object.prototype = {
 
 Jeeel.Class.extend(Jeeel.Storage.Object, Jeeel.Storage.Abstract);
 /**
- * 外部との連携に関するネームスペース
+ * @staticClass 外部との連携に関するネームスペース
  */
 Jeeel.External = {
     
@@ -36763,27 +42493,24 @@ Jeeel.External = {
      * 
      * @param {Mixied} [x] 引数
      */
-    Jeeel.Deferred.success = {func: function (x) {
-        return x;
-    }};
+    Jeeel.Deferred.success = {func: Jeeel.Function.Template.RETURN_ARGUMENT};
 
     /**
      * デフォルトのメソッド失敗時の挙動
      * 
      * @param {Mixied} [x] 引数
      */
-    Jeeel.Deferred.error = {func: function (x) {
-        throw x;
-    }};
+    Jeeel.Deferred.error = {func: Jeeel.Function.Template.THROW_ARGUMENT};
 
     /**
      * 指定したメソッドを遅延実行する
      * 
      * @param {Function} callback 遅延実行対象のメソッド
      * @param {Mixied} [thisArg] コールバック中のthisに相当する値(デフォルトは作成したインスタンスになる)
+     * @param {Integer} [delayTime] 遅延時間(デフォルトは0)
      * @return {Jeeel.Deferred} 作成したインスタンス
      */
-    Jeeel.Deferred.next = function (callback, thisArg) {
+    Jeeel.Deferred.next = function (callback, thisArg, delayTime) {
         var df = new this();
         
         if ( ! deferredQueue[0]) {
@@ -36792,16 +42519,22 @@ Jeeel.External = {
                 var dq = deferredQueue.shift();
 
                 if (deferredQueue[0]) {
-                    id = setTimeout(arguments.callee, 0);
+                    id = setTimeout(arguments.callee, dq._delayTime);
                     
+                    /**
+                     * @ignore
+                     */
                     deferredQueue[0]._canceller = function () {
                         clearTimeout(id);
                     };
                 }
                 
                 dq.call();
-            }, 0);
+            }, +delayTime || 0);
 
+            /**
+             * @ignore
+             */
             df._canceller = function () {
                 clearTimeout(id);
             };
@@ -36810,6 +42543,8 @@ Jeeel.External = {
         deferredQueue[deferredQueue.length] = function () {
             df.call();
         };
+        
+        deferredQueue[deferredQueue.length - 1]._delayTime = +delayTime || 0;
 
         if (callback) {
             df.next(callback, thisArg);
@@ -36885,7 +42620,7 @@ Jeeel.Deferred.prototype = {
      * @return {Jeeel.Deferred} 自インスタンス
      */
     cancel: function () {
-        (this._canceller || function () {})();
+        (this._canceller || Jeeel.Function.Template.EMPTY)();
         
         return this.reset();
     },
@@ -36941,1632 +42676,6 @@ Jeeel.Deferred.prototype = {
         return this;
     }
 };
-Jeeel.directory.Jeeel.Framework = {
-
-    /**
-     * 自身を文字列参照された場合の変換
-     *
-     * @return {String} 自身のディレクトリ
-     * @private
-     */
-    toString: function () {
-        return Jeeel.directory.Jeeel + 'Framework/';
-    }
-};
-
-/**
- * 大規模アプリケーション開発を円滑にするための汎用クラス等を保持するネームスペース<br />
- * 現在試用段階であり、使用する際は削除・変更が頻繁にある事に注意
- */
-Jeeel.Framework = {
-    
-};
-
-Jeeel.file.Jeeel.Framework = ['Net', 'Event', 'EventDispatcher', 'Layer', 'Mvc'];
-
-Jeeel._autoImports(Jeeel.directory.Jeeel.Framework, Jeeel.file.Jeeel.Framework);
-Jeeel.directory.Jeeel.Framework.Net = {
-
-    /**
-     * 自身を文字列参照された場合の変換
-     *
-     * @return {String} 自身のディレクトリ
-     * @private
-     */
-    toString: function () {
-        return Jeeel.directory.Jeeel.Framework + 'Net/';
-    }
-};
-
-/**
- * ネット関連のネームスペース
- */
-Jeeel.Framework.Net = {
-
-};
-
-Jeeel.file.Jeeel.Framework.Net = ['Connect'];
-
-Jeeel._autoImports(Jeeel.directory.Jeeel.Framework.Net, Jeeel.file.Jeeel.Framework.Net);
-
-/**
- * コンストラクタ
- * 
- * @class サーバーコネクトのプロトタイプ
- */
-Jeeel.Framework.Net.Connect = function () {
-    
-};
-
-Jeeel.Framework.Net.Connect.prototype = {
-    
-    /**
-     * 並列接続時の動作ポリシー
-     * 
-     * @type Integer
-     * @protected
-     */
-    _collisionPolicy: 0,
-    
-    /**
-     * タイムアウト時間(ミリ秒)
-     * 
-     * @type Integer
-     * @protected
-     */
-    _timeout: 60000,
-    
-    /**
-     * HTTPメソッド
-     * 
-     * @type String
-     * @protected
-     */
-    _method: 'POST',
-    
-    /**
-     * Ajaxインスタンス
-     * 
-     * @type Jeeel.Net.Ajax
-     * @protected
-     */
-    _ajax: null,
-    
-    /**
-     * 並列リクエストをした場合の動作を設定する
-     * 
-     * @param {Integer} collisionPolicy コリジョンポリシー
-     * @return {Jeeel.Framework.Net.Connect} 自インスタンス
-     * @see Jeeel.Net.Ajax.CollisionPolicy
-     */
-    setCollisionPolicy: function (collisionPolicy) {
-        this._collisionPolicy = collisionPolicy;
-        
-        return this;
-    },
-    
-    /**
-     * リクエストのタイムアウトまでの時間を設定する(デフォルトは60秒)
-     * 
-     * @param {Integer} time タイムアウト時間、0で無制限(ミリ秒)
-     * @return {Jeeel.Framework.Net.Connect} 自インスタンス
-     */
-    setTimeoutTime: function (time) {
-        this._timeout = time;
-        
-        return this;
-    },
-    
-    /**
-     * HTTPメソッドを設定する
-     * 
-     * @param {String} [method] HTTPメソッド(POSTもしくはGET、大文字小文字は問わない)
-     * @return {Jeeel.Framework.Net.Connect} 自インスタンス
-     */
-    setMethod: function (method) {
-        this._method = method;
-        
-        return this;
-    },
-    
-    /**
-     * サーバーに接続する
-     * 
-     * @param {String} url 接続URL
-     * @param {Hash} [params] 送信データのリスト
-     * @param {Function} [success] 成功時のコールバック(明示的に指定する場合) void callBack(Jeeel.Net.Ajax.Response response)
-     * @param {Function} [failure] 失敗時のコールバック(明示的に指定する場合) void callBack(Jeeel.Net.Ajax.Response response)
-     * @param {Function} [timeout] タイムアウト時のコールバック(明示的に指定する場合) void callBack(Jeeel.Net.Ajax.Response response)
-     * @return {Jeeel.Framework.Net.Connect} 自インスタンス
-     */
-    connect: function (url, params, success, failure, timeout) {
-        this._ajax = new Jeeel.Net.Ajax(url, this._method);
-        
-        this._ajax.setAll(params || {})
-                  .setTimeoutTime(this._timeout)
-                  .setCollisionPolicy(this._collisionPolicy)
-                  .setSuccessMethod(success || this.update, this)
-                  .setFailureMethod(failure || this.recover, this)
-                  .setTimeoutMethod(timeout || this.abanbon, this)
-                  .setCompleteMethod(function () {
-                      this._ajax = null;
-                  }, this)
-                  .execute();
-        
-        return this;
-    },
-    
-    /**
-     * 現在の通信を中止させる
-     * 
-     * @return {Jeeel.Framework.Net.Connect} 自インスタンス
-     */
-    abort: function () {
-        if (this._ajax) {
-            this._ajax.abort();
-        }
-        
-        return this;
-    },
-    
-    /**
-     * 接続成功時に通常呼ばれるコールバック(内部のthisは自インスタンスになる)
-     * 
-     * @param {Jeeel.Net.Ajax.Response} response レスポンス
-     * @abstract
-     */
-    update: function (response) {
-        
-    },
-    
-    /**
-     * タイムアウト時に通常呼ばれるコールバック(内部のthisは自インスタンスになる)
-     * 
-     * @param {Jeeel.Net.Ajax.Response} response レスポンス
-     * @abstract
-     */
-    abanbon: function (response) {
-        
-    },
-    
-    /**
-     * エラー時に通常呼ばれるコールバック(内部のthisは自インスタンスになる)
-     * 
-     * @param {Jeeel.Net.Ajax.Response} response レスポンス
-     * @abstract
-     */
-    recover: function (response) {
-        
-    },
-    
-    /**
-     * コンストラクタ
-     * 
-     * @constructor
-     */
-    constructor: Jeeel.Framework.Net.Connect
-};Jeeel.directory.Jeeel.Framework.Event = {
-
-    /**
-     * 自身を文字列参照された場合の変換
-     *
-     * @return {String} 自身のディレクトリ
-     * @private
-     */
-    toString: function () {
-        return Jeeel.directory.Jeeel.Framework + 'Event/';
-    }
-};
-
-/**
- * コンストラクタ
- * 
- * @class イベントを管理するクラス<br />
- *         イベントの伝播は最上層からキャプチャリング段階に入り発生地点までたどる<br />
- *         発生地点でターゲティング段階になり、バブリング段階になって最上層に向かって上っていく<br />
- *         最後にフォーリング段階になり発生地点から最下層まで全ての要素に伝播していく
- * @param {String} type イベントタイプ
- * @param {Boolean} [bubbles=true] バブリング処理をするかどうか(上位伝播)
- * @param {Boolean} [falls] フォーリング処理をするかどうか(下位伝播)
- * @param {Boolean} [cancelable] デフォルト動作をキャンセル出来るかどうか(存在しない場合や出来ない場合がfalse)
- */
-Jeeel.Framework.Event = function (type, bubbles, falls, cancelable) {
-    this._type = type;
-    this._bubbles = !!(bubbles === false ? bubbles : bubbles || true);
-    this._falls = !!falls;
-    this._cancelable = !!cancelable;
-    this._captureTargets = [];
-};
-
-Jeeel.Framework.Event.prototype = {
-  
-    /**
-     * イベントタイプ
-     * 
-     * @type String
-     * @protected
-     */
-    _type: '',
-    
-    /**
-     * 上階層の要素にバブリングフローをするかどうか
-     * 
-     * @type Boolean
-     * @protected
-     */
-    _bubbles: true,
-    
-    /**
-     * 下階層の要素にフォーリングフローするかどうか
-     * 
-     * @type Boolean
-     * @protected
-     */
-    _falls: false,
-    
-    /**
-     * デフォルトの動作をキャンセル出来るかどうか
-     * 
-     * @type Boolean
-     * @protected
-     */
-    _cancelable: false,
-    
-    /**
-     * デフォルトの挙動をキャンセルしたかどうか
-     * 
-     * @type Boolean
-     * @protected
-     */
-    _cancelDefault: false,
-    
-    /**
-     * イベントのハンドリングをキャンセルしたかどうか
-     * 
-     * @type Boolean
-     * @protected
-     */
-    _cancelHandle: false,
-    
-    /**
-     * イベントの伝播をキャンセルしたかどうか
-     * 
-     * @type Boolean
-     * @protected
-     */
-    _cancelFlow: false,
-    
-    /**
-     * イベントフェーズ
-     * 
-     * @type Integer
-     * @protected
-     */
-    _phase: 1,
-    
-    /**
-     * キャプチャ段階で使用する対象リスト
-     * 
-     * @type Object[]
-     * @protected
-     */
-    _captureTargets: [],
-    
-    /**
-     * イベント発生対象
-     * 
-     * @type Object
-     * @protected
-     */
-    _target: null,
-    
-    /**
-     * イベントハンドリング対象
-     * 
-     * @type Object
-     * @protected
-     */
-    _currentTarget: null,
-    
-    /**
-     * イベントタイプを取得する
-     * 
-     * @return {String} イベントタイプ
-     */
-    getType: function () {
-        return this._type;
-    },
-    
-    /**
-     * バブリング処理をするかどうかを返す
-     * 
-     * @return {Boolean} バブリング処理をするかどうか
-     */
-    getBubbles: function () {
-        return this._bubbles;
-    },
-    
-    /**
-     * フォーリング段階をするかどうかを返す
-     * 
-     * @return {Boolean} フォーリング処理をするかどうか
-     */
-    getFalls: function () {
-        return this._falls;
-    },
-    
-    /**
-     * 現在のイベントフェーズを示す定数を取得する
-     * 
-     * @return {Integer} イベントフェーズ定数
-     */
-    getEventPhase: function () {
-        return this._phase;
-    },
-    
-    /**
-     * イベント発生対象を取得する
-     * 
-     * @return {Object} イベント発生対象
-     */
-    getTarget: function () {
-        return this._target;
-    },
-    
-    /**
-     * イベントハンドリング対象を取得する
-     * 
-     * @return {Object} イベントハンドリング対象
-     */
-    getCurrentTarget: function () {
-        return this._currentTarget;
-    },
-    
-    /**
-     * イベントのデフォルトの動作がキャンセル出来るかどうかを返す
-     * 
-     * @return {Boolean} キャンセル出来るかどうか
-     */
-    isCancelable: function () {
-        return this._cancelable;
-    },
-    
-    /**
-     * デフォルトの挙動がキャンセルされたかどうかを返す
-     * 
-     * @return {Boolean} キャンセルされたかどうか
-     */
-    isDefaultPrevented: function () {
-        return this._cancelDefault;
-    },
-    
-    /**
-     * イベントのデフォルトの動作をキャンセルする<br />
-     * デフォルトの挙動のキャンセルが許可されていない場合は無意味
-     * 
-     * @return {Jeeel.Framework.Event} 自インスタンス
-     */
-    preventDefault: function () {
-        if (this._cancelable) {
-            this._cancelDefault = true;
-        }
-        
-        return this;
-    },
-    
-    /**
-     * イベントの伝播を止める
-     * 
-     * @return {Jeeel.Framework.Event} 自インスタンス
-     */
-    stopPropagation: function () {
-        this._cancelFlow = true;
-        
-        return this;
-    },
-    
-    /**
-     * イベントの伝播とハンドリングを止める
-     * 
-     * @return {Jeeel.Framework.Event} 自インスタンス
-     */
-    stopImmediatePropagation: function () {
-        this._cancelFlow = this._cancelHandle = true;
-        
-        return this;
-    },
-    
-    /**
-     * イベントの伝播、ハンドリング、デフォルトの挙動全てを停止する
-     * 
-     * @return {Jeeel.Framework.Event} 自インスタンス
-     */
-    stop: function () {
-        this._cancelDefault = this._cancelFlow = this._cancelHandle = true;
-        
-        return this;
-    },
-    
-    /**
-     * 複製を行う
-     * 
-     * @param {Boolean} [dispatchable] ディスパッチ済みのインスタンスを複製した際にディスパッチ出来るようにするかどうか
-     * @return {Jeeel.Framework.Event} 複製したインスタンス
-     */
-    clone: function (dispatchable) {
-        var instance = new this.constructor(this._type, this._bubbles, this._cancelable);
-        
-        for (var key in this) {
-            if ( ! Jeeel.Type.isFunction(this[key])) {
-                instance[key] = this[key];
-            }
-        }
-        
-        for (var i = this._captureTargets.length; i--;) {
-            instance._captureTargets[i] = this._captureTargets[i];
-        }
-        
-        if (dispatchable) {
-            instance._phase = 1;
-            instance._target = null;
-        }
-        
-        return instance;
-    },
-    
-    /**
-     * コンストラクタ
-     * 
-     * @constructor
-     */
-    constructor: Jeeel.Framework.Event
-};
-
-Jeeel.file.Jeeel.Framework.Event = ['Phase', 'Type'];
-
-Jeeel._autoImports(Jeeel.directory.Jeeel.Framework.Event, Jeeel.file.Jeeel.Framework.Event);
-
-/**
- * イベントフェーズの列挙体
- * 
- * @enum {Integer}
- */
-Jeeel.Framework.Event.Phase = {
-  
-    /**
-     * キャプチャ段階
-     * 
-     * @type Integer
-     * @constant
-     */
-    CAPTURING: 1,
-    
-    /**
-     * ターゲット段階
-     * 
-     * @type Integer
-     * @constant
-     */
-    TARGETING: 2,
-    
-    /**
-     * バブリング段階
-     * 
-     * @type Integer
-     * @constant
-     */
-    BUBBLING: 3,
-    
-    /**
-     * フォーリング段階
-     * 
-     * @type Integer
-     * @constant
-     */
-    FALLING: 4
-};
-/**
- * イベントタイプの列挙体
- * 
- * @enum {String}
- */
-Jeeel.Framework.Event.Type = {
-  
-    /**
-     * レイヤーオブジェクトがaddChildで追加された時に発生する
-     * 
-     * @type String
-     * @constant
-     */
-    ADDED: 'Added',
-    
-    /**
-     * レイヤーオブジェクトがremoveChildで削除された時に発生する
-     * 
-     * @type String
-     * @constant
-     */
-    REMOVED: 'Removed'
-};
-/**
- * コンストラクタ
- * 
- * @class イベントのハンドリング、ディスパッチを行うクラス
- */
-Jeeel.Framework.EventDispatcher = function () {
-    this._eventHandlers = {};
-};
-
-Jeeel.Framework.EventDispatcher.prototype = {
-    
-    /**
-     * 登録イベントハンドラー
-     * 
-     * @type Hash
-     * @private
-     */
-    _eventHandlers: {},
-    
-    /**
-     * イベントの登録を行う
-     * 
-     * @param {String} type イベントタイプ
-     * @param {Function} listener 登録リスナー
-     * @param {Boolean} [useCapture] キャプチャ段階でリスナーを呼び出すかどうか
-     * @param {Mixied} [thisArg] イベントリスナー内でthisに相当する値
-     * @param {Mixied} var_args 可変引数、コールバックに渡す引数(最初の引数はJeeel.Framework.Event、２つ目以降に任意引数)
-     * @return {Jeeel.Framework.EventDispatcher} 自インスタンス
-     */
-    addEventListener: function (type, listener, useCapture, thisArg, var_args) {
-        if ( ! this._eventHandlers[type]) {
-            this._eventHandlers[type] = [];
-        }
-        
-        useCapture = !!useCapture;
-        
-        var handlers = this._eventHandlers[type];
-        
-        for (var i = handlers.length; i--;) {
-            if (handlers[i].listener === listener && handlers[i].useCapture === useCapture) {
-                return this;
-            }
-        }
-        
-        var args = Array.prototype.slice.call(arguments, 4, arguments.length);
-        
-        args.unshift(null);
-          
-        handlers[handlers.length] = {
-            listener: listener,
-            useCapture: useCapture,
-            thisArg: thisArg,
-            args: args
-        };
-        
-        return this;
-    },
-    
-    /**
-     * イベントの削除を行う
-     * 
-     * @param {String} type イベントタイプ
-     * @param {Function} listener 削除リスナー
-     * @param {Boolean} [useCapture] キャプチャ段階でリスナーを呼び出すかどうか
-     * @return {Jeeel.Framework.EventDispatcher} 自インスタンス
-     */
-    removeEventListener: function (type, listener, useCapture) {
-        var handlers = this._eventHandlers[type];
-        
-        if ( ! handlers) {
-            return this;
-        }
-        
-        useCapture = !!useCapture;
-        
-        for (var i = handlers.length; i--;) {
-            if (handlers[i].listener === listener && handlers[i].useCapture === useCapture) {
-                handlers.splice(i, 1);
-                break;
-            }
-        }
-        
-        return this;
-    },
-    
-    /**
-     * 指定したイベントタイプのイベントが登録されているかどうかを返す
-     * 
-     * @param {String} type イベントタイプ
-     * @return {Boolean} 登録されているかどうか
-     */
-    hasEventListener: function (type) {
-        return !!(this._eventHandlers[type] && this._eventHandlers[type].length);
-    },
-    
-    /**
-     * イベントを発生させる
-     * 
-     * @param {Jeeel.Framework.Event} event 発生対象のEvent
-     * @return {Jeeel.Framework.EventDispatcher} 自インスタンス
-     */
-    dispatchEvent: function (event) {
-        if (event._target) {
-            throw new Error('eventは既にディスパッチ済みのEventオブジェクトです。');
-        }
-        
-        event._target = this;
-        
-        event._captureTargets.push(this);
-        
-        return this._flowEvent(event);
-    },
-    
-    /**
-     * コンストラクタ
-     * 
-     * @constructor
-     */
-    constructor: Jeeel.Framework.EventDispatcher,
-    
-    /**
-     * 他のディスパッチャーで発生したイベントを疑似フローさせる
-     * 
-     * @param {Jeeel.Framework.Event} event 疑似フロー対象のEvent
-     * @return {Jeeel.Framework.EventDispatcher} 自インスタンス
-     * @final
-     * @protected
-     */
-    _flowEvent: function (event) {
-        if (event._cancelFlow) {
-            return this;
-        }
-        
-        var phase = event.getEventPhase();
-        
-        this._callListener(event, phase === Jeeel.Framework.Event.Phase.CAPTURING);
-        
-        switch (phase) {
-            case Jeeel.Framework.Event.Phase.CAPTURING:
-                var capture = event._captureTargets.pop();
-                
-                if (capture === event._target) {
-                    event._phase = Jeeel.Framework.Event.Phase.TARGETING;
-                } else if (capture === this) {
-                    capture = event._captureTargets.pop();
-                    
-                    if (capture === event._target) {
-                        event._phase = Jeeel.Framework.Event.Phase.TARGETING;
-                    }
-                }
-                
-                capture._flowEvent(event);
-                break;
-                
-            case Jeeel.Framework.Event.Phase.TARGETING:
-                if (event.getBubbles() || event.getFalls()) {
-                    if (event.getBubbles()) {
-                        event._phase = Jeeel.Framework.Event.Phase.BUBBLING;
-                        this._flowBubblingPhaseEvent(event);
-                    }
-                    
-                    if (event.getFalls()) {
-                        event._phase = Jeeel.Framework.Event.Phase.FALLING;
-                        this._flowFallingPhaseEvent(event);
-                    }
-                } else {
-                    event._cancelFlow = true;
-                }
-                
-                break;
-            
-            case Jeeel.Framework.Event.Phase.BUBBLING:
-                if (event.getBubbles()) {
-                    this._flowBubblingPhaseEvent(event);
-                }
-                break;
-                
-            case Jeeel.Framework.Event.Phase.FALLING:
-                if (event.getFalls()) {
-                    this._flowFallingPhaseEvent(event);
-                }
-                break;
-                
-            default:
-                throw new Error('フェーズの状態が不明です。');
-                break;
-        }
-        
-        return this;
-    },
-    
-    /**
-     * イベントをバブリングする
-     * 
-     * @param {Jeeel.Framework.Event} event バブリング対象のEvent
-     * @protected
-     * @abstract
-     */
-    _flowBubblingPhaseEvent: function (event) {
-        
-    },
-    
-    /**
-     * イベントをフォーリングする
-     * 
-     * @param {Jeeel.Framework.Event} event フォーリング対象のEvent
-     * @protected
-     * @abstract
-     */
-    _flowFallingPhaseEvent: function (event) {
-        
-    },
-    
-    /**
-     * このインスタンスに定義されているリスナーを呼び出す
-     * 
-     * @param {Jeeel.Framework.Event} event Eventオブジェクト
-     * @param {Boolean} useCapture キャプチャ段階でのリスナーをキャッチするかどうか
-     * @final
-     * @protected
-     */
-    _callListener: function (event, useCapture) {
-        if (event._cancelHandle) {
-            return this;
-        }
-        
-        var handlers = this._eventHandlers[event.getType()];
-        
-        if ( ! handlers) {
-            return this;
-        }
-        
-        event._currentTarget = this;
-        
-        var cloneHandlers = handlers.concat();
-        
-        for (var i = 0, l = cloneHandlers.length; i < l; i++) {
-            
-            if (cloneHandlers[i].useCapture === useCapture) {
-                cloneHandlers[i].args[0] = event;
-                
-                cloneHandlers[i].listener.apply(cloneHandlers[i].thisArg, cloneHandlers[i].args);
-                
-                cloneHandlers[i].args[0] = null;
-
-                if (event._cancelHandle) {
-                    break;
-                }
-            }
-        }
-        
-        return this;
-    }
-};
-/**
- * コンストラクタ
- * 
- * @class 階層構造のオブジェクトを管理するクラス
- * @augments Jeeel.Framework.EventDispatcher
- */
-Jeeel.Framework.Layer = function () {
-    Jeeel.Framework.EventDispatcher.call(this);
-    
-    this._children = [];
-};
-
-Jeeel.Framework.Layer.prototype = {
-    
-    /**
-     * 親レイヤー
-     * 
-     * @type Jeeel.Framework.Layer
-     * @protected
-     */
-    _parent: null,
-    
-    /**
-     * 子レイヤーリスト
-     * 
-     * @type Jeeel.Framework.Layer[]
-     * @protected
-     */
-    _children: [],
-    
-    /**
-     * 子レイヤーを追加する
-     * 
-     * @param {Jeeel.Framework.Layer} child 子レイヤー
-     * @return {Jeeel.Framework.Layer} 自インスタンス
-     */
-    addChild: function (child) {
-        this._children[this._children.length] = child;
-        
-        child._refreshRelationship(this);
-        
-        return this;
-    },
-    
-    /**
-     * 子レイヤーを削除する
-     * 
-     * @param {Jeeel.Framework.Layer} child 子レイヤー
-     * @return {Jeeel.Framework.Layer} 自インスタンス
-     */
-    removeChild: function (child) {
-        for (var i = this._children.length; i--;) {
-            if (this._children[i] === child) {
-                this._children.splice(i, 1);
-                child._refreshRelationship();
-                break;
-            }
-        }
-
-        return this;
-    },
-    
-    /**
-     * 指定したインデックスの子レイヤーを削除する
-     * 
-     * @param {Integer} index インデックス
-     * @return {Jeeel.Framework.Layer} 自インスタンス
-     */
-    removeChildAt: function (index) {
-        if (this._children[index]) {
-            var child = this._children[index];
-            
-            this._children.splice(index, 1);
-            
-            child._refreshRelationship();
-        }
-        
-        return this;
-    },
-    
-    /**
-     * 全ての子レイヤーを削除する
-     * 
-     * @return {Jeeel.Framework.Layer} 自インスタンス
-     */
-    removeChildren: function () {
-        for (var i = this._children.length; i--;) {
-            this._children[i]._refreshRelationship();
-        }
-        
-        this._children.splice(0, this._children.length);
-        
-        return this;
-    },
-    
-    /**
-     * 親レイヤーを取得する
-     * 
-     * @return {Jeeel.Framework.Layer} 親レイヤー
-     */
-    getParent: function () {
-        return this._parent;
-    },
-    
-    /**
-     * 子レイヤーリストを取得する
-     * 
-     * @return {Jeeel.Framework.Layer[]} 子レイヤーリスト
-     */
-    getChildren: function () {
-        return this._children;
-    },
-    
-    /**
-     * 指定したインデックスの子レイヤーを取得する
-     * 
-     * @param {Integer} index インデックス
-     * @return {Jeeel.Framework.Layer} 子レイヤー
-     */
-    getChildAt: function (index) {
-        return this._children[index] || null;
-    },
-    
-    /**
-     * 子レイヤーの数を取得する
-     * 
-     * @return {Integer} 子レイヤーの数
-     */
-    getChildSize: function () {
-        return this._children.length;
-    },
-    
-    /**
-     * イベントを発生させる
-     * 
-     * @param {Jeeel.Framework.Event} event 発生対象のEvent
-     * @return {Jeeel.Framework.Layer} 自インスタンス
-     */
-    dispatchEvent: function (event) {
-        if ( ! (event instanceof Jeeel.Framework.Event)) {
-            throw new Error('eventが指定されていません。');
-        } else if (event._target) {
-            throw new Error('eventは既にディスパッチ済みのEventオブジェクトです。');
-        }
-        
-        event._target = this;
-        
-        var layer = this;
-        var captureTargets = event._captureTargets;
-        
-        while (layer) {
-            captureTargets[captureTargets.length] = layer;
-            layer = layer._parent;
-        }
-        
-        captureTargets[captureTargets.length - 1]._flowEvent(event);
-        
-        return this;
-    },
-    
-    /**
-     * コンストラクタ
-     * 
-     * @constructor
-     */
-    constructor: Jeeel.Framework.Layer,
-    
-    /**
-     * ディスパッチされたイベントのフローを親レイヤーに伝える
-     * 
-     * @param {Jeeel.Framework.Event} event フロー対象のEvent
-     * @return {Jeeel.Framework.Layer} 自インスタンス
-     * @protected
-     */
-    _flowBubblingPhaseEvent: function (event) {
-        // 上位伝播対象でイベントがキャンセルしていない場合に親レイヤーに伝播する
-        if (this._parent && event.getBubbles() && ! event._cancelFlow) {
-            this._parent._flowEvent(event);
-        }
-    },
-    
-    /**
-     * ディスパッチされたイベントのフローを子レイヤーに伝える
-     * 
-     * @param {Jeeel.Framework.Event} event フォーリング対象のEvent
-     * @return {Jeeel.Framework.Layer} 自インスタンス
-     * @protected
-     */
-    _flowFallingPhaseEvent: function (event) {
-        // 下位伝播対象でイベントがキャンセルしていない場合に子レイヤーに伝播する
-        if (event.getFalls() && ! event._cancelFlow) {
-            for (var i =  this._children.length; i--;) {
-                this._children[i]._flowEvent(event);
-            }
-        }
-    },
-    
-    /**
-     * 親に追加された時に呼び出される(デフォルトの挙動)
-     * 
-     * @abstract
-     * @protected
-     */
-    _onAddedThis: function (parent) {
-        
-    },
-    
-    /**
-     * 親から削除された時に呼び出される(デフォルトの挙動)
-     * 
-     * @abstract
-     * @protected
-     */
-    _onRemovedThis: function (parent) {
-        
-    },
-    
-    /**
-     * 親子関係の更新する
-     * 
-     * @param {Jeeel.Framework.Layer} parent 親レイヤー
-     * @final
-     * @protected
-     */
-    _refreshRelationship: function (parent) {
-        var event;
-        
-        if ( ! parent) {
-            parent = this._parent;
-            this._parent = null;
-            
-            event = new Jeeel.Framework.Event(Jeeel.Framework.Event.Type.REMOVED, true, false, true);
-            
-            this.dispatchEvent(event);
-            
-            if ( ! event.isDefaultPrevented()) {
-                this._onRemovedThis(parent);
-            }
-            return;
-        } else if (this._parent) {
-            this._parent.removeChild(this);
-        }
-        
-        this._parent = parent;
-        
-        event = new Jeeel.Framework.Event(Jeeel.Framework.Event.Type.ADDED, true, false, true);
-        
-        this.dispatchEvent(event);
-        
-        if ( ! event.isDefaultPrevented()) {
-            this._onAddedThis(parent);
-        }
-    }
-};
-
-Jeeel.Class.extend(Jeeel.Framework.Layer, Jeeel.Framework.EventDispatcher);
-Jeeel.directory.Jeeel.Framework.Mvc = {
-
-    /**
-     * 自身を文字列参照された場合の変換
-     *
-     * @return {String} 自身のディレクトリ
-     * @private
-     */
-    toString: function () {
-        return Jeeel.directory.Jeeel.Framework + 'Mvc/';
-    }
-};
-
-/**
- * MVCモデル関連のネームスペース
- */
-Jeeel.Framework.Mvc = {
-    
-};
-
-Jeeel.file.Jeeel.Framework.Mvc = ['Model', 'View', 'Controller'];
-
-Jeeel._autoImports(Jeeel.directory.Jeeel.Framework.Mvc, Jeeel.file.Jeeel.Framework.Mvc);
-
-/**
- * コンストラクタ
- * 
- * @class モデルのプロトタイプ
- * @augments Jeeel.Framework.Net.Connect
- */
-Jeeel.Framework.Mvc.Model = function () {
-    Jeeel.Framework.Net.Connect.call(this);
-    
-    this._state = {};
-};
-
-/**
- * インスタンスの作成を行う
- * 
- * @return {Jeeel.Framework.Mvc.Model} 作成したインスタンス
- */
-Jeeel.Framework.Mvc.Model.create = function () {
-    return new this();
-};
-
-Jeeel.Framework.Mvc.Model.prototype = {
-    
-    /**
-     * モデルのステータス(配列もしくは連想配列)
-     * 
-     * @type Hash
-     * @protected
-     */
-    _state: {},
-    
-    /**
-     * このモデルを管理するコントローラ
-     * 
-     * @type Jeeel.Framework.Mvc.Controller
-     * @protected
-     */
-    _controller: null,
-    
-    /**
-     * ステータスを取得する
-     * 
-     * @return {Hash} ステータス
-     */
-    getState: function () {
-        return this._state;
-    },
-    
-    /** 
-     * ステータスを設定する
-     * 
-     * @param {Hash} state ステータス
-     * @return {Jeeel.Framework.Mvc.Model} 自インスタンス
-     */
-    setState: function (state) {},
-    
-    /**
-     * モデルの初期化を行い、登録してあるビューに通知する
-     * 
-     * @return {Jeeel.Framework.Mvc.Model} 自インスタンス
-     */
-    init: function () {
-        this._state = {};
-        return this.notify();
-    },
-    
-    /**
-     * サーバー接続後に呼び出される
-     * 
-     * @param {Jeeel.Net.Ajax.Response} response レスポンス
-     */
-    update: function (response) {
-        var res;
-        
-        try {
-            res = Jeeel.Json.decode(decodeURIComponent(response.responseText));
-        } catch (e) {}
-        
-        if ( ! Jeeel.Type.isHash(res)) {
-            this.recover(response);
-        } else {
-            this._state = res;
-            this.notify();
-        }
-    },
-        
-    /**
-     * コントローラを紐付ける
-     * 
-     * @param {Jeeel.Framework.Mvc.Controller} controller コントローラ
-     * @return {Jeeel.Framework.Mvc.Model} 自インスタンス
-     */
-    attach: function (controller) {
-        if (this._controller) {
-            this._controller.setModel(null);
-        }
-        
-        this._controller = controller;
-        
-        return this;
-    },
-    
-    /**
-     * コントローラとの紐付けを解除する
-     * 
-     * @param {Jeeel.Framework.Mvc.Controller} controller コントローラ
-     * @return {Jeeel.Framework.Mvc.Model} 自インスタンス
-     */
-    detach: function (controller) {
-        if (this._controller === controller) {
-            this._controller = null;
-        }
-        
-        return this;
-    },
-    
-    /**
-     * ビューへの通知を行う
-     * 
-     * @return {Jeeel.Framework.Mvc.Model} 自インスタンス
-     */
-    notify: function () {
-        this._controller.update();
-        
-        return this;
-    },
-    
-    /**
-     * コンストラクタ
-     * 
-     * @constructor
-     */
-    constructor: Jeeel.Framework.Mvc.Model
-};
-
-/**
- * ステータスをサーバーから取得し設定する
- * 
- * @param {String} url 取得先URL
- * @param {Hash} [params] 送信データのリスト
- * @param {Function} [success] 成功時のコールバック(明示的に指定する場合) void callBack(Jeeel.Net.Ajax.Response response)
- * @param {Function} [failure] 失敗時のコールバック(明示的に指定する場合) void callBack(Jeeel.Net.Ajax.Response response)
- * @param {Function} [timeout] タイムアウト時のコールバック(明示的に指定する場合) void callBack(Jeeel.Net.Ajax.Response response)
- * @return {Jeeel.Framework.Mvc.Model} 自インスタンス
- */
-Jeeel.Framework.Mvc.Model.prototype.setState = function (url, params, success, failure, timeout) {
-    var state = url;
-    
-    if (Jeeel.Type.isString(url) || arguments.length > 1) {
-        return this.connect(url, params, success, failure, timeout);
-    }
-    
-    if ( ! Jeeel.Type.isHash(state)) {
-        throw new Error('stateがHashではありません。');
-    }
-
-    this._state = state;
-    
-    return this;
-};
-
-Jeeel.Class.extend(Jeeel.Framework.Mvc.Model, Jeeel.Framework.Net.Connect);
-
-/**
- * コンストラクタ
- * 
- * @class ビューのプロトタイプ(Elementのラッパー要素の代わりでもある)
- * @augments Jeeel.Framework.Layer
- * @param {Element|String} element このビューが扱うElement
- * @param {Boolean} [useAutoAdd] このビューのオーナーコントローラが親コントローラに追加された時に、<br />
- *                                自動的にこのビューのElementを親コントローラのビューに追加するかどうか
- * @throws {Error} elementがHTML要素かIDで無かった場合に発生
- */
-Jeeel.Framework.Mvc.View = function (element, useAutoAdd) {
-    if (Jeeel.Type.isString(element)) {
-        element = Jeeel.Document.getElementById(element);
-    }
-    
-    if ( ! Jeeel.Type.isElement(element)) {
-        throw new Error('このビューに対するElementを指定して下さい。');
-    }
-    
-    this._element = element;
-    this._useAutoAdd = !!useAutoAdd;
-    
-    Jeeel.Framework.Layer.call(this);
-};
-
-/**
- * インスタンスの作成を行う
- * 
- * @param {Element|String} element このビューが扱うElement
- * @param {Boolean} [useAutoAdd] このビューのオーナーコントローラが親コントローラに追加された時に、<br />
- *                                自動的にこのビューのElementを親コントローラのビューに追加するかどうか
- * @return {Jeeel.Framework.Mvc.View} 作成したインスタンス
- * @throws {Error} elementがHTML要素かIDで無かった場合に発生
- */
-Jeeel.Framework.Mvc.View.create = function (element, useAutoAdd) {
-    return new this(element, useAutoAdd);
-};
-
-Jeeel.Framework.Mvc.View.prototype = {
-    
-    /**
-     * このビューを管理するコントローラ
-     * 
-     * @type Jeeel.Framework.Mvc.Controller
-     * @protected
-     */
-    _controller: null,
-    
-    /**
-     * このビューに関連付けられているElement
-     * 
-     * @type Element
-     * @protected
-     */
-    _element: null,
-    
-    /**
-     * Dom上に自動追加するかどうか
-     * 
-     * @type Boolean
-     * @protected
-     */
-    _useAutoAdd: false,
-    
-    /**
-     * このビューに関連付けられているElementを取得する
-     * 
-     * @return {Element} 関連付けElement
-     */
-    getElement: function () {
-        return this._element;
-    },
-    
-    /**
-     * 子ビューを追加する<br />
-     * この追加でコントローラ管理されているビューを追加するとElement間の追加しか行われない
-     * 
-     * @param {Jeeel.Framework.Mvc.View} child 追加要素
-     * @return {Jeeel.Framework.Mvc.View} 自インスタンス
-     */
-    addChild: function (child) {
-      
-        if ( ! child._controller) {
-            Jeeel.Framework.Layer.prototype.addChild.call(this, child);
-        }
-        
-        if (child._useAutoAdd) {
-            this._element.appendChild(child._element);
-        }
-        
-        return this;
-    },
-    
-    /**
-     * 子ビューを削除する<br />
-     * この削除でコントローラ管理されているビューを削除するとElement間の削除しか行われない
-     * 
-     * @param {Jeeel.Framework.Mvc.View} child 削除要素
-     * @return {Jeeel.Framework.Mvc.View} 自インスタンス
-     */
-    removeChild: function (child) {
-      
-        if ( ! child._controller) {
-            Jeeel.Framework.Layer.prototype.removeChild.call(this, child);
-        }
-        
-        if (child._useAutoAdd) {
-            this._element.removeChild(child._element);
-        }
-        
-        return this;
-    },
-    
-    /**
-     * このビューのElementへイベントの登録を行う
-     * 
-     * @param {String} type イベントタイプ
-     * @param {Function} listener 登録リスナー
-     * @param {Mixied} [thisArg] イベントリスナー内でthisに相当する値(デフォルトはこのインスタンス)
-     * @param {Mixied} var_args 可変引数、コールバックに渡す引数(最初の引数はJeeel.Dom.Eventで固定)
-     * @return {Jeeel.Framework.Mvc.View} 自インスタンス
-     */
-    addDomEventListener: function (type, listener, thisArg, var_args) {
-        var args = Array.prototype.slice.call(arguments, 0, arguments.length);
-        
-        args.unshift(this._element);
-        
-        if ( ! thisArg) {
-            args[3] = this;
-        }
-        
-        Jeeel.Dom.Event.addEventListener.apply(Jeeel.Dom.Event, args);
-        
-        return this;
-    },
-    
-    /**
-     * このビューのElementからイベントの削除を行う
-     * 
-     * @param {String} type イベントタイプ
-     * @param {Function} listener 削除リスナー
-     * @return {Jeeel.Framework.Mvc.View} 自インスタンス
-     */
-    removeDomEventListener: function (type, listener) {
-        Jeeel.Dom.Event.removeEventListener(this._element, type, listener);
-        
-        return this;
-    },
-    
-    /**
-     * コントローラを紐付ける
-     * 
-     * @param {Jeeel.Framework.Mvc.Controller} controller コントローラ
-     * @return {Jeeel.Framework.Mvc.View} 自インスタンス
-     */
-    attach: function (controller) {
-        if (this._controller) {
-            this._controller.removeView(this);
-        }
-        
-        this._controller = controller;
-        
-        return this;
-    },
-    
-    /**
-     * コントローラとの紐付けを解除する
-     * 
-     * @param {Jeeel.Framework.Mvc.Controller} controller コントローラ
-     * @return {Jeeel.Framework.Mvc.View} 自インスタンス
-     */
-    detach: function (controller) {
-        if (this._controller === controller) {
-            this._controller = null;
-        }
-        
-        return this;
-    },
-    
-    /**
-     * コントローラが親コントローラに追加された時に呼び出される<br />
-     * デフォルトでは親コントローラのビューにaddChildされる
-     * 
-     * @param {Jeeel.Framework.Mvc.Controller} controller コントローラ
-     * @param {Jeeel.Framework.Mvc.Controller} parentController 親コントローラ
-     */
-    onControllerAdded: function (controller, parentController) {
-        if ( ! this._useAutoAdd) {
-            return;
-        }
-        
-        var parentView = parentController.getView();
-        
-        if (parentView) {
-            parentView.addChild(this);
-        }
-    },
-    
-    /**
-     * コントローラが親コントローラから削除された時に呼び出される<br />
-     * デフォルトでは親コントローラのビューからremoveChildされる
-     * 
-     * @param {Jeeel.Framework.Mvc.Controller} controller コントローラ
-     * @param {Jeeel.Framework.Mvc.Controller} parentController 親コントローラ
-     */
-    onControllerRemoved: function (controller, parentController) {
-        if ( ! this._useAutoAdd) {
-            return;
-        }
-        
-        var parentView = parentController.getView();
-        
-        if (parentView) {
-            parentView.removeChild(this);
-        }
-    },
-    
-    /**
-     * モデルが変化した際にコントローラから呼び出される<br />
-     * デフォルトでは子ビュー全てのupdateメソッドを呼び出す
-     * 
-     * @param {Jeeel.Framework.Mvc.Controller} controller コントローラ
-     * @return {Jeeel.Framework.Mvc.View} 自インスタンス
-     */
-    update: function (controller) {
-        for (var i = 0, l = this._children.length; i < l; i++) {
-            this._children[i].update(controller);
-        }
-        
-        return this;
-    },
-    
-    /**
-     * コンストラクタ
-     * 
-     * @param {Element|String} element このビューが扱うElement
-     * @constructor
-     */
-    constructor: Jeeel.Framework.Mvc.View
-};
-
-Jeeel.Class.extend(Jeeel.Framework.Mvc.View, Jeeel.Framework.Layer);
-
-/**
- * コンストラクタ
- * 
- * @class コントローラのプロトタイプ<br />
- *         役割はそれぞれ、モデルが通信・計算・ステータス保持、<br />
- *         ビューが描画・構成・HTML要素とのやりとり、<br />
- *         コントローラが制御・イベントリスナ・カスタムイベントディスパッチなどとなる<br />
- *         なおコントローラとビューはLayerを継承しており、子供にそれぞれコントローラ、ビューを持つ事が出来る<br />
- *         また、EventDispatcherも継承しているのでイベントの制御も可能であり、<br />
- *         子に追加された時や削除された時はデフォルトでイベントがディスパッチされるようになっている
- * @augments Jeeel.Framework.Layer
- */
-Jeeel.Framework.Mvc.Controller = function () {
-    Jeeel.Framework.Layer.call(this);
-};
-
-/**
- * インスタンスの作成を行う
- * 
- * @return {Jeeel.Framework.Mvc.Controller} 作成したインスタンス
- */
-Jeeel.Framework.Mvc.Controller.create = function () {
-    return new this();
-};
-
-Jeeel.Framework.Mvc.Controller.prototype = {
-  
-    /**
-     * このコントローラに紐づくモデル
-     * 
-     * @type Jeeel.Framework.Mvc.Model
-     * @protected
-     */
-    _model: null,
-    
-    /**
-     * このコントローラに紐づくビュー
-     * 
-     * @type Jeeel.Framework.Mvc.View
-     * @protected
-     */
-    _view: null,
-    
-    /**
-     * ビューへの通知を行う
-     * 
-     * @return {Jeeel.Framework.Mvc.Controller} 自インスタンス
-     */
-    update: function () {
-        this._view.update(this);
-        
-        return this;
-    },
-    
-    /**
-     * モデルを取得する
-     * 
-     * @return {Jeeel.Framework.Mvc.Model} モデル
-     */
-    getModel: function () {
-        return this._model;
-    },
-    
-    /**
-     * モデルを設定する
-     * 
-     * @param {Jeeel.Framework.Mvc.Model} model モデル
-     * @return {Jeeel.Framework.Mvc.Controller} 自インスタンス
-     */
-    setModel: function (model) {
-        if (this._model) {
-            this._model.detach(this);
-        }
-        
-        this._model = model;
-        
-        if (model) {
-            model.attach(this);
-        }
-        
-        return this;
-    },
-    
-    /**
-     * ビューを取得する
-     * 
-     * @return {Jeeel.Framework.Mvc.View} ビュー
-     */
-    getView: function () {
-        return this._view;
-    },
-    
-    /**
-     * ビューを設定する
-     * 
-     * @param {Jeeel.Framework.Mvc.View} view ビュー
-     * @return {Jeeel.Framework.Mvc.Controller} 自インスタンス
-     */
-    setView: function (view) {
-        if (this._view) {
-            this._view.detach(this);
-        }
-        
-        this._view = view;
-        
-        if (view) {
-            view.attach(this);
-        }
-        
-        return this;
-    },
-       
-    /**
-     * コンストラクタ
-     * 
-     * @constructor
-     */
-    constructor: Jeeel.Framework.Mvc.Controller,
-    
-    /**
-     * 親に追加された時に呼び出される(デフォルトの挙動)
-     * 
-     * @protected
-     */
-    _onAddedThis: function (parent) {
-        this._view.onControllerAdded(this, parent);
-    },
-    
-    /**
-     * 親から削除された時に呼び出される(デフォルトの挙動)
-     * 
-     * @protected
-     */
-    _onRemovedThis: function (parent) {
-        this._view.onControllerRemoved(this, parent);
-    }
-};
-
-Jeeel.Class.extend(Jeeel.Framework.Mvc.Controller, Jeeel.Framework.Layer);
 
 Jeeel.directory.Jeeel.Config = {
 
@@ -38634,7 +42743,7 @@ Jeeel.directory.Jeeel.Config = {
     };
     
     /**
-     * コンフィグファイルの読み込みを行う<br />
+     * コンフィグファイルの読み込みを同期的に行う<br />
      * キャッシングも行い同じコンフィグへのアクセスは早くなる
      * 
      * @param {String} url コンフィグへのURL
@@ -38644,8 +42753,36 @@ Jeeel.directory.Jeeel.Config = {
         if (cash[url]) {
             return cash[url];
         }
-        
+
         return cash[url] = new this(Jeeel.Dom.Xml.load(url));
+    };
+    
+    /**
+     * コンフィグファイルの読み込みを非同期行う<br />
+     * キャッシングも行い同じコンフィグへのアクセスは早くなる
+     * 
+     * @param {String} url コンフィグへのURL
+     * @param {Function} callback 指定すると非同期読み込みになり引数にコンフィグが渡される<br />
+     *                               void callback(Jeeel.Config config)
+     */
+    Jeeel.Config.loadAsync = function (url, callback) {
+        if ( ! callback) {
+            return;
+        }
+        
+        if (cash[url]) {
+            callback(cash[url]);
+        } else {
+            var self = this;
+            
+            Jeeel.Dom.Xml.loadAsync(url, function (xml) {
+                cash[url] = new self(xml);
+                
+                callback(cash[url]);
+                
+                self = null;
+            });
+        }
     };
 })();
 
@@ -38692,7 +42829,88 @@ Jeeel.Config.prototype = {
             };
         }
     }
-};Jeeel.directory.Jeeel.Util = {
+};
+/**
+ * コンストラクタ
+ * 
+ * @class 独自エラークラス(デバッグモードが有効の場合はスタックトレースも取得する)
+ * @param {String} [message] エラーメッセージ
+ * @param {Integer} [code] エラーコード
+ * @param {Integer} [nestCount] このエラーメッセージを本来投げるべき箇所以外で作成した場合に指定
+ */
+Jeeel.Error = function (message, code, nestCount) {
+  
+    if (Error && Error.call) {
+        var err = Error.call(this, message);
+        var pairs = Jeeel.Hash.getPairs(err, false);
+
+        for (var i = pairs.length; i--;) {
+            if (pairs[i].key === '__proto__') {
+                continue;
+            } else if (pairs[i].key === 'name') {
+                continue;
+            }
+
+            this[pairs[i].key] = pairs[i].value;
+        }
+    }
+    
+    this.message = '' + message;
+    this.code = +code || 0;
+    
+    if (Jeeel._debugMode && Jeeel.Debug) {
+        
+        if ( ! (nestCount > 0)) {
+            nestCount = 1;
+        } else {
+            nestCount++;
+        }
+        
+        this.stackTrace = Jeeel.Debug.Debugger.getTrace(nestCount);
+    }
+};
+
+Jeeel.Error.prototype = {
+    
+    /**
+     * Error名
+     * 
+     * @type String
+     */
+    name: 'JeeelError',
+
+    /**
+     * エラーメッセージ
+     * 
+     * @type String
+     */
+    message: '',
+    
+    /**
+     * エラーコード
+     * 
+     * @type Integer
+     */
+    code: 0,
+    
+    /**
+     * スタックトレース
+     * 
+     * @type Jeeel.Object.Technical.Trace[]
+     */
+    stackTrace: [],
+    
+    /**
+     * コンストラクタ
+     * 
+     * @param {String} [message] エラーメッセージ
+     * @param {Integer} [nestCount] このエラーメッセージを本来投げるべき箇所以外で作成した場合に指定
+     * @constructor
+     */
+    constructor: Jeeel.Error
+};
+
+Jeeel.Class.extend(Jeeel.Error, Error);Jeeel.directory.Jeeel.Util = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -38706,7 +42924,8 @@ Jeeel.Config.prototype = {
 };
 
 /**
- * ユーティル関連のネームスペース
+ * @namespace ユーティル関連のネームスペース
+ * @deprecated 今後削除される可能性あり
  */
 Jeeel.Util = {
 
@@ -38716,7 +42935,9 @@ Jeeel.file.Jeeel.Util = ['Prefecture'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Util, Jeeel.file.Jeeel.Util);
 /**
- * 都道府県に関するモジュール
+ * @staticClass 都道府県に関するモジュール
+ * 
+ * @deprecated 今後削除される可能性あり
  */
 Jeeel.Util.Prefecture = {
     /**
@@ -38813,7 +43034,7 @@ Jeeel.directory.Jeeel.Gui = {
 };
 
 /**
- * GUI関連のネームスペース
+ * @namespace GUI関連のネームスペース
  */
 Jeeel.Gui = {
     
@@ -38823,6 +43044,11 @@ Jeeel.file.Jeeel.Gui = ['Abstract', 'Tooltip', 'ColorPicker', 'Scrollbar', 'Cale
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Gui, Jeeel.file.Jeeel.Gui);
 
+/**
+ * コンストラクタ
+ * 
+ * @abstractClass GUIクラスを作る際の抽象クラス
+ */
 Jeeel.Gui.Abstract = function () {
     
 };
@@ -39174,6 +43400,8 @@ Jeeel.directory.Jeeel.Gui.ColorPicker = {
 Jeeel.Gui.ColorPicker = function (appendTarget) {
     Jeeel.Gui.Abstract.call(this);
     
+    this._targets = [];
+//    this._pickerSize = {};
     this._init(appendTarget);
 };
 
@@ -39341,7 +43569,7 @@ Jeeel.Gui.ColorPicker.initStyle = function () {
 };
 
 /**
- * スタイル定義に使う定数
+ * @namespace スタイル定義に使う定数
  */
 Jeeel.Gui.ColorPicker.STYLE = {
     COLOR_PICKER_PADDING: 5,
@@ -39353,7 +43581,7 @@ Jeeel.Gui.ColorPicker.STYLE = {
 };
 
 /**
- * カラーピッカーのクラス名
+ * @namespace カラーピッカーのクラス名
  */
 Jeeel.Gui.ColorPicker.CLASS = {
     COLOR_PICKER: 'jeeel-gui-color-picker',
@@ -39381,7 +43609,8 @@ Jeeel.Gui.ColorPicker.CLASS = {
 Jeeel.Gui.ColorPicker.createLength = 0;
 
 Jeeel.Gui.ColorPicker.prototype = {
-    _target: null,
+    _targets: [],
+    _currentTarget: null,
     _callback: null,
     _color: null,
     _size: {
@@ -39389,6 +43618,11 @@ Jeeel.Gui.ColorPicker.prototype = {
         height: 150,
         grid: 1,
         gridie: 2
+    },
+    
+    _pickerSize: {
+        width: 189,
+        height: 209
     },
     
     _colorPicker: null,
@@ -39413,7 +43647,7 @@ Jeeel.Gui.ColorPicker.prototype = {
     },
     
     /**
-     * このインスタンスを紐付けるターゲットをセットする(コールバックの設定はキャンセルされる)
+     * このインスタンスを紐付けるターゲットを追加する(コールバックの設定はキャンセルされる)
      * 
      * @param {Element} commonTarget 対象のElement(他の引数を指定しない場合このElementが他の引数と共通になる)
      * @param {Element} [textTarget] Textの値を受け取り専用のElement<br />
@@ -39424,11 +43658,63 @@ Jeeel.Gui.ColorPicker.prototype = {
      *                              falseを渡せばBGカラーの値の受け取りが無くなる
      * @return {Jeeel.Gui.ColorPicker} 自インスタンス
      */
+    addTarget: function (commonTarget, textTarget, bgTarget) {
+        
+        var idx = this._targets.length;
+        
+        this._targets[idx] = {
+            click: commonTarget,
+            text: Jeeel.Type.isEmpty(textTarget) && commonTarget || textTarget,
+            bg: Jeeel.Type.isEmpty(bgTarget) && commonTarget || bgTarget
+        };
+        
+        Jeeel.Dom.Event.addEventListener(commonTarget, Jeeel.Dom.Event.Type.CLICK, this._toggle, this);
+        
+        this._callback = {
+            func: this._targetCallback,            
+            thisArg: this
+        };
+        
+        return this;
+    },
+    
+    /**
+     * このインスタンスを紐付けるターゲットを削除する
+     * 
+     * @param {Element} commonTarget 対象のElement
+     * @return {Jeeel.Gui.ColorPicker} 自インスタンス
+     */
+    removeTarget: function (commonTarget) {
+        
+        for (var i = this._targets.length; i--;) {
+            if (this._targets[i].click === commonTarget) {
+                Jeeel.Dom.Event.removeEventListener(commonTarget, Jeeel.Dom.Event.Type.CLICK, this._toggle);
+                this._targets.splice(i, 1);
+                break;
+            }
+        }
+        
+        return this;
+    },
+    
+    /**
+     * このインスタンスを紐付けるターゲットをセットする(コールバックの設定はキャンセルされる)
+     * 
+     * @param {Element} commonTarget 対象のElement(他の引数を指定しない場合このElementが他の引数と共通になる)
+     * @param {Element} [textTarget] Textの値を受け取り専用のElement<br />
+     *                                nullを渡すと省略と同じ意味になり、<br />
+     *                                falseを渡せばTextの値の受け取りが無くなる
+     * @param {Element} [bgTarget] BGカラー受け取り専用のElement<br />
+     *                              nullを渡すと省略と同じ意味になり、<br />
+     *                              falseを渡せばBGカラーの値の受け取りが無くなる
+     * @return {Jeeel.Gui.ColorPicker} 自インスタンス
+     * @deprecated じきに無くなります
+     */
     setTarget: function (commonTarget, textTarget, bgTarget) {
       
         this._resetTarget();
       
-        this._target = {
+        this._currentTarget = {
             click: commonTarget,
             text: Jeeel.Type.isEmpty(textTarget) && commonTarget || textTarget,
             bg: Jeeel.Type.isEmpty(bgTarget) && commonTarget || bgTarget
@@ -39437,31 +43723,7 @@ Jeeel.Gui.ColorPicker.prototype = {
         Jeeel.Dom.ElementOperator.create(commonTarget).addClick(this._toggle, this);
         
         this._callback = {
-            func: function (color, colorText) {
-                var rgb = color.toRgb();
-                var hsl = color.toHsl();
-                
-                if (this._target.bg) {
-                    this._target.bg.style.backgroundColor = rgb.toString();
-                }
-                
-                if (this._target.text && 'value' in this._target.text) {
-                    this._target.text.value = colorText;
-                    
-                    if (this._target.bg === this._target.text) {
-                        var fontColor;
-
-                        if (hsl.luminance < 0.6) {
-                            fontColor = '#ffffff';
-                        } else {
-                            fontColor = '#000000';
-                        }
-
-                        this._target.text.style.color = fontColor;
-                    }
-                }
-            },
-            
+            func: this._targetCallback,            
             thisArg: this
         };
         
@@ -39567,29 +43829,81 @@ Jeeel.Gui.ColorPicker.prototype = {
      */
     constructor: Jeeel.Gui.ColorPicker,
     
-    _toggle: function (ev, elm) {
+    /**
+     * 内部的に表示を切り替える
+     * 
+     * @param {Jeeel.Dom.Event} e イベントオブジェクト
+     */
+    _toggle: function (e) {
         
-        var rect = Jeeel.Dom.Element.create(elm).getRect();
+        var target = e.currentTarget;
+        var isUnMatch = true;
+        
+        for (var i = this._targets.length; i--;) {
+            if (this._targets[i].click === target) {
+                if (this._currentTarget === this._targets[i]) {
+                    isUnMatch = false;
+                }
+                
+                this._currentTarget = this._targets[i];
+                break;
+            }
+        }
+        
+        var rect = Jeeel.Dom.Element.create(target).getRect();
         
         this.move(rect.endPoint.x + 10, rect.y);
+        
+        // 前のターゲットと違うターゲットで表示状態のままであった場合移動だけで終了する
+        if (isUnMatch && this._colorPicker.style.display !== 'none') {
+            return;
+        }
         
         this.toggle();
     },
     
+    /**
+     * ターゲットを初期化する
+     */
     _resetTarget: function () {
-        if ( ! this._target) {
+        if ( ! this._currentTarget) {
             return;
         }
         
-        Jeeel.Dom.ElementOperator.create(this._target.click).removeClick(this._toggle);
+        Jeeel.Dom.ElementOperator.create(this._currentTarget.click).removeClick(this._toggle);
         
-        this._target = null;
+        this._currentTarget = null;
+    },
+    
+    _targetCallback: function (color, colorText) {
+        var rgb = color.toRgb();
+        var hsl = color.toHsl();
+
+        if (this._currentTarget.bg) {
+            this._currentTarget.bg.style.backgroundColor = rgb.toString();
+        }
+
+        if (this._currentTarget.text && 'value' in this._currentTarget.text) {
+            this._currentTarget.text.value = colorText;
+
+            if (this._currentTarget.bg === this._currentTarget.text) {
+                var fontColor;
+
+                if (hsl.luminance < 0.6) {
+                    fontColor = '#ffffff';
+                } else {
+                    fontColor = '#000000';
+                }
+
+                this._currentTarget.text.style.color = fontColor;
+            }
+        }
     },
     
     _showElement: function (elm, rate) {
         elm = $ELM(elm);
         
-        var size = elm.getSize();
+        var size = this._pickerSize;
         var scalingSpeed = {w: size.width * rate / 100, h: size.height * rate / 100};
         var s = {w: 0, h: 0};
         
@@ -39834,13 +44148,13 @@ Jeeel.Gui.ColorPicker.prototype = {
         var key = ev && ev.getKeyCode();
         
         switch (key) {
-            case Jeeel.Code.KeyCode.Up:
-            case Jeeel.Code.KeyCode.Down:
-            case Jeeel.Code.KeyCode.Left:
-            case Jeeel.Code.KeyCode.Right:
-            case Jeeel.Code.KeyCode.Home:
-            case Jeeel.Code.KeyCode.End:
-            case Jeeel.Code.KeyCode.Ctrl:
+            case Jeeel.Dom.Event.KeyCode.Up:
+            case Jeeel.Dom.Event.KeyCode.Down:
+            case Jeeel.Dom.Event.KeyCode.Left:
+            case Jeeel.Dom.Event.KeyCode.Right:
+            case Jeeel.Dom.Event.KeyCode.Home:
+            case Jeeel.Dom.Event.KeyCode.End:
+            case Jeeel.Dom.Event.KeyCode.Ctrl:
                 return;
                 break;
             
@@ -40141,7 +44455,7 @@ Jeeel.Gui.ColorPicker.prototype = {
     },
     
     _initFinish: function (appendTarget) {
-        Jeeel.Dom.Element.create(this._colorPicker).hide().setBackgroundIframe();
+        Jeeel.Dom.Element.create(this._colorPicker).hide().setShim();
 
         this._drawPallet();
         this._drawLuminanceBar();
@@ -40174,7 +44488,7 @@ Jeeel.directory.Jeeel.Gui.Scrollbar = {
 };
 
 /**
- * スクロールバー関連のネームスペース
+ * @namespace スクロールバー関連のネームスペース
  */
 Jeeel.Gui.Scrollbar = {
     
@@ -40186,6 +44500,7 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Gui.Scrollbar, Jeeel.file.Jeeel.Gui.Scr
 
 /**
  * コンストラクタ
+ * 
  * @class 垂直スクロールバーを単体で扱うクラス
  * @augments Jeeel.Gui.Abstract
  */
@@ -40545,6 +44860,7 @@ Jeeel.Class.extend(Jeeel.Gui.Scrollbar.Vertical, Jeeel.Gui.Abstract);
 
 /**
  * コンストラクタ
+ * 
  * @class 水平スクロールバーを単体で扱うクラス
  * @augments Jeeel.Gui.Abstract
  */
@@ -41834,7 +46150,7 @@ Jeeel.directory.Jeeel.Gui.Mouse = {
 };
 
 /**
- * マウス関連のGUIネームスペース
+ * @namespace マウス関連のGUIネームスペース
  */
 Jeeel.Gui.Mouse = {
 
@@ -42174,9 +46490,9 @@ Jeeel.Gui.Mouse.Gesture.prototype = {
         var vLength  = newPoint.y - oldPoint.y;
 
         if (Math.abs(hLength) > Math.abs(vLength) + this._sensitivityPlay) {
-            newGesture = (hLength < 0 ? Jeeel.Code.KeyCode.Left : Jeeel.Code.KeyCode.Right);
+            newGesture = (hLength < 0 ? Jeeel.Dom.Event.KeyCode.Left : Jeeel.Dom.Event.KeyCode.Right);
         } else if (this._sensitivityPlay + Math.abs(hLength) < Math.abs(vLength)) {
-            newGesture = (vLength < 0 ? Jeeel.Code.KeyCode.Up : Jeeel.Code.KeyCode.Down);
+            newGesture = (vLength < 0 ? Jeeel.Dom.Event.KeyCode.Up : Jeeel.Dom.Event.KeyCode.Down);
         } else {
             return;
         }
@@ -42293,19 +46609,19 @@ Jeeel.Gui.Mouse.Gesture.prototype = {
             }
 
             switch (this._gestureList[i]) {
-                case Jeeel.Code.KeyCode.Left:
+                case Jeeel.Dom.Event.KeyCode.Left:
                     res += '←';
                     break;
 
-                case Jeeel.Code.KeyCode.Right:
+                case Jeeel.Dom.Event.KeyCode.Right:
                     res += '→';
                     break;
 
-                case Jeeel.Code.KeyCode.Up:
+                case Jeeel.Dom.Event.KeyCode.Up:
                     res += '↑';
                     break;
 
-                case Jeeel.Code.KeyCode.Down:
+                case Jeeel.Dom.Event.KeyCode.Down:
                     res += '↓';
                     break;
 
@@ -42633,7 +46949,7 @@ Jeeel.file.Jeeel.Worker = ['Type'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Worker, Jeeel.file.Jeeel.Worker);
 /**
- * Worker内で使用されるイベントタイプを示す列挙体
+ * @namespace Worker内で使用されるイベントタイプを示す列挙体
  */
 Jeeel.Worker.Type = {
     
@@ -42684,12 +47000,36 @@ Jeeel.directory.Jeeel.Database = {
 };
 
 /**
- * DBMSに相当するStaticクラス
- *
- * @ignore 未完
+ * @namespace データベースに関連する機能を保有するネームスペース
  */
 Jeeel.Database = {
 
+};
+
+Jeeel.file.Jeeel.Database = ['Relation', 'Index'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Database, Jeeel.file.Jeeel.Database);
+
+Jeeel.directory.Jeeel.Database.Relation = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel.Database + 'Relation/';
+    }
+};
+
+/**
+ * @staticClass リレーショナルデータベースのDBMSに相当するStaticクラス
+ *
+ * @ignore 未完
+ */
+Jeeel.Database.Relation = {
+  
     /**
      * デフォルトで使用するDBのVersion
      *
@@ -42700,7 +47040,7 @@ Jeeel.Database = {
 
     /**
      * デフォルトで使用するDBの最大サイズ<br />
-     * デフォルト
+     * デフォルトで512MB
      *
      * @type Integer
      * @private
@@ -42718,7 +47058,7 @@ Jeeel.Database = {
      * 
      * @param {String} dbName 対象データベース名
      * @param {String} [displayName] 表示データベース名
-     * @return {Jeeel.Database.Connection} データベースとの接続インスタンス
+     * @return {Jeeel.Database.Relation.Connection} データベースとの接続インスタンス
      */
     connectDatabase: function (dbName, displayName) {
 
@@ -42786,20 +47126,20 @@ Jeeel.Database = {
     }
 };
 
-Jeeel.file.Jeeel.Database = ['Connection', 'Transaction', 'Result', 'Table'];
+Jeeel.file.Jeeel.Database.Relation = ['Connection', 'Transaction', 'Result', 'Table'];
 
-Jeeel._autoImports(Jeeel.directory.Jeeel.Database, Jeeel.file.Jeeel.Database);
+Jeeel._autoImports(Jeeel.directory.Jeeel.Database.Relation, Jeeel.file.Jeeel.Database.Relation);
 
 /**
  * コンストラクタ
  * 
  * @class 1つのデータベースとの接続を管理するクラス
  */
-Jeeel.Database.Connection = function (dbName, dbVersion, displayName, estimatedSize) {
+Jeeel.Database.Relation.Connection = function (dbName, dbVersion, displayName, estimatedSize) {
     this._db = openDatabase(dbName, dbVersion, displayName, estimatedSize);
 };
 
-Jeeel.Database.Connection.prototype = {
+Jeeel.Database.Relation.Connection.prototype = {
     /**
      * 基となるデータベース
      * 
@@ -42827,7 +47167,7 @@ Jeeel.Database.Connection.prototype = {
      * 成功時のメソッドの登録を行う
      *
      * @param {Function} callback 登録メソッド
-     * @return {Jeeel.Database.Connection} 自インスタンス
+     * @return {Jeeel.Database.Relation.Connection} 自インスタンス
      */
     setSuccessMethod: function (callback) {
         this._successMethod = callback;
@@ -42839,7 +47179,7 @@ Jeeel.Database.Connection.prototype = {
      * 失敗時のメソッドの登録を行う
      *
      * @param {Function} callback 登録メソッド
-     * @return {Jeeel.Database.Connection} 自インスタンス
+     * @return {Jeeel.Database.Relation.Connection} 自インスタンス
      */
     setErrorMethod: function (callback) {
         this._errorMethod = callback;
@@ -42851,14 +47191,14 @@ Jeeel.Database.Connection.prototype = {
      * トランザクション処理を行う
      *
      * @param {Function} execute 実行トランザクション
-     * @return {Jeeel.Database.Connection} 自インスタンス
+     * @return {Jeeel.Database.Relation.Connection} 自インスタンス
      */
     transaction: function (execute) {
         var self = this;
 
         this._db.transaction(
             function (tx) {
-                execute.call(this, new Jeeel.Database.Transaction(tx));
+                execute.call(this, new Jeeel.Database.Relation.Transaction(tx));
             },
 
             function (error) {
@@ -42884,14 +47224,14 @@ Jeeel.Database.Connection.prototype = {
      * 但しこのトランザクション内部では参照しかできない
      *
      * @param {Function} execute 実行トランザクション
-     * @return {Jeeel.Database.Connection} 自インスタンス
+     * @return {Jeeel.Database.Relation.Connection} 自インスタンス
      */
     readTransaction: function (execute) {
         var self = this;
 
         this._db.readTransaction(
             function (tx) {
-                execute.call(this, new Jeeel.Database.Transaction(tx));
+                execute.call(this, new Jeeel.Database.Relation.Transaction(tx));
             },
 
             function (error) {
@@ -42915,9 +47255,9 @@ Jeeel.Database.Connection.prototype = {
     /**
      * テーブルの作成を行う
      * 
-     * @param {Jeeel.Database.Table} table 作成するテーブル情報をもったオブジェクト
+     * @param {Jeeel.Database.Relation.Table} table 作成するテーブル情報をもったオブジェクト
      * @param {Boolean} [ignore] テーブルが存在した場合無視するかどうか
-     * @return {Jeeel.Database.Connection} 自インスタンス
+     * @return {Jeeel.Database.Relation.Connection} 自インスタンス
      */
     createTable: function (table, ignore) {
       
@@ -42933,7 +47273,7 @@ Jeeel.Database.Connection.prototype = {
      * 
      * @param {String} table テーブル名
      * @param {Boolean} [ignore] テーブルが存在しなかった場合無視するかどうか
-     * @return {Jeeel.Database.Connection} 自インスタンス
+     * @return {Jeeel.Database.Relation.Connection} 自インスタンス
      */
     dropTable: function (table, ignore) {
         var sql = 'DROP TABLE ' + (ignore ? 'IF EXISTS ' : '') + '`' + table + '`;';
@@ -42945,11 +47285,11 @@ Jeeel.Database.Connection.prototype = {
         );
     }
 };
-Jeeel.Database.Transaction = function (transaction) {
+Jeeel.Database.Relation.Transaction = function (transaction) {
     this._transaction = transaction;
 };
 
-Jeeel.Database.Transaction.prototype = {
+Jeeel.Database.Relation.Transaction.prototype = {
     /**
      * トランザクション
      * 
@@ -42999,7 +47339,7 @@ Jeeel.Database.Transaction.prototype = {
             bind || [],
             function (transaction, result) {
                 if (self._successMethod) {
-                    self._successMethod.call(this, self, new Jeeel.Database.Result(result));
+                    self._successMethod.call(this, self, new Jeeel.Database.Relation.Result(result));
                 }
             },
             function (transaction, error) {
@@ -43031,7 +47371,7 @@ Jeeel.Database.Transaction.prototype = {
      * 
      * @param {String} table テーブル名
      * @param {Hash} bind 挿入するレコード内容のキーと値のペアリスト
-     * @return {Jeeel.Database.Transaction} 自インスタンス
+     * @return {Jeeel.Database.Relation.Transaction} 自インスタンス
      */
     insertRecord: function (table, bind) {
         var sql = 'INSERT INTO `' + table + '` ';
@@ -43068,15 +47408,15 @@ Jeeel.Database.Transaction.prototype = {
      * @return {Mixied} クォート後の値
      */
     quote: function (value) {
-        return Jeeel.Database.quote(value);
+        return Jeeel.Database.Relation.quote(value);
     }
 };
 
-Jeeel.Database.Result = function (result) {
+Jeeel.Database.Relation.Result = function (result) {
     this._result = result;
 };
 
-Jeeel.Database.Result.prototype = {
+Jeeel.Database.Relation.Result.prototype = {
 
     /**
      * @type SQLResultSet
@@ -43106,7 +47446,7 @@ Jeeel.Database.Result.prototype = {
         return res;
     }
 };
-Jeeel.directory.Jeeel.Database.Table = {
+Jeeel.directory.Jeeel.Database.Relation.Table = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -43115,7 +47455,7 @@ Jeeel.directory.Jeeel.Database.Table = {
      * @private
      */
     toString: function () {
-        return Jeeel.directory.Jeeel.Database + 'Table/';
+        return Jeeel.directory.Jeeel.Database.Relation + 'Table/';
     }
 };
 
@@ -43125,7 +47465,7 @@ Jeeel.directory.Jeeel.Database.Table = {
  * @class テーブルを管理するクラス
  * @param {String} name テーブル名
  */
-Jeeel.Database.Table = function (name) {
+Jeeel.Database.Relation.Table = function (name) {
     this._name = name;
     this._columns = {};
     this._keys = [];
@@ -43135,13 +47475,13 @@ Jeeel.Database.Table = function (name) {
  * インスタンスの作成を行う
  *
  * @param {String} name テーブル名
- * @return {Jeeel.Database.Table} 作成したインスタンス
+ * @return {Jeeel.Database.Relation.Table} 作成したインスタンス
  */
-Jeeel.Database.Table.create = function (name) {
+Jeeel.Database.Relation.Table.create = function (name) {
     return new this(name);
 };
 
-Jeeel.Database.Table.prototype = {
+Jeeel.Database.Relation.Table.prototype = {
 
     /**
      * テーブル名
@@ -43162,7 +47502,7 @@ Jeeel.Database.Table.prototype = {
     /**
      * 主キー
      *
-     * @type Jeeel.Database.Table.Key
+     * @type Jeeel.Database.Relation.Table.Key
      * @private
      */
     _primary: null,
@@ -43170,7 +47510,7 @@ Jeeel.Database.Table.prototype = {
     /**
      * ユニークキー・インデックスキー
      *
-     * @type Jeeel.Database.Table.Key[]
+     * @type Jeeel.Database.Relation.Table.Key[]
      * @private
      */
     _keys: [],
@@ -43184,10 +47524,10 @@ Jeeel.Database.Table.prototype = {
      * @param {String} [defaultValue] 初期値
      * @param {String} [extra] 追加情報(AUTO_INCREMENT等)
      * @param {String} [comment] カラムの説明
-     * @return {Jeeel.Database.Table.Column} 追加したカラムインスタンス
+     * @return {Jeeel.Database.Relation.Table.Column} 追加したカラムインスタンス
      */
     createColumn: function (name, type, allowNull, defaultValue, extra, comment) {
-        var column = new Jeeel.Database.Table.Column(name, type);
+        var column = new Jeeel.Database.Relation.Table.Column(name, type);
 
         if (Jeeel.Type.isBoolean(allowNull)) {
             column.setNull(allowNull);
@@ -43213,8 +47553,8 @@ Jeeel.Database.Table.prototype = {
     /**
      * カラムの追加を行う
      *
-     * @param {Jeeel.Database.Table.Column} column カラムインスタンス
-     * @return {Jeeel.Database.Table} 自インスタンス
+     * @param {Jeeel.Database.Relation.Table.Column} column カラムインスタンス
+     * @return {Jeeel.Database.Relation.Table} 自インスタンス
      */
     addColumn: function (column) {
         this._columns[column.getName()] = column;
@@ -43226,7 +47566,7 @@ Jeeel.Database.Table.prototype = {
      * 主キーの設定を行う
      *
      * @param {String} var_args 主キーに使用するカラム名を複数引き渡す
-     * @return {Jeeel.Database.Table} 自インスタンス
+     * @return {Jeeel.Database.Relation.Table} 自インスタンス
      */
     setPrimaryKey: function (var_args) {
 
@@ -43234,7 +47574,7 @@ Jeeel.Database.Table.prototype = {
             throw new Error('キーは少なくとも1つは指定してください。');
         }
 
-        var primary = new Jeeel.Database.Table.Key(Jeeel.Database.Table.Key.Type.PRIMARY);
+        var primary = new Jeeel.Database.Relation.Table.Key(Jeeel.Database.Relation.Table.Key.Type.PRIMARY);
 
         primary.setName('primary_' + arguments[0]);
 
@@ -43256,7 +47596,7 @@ Jeeel.Database.Table.prototype = {
      * ユニークキーを追加する
      *
      * @param {String} var_args ユニークキーに使用するカラム名を複数引き渡す
-     * @return {Jeeel.Database.Table} 自インスタンス
+     * @return {Jeeel.Database.Relation.Table} 自インスタンス
      */
     addUniqueKey: function (var_args) {
       
@@ -43264,7 +47604,7 @@ Jeeel.Database.Table.prototype = {
             throw new Error('キーは少なくとも1つは指定してください。');
         }
         
-        var uniqueKey = new Jeeel.Database.Table.Key(Jeeel.Database.Table.Key.Type.UNIQUE);
+        var uniqueKey = new Jeeel.Database.Relation.Table.Key(Jeeel.Database.Relation.Table.Key.Type.UNIQUE);
 
         uniqueKey.setName('unique_' + arguments[0] + '_' + this._keys.length);
 
@@ -43286,14 +47626,14 @@ Jeeel.Database.Table.prototype = {
      * インデックスキーを追加する
      *
      * @param {String} var_args インデックスキーに使用するカラム名を複数引き渡す
-     * @return {Jeeel.Database.Table} 自インスタンス
+     * @return {Jeeel.Database.Relation.Table} 自インスタンス
      */
     addIndexKey: function (var_args) {
         if (arguments.length == 0) {
             throw new Error('キーは少なくとも1つは指定してください。');
         }
 
-        var indexKey = new Jeeel.Database.Table.Key(Jeeel.Database.Table.Key.Type.INDEX);
+        var indexKey = new Jeeel.Database.Relation.Table.Key(Jeeel.Database.Relation.Table.Key.Type.INDEX);
 
         indexKey.setName('index_' + arguments[0] + '_' + this._keys.length);
 
@@ -43348,9 +47688,9 @@ Jeeel.Database.Table.prototype = {
     }
 };
 
-Jeeel.file.Jeeel.Database.Table = ['Column', 'Key'];
+Jeeel.file.Jeeel.Database.Relation.Table = ['Column', 'Key'];
 
-Jeeel._autoImports(Jeeel.directory.Jeeel.Database.Table, Jeeel.file.Jeeel.Database.Table);
+Jeeel._autoImports(Jeeel.directory.Jeeel.Database.Relation.Table, Jeeel.file.Jeeel.Database.Relation.Table);
 
 /**
  * コンストラクタ
@@ -43359,7 +47699,7 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Database.Table, Jeeel.file.Jeeel.Databa
  * @param {String} name カラム名
  * @param {String} type カラムの型
  */
-Jeeel.Database.Table.Column = function (name, type) {
+Jeeel.Database.Relation.Table.Column = function (name, type) {
     this._name = name;
     this._type = type;
 };
@@ -43369,13 +47709,13 @@ Jeeel.Database.Table.Column = function (name, type) {
  *
  * @param {String} name カラム名
  * @param {String} type カラムの型
- * @return {Jeeel.Database.Table.Column} 作成したインスタンス
+ * @return {Jeeel.Database.Relation.Table.Column} 作成したインスタンス
  */
-Jeeel.Database.Table.Column.create = function (name, type) {
+Jeeel.Database.Relation.Table.Column.create = function (name, type) {
     return new this(name, type);
 };
 
-Jeeel.Database.Table.Column.prototype = {
+Jeeel.Database.Relation.Table.Column.prototype = {
     _name: '',
     _type: '',
     _null: true,
@@ -43455,7 +47795,7 @@ Jeeel.Database.Table.Column.prototype = {
         return sql;
     }
 };
-Jeeel.directory.Jeeel.Database.Table.Key = {
+Jeeel.directory.Jeeel.Database.Relation.Table.Key = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -43464,7 +47804,7 @@ Jeeel.directory.Jeeel.Database.Table.Key = {
      * @private
      */
     toString: function () {
-        return Jeeel.directory.Jeeel.Database.Table + 'Key/';
+        return Jeeel.directory.Jeeel.Database.Relation.Table + 'Key/';
     }
 };
 
@@ -43473,10 +47813,10 @@ Jeeel.directory.Jeeel.Database.Table.Key = {
  * 
  * @class キーを管理するクラス
  * @param {String} type キーの種類を示す文字列
- * @see Jeeel.Database.Table.Key.Type
+ * @see Jeeel.Database.Relation.Table.Key.Type
  */
-Jeeel.Database.Table.Key = function (type) {
-    if ( ! Jeeel.Type.inArray(type, Jeeel.Database.Table.Key.Type, true)) {
+Jeeel.Database.Relation.Table.Key = function (type) {
+    if ( ! Jeeel.Type.inArray(type, Jeeel.Database.Relation.Table.Key.Type, true)) {
         throw new Error('キーの種類が間違っています。');
     }
 
@@ -43484,7 +47824,7 @@ Jeeel.Database.Table.Key = function (type) {
     this._keys = [];
 };
 
-Jeeel.Database.Table.Key.prototype = {
+Jeeel.Database.Relation.Table.Key.prototype = {
 
     /**
      * キーの名前
@@ -43523,7 +47863,7 @@ Jeeel.Database.Table.Key.prototype = {
      * 名前を設定する
      *
      * @param {String} name 名前
-     * @return {Jeeel.Database.Table.Key} 自インスタンス
+     * @return {Jeeel.Database.Relation.Table.Key} 自インスタンス
      */
     setName: function (name) {
         this._name = name;
@@ -43544,10 +47884,10 @@ Jeeel.Database.Table.Key.prototype = {
      * キーの種類を設定する
      *
      * @param {String} type キーの種類
-     * @return {Jeeel.Database.Table.Key} 自インスタンス
+     * @return {Jeeel.Database.Relation.Table.Key} 自インスタンス
      */
     setType: function (type) {
-        if ( ! Jeeel.Type.inArray(type, Jeeel.Database.Table.Key.Type, true)) {
+        if ( ! Jeeel.Type.inArray(type, Jeeel.Database.Relation.Table.Key.Type, true)) {
             throw new Error('キーの種類が間違っています。');
         }
 
@@ -43569,7 +47909,7 @@ Jeeel.Database.Table.Key.prototype = {
      * 対象のカラムを追加する
      *
      * @param {String} key カラム名
-     * @return {Jeeel.Database.Table.Key} 自インスタンス
+     * @return {Jeeel.Database.Relation.Table.Key} 自インスタンス
      */
     addKey: function (key) {
         this._keys.push(key);
@@ -43580,7 +47920,7 @@ Jeeel.Database.Table.Key.prototype = {
     /**
      * カラム名のリストを空にする
      * 
-     * @return {Jeeel.Database.Table.Key} 自インスタンス
+     * @return {Jeeel.Database.Relation.Table.Key} 自インスタンス
      */
     clearKeys: function () {
         this._keys = [];
@@ -43605,7 +47945,7 @@ Jeeel.Database.Table.Key.prototype = {
     toString: function () {
       
         var sql = this._type
-                + (this._type != Jeeel.Database.Table.Key.Type.PRIMARY && this._name ? ' `' + this._name + '`' : '') + ' (';
+                + (this._type != Jeeel.Database.Relation.Table.Key.Type.PRIMARY && this._name ? ' `' + this._name + '`' : '') + ' (';
 
         for (var i = 0; i < this._keys.length; i++) {
             if (i > 0) {
@@ -43621,14 +47961,14 @@ Jeeel.Database.Table.Key.prototype = {
     }
 };
 
-Jeeel.file.Jeeel.Database.Table.Key = ['Type'];
+Jeeel.file.Jeeel.Database.Relation.Table.Key = ['Type'];
 
-Jeeel._autoImports(Jeeel.directory.Jeeel.Database.Table.Key, Jeeel.file.Jeeel.Database.Table.Key);
+Jeeel._autoImports(Jeeel.directory.Jeeel.Database.Relation.Table.Key, Jeeel.file.Jeeel.Database.Relation.Table.Key);
 
 /**
  * キーの種類についての列挙対
  */
-Jeeel.Database.Table.Key.Type = {
+Jeeel.Database.Relation.Table.Key.Type = {
 
     /**
      * 主キー
@@ -43654,7 +47994,94 @@ Jeeel.Database.Table.Key.Type = {
      */
     INDEX: 'KEY'
 };
-Jeeel.directory.Jeeel.File = {
+
+Jeeel.directory.Jeeel.Database.Index = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel.Database + 'Index/';
+    }
+};
+
+/**
+ * @staticClass キーバリューストア型データベースのマスターにあたるstaticクラス
+ * 
+ * @ignore 未完成
+ */
+Jeeel.Database.Index = {
+    
+    /**
+     * データベースへの接続を行う
+     * 
+     * @return {Jeeel.Database.Index.Connection} データベースとの接続インスタンス
+     */
+    connectDatabase: function (dbName, description) {
+        
+    }
+};
+
+Jeeel.file.Jeeel.Database.Index = ['Connection'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Database.Index, Jeeel.file.Jeeel.Database.Index);
+
+/**
+ * コンストラクタ
+ * 
+ * @class 1つのデータベースとの接続を維持するクラス
+ * @param {String} dbName データベース名
+ * @param {String} [description] データベースの説明
+ */
+Jeeel.Database.Index.Connection = function (dbName, description) {
+    this._request = this.constructor.indexedDB.open(dbName, description);
+    this._request.onsuccess = Jeeel.Function.simpleBind(this._succeedOpen, this);
+    this._request.onerror = Jeeel.Function.simpleBind(this._failedOpen, this);
+};
+
+(function (global) {
+    if ( ! global) {
+        return;
+    }
+    
+    var indexDB = global.indexedDB
+               || global.webkitIndexedDB
+               || global.mozIndexedDB
+               || global.moz_indexedDB
+               || global.msIndexedDB
+               || global.oIndexedDB;
+    
+    if (indexDB) {
+        Jeeel.Database.Index.Connection.indexedDB = indexDB;
+    }
+    
+    indexDB = null;
+})(Jeeel._global);
+
+Jeeel.Database.Index.Connection.prototype = {
+    
+    _request: null,
+    
+    _db: null,
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Database.Index.Connection,
+    
+    _succeedOpen: function (e) {
+        this._db = e.result;
+    },
+    
+    _failedOpen: function (e) {
+        
+    }
+};Jeeel.directory.Jeeel.File = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -43668,7 +48095,7 @@ Jeeel.directory.Jeeel.File = {
 };
 
 /**
- * ファイルに関するネームスペース
+ * @namespace ファイルに関するネームスペース
  */
 Jeeel.File = {
   
@@ -44123,7 +48550,7 @@ Jeeel.directory.Jeeel.Media = {
 };
 
 /**
- * メディア関連のネームスペース
+ * @namespace メディア関連のネームスペース
  */
 Jeeel.Media = {
 
@@ -44481,7 +48908,7 @@ Jeeel.directory.Jeeel.Graphics = {
 };
 
 /**
- * グラフィックス関連のネームスペース
+ * @namespace グラフィックス関連のネームスペース
  */
 Jeeel.Graphics = {
 
@@ -45168,7 +49595,6 @@ Jeeel.Graphics.Brush.prototype = {
  * @class ラスター系のグラフィックス処理機能を提供するクラス
  * @augments Jeeel.Graphics.Abstract
  * @param {Jeeel.Graphics.Raster.*} adapter 内部アダプター
- * @ignore 未完
  */
 Jeeel.Graphics.Raster = function (adapter) {
     Jeeel.Graphics.Abstract.call(this);
@@ -45229,7 +49655,7 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Graphics.Raster, Jeeel.file.Jeeel.Graph
 };
 
 /**
- * Canvasに関してのネームスペース
+ * @namespace Canvasに関してのネームスペース
  */
 Jeeel.Graphics.Raster.Canvas = {
   
@@ -45261,7 +49687,7 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Graphics.Raster.Canvas, Jeeel.file.Jeee
 };
 
 /**
- * Canvasのコンテキストに関するネームスペース
+ * @namespace Canvasのコンテキストに関するネームスペース
  */
 Jeeel.Graphics.Raster.Canvas.Context = {
     
@@ -45281,6 +49707,7 @@ Jeeel.Graphics.Raster.Canvas.Context = {
      * 
      * @class 2次元のグラフィックスを扱うクラス
      * @param {Canvas} canvas キャンバスElement
+     * @name Jeeel.Graphics.Raster.Canvas.Context.2d
      * @constructor
      */
     '2d': function (canvas) {
@@ -45292,10 +49719,16 @@ Jeeel.Graphics.Raster.Canvas.Context = {
         
         var self = this, rp = this._refreshPen, rb = this._refreshBrush;
         
+        /**
+         * @ignore
+         */
         this._refreshPen = function () {
             rp.apply(self, arguments);
         };
         
+        /**
+         * @ignore
+         */
         this._refreshBrush = function () {
             rb.apply(self, arguments);
         };
@@ -45308,6 +49741,9 @@ Jeeel.Graphics.Raster.Canvas.Context = {
     }
 };
 
+/**
+ * @lends Jeeel.Graphics.Raster.Canvas.Context.2d.prototype
+ */
 Jeeel.Graphics.Raster.Canvas.Context['2d'].prototype = {
   
     /**
@@ -45818,7 +50254,7 @@ Jeeel.file.Jeeel.Graphics.Raster.Canvas.Context = ['Type'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Graphics.Raster.Canvas.Context, Jeeel.file.Jeeel.Graphics.Raster.Canvas.Context);
 /**
- * canvasのcontextに使用できるcontextIdの列挙体
+ * @namespace canvasのcontextに使用できるcontextIdの列挙体
  */
 Jeeel.Graphics.Raster.Canvas.Context.Type = {
   
@@ -45848,7 +50284,6 @@ Jeeel.Graphics.Raster.Canvas.Context.Type = {
  * @class ベクター系のグラフィックス処理機能を提供するクラス
  * @augments Jeeel.Graphics.Abstract
  * @param {Jeeel.Graphics.Vector.*} adapter 内部アダプター
- * @ignore 未完
  */
 Jeeel.Graphics.Vector = function (adapter) {
     Jeeel.Graphics.Abstract.call(this);
@@ -45875,6 +50310,12 @@ Jeeel.Class.extend(Jeeel.Graphics.Vector, Jeeel.Graphics.Abstract);
 Jeeel.file.Jeeel.Graphics.Vector = ['Svg'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Graphics.Vector, Jeeel.file.Jeeel.Graphics.Vector);
+/**
+ * コンストラクタ
+ * 
+ * @class SVGを管理するクラス
+ * @param {SVGElement} svg SVG要素
+ */
 Jeeel.Graphics.Vector.Svg = function (svg) {
     this._svg = svg;
     this._doc = Jeeel.Dom.Document.create(svg.ownerDocument);
@@ -46391,7 +50832,3080 @@ Jeeel.Graphics.Vector.Svg.prototype = {
         
         return d.join(' ');
     }
-};Jeeel.directory.Jeeel.Debug = {
+};Jeeel.directory.Jeeel.Framework = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel + 'Framework/';
+    }
+};
+
+/**
+ * @namespace 大規模アプリケーション開発を円滑にするための汎用クラス等を保持するネームスペース
+ */
+Jeeel.Framework = {
+    
+};
+
+Jeeel.file.Jeeel.Framework = ['Net', 'Event', 'EventDispatcher', 'Layer', 'Mvc', 'Acl'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Framework, Jeeel.file.Jeeel.Framework);
+Jeeel.directory.Jeeel.Framework.Net = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel.Framework + 'Net/';
+    }
+};
+
+/**
+ * @namespace ネット関連のネームスペース
+ */
+Jeeel.Framework.Net = {
+
+};
+
+Jeeel.file.Jeeel.Framework.Net = ['Connect'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Framework.Net, Jeeel.file.Jeeel.Framework.Net);
+
+/**
+ * コンストラクタ
+ * 
+ * @class サーバーコネクトのプロトタイプ
+ */
+Jeeel.Framework.Net.Connect = function () {
+    
+};
+
+Jeeel.Framework.Net.Connect.prototype = {
+    
+    /**
+     * 並列接続時の動作ポリシー
+     * 
+     * @type Integer
+     * @protected
+     */
+    _collisionPolicy: 0,
+    
+    /**
+     * タイムアウト時間(ミリ秒)
+     * 
+     * @type Integer
+     * @protected
+     */
+    _timeout: 60000,
+    
+    /**
+     * HTTPメソッド
+     * 
+     * @type String
+     * @protected
+     */
+    _method: 'POST',
+    
+    /**
+     * Ajaxインスタンス
+     * 
+     * @type Jeeel.Net.Ajax
+     * @protected
+     */
+    _ajax: null,
+    
+    /**
+     * 並列リクエストをした場合の動作を設定する
+     * 
+     * @param {Integer} collisionPolicy コリジョンポリシー
+     * @return {Jeeel.Framework.Net.Connect} 自インスタンス
+     * @see Jeeel.Net.Ajax.CollisionPolicy
+     */
+    setCollisionPolicy: function (collisionPolicy) {
+        this._collisionPolicy = collisionPolicy;
+        
+        return this;
+    },
+    
+    /**
+     * リクエストのタイムアウトまでの時間を設定する(デフォルトは60秒)
+     * 
+     * @param {Integer} time タイムアウト時間、0で無制限(ミリ秒)
+     * @return {Jeeel.Framework.Net.Connect} 自インスタンス
+     */
+    setTimeoutTime: function (time) {
+        this._timeout = time;
+        
+        return this;
+    },
+    
+    /**
+     * HTTPメソッドを設定する
+     * 
+     * @param {String} [method] HTTPメソッド(POSTもしくはGET、大文字小文字は問わない)
+     * @return {Jeeel.Framework.Net.Connect} 自インスタンス
+     */
+    setMethod: function (method) {
+        this._method = method;
+        
+        return this;
+    },
+    
+    /**
+     * サーバーに接続する
+     * 
+     * @param {String} url 接続URL
+     * @param {Hash} [params] 送信データのリスト
+     * @param {Function} [success] 成功時のコールバック(明示的に指定する場合) void callBack(Jeeel.Net.Ajax.Response response)
+     * @param {Function} [failure] 失敗時のコールバック(明示的に指定する場合) void callBack(Jeeel.Net.Ajax.Response response)
+     * @param {Function} [timeout] タイムアウト時のコールバック(明示的に指定する場合) void callBack(Jeeel.Net.Ajax.Response response)
+     * @return {Jeeel.Framework.Net.Connect} 自インスタンス
+     */
+    connect: function (url, params, success, failure, timeout) {
+        this._ajax = new Jeeel.Net.Ajax(url, this._method);
+        
+        this._ajax.setAll(params || {})
+                  .setTimeoutTime(this._timeout)
+                  .setCollisionPolicy(this._collisionPolicy)
+                  .setSuccessMethod(success || this.update, this)
+                  .setFailureMethod(failure || this.recover, this)
+                  .setTimeoutMethod(timeout || this.abanbon, this)
+                  .setCompleteMethod(function () {
+                      this._ajax = null;
+                  }, this)
+                  .execute();
+        
+        return this;
+    },
+    
+    /**
+     * 現在の通信を中止させる
+     * 
+     * @return {Jeeel.Framework.Net.Connect} 自インスタンス
+     */
+    abort: function () {
+        if (this._ajax) {
+            this._ajax.abort();
+        }
+        
+        return this;
+    },
+    
+    /**
+     * 接続成功時に通常呼ばれるコールバック(内部のthisは自インスタンスになる)
+     * 
+     * @param {Jeeel.Net.Ajax.Response} response レスポンス
+     * @abstract
+     */
+    update: function (response) {
+        
+    },
+    
+    /**
+     * タイムアウト時に通常呼ばれるコールバック(内部のthisは自インスタンスになる)
+     * 
+     * @param {Jeeel.Net.Ajax.Response} response レスポンス
+     * @abstract
+     */
+    abanbon: function (response) {
+        
+    },
+    
+    /**
+     * エラー時に通常呼ばれるコールバック(内部のthisは自インスタンスになる)
+     * 
+     * @param {Jeeel.Net.Ajax.Response} response レスポンス
+     * @abstract
+     */
+    recover: function (response) {
+        
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Framework.Net.Connect
+};Jeeel.directory.Jeeel.Framework.Event = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel.Framework + 'Event/';
+    }
+};
+
+/**
+ * コンストラクタ
+ * 
+ * @class イベントを管理するクラス<br />
+ *         イベントの伝播は最上層からキャプチャリング段階に入り発生地点までたどる<br />
+ *         発生地点でターゲティング段階になり、バブリング段階になって最上層に向かって上っていく<br />
+ *         最後にフォーリング段階になり発生地点から最下層まで全ての要素に伝播していく
+ * @param {String} type イベントタイプ
+ * @param {Boolean} [bubbles=true] バブリング処理をするかどうか(上位伝播)
+ * @param {Boolean} [falls] フォーリング処理をするかどうか(下位伝播)
+ * @param {Boolean} [cancelable] デフォルト動作をキャンセル出来るかどうか(存在しない場合や出来ない場合がfalse)
+ */
+Jeeel.Framework.Event = function (type, bubbles, falls, cancelable) {
+    this._type = type;
+    this._bubbles = !!(bubbles === false ? bubbles : bubbles || true);
+    this._falls = !!falls;
+    this._cancelable = !!cancelable;
+    this._captureTargets = [];
+};
+
+Jeeel.Framework.Event.prototype = {
+  
+    /**
+     * イベントタイプ
+     * 
+     * @type String
+     * @protected
+     */
+    _type: '',
+    
+    /**
+     * 上階層の要素にバブリングフローをするかどうか
+     * 
+     * @type Boolean
+     * @protected
+     */
+    _bubbles: true,
+    
+    /**
+     * 下階層の要素にフォーリングフローするかどうか
+     * 
+     * @type Boolean
+     * @protected
+     */
+    _falls: false,
+    
+    /**
+     * デフォルトの動作をキャンセル出来るかどうか
+     * 
+     * @type Boolean
+     * @protected
+     */
+    _cancelable: false,
+    
+    /**
+     * デフォルトの挙動をキャンセルしたかどうか
+     * 
+     * @type Boolean
+     * @protected
+     */
+    _cancelDefault: false,
+    
+    /**
+     * イベントのハンドリングをキャンセルしたかどうか
+     * 
+     * @type Boolean
+     * @protected
+     */
+    _cancelHandle: false,
+    
+    /**
+     * イベントの伝播をキャンセルしたかどうか
+     * 
+     * @type Boolean
+     * @protected
+     */
+    _cancelFlow: false,
+    
+    /**
+     * イベントフェーズ
+     * 
+     * @type Integer
+     * @protected
+     */
+    _phase: 1,
+    
+    /**
+     * キャプチャ段階で使用する対象リスト
+     * 
+     * @type Object[]
+     * @protected
+     */
+    _captureTargets: [],
+    
+    /**
+     * イベント発生対象
+     * 
+     * @type Object
+     * @protected
+     */
+    _target: null,
+    
+    /**
+     * イベントハンドリング対象
+     * 
+     * @type Object
+     * @protected
+     */
+    _currentTarget: null,
+    
+    /**
+     * イベントタイプを取得する
+     * 
+     * @return {String} イベントタイプ
+     */
+    getType: function () {
+        return this._type;
+    },
+    
+    /**
+     * バブリング処理をするかどうかを返す
+     * 
+     * @return {Boolean} バブリング処理をするかどうか
+     */
+    getBubbles: function () {
+        return this._bubbles;
+    },
+    
+    /**
+     * フォーリング段階をするかどうかを返す
+     * 
+     * @return {Boolean} フォーリング処理をするかどうか
+     */
+    getFalls: function () {
+        return this._falls;
+    },
+    
+    /**
+     * 現在のイベントフェーズを示す定数を取得する
+     * 
+     * @return {Integer} イベントフェーズ定数
+     */
+    getEventPhase: function () {
+        return this._phase;
+    },
+    
+    /**
+     * イベント発生対象を取得する
+     * 
+     * @return {Object} イベント発生対象
+     */
+    getTarget: function () {
+        return this._target;
+    },
+    
+    /**
+     * イベントハンドリング対象を取得する
+     * 
+     * @return {Object} イベントハンドリング対象
+     */
+    getCurrentTarget: function () {
+        return this._currentTarget;
+    },
+    
+    /**
+     * イベントのデフォルトの動作がキャンセル出来るかどうかを返す
+     * 
+     * @return {Boolean} キャンセル出来るかどうか
+     */
+    isCancelable: function () {
+        return this._cancelable;
+    },
+    
+    /**
+     * デフォルトの挙動がキャンセルされたかどうかを返す
+     * 
+     * @return {Boolean} キャンセルされたかどうか
+     */
+    isDefaultPrevented: function () {
+        return this._cancelDefault;
+    },
+    
+    /**
+     * イベントのデフォルトの動作をキャンセルする<br />
+     * デフォルトの挙動のキャンセルが許可されていない場合は無意味
+     * 
+     * @return {Jeeel.Framework.Event} 自インスタンス
+     */
+    preventDefault: function () {
+        if (this._cancelable) {
+            this._cancelDefault = true;
+        }
+        
+        return this;
+    },
+    
+    /**
+     * イベントの伝播を止める
+     * 
+     * @return {Jeeel.Framework.Event} 自インスタンス
+     */
+    stopPropagation: function () {
+        this._cancelFlow = true;
+        
+        return this;
+    },
+    
+    /**
+     * イベントの伝播とハンドリングを止める
+     * 
+     * @return {Jeeel.Framework.Event} 自インスタンス
+     */
+    stopImmediatePropagation: function () {
+        this._cancelFlow = this._cancelHandle = true;
+        
+        return this;
+    },
+    
+    /**
+     * イベントの伝播、ハンドリング、デフォルトの挙動全てを停止する
+     * 
+     * @return {Jeeel.Framework.Event} 自インスタンス
+     */
+    stop: function () {
+        this._cancelDefault = this._cancelFlow = this._cancelHandle = true;
+        
+        return this;
+    },
+    
+    /**
+     * 複製を行う
+     * 
+     * @param {Boolean} [dispatchable] ディスパッチ済みのインスタンスを複製した際にディスパッチ出来るようにするかどうか
+     * @return {Jeeel.Framework.Event} 複製したインスタンス
+     */
+    clone: function (dispatchable) {
+        var instance = new this.constructor(this._type, this._bubbles, this._cancelable);
+        
+        for (var key in this) {
+            if ( ! Jeeel.Type.isFunction(this[key])) {
+                instance[key] = this[key];
+            }
+        }
+        
+        for (var i = this._captureTargets.length; i--;) {
+            instance._captureTargets[i] = this._captureTargets[i];
+        }
+        
+        if (dispatchable) {
+            instance._phase = 1;
+            instance._target = null;
+        }
+        
+        return instance;
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Framework.Event
+};
+
+Jeeel.file.Jeeel.Framework.Event = ['Phase', 'Type'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Framework.Event, Jeeel.file.Jeeel.Framework.Event);
+
+/**
+ * @namespace イベントフェーズの列挙体
+ */
+Jeeel.Framework.Event.Phase = {
+  
+    /**
+     * キャプチャ段階
+     * 
+     * @type Integer
+     * @constant
+     */
+    CAPTURING: 1,
+    
+    /**
+     * ターゲット段階
+     * 
+     * @type Integer
+     * @constant
+     */
+    TARGETING: 2,
+    
+    /**
+     * バブリング段階
+     * 
+     * @type Integer
+     * @constant
+     */
+    BUBBLING: 3,
+    
+    /**
+     * フォーリング段階
+     * 
+     * @type Integer
+     * @constant
+     */
+    FALLING: 4
+};
+/**
+ * @namespace イベントタイプの列挙体
+ */
+Jeeel.Framework.Event.Type = {
+  
+    /**
+     * レイヤーオブジェクトがaddChildで追加された時に発生する
+     * 
+     * @type String
+     * @constant
+     */
+    ADDED: 'Added',
+    
+    /**
+     * レイヤーオブジェクトがremoveChildで削除された時に発生する
+     * 
+     * @type String
+     * @constant
+     */
+    REMOVED: 'Removed'
+};
+/**
+ * コンストラクタ
+ * 
+ * @class イベントのハンドリング、ディスパッチを行うクラス
+ */
+Jeeel.Framework.EventDispatcher = function () {
+    this._eventHandlers = {};
+};
+
+Jeeel.Framework.EventDispatcher.prototype = {
+    
+    /**
+     * 登録イベントハンドラー
+     * 
+     * @type Hash
+     * @private
+     */
+    _eventHandlers: {},
+    
+    /**
+     * イベントの登録を行う
+     * 
+     * @param {String} type イベントタイプ
+     * @param {Function} listener 登録リスナー
+     * @param {Boolean} [useCapture] キャプチャ段階でリスナーを呼び出すかどうか
+     * @param {Mixied} [thisArg] イベントリスナー内でthisに相当する値
+     * @param {Mixied} var_args 可変引数、コールバックに渡す引数(最初の引数はJeeel.Framework.Event、２つ目以降に任意引数)
+     * @return {Jeeel.Framework.EventDispatcher} 自インスタンス
+     */
+    addEventListener: function (type, listener, useCapture, thisArg, var_args) {
+        if ( ! this._eventHandlers[type]) {
+            this._eventHandlers[type] = [];
+        }
+        
+        useCapture = !!useCapture;
+        
+        var handlers = this._eventHandlers[type];
+        
+        for (var i = handlers.length; i--;) {
+            if (handlers[i].listener === listener && handlers[i].useCapture === useCapture) {
+                return this;
+            }
+        }
+        
+        var args = Array.prototype.slice.call(arguments, 4, arguments.length);
+        
+        args.unshift(null);
+          
+        handlers[handlers.length] = {
+            listener: listener,
+            useCapture: useCapture,
+            thisArg: thisArg,
+            args: args
+        };
+        
+        return this;
+    },
+    
+    /**
+     * イベントの削除を行う
+     * 
+     * @param {String} type イベントタイプ
+     * @param {Function} listener 削除リスナー
+     * @param {Boolean} [useCapture] キャプチャ段階でリスナーを呼び出すかどうか
+     * @return {Jeeel.Framework.EventDispatcher} 自インスタンス
+     */
+    removeEventListener: function (type, listener, useCapture) {
+        var handlers = this._eventHandlers[type];
+        
+        if ( ! handlers) {
+            return this;
+        }
+        
+        useCapture = !!useCapture;
+        
+        for (var i = handlers.length; i--;) {
+            if (handlers[i].listener === listener && handlers[i].useCapture === useCapture) {
+                handlers.splice(i, 1);
+                break;
+            }
+        }
+        
+        return this;
+    },
+    
+    /**
+     * 指定したイベントタイプのイベントが登録されているかどうかを返す
+     * 
+     * @param {String} type イベントタイプ
+     * @return {Boolean} 登録されているかどうか
+     */
+    hasEventListener: function (type) {
+        return !!(this._eventHandlers[type] && this._eventHandlers[type].length);
+    },
+    
+    /**
+     * イベントを発生させる
+     * 
+     * @param {Jeeel.Framework.Event} event 発生対象のEvent
+     * @return {Jeeel.Framework.EventDispatcher} 自インスタンス
+     */
+    dispatchEvent: function (event) {
+        if (event._target) {
+            throw new Error('eventは既にディスパッチ済みのEventオブジェクトです。');
+        }
+        
+        event._target = this;
+        
+        event._captureTargets.push(this);
+        
+        return this._flowEvent(event);
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Framework.EventDispatcher,
+    
+    /**
+     * 他のディスパッチャーで発生したイベントを疑似フローさせる
+     * 
+     * @param {Jeeel.Framework.Event} event 疑似フロー対象のEvent
+     * @return {Jeeel.Framework.EventDispatcher} 自インスタンス
+     * @final
+     * @protected
+     */
+    _flowEvent: function (event) {
+        if (event._cancelFlow) {
+            return this;
+        }
+        
+        var phase = event.getEventPhase();
+        
+        this._callListener(event, phase === Jeeel.Framework.Event.Phase.CAPTURING);
+        
+        switch (phase) {
+            case Jeeel.Framework.Event.Phase.CAPTURING:
+                var capture = event._captureTargets.pop();
+                
+                if (capture === event._target) {
+                    event._phase = Jeeel.Framework.Event.Phase.TARGETING;
+                } else if (capture === this) {
+                    capture = event._captureTargets.pop();
+                    
+                    if (capture === event._target) {
+                        event._phase = Jeeel.Framework.Event.Phase.TARGETING;
+                    }
+                }
+                
+                capture._flowEvent(event);
+                break;
+                
+            case Jeeel.Framework.Event.Phase.TARGETING:
+                if (event.getBubbles() || event.getFalls()) {
+                    if (event.getBubbles()) {
+                        event._phase = Jeeel.Framework.Event.Phase.BUBBLING;
+                        this._flowBubblingPhaseEvent(event);
+                    }
+                    
+                    if (event.getFalls()) {
+                        event._phase = Jeeel.Framework.Event.Phase.FALLING;
+                        this._flowFallingPhaseEvent(event);
+                    }
+                } else {
+                    event._cancelFlow = true;
+                }
+                
+                break;
+            
+            case Jeeel.Framework.Event.Phase.BUBBLING:
+                if (event.getBubbles()) {
+                    this._flowBubblingPhaseEvent(event);
+                }
+                break;
+                
+            case Jeeel.Framework.Event.Phase.FALLING:
+                if (event.getFalls()) {
+                    this._flowFallingPhaseEvent(event);
+                }
+                break;
+                
+            default:
+                throw new Error('フェーズの状態が不明です。');
+                break;
+        }
+        
+        return this;
+    },
+    
+    /**
+     * イベントをバブリングする
+     * 
+     * @param {Jeeel.Framework.Event} event バブリング対象のEvent
+     * @protected
+     * @abstract
+     */
+    _flowBubblingPhaseEvent: function (event) {
+        
+    },
+    
+    /**
+     * イベントをフォーリングする
+     * 
+     * @param {Jeeel.Framework.Event} event フォーリング対象のEvent
+     * @protected
+     * @abstract
+     */
+    _flowFallingPhaseEvent: function (event) {
+        
+    },
+    
+    /**
+     * このインスタンスに定義されているリスナーを呼び出す
+     * 
+     * @param {Jeeel.Framework.Event} event Eventオブジェクト
+     * @param {Boolean} useCapture キャプチャ段階でのリスナーをキャッチするかどうか
+     * @final
+     * @protected
+     */
+    _callListener: function (event, useCapture) {
+        if (event._cancelHandle) {
+            return this;
+        }
+        
+        var handlers = this._eventHandlers[event.getType()];
+        
+        if ( ! handlers) {
+            return this;
+        }
+        
+        event._currentTarget = this;
+        
+        var cloneHandlers = handlers.concat();
+        
+        for (var i = 0, l = cloneHandlers.length; i < l; i++) {
+            
+            if (cloneHandlers[i].useCapture === useCapture) {
+                cloneHandlers[i].args[0] = event;
+                
+                cloneHandlers[i].listener.apply(cloneHandlers[i].thisArg, cloneHandlers[i].args);
+                
+                cloneHandlers[i].args[0] = null;
+
+                if (event._cancelHandle) {
+                    break;
+                }
+            }
+        }
+        
+        return this;
+    }
+};
+/**
+ * コンストラクタ
+ * 
+ * @class 階層構造のオブジェクトを管理するクラス
+ * @augments Jeeel.Framework.EventDispatcher
+ */
+Jeeel.Framework.Layer = function () {
+    Jeeel.Framework.EventDispatcher.call(this);
+    
+    this._children = [];
+};
+
+Jeeel.Framework.Layer.prototype = {
+    
+    /**
+     * 親レイヤー
+     * 
+     * @type Jeeel.Framework.Layer
+     * @protected
+     */
+    _parent: null,
+    
+    /**
+     * 子レイヤーリスト
+     * 
+     * @type Jeeel.Framework.Layer[]
+     * @protected
+     */
+    _children: [],
+    
+    /**
+     * 子レイヤーを追加する
+     * 
+     * @param {Jeeel.Framework.Layer} child 子レイヤー
+     * @return {Jeeel.Framework.Layer} 自インスタンス
+     */
+    addChild: function (child) {
+        this._children[this._children.length] = child;
+        
+        child._refreshRelationship(this);
+        
+        return this;
+    },
+    
+    /**
+     * 子レイヤーを削除する
+     * 
+     * @param {Jeeel.Framework.Layer} child 子レイヤー
+     * @return {Jeeel.Framework.Layer} 自インスタンス
+     */
+    removeChild: function (child) {
+        for (var i = this._children.length; i--;) {
+            if (this._children[i] === child) {
+                this._children.splice(i, 1);
+                child._refreshRelationship();
+                break;
+            }
+        }
+
+        return this;
+    },
+    
+    /**
+     * 指定したインデックスの子レイヤーを削除する
+     * 
+     * @param {Integer} index インデックス
+     * @return {Jeeel.Framework.Layer} 自インスタンス
+     */
+    removeChildAt: function (index) {
+        if (this._children[index]) {
+            var child = this._children[index];
+            
+            this._children.splice(index, 1);
+            
+            child._refreshRelationship();
+        }
+        
+        return this;
+    },
+    
+    /**
+     * 全ての子レイヤーを削除する
+     * 
+     * @return {Jeeel.Framework.Layer} 自インスタンス
+     */
+    removeChildren: function () {
+        for (var i = this._children.length; i--;) {
+            this._children[i]._refreshRelationship();
+        }
+        
+        this._children.splice(0, this._children.length);
+        
+        return this;
+    },
+    
+    /**
+     * 親レイヤーを取得する
+     * 
+     * @return {Jeeel.Framework.Layer} 親レイヤー
+     */
+    getParent: function () {
+        return this._parent;
+    },
+    
+    /**
+     * 子レイヤーリストを取得する
+     * 
+     * @return {Jeeel.Framework.Layer[]} 子レイヤーリスト
+     */
+    getChildren: function () {
+        return this._children;
+    },
+    
+    /**
+     * 指定したインデックスの子レイヤーを取得する
+     * 
+     * @param {Integer} index インデックス
+     * @return {Jeeel.Framework.Layer} 子レイヤー
+     */
+    getChildAt: function (index) {
+        return this._children[index] || null;
+    },
+    
+    /**
+     * 子レイヤーの数を取得する
+     * 
+     * @return {Integer} 子レイヤーの数
+     */
+    getChildSize: function () {
+        return this._children.length;
+    },
+    
+    /**
+     * イベントを発生させる
+     * 
+     * @param {Jeeel.Framework.Event} event 発生対象のEvent
+     * @return {Jeeel.Framework.Layer} 自インスタンス
+     */
+    dispatchEvent: function (event) {
+        if ( ! (event instanceof Jeeel.Framework.Event)) {
+            throw new Error('eventが指定されていません。');
+        } else if (event._target) {
+            throw new Error('eventは既にディスパッチ済みのEventオブジェクトです。');
+        }
+        
+        event._target = this;
+        
+        var layer = this;
+        var captureTargets = event._captureTargets;
+        
+        while (layer) {
+            captureTargets[captureTargets.length] = layer;
+            layer = layer._parent;
+        }
+        
+        captureTargets[captureTargets.length - 1]._flowEvent(event);
+        
+        return this;
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Framework.Layer,
+    
+    /**
+     * ディスパッチされたイベントのフローを親レイヤーに伝える
+     * 
+     * @param {Jeeel.Framework.Event} event フロー対象のEvent
+     * @return {Jeeel.Framework.Layer} 自インスタンス
+     * @protected
+     */
+    _flowBubblingPhaseEvent: function (event) {
+        // 上位伝播対象でイベントがキャンセルしていない場合に親レイヤーに伝播する
+        if (this._parent && event.getBubbles() && ! event._cancelFlow) {
+            this._parent._flowEvent(event);
+        }
+    },
+    
+    /**
+     * ディスパッチされたイベントのフローを子レイヤーに伝える
+     * 
+     * @param {Jeeel.Framework.Event} event フォーリング対象のEvent
+     * @return {Jeeel.Framework.Layer} 自インスタンス
+     * @protected
+     */
+    _flowFallingPhaseEvent: function (event) {
+        // 下位伝播対象でイベントがキャンセルしていない場合に子レイヤーに伝播する
+        if (event.getFalls() && ! event._cancelFlow) {
+            for (var i =  this._children.length; i--;) {
+                this._children[i]._flowEvent(event);
+            }
+        }
+    },
+    
+    /**
+     * 親に追加された時に呼び出される(デフォルトの挙動)
+     * 
+     * @abstract
+     * @protected
+     */
+    _onAddedThis: function (parent) {
+        
+    },
+    
+    /**
+     * 親から削除された時に呼び出される(デフォルトの挙動)
+     * 
+     * @abstract
+     * @protected
+     */
+    _onRemovedThis: function (parent) {
+        
+    },
+    
+    /**
+     * 親子関係の更新する
+     * 
+     * @param {Jeeel.Framework.Layer} parent 親レイヤー
+     * @final
+     * @protected
+     */
+    _refreshRelationship: function (parent) {
+        var event;
+        
+        if ( ! parent) {
+            parent = this._parent;
+            this._parent = null;
+            
+            event = new Jeeel.Framework.Event(Jeeel.Framework.Event.Type.REMOVED, true, false, true);
+            
+            this.dispatchEvent(event);
+            
+            if ( ! event.isDefaultPrevented()) {
+                this._onRemovedThis(parent);
+            }
+            return;
+        } else if (this._parent) {
+            this._parent.removeChild(this);
+        }
+        
+        this._parent = parent;
+        
+        event = new Jeeel.Framework.Event(Jeeel.Framework.Event.Type.ADDED, true, false, true);
+        
+        this.dispatchEvent(event);
+        
+        if ( ! event.isDefaultPrevented()) {
+            this._onAddedThis(parent);
+        }
+    }
+};
+
+Jeeel.Class.extend(Jeeel.Framework.Layer, Jeeel.Framework.EventDispatcher);
+Jeeel.directory.Jeeel.Framework.Mvc = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel.Framework + 'Mvc/';
+    }
+};
+
+/**
+ * @namespace MVCモデル関連のネームスペース
+ */
+Jeeel.Framework.Mvc = {
+    
+};
+
+Jeeel.file.Jeeel.Framework.Mvc = ['Model', 'View', 'Controller'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Framework.Mvc, Jeeel.file.Jeeel.Framework.Mvc);
+
+/**
+ * コンストラクタ
+ * 
+ * @class モデルのプロトタイプ
+ * @augments Jeeel.Framework.Net.Connect
+ */
+Jeeel.Framework.Mvc.Model = function () {
+    Jeeel.Framework.Net.Connect.call(this);
+    
+    this._state = {};
+};
+
+/**
+ * インスタンスの作成を行う
+ * 
+ * @return {Jeeel.Framework.Mvc.Model} 作成したインスタンス
+ */
+Jeeel.Framework.Mvc.Model.create = function () {
+    return new this();
+};
+
+Jeeel.Framework.Mvc.Model.prototype = {
+    
+    /**
+     * モデルのステータス(配列もしくは連想配列)
+     * 
+     * @type Hash
+     * @protected
+     */
+    _state: {},
+    
+    /**
+     * このモデルを管理するコントローラ
+     * 
+     * @type Jeeel.Framework.Mvc.Controller
+     * @protected
+     */
+    _controller: null,
+    
+    /**
+     * ステータスを取得する
+     * 
+     * @return {Hash} ステータス
+     */
+    getState: function () {
+        return this._state;
+    },
+    
+    /** 
+     * ステータスを設定する
+     * 
+     * @param {Hash} state ステータス
+     * @return {Jeeel.Framework.Mvc.Model} 自インスタンス
+     */
+    setState: function (state) {},
+    
+    /**
+     * モデルの初期化を行い、登録してあるビューに通知する
+     * 
+     * @return {Jeeel.Framework.Mvc.Model} 自インスタンス
+     */
+    init: function () {
+        this._state = {};
+        return this.notify();
+    },
+    
+    /**
+     * サーバー接続後に呼び出される
+     * 
+     * @param {Jeeel.Net.Ajax.Response} response レスポンス
+     */
+    update: function (response) {
+        var res;
+        
+        try {
+            res = Jeeel.Json.decode(decodeURIComponent(response.responseText));
+        } catch (e) {}
+        
+        if ( ! Jeeel.Type.isHash(res)) {
+            this.recover(response);
+        } else {
+            this._state = res;
+            this.notify();
+        }
+    },
+        
+    /**
+     * コントローラを紐付ける
+     * 
+     * @param {Jeeel.Framework.Mvc.Controller} controller コントローラ
+     * @return {Jeeel.Framework.Mvc.Model} 自インスタンス
+     */
+    attach: function (controller) {
+        if (this._controller) {
+            this._controller.setModel(null);
+        }
+        
+        this._controller = controller;
+        
+        return this;
+    },
+    
+    /**
+     * コントローラとの紐付けを解除する
+     * 
+     * @param {Jeeel.Framework.Mvc.Controller} controller コントローラ
+     * @return {Jeeel.Framework.Mvc.Model} 自インスタンス
+     */
+    detach: function (controller) {
+        if (this._controller === controller) {
+            this._controller = null;
+        }
+        
+        return this;
+    },
+    
+    /**
+     * ビューへの通知を行う
+     * 
+     * @return {Jeeel.Framework.Mvc.Model} 自インスタンス
+     */
+    notify: function () {
+        this._controller.update();
+        
+        return this;
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Framework.Mvc.Model
+};
+
+/**
+ * ステータスをサーバーから取得し設定する
+ * 
+ * @param {String} url 取得先URL
+ * @param {Hash} [params] 送信データのリスト
+ * @param {Function} [success] 成功時のコールバック(明示的に指定する場合) void callBack(Jeeel.Net.Ajax.Response response)
+ * @param {Function} [failure] 失敗時のコールバック(明示的に指定する場合) void callBack(Jeeel.Net.Ajax.Response response)
+ * @param {Function} [timeout] タイムアウト時のコールバック(明示的に指定する場合) void callBack(Jeeel.Net.Ajax.Response response)
+ * @return {Jeeel.Framework.Mvc.Model} 自インスタンス
+ */
+Jeeel.Framework.Mvc.Model.prototype.setState = function (url, params, success, failure, timeout) {
+    var state = url;
+    
+    if (Jeeel.Type.isString(url) || arguments.length > 1) {
+        return this.connect(url, params, success, failure, timeout);
+    }
+    
+    if ( ! Jeeel.Type.isHash(state)) {
+        throw new Error('stateがHashではありません。');
+    }
+
+    this._state = state;
+    
+    return this;
+};
+
+Jeeel.Class.extend(Jeeel.Framework.Mvc.Model, Jeeel.Framework.Net.Connect);
+
+/**
+ * コンストラクタ
+ * 
+ * @class ビューのプロトタイプ(Elementのラッパー要素の代わりでもある)
+ * @augments Jeeel.Framework.Layer
+ * @param {Element|String} element このビューが扱うElement
+ * @param {Boolean} [useAutoAdd] このビューのオーナーコントローラが親コントローラに追加された時に、<br />
+ *                                自動的にこのビューのElementを親コントローラのビューに追加するかどうか
+ * @throws {Error} elementがHTML要素かIDで無かった場合に発生
+ */
+Jeeel.Framework.Mvc.View = function (element, useAutoAdd) {
+    if (Jeeel.Type.isString(element)) {
+        element = Jeeel.Document.getElementById(element);
+    }
+    
+    if ( ! Jeeel.Type.isElement(element)) {
+        throw new Error('このビューに対するElementを指定して下さい。');
+    }
+    
+    this._element = element;
+    this._useAutoAdd = !!useAutoAdd;
+    
+    Jeeel.Framework.Layer.call(this);
+};
+
+/**
+ * インスタンスの作成を行う
+ * 
+ * @param {Element|String} element このビューが扱うElement
+ * @param {Boolean} [useAutoAdd] このビューのオーナーコントローラが親コントローラに追加された時に、<br />
+ *                                自動的にこのビューのElementを親コントローラのビューに追加するかどうか
+ * @return {Jeeel.Framework.Mvc.View} 作成したインスタンス
+ * @throws {Error} elementがHTML要素かIDで無かった場合に発生
+ */
+Jeeel.Framework.Mvc.View.create = function (element, useAutoAdd) {
+    return new this(element, useAutoAdd);
+};
+
+Jeeel.Framework.Mvc.View.prototype = {
+    
+    /**
+     * このビューを管理するコントローラ
+     * 
+     * @type Jeeel.Framework.Mvc.Controller
+     * @protected
+     */
+    _controller: null,
+    
+    /**
+     * このビューに関連付けられているElement
+     * 
+     * @type Element
+     * @protected
+     */
+    _element: null,
+    
+    /**
+     * Dom上に自動追加するかどうか
+     * 
+     * @type Boolean
+     * @protected
+     */
+    _useAutoAdd: false,
+    
+    /**
+     * このビューに関連付けられているElementを取得する
+     * 
+     * @return {Element} 関連付けElement
+     */
+    getElement: function () {
+        return this._element;
+    },
+    
+    /**
+     * 子ビューを追加する<br />
+     * この追加でコントローラ管理されているビューを追加するとElement間の追加しか行われない
+     * 
+     * @param {Jeeel.Framework.Mvc.View} child 追加要素
+     * @return {Jeeel.Framework.Mvc.View} 自インスタンス
+     */
+    addChild: function (child) {
+      
+        if ( ! child._controller) {
+            Jeeel.Framework.Layer.prototype.addChild.call(this, child);
+        }
+        
+        if (child._useAutoAdd) {
+            this._element.appendChild(child._element);
+        }
+        
+        return this;
+    },
+    
+    /**
+     * 子ビューを削除する<br />
+     * この削除でコントローラ管理されているビューを削除するとElement間の削除しか行われない
+     * 
+     * @param {Jeeel.Framework.Mvc.View} child 削除要素
+     * @return {Jeeel.Framework.Mvc.View} 自インスタンス
+     */
+    removeChild: function (child) {
+      
+        if ( ! child._controller) {
+            Jeeel.Framework.Layer.prototype.removeChild.call(this, child);
+        }
+        
+        if (child._useAutoAdd) {
+            this._element.removeChild(child._element);
+        }
+        
+        return this;
+    },
+    
+    /**
+     * このビューのElementへイベントの登録を行う
+     * 
+     * @param {String} type イベントタイプ
+     * @param {Function} listener 登録リスナー
+     * @param {Mixied} [thisArg] イベントリスナー内でthisに相当する値(デフォルトはこのインスタンス)
+     * @param {Mixied} var_args 可変引数、コールバックに渡す引数(最初の引数はJeeel.Dom.Eventで固定)
+     * @return {Jeeel.Framework.Mvc.View} 自インスタンス
+     */
+    addDomEventListener: function (type, listener, thisArg, var_args) {
+        var args = Array.prototype.slice.call(arguments, 0, arguments.length);
+        
+        args.unshift(this._element);
+        
+        if ( ! thisArg) {
+            args[3] = this;
+        }
+        
+        Jeeel.Dom.Event.addEventListener.apply(Jeeel.Dom.Event, args);
+        
+        return this;
+    },
+    
+    /**
+     * このビューのElementからイベントの削除を行う
+     * 
+     * @param {String} type イベントタイプ
+     * @param {Function} listener 削除リスナー
+     * @return {Jeeel.Framework.Mvc.View} 自インスタンス
+     */
+    removeDomEventListener: function (type, listener) {
+        Jeeel.Dom.Event.removeEventListener(this._element, type, listener);
+        
+        return this;
+    },
+    
+    /**
+     * コントローラを紐付ける
+     * 
+     * @param {Jeeel.Framework.Mvc.Controller} controller コントローラ
+     * @return {Jeeel.Framework.Mvc.View} 自インスタンス
+     */
+    attach: function (controller) {
+        if (this._controller) {
+            this._controller.removeView(this);
+        }
+        
+        this._controller = controller;
+        
+        return this;
+    },
+    
+    /**
+     * コントローラとの紐付けを解除する
+     * 
+     * @param {Jeeel.Framework.Mvc.Controller} controller コントローラ
+     * @return {Jeeel.Framework.Mvc.View} 自インスタンス
+     */
+    detach: function (controller) {
+        if (this._controller === controller) {
+            this._controller = null;
+        }
+        
+        return this;
+    },
+    
+    /**
+     * コントローラが親コントローラに追加された時に呼び出される<br />
+     * デフォルトでは親コントローラのビューにaddChildされる
+     * 
+     * @param {Jeeel.Framework.Mvc.Controller} controller コントローラ
+     * @param {Jeeel.Framework.Mvc.Controller} parentController 親コントローラ
+     */
+    onControllerAdded: function (controller, parentController) {
+        if ( ! this._useAutoAdd) {
+            return;
+        }
+        
+        var parentView = parentController.getView();
+        
+        if (parentView) {
+            parentView.addChild(this);
+        }
+    },
+    
+    /**
+     * コントローラが親コントローラから削除された時に呼び出される<br />
+     * デフォルトでは親コントローラのビューからremoveChildされる
+     * 
+     * @param {Jeeel.Framework.Mvc.Controller} controller コントローラ
+     * @param {Jeeel.Framework.Mvc.Controller} parentController 親コントローラ
+     */
+    onControllerRemoved: function (controller, parentController) {
+        if ( ! this._useAutoAdd) {
+            return;
+        }
+        
+        var parentView = parentController.getView();
+        
+        if (parentView) {
+            parentView.removeChild(this);
+        }
+    },
+    
+    /**
+     * モデルが変化した際にコントローラから呼び出される<br />
+     * デフォルトでは子ビュー全てのupdateメソッドを呼び出す
+     * 
+     * @param {Jeeel.Framework.Mvc.Controller} controller コントローラ
+     * @return {Jeeel.Framework.Mvc.View} 自インスタンス
+     */
+    update: function (controller) {
+        for (var i = 0, l = this._children.length; i < l; i++) {
+            this._children[i].update(controller);
+        }
+        
+        return this;
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @param {Element|String} element このビューが扱うElement
+     * @constructor
+     */
+    constructor: Jeeel.Framework.Mvc.View
+};
+
+Jeeel.Class.extend(Jeeel.Framework.Mvc.View, Jeeel.Framework.Layer);
+
+/**
+ * コンストラクタ
+ * 
+ * @class コントローラのプロトタイプ<br />
+ *         役割はそれぞれ、モデルが通信・計算・ステータス保持、<br />
+ *         ビューが描画・構成・HTML要素とのやりとり、<br />
+ *         コントローラが制御・イベントリスナ・カスタムイベントディスパッチなどとなる<br />
+ *         なおコントローラとビューはLayerを継承しており、子供にそれぞれコントローラ、ビューを持つ事が出来る<br />
+ *         また、EventDispatcherも継承しているのでイベントの制御も可能であり、<br />
+ *         子に追加された時や削除された時はデフォルトでイベントがディスパッチされるようになっている
+ * @augments Jeeel.Framework.Layer
+ */
+Jeeel.Framework.Mvc.Controller = function () {
+    Jeeel.Framework.Layer.call(this);
+};
+
+/**
+ * インスタンスの作成を行う
+ * 
+ * @return {Jeeel.Framework.Mvc.Controller} 作成したインスタンス
+ */
+Jeeel.Framework.Mvc.Controller.create = function () {
+    return new this();
+};
+
+Jeeel.Framework.Mvc.Controller.prototype = {
+  
+    /**
+     * このコントローラに紐づくモデル
+     * 
+     * @type Jeeel.Framework.Mvc.Model
+     * @protected
+     */
+    _model: null,
+    
+    /**
+     * このコントローラに紐づくビュー
+     * 
+     * @type Jeeel.Framework.Mvc.View
+     * @protected
+     */
+    _view: null,
+    
+    /**
+     * ビューへの通知を行う
+     * 
+     * @return {Jeeel.Framework.Mvc.Controller} 自インスタンス
+     */
+    update: function () {
+        this._view.update(this);
+        
+        return this;
+    },
+    
+    /**
+     * モデルを取得する
+     * 
+     * @return {Jeeel.Framework.Mvc.Model} モデル
+     */
+    getModel: function () {
+        return this._model;
+    },
+    
+    /**
+     * モデルを設定する
+     * 
+     * @param {Jeeel.Framework.Mvc.Model} model モデル
+     * @return {Jeeel.Framework.Mvc.Controller} 自インスタンス
+     */
+    setModel: function (model) {
+        if (this._model) {
+            this._model.detach(this);
+        }
+        
+        this._model = model;
+        
+        if (model) {
+            model.attach(this);
+        }
+        
+        return this;
+    },
+    
+    /**
+     * ビューを取得する
+     * 
+     * @return {Jeeel.Framework.Mvc.View} ビュー
+     */
+    getView: function () {
+        return this._view;
+    },
+    
+    /**
+     * ビューを設定する
+     * 
+     * @param {Jeeel.Framework.Mvc.View} view ビュー
+     * @return {Jeeel.Framework.Mvc.Controller} 自インスタンス
+     */
+    setView: function (view) {
+        if (this._view) {
+            this._view.detach(this);
+        }
+        
+        this._view = view;
+        
+        if (view) {
+            view.attach(this);
+        }
+        
+        return this;
+    },
+       
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Framework.Mvc.Controller,
+    
+    /**
+     * 親に追加された時に呼び出される(デフォルトの挙動)
+     * 
+     * @protected
+     */
+    _onAddedThis: function (parent) {
+        this._view.onControllerAdded(this, parent);
+    },
+    
+    /**
+     * 親から削除された時に呼び出される(デフォルトの挙動)
+     * 
+     * @protected
+     */
+    _onRemovedThis: function (parent) {
+        this._view.onControllerRemoved(this, parent);
+    }
+};
+
+Jeeel.Class.extend(Jeeel.Framework.Mvc.Controller, Jeeel.Framework.Layer);
+Jeeel.directory.Jeeel.Framework.Acl = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel.Framework + 'Acl/';
+    }
+};
+
+/**
+ * コンストラクタ
+ * 
+ * @class ロールベースアクセス制御を管理するクラス
+ */
+Jeeel.Framework.Acl = function () {
+    this._roleManager = new this.constructor.Role.Manager();
+    this._resourceManager = new this.constructor.Resource.Manager();
+};
+
+/**
+ * インスタンスの作成を行う
+ * 
+ * @return {Jeeel.Framework.Acl} 作成したインスタンス
+ */
+Jeeel.Framework.Acl.create = function () {
+    return new this();
+};
+
+Jeeel.Framework.Acl.prototype = {
+    
+    /**
+     * デフォルトのロールタイプ
+     * 
+     * @type String
+     * @private
+     */
+    _defaultRoleType: 'User',
+    
+    /**
+     * デフォルトのリソースタイプ
+     * 
+     * @type String
+     * @private
+     */
+    _defaultResourceType: 'Url',
+    
+    /**
+     * ロール管理インスタンス
+     * 
+     * @type Jeeel.Framework.Acl.Role.Manager
+     * @private
+     */
+    _roleManager: null,
+    
+    /**
+     * リソース管理インスタンス
+     * 
+     * @type Jeeel.Framework.Acl.Resource.Manager
+     * @private
+     */
+    _resourceManager: null,
+    
+    /**
+     * デフォルトのロールの種類を設定する
+     * 
+     * @param {String} roleType ロールの種類
+     * @return {Jeeel.Framework.Acl} 自インスタンス
+     */
+    setDefaultRoleType: function (roleType) {
+        this._defaultRoleType = roleType;
+        
+        return this;
+    },
+    
+    /**
+     * デフォルトのリソースの種類を設定する
+     * 
+     * @param {String} resourceType リソースの種類
+     * @return {Jeeel.Framework.Acl} 自インスタンス
+     */
+    setDefaultResourceType: function (resourceType) {
+        this._defaultResourceType = resourceType;
+        
+        return this;
+    },
+
+    /**
+     * ロールを追加する
+     * 
+     * @param {Jeeel.Framework.Acl.Role.Abstract} role ロール
+     * @return {Jeeel.Framework.Acl} 自インスタンス
+     */
+    addRole: function (role) {
+        this._roleManager.addRole(role);
+        
+        return this;
+    },
+    
+    /**
+     * リソースを追加する
+     * 
+     * @param {Jeeel.Framework.Acl.Resource.Abstract} resource リソース
+     * @return {Jeeel.Framework.Acl} 自インスタンス
+     */
+    addResource: function (resource) {
+        this._resourceManager.addResource(resource);
+        
+        return this;
+    },
+    
+    /**
+     * ロールを取得する
+     * 
+     * @param {String} roleId ロールID
+     * @param {String} [roleType] ロールタイプ
+     * @return {Jeeel.Framework.Acl.Role.Abstract} 取得したロール
+     */
+    getRole: function (roleId, roleType) {
+        if ( ! roleType) {
+            roleType = this._defaultRoleType;
+        }
+        
+        return this._roleManager.getRole(roleType, roleId);
+    },
+    
+    /**
+     * リソースを取得する
+     * 
+     * @param {String} resourceId リソースID
+     * @param {String} [resourceType] リソースタイプ
+     * @return {Jeeel.Framework.Acl.Resource.Abstract} 取得したリソース
+     */
+    getResource: function (resourceId, resourceType) {
+        if ( ! resourceType) {
+            resourceType = this._defaultResourceType;
+        }
+        
+        return this._resourceManager.getResource(resourceType, resourceId);
+    },
+    
+    /**
+     * 現在のロールを取得する
+     * 
+     * @return {Jeeel.Framework.Acl.Role.Abstract} 取得したロール
+     */
+    getCurrentRole: function () {
+        return this._roleManager.getCurrentRole();
+    },
+    
+    /**
+     * 現在のロールを切り替える
+     * 
+     * @param {String} roleId ロールID
+     * @param {String} [roleType] ロールタイプ
+     * @return {Jeeel.Framework.Acl} 自インスタンス
+     */
+    switchRole: function (roleId, roleType) {
+        
+        if ( ! roleType) {
+            roleType = this._defaultRoleType;
+        }
+        
+        this._roleManager.switchRole(roleType, roleId);
+        
+        return this;
+    },
+    
+    /**
+     * 現在のロールに対してリソースへの権限を許可する
+     * 
+     * @param {String} resourceId リソースID
+     * @param {String|String[]} [authorizations] 問い合わせ権限(省略は全権限)
+     * @param {String} [resourceType] リソースタイプ
+     * @return {Jeeel.Framework.Acl} 自インスタンス
+     */
+    allow: function (resourceId, authorizations, resourceType) {
+        var role = this._roleManager.getCurrentRole();
+        var resource = (resourceId instanceof Jeeel.Framework.Acl.Resource.Abstract) ? resourceId : this.getResource(resourceId, resourceType);
+        
+        if (role && resource) {
+            role.allow(resource, authorizations);
+        }
+        
+        return this;
+    },
+    
+    /**
+     * 現在のロールに対してリソースへの権限を禁止する
+     * 
+     * @param {String} resourceId リソースID
+     * @param {String|String[]} [authorizations] 問い合わせ権限(省略は全権限)
+     * @param {String} [resourceType] リソースタイプ
+     * @return {Jeeel.Framework.Acl} 自インスタンス
+     */
+    deny: function (resourceId, authorizations, resourceType) {
+        var role = this._roleManager.getCurrentRole();
+        var resource = (resourceId instanceof Jeeel.Framework.Acl.Resource.Abstract) ? resourceId : this.getResource(resourceId, resourceType);
+        
+        if (role && resource) {
+            role.deny(resource, authorizations);
+        }
+        
+        return this;
+    },
+    
+    /**
+     * 現在のロールが指定したリソースに対して権限か許可されているどうかを返す
+     * 
+     * @param {String} resourceId リソースID
+     * @param {String|String[]} [authorizations] 問い合わせ権限(省略は全権限)
+     * @param {String} [resourceType] リソースタイプ
+     * @return {Boolean} 許可されているかどうか
+     */
+    isAllowed: function (resourceId, authorizations, resourceType) {
+        var role = this._roleManager.getCurrentRole();
+        var resource = (resourceId instanceof Jeeel.Framework.Acl.Resource.Abstract) ? resourceId : this.getResource(resourceId, resourceType);
+        
+        if ( ! role) {
+            throw new Error('Role does not exist.');
+        }
+        
+        return role.isAllowed(resource, authorizations);
+    },
+    
+    /**
+     * 現在のロールが指定したリソースに対して権限か禁止されているどうかを返す
+     * 
+     * @param {String} resourceId リソースID
+     * @param {String|String[]} [authorizations] 問い合わせ権限(省略は全権限)
+     * @param {String} [resourceType] リソースタイプ
+     * @return {Boolean} 禁止されているかどうか
+     */
+    isDenied: function (resourceId, authorizations, resourceType) {
+        return ! this.isAllowed(resourceId, authorizations, resourceType);
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Framework.Acl
+};
+
+Jeeel.file.Jeeel.Framework.Acl = ['Role', 'Resource', 'Error'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Framework.Acl, Jeeel.file.Jeeel.Framework.Acl);Jeeel.directory.Jeeel.Framework.Acl.Role = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel.Framework.Acl + 'Role/';
+    }
+};
+
+/**
+ * @namespace ロールに関するネームスペース
+ */
+Jeeel.Framework.Acl.Role = {
+    
+    /**
+     * コンストラクタ
+     *
+     * @abstractClass ロールクラスを作る際の抽象クラス
+     */
+    Abstract: function () {
+        this._extends = [];
+        this._resourceAllowedAuthorizations = {};
+        this._resourceDeniedAuthorizations = {};
+    }
+};
+
+Jeeel.Framework.Acl.Role.Abstract.prototype = {
+    
+    /**
+     * 継承ロール
+     * 
+     * @type Jeeel.Framework.Acl.Role.Abstract[]
+     * @protected
+     */
+    _extends: [],
+    
+    /**
+     * リソースに対しての許可権限情報
+     */
+    _resourceAllowedAuthorizations: {},
+    
+    /**
+     * リソースに対しての拒否権限情報
+     */
+    _resourceDeniedAuthorizations: {},
+    
+    /**
+     * リソースをデフォルトで許可するかどうか
+     * 
+     * @type Boolean
+     * @protected
+     */
+    _defaultAuthorizationAllow: false,
+    
+    /**
+     * ロールの継承を行う
+     * 
+     * @param {Jeeel.Framework.Acl.Role.Abstract} role ロール
+     * @return {Jeeel.Framework.Acl.Role.Abstract} 自インスタンス
+     */
+    extend: function (role) {
+        
+        if ( ! (role instanceof Jeeel.Framework.Acl.Role.Abstract)) {
+            throw new Error('Argument role is not instance of Jeeel.Framework.Acl.Role.Abstract.');
+        } else if (role.getRoleType() !== this.getRoleType()) {
+            throw new Error('Role type does not match.');
+        }
+        
+        var roleId = role.getRoleId();
+        
+        for (var i = this._extends.length; i--;) {
+            if (this._extends[i].getRoleId() === roleId) {
+                return this;
+            }
+        }
+        
+        this._extends.push(role);
+        
+        return this;
+    },
+    
+    /**
+     * 権限リストに載っていない権限を許可として扱うようにする
+     * 
+     * @return {Jeeel.Framework.Acl.Role.Abstract} 自インスタンス
+     */
+    allowDefaultAuthorization: function () {
+        this._defaultAuthorizationAllow = true;
+        
+        return this;
+    },
+    
+    /**
+     * 権限リストに載っていない権限を禁止として扱うようにする
+     * 
+     * @return {Jeeel.Framework.Acl.Role.Abstract} 自インスタンス
+     */
+    denyDefaultAuthorization: function () {
+        this._defaultAuthorizationAllow = false;
+        
+        return this;
+    },
+    
+    /**
+     * リソースへの権限を許可する
+     * 
+     * @param {Jeeel.Framework.Acl.Resource.Abstract} resource リソース
+     * @param {String|String[]} [authorizations] 許可権限(省略は全権限)
+     * @return {Jeeel.Framework.Acl.Role.Abstract} 自インスタンス
+     */
+    allow: function (resource, authorizations) {
+        return this._addAuthorization(resource, authorizations);
+    },
+    
+    /**
+     * リソースへの権限の許可を取り消す
+     * 
+     * @param {Jeeel.Framework.Acl.Resource.Abstract} resource リソース
+     * @param {String|String[]} [authorizations] 許可取り消し権限(省略は全権限)
+     * @return {Jeeel.Framework.Acl.Role.Abstract} 自インスタンス
+     */
+    removeAllowance: function (resource, authorizations) {
+        return this._removeAuthorization(resource, authorizations);
+    },
+    
+    /**
+     * リソースへの権限を禁止する
+     * 
+     * @param {Jeeel.Framework.Acl.Resource.Abstract} resource リソース
+     * @param {String|String[]} [authorizations] 禁止権限(省略は全権限)
+     * @return {Jeeel.Framework.Acl.Role.Abstract} 自インスタンス
+     */
+    deny: function (resource, authorizations) {
+        return this._addAuthorization(resource, authorizations, true);
+    },
+    
+    /**
+     * リソースへの権限の禁止を取り消す
+     * 
+     * @param {Jeeel.Framework.Acl.Resource.Abstract} resource リソース
+     * @param {String|String[]} [authorizations] 禁止取り消し権限(省略は全権限)
+     * @return {Jeeel.Framework.Acl.Role.Abstract} 自インスタンス
+     */
+    removeDenial: function (resource, authorizations) {
+        return this._removeAuthorization(resource, authorizations, true);
+    },
+    
+    /**
+     * リソースへの権限が許可されているかどうかを取得する
+     * 
+     * @param {Jeeel.Framework.Acl.Resource.Abstract} resource リソース
+     * @param {String|String[]} [authorizations] 問い合わせ権限(省略は全権限)
+     * @return {Boolean} 許可されているかどうか
+     */
+    isAllowed: function (resource, authorizations) {
+        if ( ! (resource instanceof Jeeel.Framework.Acl.Resource.Abstract)) {
+            return this._defaultAuthorizationAllow;
+        }
+        
+        if ( ! authorizations) {
+            authorizations = '*';
+        } else if ( ! Jeeel.Type.isArray(authorizations)) {
+            authorizations = [authorizations];
+        }
+        
+        var type = resource.getResourceType();
+        var id = resource.getResourceId();
+        var i, perm;
+        
+        var alloweds = this._resourceAllowedAuthorizations[type] && this._resourceAllowedAuthorizations[type][id];
+        var denieds = this._resourceDeniedAuthorizations[type] && this._resourceDeniedAuthorizations[type][id];
+        
+        for (i = this._extends.length; i--;) {
+            if (this._extends[i].isAllowed(resource, authorizations)) {
+                return true;
+            }
+        }
+        
+        perm = [
+            alloweds && alloweds.perms || [],
+            denieds && denieds.perms || []
+        ];
+        
+        // デフォルトで許可の場合はまず禁止リストを優先する
+        if (this._defaultAuthorizationAllow) {
+            if (this._isDenied(resource, authorizations, perm[1])) {
+                return false;
+            }
+            
+            if (this._isAllowed(resource, authorizations, perm[0])) {
+                return true;
+            }
+        } else {
+            if (this._isAllowed(resource, authorizations, perm[0])) {
+                return true;
+            }
+          
+            if (this._isDenied(resource, authorizations, perm[1])) {
+                return false;
+            }
+        }
+
+        return this._defaultAuthorizationAllow;
+    },
+    
+    /**
+     * リソースへの権限が禁止されているかどうかを取得する
+     * 
+     * @param {Jeeel.Framework.Acl.Resource.Abstract} resource リソース
+     * @param {String|String[]} [authorizations] 問い合わせ権限(省略は全権限)
+     * @return {Boolean} 禁止されているかどうか
+     */
+    isDenied: function (resource, authorizations) {
+        return ! this.isAllowed(resource, authorizations);
+    },
+    
+    /**
+     * ロールの種類を取得する
+     * 
+     * @return {String} ロール種類
+     */
+    getRoleType: function () {
+        throw new Error('This method does not always have to override.');
+    },
+    
+    /**
+     * このロールを示すIDを取得する
+     * 
+     * @return {String} ロールID
+     */
+    getRoleId: function () {
+        throw new Error('This method does not always have to override.');
+    },
+    
+    /**
+     * 指定したロールがこのロールと同等かどうかを返す<br />
+     * 場合によってはオーバーライドして挙動を変えることが可能
+     * 
+     * @param {String} roleId 比較ロールID
+     * @param {Boolean} [strict] 厳密に判定するかどうか
+     * @return {Boolean} 同等かどうか
+     */
+    isMatch: function (roleId, strict) {
+        if (roleId === this.getRoleId()) {
+            return true;
+        } else if (strict) {
+            return false;
+        }
+        
+        for (var i = this._extends.length; i--;) {
+            if (this._extends[i].isMatch(roleId)) {
+                return true;
+            }
+        }
+        
+        return false;
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Framework.Acl.Role.Abstract,
+    
+    /**
+     * @param {Jeeel.Framework.Acl.Resource.Abstract} resource リソース
+     * @param {String|String[]} [authorizations] 付与権限(省略は全権限)
+     * @param {Boolean} [isDenied] 拒否リストかどうか
+     * @return {Jeeel.Framework.Acl.Role.Abstract} 自インスタンス
+     */
+    _addAuthorization: function (resource, authorizations, isDenied) {
+        if ( ! (resource instanceof Jeeel.Framework.Acl.Resource.Abstract)) {
+            return this;
+        }
+        
+        if ( ! authorizations) {
+            authorizations = ['*'];
+        } else if ( ! Jeeel.Type.isArray(authorizations)) {
+            authorizations = [authorizations];
+        }
+        
+        var resourcePerms = resource.getAuthorizations();
+        var perms = [];
+        
+        // 実際にリソースに存在する権限かどうかを確認してフィルターをかける
+        for (var i = authorizations.length; i--;) {
+            if (authorizations[i] === '*' || Jeeel.Type.inArray(authorizations[i], resourcePerms, true)) {
+                perms.push(authorizations[i]);
+            }
+        }
+        
+        // フィルターをかけた後に追加が必要な場合は追加を実行
+        if (perms.length) {
+            
+            var type = resource.getResourceType();
+            var id = resource.getResourceId();
+
+            if (isDenied) {
+                authorizations = this._resourceDeniedAuthorizations;
+            } else {
+                authorizations = this._resourceAllowedAuthorizations;
+            }
+            
+            if ( ! authorizations[type]) {
+                authorizations[type] = {};
+            }
+            
+            if ( ! authorizations[type][id]) {
+                authorizations[type][id] = {
+                    resource: resource,
+                    perms: []
+                };
+            }
+            
+            // 権限が全ての場合は追加の必要が無いので無視
+            if (authorizations[type][id].perms !== '*') {
+                
+                // 追加権限に*を含んでいた場合は強制的に全権限になる
+                if (Jeeel.Type.inArray('*', perms, true)) {
+                    authorizations[type][id].perms = '*';
+                } else {
+                    var tmp = Jeeel.Hash.merge(authorizations[type][id].perms, perms);
+                    
+                    authorizations[type][id].perms = Jeeel.Filter.Hash.Unique.create(true, true).filter(tmp);
+                }
+            }
+        }
+        
+        return this;
+    },
+    
+    _removeAuthorization: function (resource, authorizations, isDenied) {
+        if ( ! (resource instanceof Jeeel.Framework.Acl.Resource.Abstract)) {
+            return this;
+        }
+        
+        if ( ! authorizations) {
+            authorizations = ['*'];
+        } else if ( ! Jeeel.Type.isArray(authorizations)) {
+            authorizations = [authorizations];
+        }
+        
+        var resourcePerms = resource.getAuthorizations();
+        var i, perms = [];
+        
+        // 実際にリソースに存在する権限かどうかを確認してフィルターをかける
+        for (i = authorizations.length; i--;) {
+            if (authorizations[i] === '*' || Jeeel.Type.inArray(authorizations[i], resourcePerms, true)) {
+                perms.push(authorizations[i]);
+            }
+        }
+        
+        // フィルターをかけた後に削除が必要な場合は削除を実行
+        if (perms.length) {
+            
+            var type = resource.getResourceType();
+            var id = resource.getResourceId();
+
+            if (isDenied) {
+                authorizations = this._resourceDeniedAuthorizations;
+            } else {
+                authorizations = this._resourceAllowedAuthorizations;
+            }
+            
+            if ( ! authorizations[type]) {
+                return this;
+            }
+            
+            if ( ! authorizations[type][id]) {
+                return this;
+            }
+            
+            var clear = false;
+            var tmp;
+            
+            if (Jeeel.Type.inArray('*', perms, true)) {
+                clear = true;
+            } else if (authorizations[type][id].perms === '*') {
+                tmp = [];
+                
+                for (i = resourcePerms.length; i--;) {
+                    if ( ! Jeeel.Type.inArray(resourcePerms[i], perms, true)) {
+                        tmp.push(resourcePerms[i]);
+                    }
+                }
+                
+                authorizations[type][id].perms = tmp;
+                
+                clear = tmp.length === 0;
+            } else {
+                var tmp = [];
+                
+                for (i = authorizations[type][id].perms.length; i--;) {
+                    if (Jeeel.Type.inArray(authorizations[type][id].perms[i], perms, true)) {
+                        tmp.push(authorizations[type][id].perms[i]);
+                    }
+                }
+                
+                authorizations[type][id].perms = tmp;
+                
+                clear = tmp.length === 0;
+            }
+            
+            if (clear) {
+                delete authorizations[type][id];
+                
+                if (Jeeel.Type.isEmptyHash(authorizations[type])) {
+                    delete authorizations[type];
+                }
+            }
+        }
+        
+        return this;
+    },
+    
+    _isAllowed: function (resource, authorizations, alloweds) {
+        
+        if (alloweds === '*') {
+            return true;
+        }
+        
+        var i;
+        
+        if (authorizations === '*') {
+            var rperms = resource.getAuthorizations();
+            
+            for (i = rperms.length; i--;) {
+                if ( ! Jeeel.Type.inArray(rperms[i], alloweds, true)) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        for (i = alloweds.length; i--;) {
+
+            var tmp = Jeeel.Hash.search(alloweds[i], authorizations, true);
+
+            if (tmp === null) {
+                return false;
+            } else {
+                authorizations.splice(tmp, 1);
+            }
+        }
+        
+        return ! authorizations.length;
+    },
+    
+    _isDenied: function (resource, authorizations, denieds) {
+        
+        if (denieds === '*') {
+            return true;
+        }
+        
+        if (authorizations === '*') {
+            if (denieds.length) {
+                return true;
+            }
+            
+            return false;
+        }
+        
+        for (var i = denieds.length; i--;) {
+            if (Jeeel.Type.inArray(denieds[i], authorizations, true)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+};
+
+Jeeel.file.Jeeel.Framework.Acl.Role = ['User', 'Manager'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Framework.Acl.Role, Jeeel.file.Jeeel.Framework.Acl.Role);
+/**
+ * コンストラクタ
+ * 
+ * @class ユーザーに対してのロールを扱うクラス
+ * @augments Jeeel.Framework.Acl.Role.Abstract
+ * @param {String} roleName ロール名
+ */
+Jeeel.Framework.Acl.Role.User = function (roleName) {
+    Jeeel.Framework.Acl.Role.Abstract.call(this);
+    
+    this._roleName = roleName;
+};
+
+/**
+ * インスタンスの作成を行う
+ * 
+ * @param {String} roleName ロール名
+ * @return {Jeeel.Framework.Acl.Role.User} 作成したインスタンス
+ */
+Jeeel.Framework.Acl.Role.User.create = function (roleName) {
+    return new this(roleName);
+};
+
+Jeeel.Framework.Acl.Role.User.prototype = {
+    
+    _roleName: '',
+    
+    /**
+     * ロールの種類を取得する
+     * 
+     * @return {String} ロール種類
+     */
+    getRoleType: function () {
+        return 'User';
+    },
+    
+    /**
+     * このロールを示す名前を取得する
+     * 
+     * @return {String} ロールURL
+     */
+    getRoleId: function () {
+        return this._roleName;
+    }
+};
+
+Jeeel.Class.extend(Jeeel.Framework.Acl.Role.User, Jeeel.Framework.Acl.Role.Abstract);
+/**
+ * コンストラクタ
+ * 
+ * @class ロール管理クラス
+ */
+Jeeel.Framework.Acl.Role.Manager = function () {
+    this._roles = {};
+};
+
+Jeeel.Framework.Acl.Role.Manager.prototype = {
+    
+    /**
+     * ロール
+     * 
+     * @type Jeeel.Framework.Acl.Role.Abstract[]
+     * @private
+     */
+    _roles: {},
+    
+    /**
+     * 現在のロール
+     * 
+     * @type Jeeel.Framework.Acl.Role.Abstract
+     * @private
+     */
+    _currentRole: null,
+    
+    /**
+     * ロールを追加する
+     * 
+     * @param {Jeeel.Framework.Acl.Role.Abstract} role ロール
+     * @return {Jeeel.Framework.Acl.Role.Manager} 自クラス
+     */
+    addRole: function (role) {
+        if ( ! (role instanceof Jeeel.Framework.Acl.Role.Abstract)) {
+            throw new Error('Argument role is not instance of Jeeel.Framework.Acl.Role.Abstract.');
+        }
+        
+        var type = role.getRoleType();
+
+        if (this.getRole(type, role.getRoleId())) {
+            return this;
+        }
+        
+        if ( ! this._roles[type]) {
+            this._roles[type] = [];
+        }
+        
+        this._roles[type].push(role);
+        
+        if ( ! this._currentRole) {
+            this._currentRole = role;
+        }
+        
+        return this;
+    },
+    
+    /**
+     * ロールを取得する
+     * 
+     * @param {String} roleType ロールタイプ
+     * @param {String} roleId ロールID
+     * @return {Jeeel.Framework.Acl.Role.Abstract} ロール
+     */
+    getRole: function (roleType, roleId) {
+        if ( ! this._roles[roleType]) {
+            return null;
+        }
+        
+        for (var i = this._roles[roleType].length; i--;) {
+            var role = this._roles[roleType][i];
+            
+            if (role.isMatch(roleId, true)) {
+                return role;
+            }
+        }
+        
+        return null;
+    },
+    
+    /**
+     * ロールを保持しているかどうかを取得する
+     * 
+     * @param {String} roleType ロールタイプ
+     * @param {String} roleId ロールID
+     * @return {Boolean} 保持しているかどうか
+     */
+    hasRole: function (roleType, roleId) {
+        
+        if ( ! this._roles[roleType]) {
+            return false;
+        }
+        
+        for (var i = this._roles[roleType].length; i--;) {
+            var role = this._roles[roleType][i];
+            
+            if (role.isMatch(roleId, true)) {
+                return true;
+            }
+        }
+        
+        return false;
+    },
+    
+    /**
+     * 現在のロールを取得する
+     * 
+     * @return {Jeeel.Framework.Acl.Role.Abstract} ロール
+     */
+    getCurrentRole: function () {
+        return this._currentRole;
+    },
+    
+    /**
+     * 現在のロールを切り替える
+     * 
+     * @param {String} roleType ロールタイプ
+     * @param {String} roleId ロールID
+     * @return {Jeeel.Framework.Acl.Role.Manager} 自クラス
+     */
+    switchRole: function (roleType, roleId) {
+        
+        var role = this.getRole(roleType, roleId);
+        
+        if (role) {
+            this._currentRole = role;
+        }
+        
+        return this;
+    }
+};Jeeel.directory.Jeeel.Framework.Acl.Resource = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel.Framework.Acl + 'Resource/';
+    }
+};
+
+/**
+ * @namespace リソースに関するネームスペース
+ */
+Jeeel.Framework.Acl.Resource = {
+    
+    /**
+     * コンストラクタ
+     *
+     * @abstractClass リソースクラスを作る際の抽象クラス
+     */
+    Abstract: function () {
+        this._permissions = [];
+    }
+};
+
+Jeeel.Framework.Acl.Resource.Abstract.prototype = {
+    
+    /**
+     * 権限リスト
+     * 
+     * @type String[]
+     * @private
+     */
+    _permissions: [],
+    
+    /**
+     * リソースに対しての権限を追加する
+     * 
+     * @param {String} permission 権限
+     * @return {Jeeel.Framework.Acl.Resource.Abstract} 自インスタンス
+     */
+    addAuthorization: function (permission) {
+        this._permissions.push(permission);
+        
+        return this;
+    },
+    
+    /**
+     * 権限一覧を取得する
+     * 
+     * @return {String} 権限一覧
+     */
+    getAuthorizations: function () {
+        return this._permissions;
+    },
+    
+    /**
+     * リソースの種類を取得する
+     * 
+     * @return {String} リソース種類
+     */
+    getResourceType: function () {
+        throw new Error('This method does not always have to override.');
+    },
+    
+    /**
+     * このリソースを示すIDを取得する
+     * 
+     * @return {String} リソースID
+     */
+    getResourceId: function () {
+        throw new Error('This method does not always have to override.');
+    },
+    
+    /**
+     * 指定したリソースがこのリソースと同等かどうかを返す<br />
+     * 場合によってはオーバーライドして挙動を変えることが可能
+     * 
+     * @param {String} resourceId 比較リソースID
+     * @param {Boolean} [strict] 厳密に判定するかどうか
+     * @return {Boolean} 同等かどうか
+     */
+    isMatch: function (resourceId, strict) {
+        return resourceId === this.getResourceId();
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Framework.Acl.Resource.Abstract
+};
+
+Jeeel.file.Jeeel.Framework.Acl.Resource = ['Url', 'Manager'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Framework.Acl.Resource, Jeeel.file.Jeeel.Framework.Acl.Resource);
+/**
+ * コンストラクタ
+ * 
+ * @class URLをリソースとして扱うクラス
+ * @augments Jeeel.Framework.Acl.Resource.Abstract
+ * @param {String} url リソースのURL
+ * @param {Boolean} [includeHierarchy] 下位階層を含むかどうか
+ */
+Jeeel.Framework.Acl.Resource.Url = function (url, includeHierarchy) {
+    Jeeel.Framework.Acl.Resource.Abstract.call(this);
+    
+    var filter = Jeeel.Filter.String.RegularExpressionEscape.create();
+    var absUrl = Jeeel.UserAgent.getBaseUrl() + url;
+    
+    var suffix;
+    
+    if (includeHierarchy) {
+        suffix = '(?:[?\\/]|$)';
+    } else {
+        suffix = '\\/?(?:\\?[^#]*)?(?:#.*)?$';
+    }
+    
+    this._url = url;
+    this._reg = new RegExp('^' + filter.filter(this._url) + suffix, 'i');
+    this._regFull = new RegExp('^' + filter.filter(absUrl) + suffix, 'i');
+    
+    // URLのリソースはアクセス以外に権限がない
+    this.addAuthorization('Access');
+};
+
+/**
+ * インスタンスの作成を行う
+ * 
+ * @param {String} url リソースのURL
+ * @param {Boolean} [includeHierarchy] 下位階層を含むかどうか
+ * @return {Jeeel.Framework.Acl.Resource.Url} 作成したインスタンス
+ */
+Jeeel.Framework.Acl.Resource.Url.create = function (url, includeHierarchy) {
+    return new this(url, includeHierarchy);
+};
+
+Jeeel.Framework.Acl.Resource.Url.prototype = {
+    
+    _url: '',
+    _reg: null,
+    _regFull: null,
+    
+    /**
+     * リソースの種類を取得する
+     * 
+     * @return {String} リソース種類
+     */
+    getResourceType: function () {
+        return 'Url';
+    },
+    
+    /**
+     * このリソースを示すURLを取得する
+     * 
+     * @return {String} リソースURL
+     */
+    getResourceId: function () {
+        return this._url;
+    },
+    
+    /**
+     * 指定したリソースがこのリソースと同等かどうかを返す
+     * 
+     * @param {String} resourceId 比較リソースID
+     * @param {Boolean} [strict] 継承関係を無視して厳密に判定するかどうか
+     * @return {Boolean} 同等かどうか
+     */
+    isMatch: function (resourceId, strict) {
+        if (strict) {
+            return this._url === resourceId;
+        }
+        
+        return this._reg.test(resourceId) || this._regFull.test(resourceId);
+    }
+};
+
+Jeeel.Class.extend(Jeeel.Framework.Acl.Resource.Url, Jeeel.Framework.Acl.Resource.Abstract);
+/**
+ * コンストラクタ
+ * 
+ * @class リソース管理クラス
+ */
+Jeeel.Framework.Acl.Resource.Manager = function () {
+    this._resources = {};
+};
+
+Jeeel.Framework.Acl.Resource.Manager.prototype = {
+  
+    /**
+     * リソース
+     * 
+     * @type Jeeel.Framework.Acl.Resource.Abstract[]
+     * @private
+     */
+    _resources: {},
+  
+    /**
+     * リソースを追加する
+     * 
+     * @param {Jeeel.Framework.Acl.Resource.Abstract} resource ロール
+     * @return {Jeeel.Framework.Acl.Resource.Manager} 自クラス
+     */
+    addResource: function (resource) {
+        if ( ! (resource instanceof Jeeel.Framework.Acl.Resource.Abstract)) {
+            throw new Error('Argument resource is not instance of Jeeel.Framework.Acl.Resource.Abstract.');
+        }
+        
+        var type = resource.getResourceType();
+        
+        if (this.getResource(type, resource.getResourceId())) {
+            return this;
+        }
+        
+        if ( ! this._resources[type]) {
+            this._resources[type] = [];
+        }
+        
+        this._resources[type].push(resource);
+        
+        return this;
+    },
+    
+    /**
+     * リソースを取得する
+     * 
+     * @param {String} resourceType リソースタイプ
+     * @param {String} resourceId リソースID
+     * @return {Jeeel.Framework.Acl.Resource.Abstract} リソース
+     */
+    getResource: function (resourceType, resourceId) {
+        if ( ! this._resources[resourceType]) {
+            return null;
+        }
+        
+        for (var i = this._resources[resourceType].length; i--;) {
+            var resource = this._resources[resourceType][i];
+            
+            if (resource.isMatch(resourceId)) {
+                return resource;
+            }
+        }
+        
+        return null;
+    },
+    
+    /**
+     * リソースを保持しているかどうかを取得する
+     * 
+     * @param {String} resourceType リソースタイプ
+     * @param {String} resourceId リソースID
+     * @return {Boolean} 保持しているかどうか
+     */
+    hasResource: function (resourceType, resourceId) {
+        if ( ! this._resources[resourceType]) {
+            return false;
+        }
+        
+        for (var i = this._resources[resourceType].length; i--;) {
+            var resource = this._resources[resourceType][i];
+            
+            if (resource.isMatch(resourceId)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+};
+
+(function () {
+    Jeeel.Acl = new Jeeel.Framework.Acl();
+    
+    var role = new Jeeel.Framework.Acl.Role.User('Administrator');
+    
+    role.allowDefaultAuthorization();
+    
+    Jeeel.Acl.addRole(role);
+})();
+
+if (Jeeel.Acl) {
+    
+    /**
+     * @ignore
+     */
+    Jeeel.Acl._enableAutoControl = false;
+    
+    /**
+     * @ignore
+     */
+    Jeeel.Acl._errors = [];
+    
+    /**
+     * 自動制御を有効にする<br />
+     * 自動制御を有効にした場合、Jeeel内部の挙動とアンカー、フォーム等にも影響を及ぼす<br />
+     * 但し、onloadイベント後にこのメソッドを実行した場合やonload後に追加された要素に対しては別途メソッドを使用する必要がある<br />
+     * またlocation.hrefを直接変更したり、他のライブラリや独自実装のAJAX等には効果がない
+     * 
+     * @return {Jeeel.Framework.Acl} 自インスタンス
+     */
+    Jeeel.Acl.enableAutoControl = function () {
+        this._enableAutoControl = true;
+
+        return this.controlDocument();
+    };
+    
+    /**
+     * 現在のドキュメント全ての要素の制御を行う
+     * 
+     * @return {Jeeel.Framework.Acl} 自インスタンス
+     */
+    Jeeel.Acl.controlDocument = function () {
+      
+        if ( ! this.isAutoControl()) {
+            return this;
+        }
+        
+        var anchors = Jeeel.Document.getElementsByTagName('a');
+        var forms = Jeeel.Document.getElementsByTagName('form');
+        
+        return this.control(forms.concat(anchors));
+    };
+    
+    /**
+     * 要素の制御を行う
+     * 
+     * @param {Element|Element[]} elements アンカーやフォーム要素もしくはそのリスト
+     * @return {Jeeel.Framework.Acl} 自インスタンス
+     */
+    Jeeel.Acl.control = function (elements) {
+        
+        if ( ! this.isAutoControl()) {
+            return this;
+        }
+        
+        if ( ! Jeeel.Type.isArray(elements)) {
+            elements = [elements];
+        }
+        
+        for (var i = elements.length; i--;) {
+            var elm = elements[i];
+            var name = elm.nodeName.toUpperCase();
+            var listener = this.CONTROLS[name];
+            var storage = Jeeel.Storage.Object(elm, this.CONTROL_NAME);
+            
+            if (storage.get('controlled')) {
+                continue;
+            }
+            
+            // 対象タグのみにイベントを追加
+            switch (name) {
+                case 'A':
+                    Jeeel.Dom.Event.addEventListener(elm, Jeeel.Dom.Event.Type.CLICK, listener, this);
+                    storage.set('controlled', true);
+                    break;
+                    
+                case 'FORM':
+                    Jeeel.Dom.Event.addEventListener(elm, Jeeel.Dom.Event.Type.SUBMIT, listener, this);
+                    storage.set('controlled', true);
+                    break;
+                    
+                default:
+                    break;
+            }
+        }
+        
+        return this;
+    };
+    
+    /**
+     * 制御のための値を保持するネーム
+     * 
+     * @type String
+     */
+    Jeeel.Acl.CONTROL_NAME = 'jeeel-acl-controls';
+    
+    /**
+     * @namespace 制御のための関数を保持するネームスペース
+     */
+    Jeeel.Acl.CONTROLS = {
+      
+        /**
+         * アンカータグ用
+         * 
+         * @param {Jeeel.Dom.Event} e イベントオブジェクト
+         * @ignore
+         */
+        A: function (e) {
+            var a = e.currentTarget;
+            
+            // hrefが設定していなかったりt、フラグメントは無視
+            if ( ! a.href) {
+                return;
+            } else if (a.href.match(/^#/)) {
+                return;
+            }
+            
+            var scheme = a.href.match(/^([a-z]+):/i);
+            
+            scheme = (scheme && scheme[1] || '').toLowerCase();
+            
+            // スキームが付いていてhttp系以外は無視
+            if (scheme && ! (scheme === 'http' || scheme === 'https')) {
+                return;
+            }
+            
+            if (this.isDenied(a.href, '*', 'Url')) {
+                e.stop();
+                this.throwError('Access Error', 404);
+            }
+        },
+        
+        /**
+         * フォームタグ用
+         * 
+         * @param {Jeeel.Dom.Event} e イベントオブジェクト
+         * @ignore
+         */
+        FORM: function (e) {
+            var form = e.currentTarget;
+            
+            // アクションが未設定は無視
+            if ( ! form.action) {
+                return;
+            } else if (form.action.match(/^#/)) {
+                return;
+            }
+            
+            var scheme = form.action.match(/^([a-z]+):/i);
+            
+            scheme = (scheme && scheme[1] || '').toLowerCase();
+            
+            // スキームが付いていてhttp系以外は無視
+            if (scheme && ! (scheme === 'http' || scheme === 'https')) {
+                return;
+            }
+
+            if (this.isDenied(form.action, '*', 'Url')) {
+                e.stop();
+                this.throwError('Access Error', 404);
+            }
+        }
+    };
+    
+    /**
+     * 自動制御かどうかを取得する
+     * 
+     * @return {Boolean} 自動制御かどうか
+     */
+    Jeeel.Acl.isAutoControl = function () {
+        return this._enableAutoControl;
+    };
+    
+    /**
+     * ACLのエラーイベントの追加
+     * 
+     * @param {Function} callback エラーコールバック
+     * @param {Mixied} [thisArg] コールバック中のthisに相当する値(デフォルトはこのインスタンスになる)
+     * @return {Jeeel.Framework.Acl} 自インスタンス
+     */
+    Jeeel.Acl.addErrorEvent = function (callback, thisArg) {
+        this._errors.push({
+            callback: callback,
+            thisArg: thisArg
+        });
+        
+        return this;
+    };
+    
+    /**
+     * ACLのエラーイベントを起動する
+     * 
+     * @param {Mixied} var_args 登録メソッドに引き渡す引数
+     * @return {Jeeel.Framework.Acl} 自インスタンス
+     */
+    Jeeel.Acl.dispatchErrorEvent = function (var_args) {
+        for (var i = this._errors.length; i--;) {
+            var error = this._errors[i];
+            
+            error.callback.apply(error.thisArg || this, arguments);
+        }
+        
+        return this;
+    };
+    
+    /**
+     * ACL用のエラーを投げる
+     * 
+     * @param {String} [message] エラーメッセージ
+     * @param {Integer} [code] エラーコード
+     */
+    Jeeel.Acl.throwError = function (message, code) {
+        
+        if ( ! this.isAutoControl()) {
+            return;
+        }
+        
+        var err = new Jeeel.Framework.Acl.Error(message, code, 1);
+        this.dispatchErrorEvent(err);
+        
+        throw err;
+    };
+}
+/**
+ * コンストラクタ
+ * 
+ * @class ACL用のカスタムエラー
+ * @param {String} [message] エラーメッセージ
+ * @param {Integer} [code] エラーコード
+ * @param {Integer} [nestCount] このエラーメッセージを本来投げるべき箇所以外で作成した場合に指定
+ */
+Jeeel.Framework.Acl.Error = function (message, code, nestCount) {
+    if ( ! (nestCount > 0)) {
+        nestCount = 1;
+    } else {
+        nestCount++;
+    }
+    
+    Jeeel.Error.call(this, message, code, nestCount);
+};
+
+Jeeel.Framework.Acl.Error.prototype = {
+    
+    /**
+     * Error名
+     * 
+     * @type String
+     */
+    name: 'AclError',
+    
+    /**
+     * コンストラクタ
+     * 
+     * @param {String} [message] エラーメッセージ
+     * @param {Integer} [code] エラーコード
+     * @constructor
+     */
+    constructor: Jeeel.Framework.Acl.Error
+};
+
+Jeeel.Class.extend(Jeeel.Framework.Acl.Error, Jeeel.Error);Jeeel.directory.Jeeel.Debug = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -46405,7 +53919,7 @@ Jeeel.Graphics.Vector.Svg.prototype = {
 };
 
 /**
- * デバッグ関連の機能を保持するネームスペース
+ * @namespace デバッグ関連の機能を保持するネームスペース
  */
 Jeeel.Debug = {
 
@@ -46420,7 +53934,7 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Debug, Jeeel.file.Jeeel.Debug);
  * @param {Mixied} obj 展開するオブジェクト
  * @return {String} 展開したオブジェクト
  */
-Jeeel.Debug.ObjectExport = function (obj) {
+Jeeel.Debug.objectExport = function (obj) {
     var res = typeof obj;
     var cnt = (arguments[1] ? arguments[1] : 0);
     var i, l;
@@ -46597,7 +54111,7 @@ Jeeel.Debug.ObjectExpander._createCss = function () {
 
     var css = 'table.' + this.EXPAND_OBJECT_ROOT_CLASS + ' {\n'
             + '    position: relative;\n'
-            + '    z-index: 100;\n'
+            + '    z-index: 10;\n'
             + '    border-spacing: 0px;\n'
             + '    white-space: nowrap;\n'
             + '    color: black;\n'
@@ -46692,7 +54206,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
      * @private
      * @constant
      */
-    _removeGesture: [Jeeel.Code.KeyCode.Down, Jeeel.Code.KeyCode.Right],
+    _removeGesture: [40, 39],
     
     /**
      * コンストラクタ
@@ -46755,6 +54269,9 @@ Jeeel.Debug.ObjectExpander.prototype = {
             th.innerHTML = this.constructor.COLLAPSE_ARROW;
             thStyle.cursor = 'pointer';
 
+            /**
+             * @ignore
+             */
             var func = function () {
                 var data  = arguments.callee.data;
                 var tbody = arguments.callee.tbody;
@@ -46786,6 +54303,9 @@ Jeeel.Debug.ObjectExpander.prototype = {
 
         if (elm.isElement) {
 
+            /**
+             * @ignore
+             */
             var mouseDown = function () {
                 var data   = arguments.callee.data;
                 var target = arguments.callee.targetTr;
@@ -46798,6 +54318,9 @@ Jeeel.Debug.ObjectExpander.prototype = {
             mouseDown.data = obj;
             mouseDown.targetTr = tr;
 
+            /**
+             * @ignore
+             */
             var mouseUp = function () {
                 var event  = Jeeel.Dom.Event.getEventObject();
 
@@ -46808,6 +54331,9 @@ Jeeel.Debug.ObjectExpander.prototype = {
                 Jeeel.Dom.Event.getEventObject().stop();
             };
 
+            /**
+             * @ignore
+             */
             var over = function () {
                 var data   = arguments.callee.data;
                 var target = arguments.callee.targetTr;
@@ -46822,6 +54348,9 @@ Jeeel.Debug.ObjectExpander.prototype = {
             over.data = obj;
             over.targetTr = tr;
 
+            /**
+             * @ignore
+             */
             var out = function () {
                 var data   = arguments.callee.data;
                 var target = arguments.callee.targetTr;
@@ -47613,7 +55142,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
 };
 
 /**
- * メッセージをHTML上に表示するためのモジュール
+ * @staticClass メッセージをHTML上に表示するためのモジュール
  */
 Jeeel.Debug.ErrorMessage = {
     
@@ -47991,7 +55520,7 @@ Jeeel.Debug.Timer.prototype = {
 };
 
 /**
- * コンソールを管理するスタティッククラス
+ * @staticClass コンソールを管理するスタティッククラス
  */
 Jeeel.Debug.Console = {
 
@@ -48034,7 +55563,7 @@ Jeeel.Debug.Console = {
      * @constant
      */
     CONSOLE_CODE_ASSIST_ID: 'jeeel-debug-console-code-assist',
-
+    
     /**
      * コンソール
      *
@@ -48103,9 +55632,16 @@ Jeeel.Debug.Console = {
      * コンソールの保存媒体
      * 
      * @type Jeeel.Session.Name
+     * @private
      */
     _consoleSession: null,
     
+    /**
+     * 現在のモードが単数行モードかどうか
+     * 
+     * @type Boolean
+     * @private
+     */
     _isSingleLineMode: true,
 
     /**
@@ -48121,8 +55657,15 @@ Jeeel.Debug.Console = {
      *
      * @type Hash
      * @private
+     * @ignore
      */
     _codeAssistData: {
+      
+        /**
+         * コード補完を使うかどうか
+         * 
+         * @type Boolean
+         */
         use: true,
         
         /**
@@ -48240,9 +55783,9 @@ Jeeel.Debug.Console = {
 
         var div = Jeeel.Document.createElement('div');
         div.innerHTML = '<textarea style="height: 25px;" id="' + this.CONSOLE_LOG_ID + '"></textarea>\n'
-                      + '<div id="' + this.CONSOLE_KEYBOARD_ID + '"></div>\n'
+                      + '<div id="' + this.CONSOLE_KEYBOARD_ID + '"><div class="title">キーボード</div></div>\n'
                       + '<div id="' + this.CONSOLE_RESULT_ID + '"></div>\n'
-                      + '<div style="display: none;" id="' + this.CONSOLE_CODE_ASSIST_ID + '"></div>';
+                      + '<ul style="display: none;" id="' + this.CONSOLE_CODE_ASSIST_ID + '"></ul>';
 
         div.id = this.CONSOLE_ID;
         this._console = Jeeel.Debug.Debugger.elementInsertTop(div);
@@ -48255,13 +55798,18 @@ Jeeel.Debug.Console = {
         this._consoleIn  = Jeeel.Dom.Element.Textarea.create(Jeeel.Document.getElementById(this.CONSOLE_LOG_ID));
         this._consoleOut = Jeeel.Document.getElementById(this.CONSOLE_RESULT_ID);
         this._consoleKeyboard = Jeeel.Document.getElementById(this.CONSOLE_KEYBOARD_ID);
-        this._consoleCodeAssistWindow = Jeeel.Dom.ElementOperator.create(Jeeel.Dom.Element.create(Jeeel.Document.getElementById(this.CONSOLE_CODE_ASSIST_ID)).setBackgroundIframe());
+        this._consoleCodeAssistWindow = Jeeel.Dom.ElementOperator.create(Jeeel.Dom.Element.create(Jeeel.Document.getElementById(this.CONSOLE_CODE_ASSIST_ID)).setShim());
 
         this._consoleLog    = session.get(this.CONSOLE_LOG_ID, []);
         this._consoleResult = Jeeel.Filter.Hash.Fill.create(0, this._consoleLog.length, null).filter([]);
         this._initKeyboard();
 
         this._consolePosition = this._consoleLog.length;
+        
+        // モバイル系ではキーボードがショボイためソフトウェアキーボードを有効化
+        if (Jeeel.UserAgent.isMobile()) {
+            this._consoleKeyboard.style.display = 'block';
+        }
         
         var singleLine, multiLine;
 
@@ -48275,20 +55823,23 @@ Jeeel.Debug.Console = {
             self._isSingleLineMode = listener === singleLine;
         };
 
+        /**
+         * @ignore
+         */
         singleLine = function () {
             var e = Jeeel.Dom.Event.getEventObject();
             var keyCode = e.getKeyCode();
             var timeoutId;
-
+            
             if (self._codeAssistData.use) {
-                if (Jeeel.Type.inArray(keyCode, [Jeeel.Code.KeyCode.Space, Jeeel.Code.KeyCode.LeftBracket, Jeeel.Code.KeyCode.RightBracket])) {
+                if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Space, Jeeel.Dom.Event.KeyCode.LeftBracket, Jeeel.Dom.Event.KeyCode.RightBracket])) {
                     self._codeAssistDataClose();
-                } else if (self._codeAssistData.enable || Jeeel.Type.inArray(keyCode, [Jeeel.Code.KeyCode.Period, Jeeel.Code.KeyCode.BackSpace]) || ! self._consoleIn.getText()) {
+                } else if (self._codeAssistData.enable || Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Period, Jeeel.Dom.Event.KeyCode.BackSpace]) || ! self._consoleIn.getText()) {
                     timeoutId = Jeeel.Timer.setTimeout(self._setCodeAssistData, 1);
                 }
             }
 
-            if (keyCode === Jeeel.Code.KeyCode.Enter) {
+            if (keyCode === Jeeel.Dom.Event.KeyCode.Enter) {
 
                 e.stop();
 
@@ -48296,7 +55847,7 @@ Jeeel.Debug.Console = {
                 
                 return false;
                 
-            } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Code.KeyCode.Up, Jeeel.Code.KeyCode.PageUp])) {
+            } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Up, Jeeel.Dom.Event.KeyCode.PageUp])) {
 
                 e.stop();
 
@@ -48306,7 +55857,7 @@ Jeeel.Debug.Console = {
 
                 return false;
                 
-            } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Code.KeyCode.Down, Jeeel.Code.KeyCode.PageDown])) {
+            } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Down, Jeeel.Dom.Event.KeyCode.PageDown])) {
                 
                 e.stop();
 
@@ -48316,7 +55867,7 @@ Jeeel.Debug.Console = {
 
                 return false;
                 
-            } else if (self._codeAssistData.enable && keyCode === Jeeel.Code.KeyCode.Tab) {
+            } else if (self._codeAssistData.enable && keyCode === Jeeel.Dom.Event.KeyCode.Tab) {
                 e.stop();
 
                 if (e.shiftKey) {
@@ -48329,7 +55880,7 @@ Jeeel.Debug.Console = {
 
                 return false;
                 
-            } else if (keyCode === Jeeel.Code.KeyCode.M && e.ctrlKey) {
+            } else if (keyCode === Jeeel.Dom.Event.KeyCode.M && e.ctrlKey) {
 
                 e.stop();
 
@@ -48341,7 +55892,7 @@ Jeeel.Debug.Console = {
                 Jeeel.Dom.Element.create(self._consoleOut).hide().show();
 
                 return false;
-            } else if (keyCode === Jeeel.Code.KeyCode.Shift) {
+            } else if (keyCode === Jeeel.Dom.Event.KeyCode.Shift) {
                 e.stop();
                 
                 Jeeel.Timer.clearTimeout(timeoutId);
@@ -48352,12 +55903,15 @@ Jeeel.Debug.Console = {
             return true;
         };
 
+        /**
+         * @ignore
+         */
         multiLine = function () {
             var e = Jeeel.Dom.Event.getEventObject();
             var keyCode = e.getKeyCode();
             
             if (e.ctrlKey) {
-                if (keyCode === Jeeel.Code.KeyCode.Enter) {
+                if (keyCode === Jeeel.Dom.Event.KeyCode.Enter) {
 
                     e.stop();
 
@@ -48365,7 +55919,7 @@ Jeeel.Debug.Console = {
 
                     return false;
 
-                } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Code.KeyCode.Up, Jeeel.Code.KeyCode.PageUp])) {
+                } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Up, Jeeel.Dom.Event.KeyCode.PageUp])) {
 
                     e.stop();
 
@@ -48373,7 +55927,7 @@ Jeeel.Debug.Console = {
 
                     return false;
 
-                } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Code.KeyCode.Down, Jeeel.Code.KeyCode.PageDown])) {
+                } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Down, Jeeel.Dom.Event.KeyCode.PageDown])) {
 
                     e.stop();
 
@@ -48381,7 +55935,7 @@ Jeeel.Debug.Console = {
 
                     return false;
 
-                } else if (keyCode === Jeeel.Code.KeyCode.M) {
+                } else if (keyCode === Jeeel.Dom.Event.KeyCode.M) {
 
                     e.stop();
 
@@ -48502,6 +56056,8 @@ Jeeel.Debug.Console = {
         arguments.callee.ignore = true;
 
         var css = 'div#' + this.CONSOLE_ID + ' {\n'
+                + '    position: relative;\n'
+                + '    z-index: 100000;\n'
                 + '    background-color: white;\n'
                 + '    text-align: left;\n'
                 + '    font-family: "Arial", "Times New Roman", "Courier New", "Courier", cursive;\n'
@@ -48519,18 +56075,60 @@ Jeeel.Debug.Console = {
                 + '}\n'
                 + 'div#' + this.CONSOLE_KEYBOARD_ID + ' {\n'
                 + '    background-color: white;\n'
-                + '    width: 100%;\n'
-                + '    height: 25px;\n'
+                + '    position: fixed;\n'
+                + '    z-index: 20;\n'
+                + '    top: 38%;\n'
+                + '    left: 38%;\n'
+                + '    border: 1px solid #C2C2C2;\n'
+                + '    width: 30%;\n'
+                + '    height: 100px;\n'
                 + '    display: none;\n'
+                + '}\n'
+                + 'div#' + this.CONSOLE_KEYBOARD_ID + ' .title {\n'
+                + '    text-align: center;\n'
+                + '}\n'
+                + 'div#' + this.CONSOLE_KEYBOARD_ID + ' .keyboard {\n'
+                + '    border-top: 1px solid #F2F2F2;\n'
+                + '}\n'
+                + 'div#' + this.CONSOLE_KEYBOARD_ID + ' .operator {\n'
+                + '    text-align: center;\n'
                 + '}\n'
                 + 'div#' + this.CONSOLE_KEYBOARD_ID + ' .button {\n'
                 + '    cursor: pointer;\n'
-                + '    text-align: center;\n'
-                + '    float: left;'
-                + '    width: 25px;\n'
+                + '    display: inline-block;\n'
+                + '    color: #d9eef7;\n'
+                + '    padding: .2em 1.25em .4em;\n'
+                + '    margin: 3px;\n'
+                + '    border: solid 1px #0076a3;\n'
+                + '    -webkit-border-radius: .5em;\n'
+                + '    -moz-border-radius: .5em;\n'
+                + '    border-radius: .5em;\n'
+                + '    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);\n'
+                + '    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.2);\n'
+                + '    box-shadow: 0 1px 2px rgba(0,0,0,.2);\n'
+                + '    background: #0095cd;\n'
+                + '    background: -webkit-gradient(linear, left top, left bottom, from(#00adee), to(#0078a5));\n'
+                + '    background: -moz-linear-gradient(top,  #00adee,  #0078a5);\n'
+                + '    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr=\'#00adee\', endColorstr=\'#0078a5\');\n'
                 + '}\n'
-                + 'div#' + this.CONSOLE_CODE_ASSIST_ID + ' {\n'
+                + 'div#' + this.CONSOLE_KEYBOARD_ID + ' .button:hover {\n'
+                + '    background: #007ead;\n'
+                + '    background: -webkit-gradient(linear, left top, left bottom, from(#0095cc), to(#00678e));\n'
+                + '    background: -moz-linear-gradient(top,  #0095cc,  #00678e);\n'
+                + '    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr=\'#0095cc\', endColorstr=\'#00678e\');\n'
+                + '}\n'
+                + 'div#' + this.CONSOLE_KEYBOARD_ID + ' .button:active {\n'
+                + '    position: relative;\n'
+                + '    top: 1px;\n'
+                + '    color: #80bed6;\n'
+                + '    background: -webkit-gradient(linear, left top, left bottom, from(#0078a5), to(#00adee));\n'
+                + '    background: -moz-linear-gradient(top,  #0078a5,  #00adee);\n'
+                + '    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr=\'#0078a5\', endColorstr=\'#00adee\');\n'
+                + '}\n'
+                + 'ul#' + this.CONSOLE_CODE_ASSIST_ID + ' {\n'
+                + '    padding: 0;\n'
                 + '    font-size: 15px;\n'
+                + '    line-height: 18px;\n'
                 + '    text-align: left;\n'
                 + '    overflow: auto;\n'
                 + '    border: solid 1px gray;\n'
@@ -48541,11 +56139,12 @@ Jeeel.Debug.Console = {
                 + '    overflow-x: hidden;\n'
                 + '    overflow-y: auto;\n'
                 + '    background-color: white;\n'
-                + '    max-height: 210px;\n'
-                + '    _height: 210px;\n'
+                + '    max-height: 200px;\n'
+                + '    _height: 200px;\n'
                 + '}\n'
-                + 'div#' + this.CONSOLE_CODE_ASSIST_ID + ' div {\n'
-                + '    padding: 2px;\n'
+                + 'ul#' + this.CONSOLE_CODE_ASSIST_ID + ' li {\n'
+                + '    list-style-type: none;\n'
+                + '    padding: 1px 20px 1px 2px;\n'
                 + '    cursor: pointer;\n'
                 + '}';
 
@@ -48705,6 +56304,8 @@ Jeeel.Debug.Console = {
     
     /**
      * コード補完ウィンドウを表示させる
+     * 
+     * @ignore
      */
     _codeAssistWindowShow: function () {
         var left = this._codeAssistData.index * 10 + 20;
@@ -48717,6 +56318,8 @@ Jeeel.Debug.Console = {
     
     /**
      * コード補完ウィンドウを非表示にする
+     * 
+     * @ignore
      */
     _codeAssistWindowHide: function () {
         this._consoleCodeAssistWindow.hide();
@@ -48725,6 +56328,8 @@ Jeeel.Debug.Console = {
     
     /**
      * コード補完に必要なデータを更新する
+     * 
+     * @ignore
      */
     _setCodeAssistData: (function () {
         var txtReg = /(^|[;:{}(\[\] ])([a-zA-Z$_][a-zA-Z0-9$_.]*)\.(|[a-zA-Z$_][a-zA-Z0-9$_]*)$/;
@@ -48800,7 +56405,7 @@ Jeeel.Debug.Console = {
                     }
 
                     try {
-                        caData.pairs = Jeeel.Hash.getPairs(target, true);
+                        caData.pairs = Jeeel.Hash.getPairs(target, true, true);
                     } catch(e) {
                         this._codeAssistDataClose(true);
                         return;
@@ -48864,7 +56469,7 @@ Jeeel.Debug.Console = {
             }
 
             var elm = this._consoleCodeAssistWindow;
-            var divs = [];
+            var lis = [];
             var self = this;
 
             if (caData.winChild) {
@@ -48873,31 +56478,40 @@ Jeeel.Debug.Console = {
 
             for (i = 0, l = keys.length; i < l; i++) {
                 var key = keys[i];
-                var div = Jeeel.Document.createElement('div');
-                div.innerHTML = key;
+                var li = Jeeel.Document.createElement('li');
+                li.innerHTML = key;
 
-                div.onclick = function () {
+                /**
+                 * @ignore
+                 */
+                li.onclick = function () {
                     self._replaceLog(arguments.callee.data);
                 };
 
-                div.onclick.data = key;
+                li.onclick.data = key;
 
-                divs[i] = div;
+                lis[i] = li;
             }
 
-            caData.winChild = new Jeeel.Dom.ElementOperator(divs);
+            caData.winChild = new Jeeel.Dom.ElementOperator(lis);
 
-            elm.appendChild(divs);
+            elm.appendChild(lis);
             this._codeAssistWindowShow();
         }
     })(),
     
+    /**
+     * @ignore
+     */
     _setCodeData: function (index, divs) {
         var self = this;
         var key = this._codeAssistData.keys[index];
         var div = this._codeAssistData.winChild[index] || Jeeel.Document.createElement('div');
         div.innerHTML = key;
 
+        /**
+         * @ignore
+         */
         div.onclick = function () {
             self._replaceLog(arguments.callee.data);
         };
@@ -48909,6 +56523,8 @@ Jeeel.Debug.Console = {
     
     /**
      * コード補完の候補を選択する
+     * 
+     * @ignore
      */
     _selectCodeAssistData: function (advanceIndex) {
         var caData = this._codeAssistData;
@@ -48927,13 +56543,23 @@ Jeeel.Debug.Console = {
         caData.winChild.$GET(caData.selectIndex).setCss('backgroundColor', '#FFF');
         
         caData.winChild.$GET(index).setCss('backgroundColor', '#FFD700');
-//        caData.winChild.$GET(index).get().;
-        
+
         caData.selectIndex = index;
+        
+        var top = index * 20;
+        var pos = this._consoleCodeAssistWindow.getScrollPos();
+        
+        if (pos.y < (top - 180)) {
+            this._consoleCodeAssistWindow.scroll(0, top - 180);
+        } else if (pos.y > top) {
+            this._consoleCodeAssistWindow.scroll(0, top);
+        }
     },
     
     /**
      * 選択されているコード補完候補を使用して適用する
+     * 
+     * @ignore
      */
     _selectCodeAssistDataExecute: function () {
         var caData = this._codeAssistData;
@@ -48953,6 +56579,8 @@ Jeeel.Debug.Console = {
 
     /**
      * 補完データを選択した時に現在の値を書き換える
+     * 
+     * @ignore
      */
     _replaceLog: function (key) {
         var txt = this._consoleIn.getText();
@@ -48964,20 +56592,37 @@ Jeeel.Debug.Console = {
         this._consoleIn.setSelectionStart(txt.length);
     },
     
+    /**
+     * ソフトウェアキーボードの初期化を行う
+     * 
+     * @ignore
+     */
     _initKeyboard: function () {
         var keyboard = this._consoleKeyboard;
         
+        var keyboardArea = Jeeel.Document.createElement('div');
         var keyInputer = Jeeel.Document.createElement('div');
         var consoleOperator = Jeeel.Document.createElement('div');
         
+        keyboardArea.className = 'keyboard';
+        consoleOperator.className = 'operator';
+        
         var button, type, keyTypes = [
-//            {txt: '{' , dispatch: function (){}},
-//            {txt: '}' , key: Jeeel.Code.KeyCode.RightBracket, shift: true, ctrl: false},
-//            {txt: '[' , key: Jeeel.Code.KeyCode.LeftBracket, shift: false, ctrl: false},
-//            {txt: ']' , key: Jeeel.Code.KeyCode.RightBracket, shift: false, ctrl: false}
+//            {txt: '{' , dispatch: Jeeel.Function.Template.EMPTY},
+//            {txt: '}' , key: Jeeel.Dom.Event.KeyCode.RightBracket, shift: true, ctrl: false},
+//            {txt: '[' , key: Jeeel.Dom.Event.KeyCode.LeftBracket, shift: false, ctrl: false},
+//            {txt: ']' , key: Jeeel.Dom.Event.KeyCode.RightBracket, shift: false, ctrl: false}
         ], operatorTypes = [
             {txt: '↑' , dispatch: function (){this._consoleUp();}},
-            {txt: '↓' , dispatch: function (){this._consoleDown();}}
+            {txt: '↓' , dispatch: function (){this._consoleDown();}},
+            {txt: Jeeel.Code.HtmlCode.CarriageReturn , dispatch: function (){
+                    if (this._codeAssistData.enable || ! this._consoleIn.getText()) {
+                        Jeeel.Timer.setTimeout(this._setCodeAssistData, 1);
+                    }
+                    
+                    this._evalConsoleText();
+                }
+            }
         ];
         
         var self = this, consoleIn = this._consoleIn.getElement();
@@ -48987,6 +56632,10 @@ Jeeel.Debug.Console = {
             
             button = Jeeel.Document.createElement('div');
             button.innerHTML = type.txt;
+            
+            /**
+             * @ignore
+             */
             button.onclick = function () {
                 var op = new Jeeel.Dom.Event.Option();
                 op.setKeyCodeArg(type.key)
@@ -49005,20 +56654,31 @@ Jeeel.Debug.Console = {
             button = Jeeel.Document.createElement('div');
             button.className = 'button';
             button.innerHTML = type.txt;
+            
+            /**
+             * @ignore
+             */
             button.onclick = function () {
                 arguments.callee.type.dispatch.call(self);
-                Jeeel.Dom.Event.getEventObject().stop();
+                
+                return false;
             };
             
             button.onclick.type = type;
+            button.onmousemove = Jeeel.Function.Template.RETURN_FALSE;
             
             consoleOperator.appendChild(button);
         }
         
-        keyboard.appendChild(keyInputer);
-        keyboard.appendChild(consoleOperator);
+        keyboardArea.appendChild(keyInputer);
+        keyboardArea.appendChild(consoleOperator);
+        
+        keyboard.appendChild(keyboardArea);
     },
     
+    /**
+     * @ignore
+     */
     _appendLogText: function (appendText) {
         
         var txt = this._consoleIn.getText() + appendText;
@@ -49042,7 +56702,7 @@ Jeeel.directory.Jeeel.Debug.Profiler = {
 };
 
 /**
- * メソッドのプロファイリング機能を提供するスタティッククラス
+ * @staticClass メソッドのプロファイリング機能を提供するスタティッククラス
  */
 Jeeel.Debug.Profiler = {
   
@@ -50277,7 +57937,7 @@ Jeeel.directory.Jeeel.Debug.Debugger = {
 };
 
 /**
- * 専門的なデバッグを行うためのモジュール等を保持するネームスペース
+ * @staticClass 専門的なデバッグを行うためのモジュール等を保持するスタティッククラス
  */
 Jeeel.Debug.Debugger = {
 
@@ -50605,11 +58265,20 @@ Jeeel.Debug.Debugger = {
     /**
      * 呼び出し元のメソッドのトレースを取得する
      *
+     * @param {Integer} [nestCount]
      * @return {Jeeel.Object.Technical.Trace[]} トレース内容のリスト
      */
-    getTrace: function () {
+    getTrace: function (nestCount) {
         var res = [];
         var func = arguments.callee;
+        
+        if ( ! (nestCount >= 0)) {
+            nestCount = 0;
+        }
+        
+        while(func.caller && nestCount--) {
+            func = func.caller;
+        }
 
         while(func.caller) {
 
@@ -50639,16 +58308,33 @@ Jeeel.Debug.Debugger = {
             return false;
         } else if (this.INFORMATION_NAME in object) {
             return false;
+        } else if (object instanceof Jeeel.Session.Core) {
+            return false;
         }
+        
+        var isPrototype = arguments[4];
 
         if (Jeeel.Type.isFunction(object) && object.prototype) {
             object.prototype.constructor = object;
         }
         
-        object[this.INFORMATION_NAME] = new Jeeel.Object.Technical.Information(name, arguments[3]);
+        if (isPrototype) {
+            object[this.INFORMATION_NAME] = new Jeeel.Object.Technical.Information(name + '.prototype', arguments[3]);
+        } else {
+            object[this.INFORMATION_NAME] = new Jeeel.Object.Technical.Information(name, arguments[3]);
+        }
 
         if (deepSet) {
-            for (var property in object) {
+            var keys = Jeeel.Hash.getKeys(object);
+            
+            if (Jeeel.Type.isFunction(object) && object.prototype) {
+                keys.push('prototype');
+            }
+            
+            for (var i = 0, l = keys.length; i < l; i++) {
+                
+                var property = keys[i];
+                
                 if (property === 'constructor') {
                     continue;
                 } else if ( ! object.hasOwnProperty(property)) {
@@ -50656,7 +58342,13 @@ Jeeel.Debug.Debugger = {
                 }
                 
                 try {
-                    arguments.callee.call(this, object[property], name + '.' + property, deepSet, object);
+                    var childName = isPrototype ? name + '#' + property : name + '.' + property;
+                    
+                    if (property === 'prototype') {
+                        childName = name;
+                    }
+
+                    this.setInformation(object[property], childName, deepSet, object, property === 'prototype');
                 } catch (e) {}
             }
         }
@@ -50751,7 +58443,7 @@ Jeeel.Debug.Debugger = {
     }
 };
 
-Jeeel.file.Jeeel.Debug.Debugger = ['Observer', 'StackTracer', 'Profiler'];
+Jeeel.file.Jeeel.Debug.Debugger = [];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Debug.Debugger, Jeeel.file.Jeeel.Debug.Debugger);
 
@@ -50761,12 +58453,15 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Debug.Debugger, Jeeel.file.Jeeel.Debug.
         return;
     }
 
+    // 現在のJeeelを保存
     var Jeeel = window.Jeeel;
 
     var listener =  function () {
         var state = document.readyState.toLowerCase();
         
-        if (state.match(/loaded|complete/) && ((Jeeel.Object || {}).Technical || {}).Information) {
+        if (state.match(/loaded|complete/) && Jeeel.Object && Jeeel.Object.Technical && Jeeel.Object.Technical.Information) {
+          
+            // 現在のJeeelと保存したJeeelが同一の場合のみ実行
             if (Jeeel === window.Jeeel) {
                 Jeeel.Debug.Debugger.setInformation(Jeeel, 'Jeeel', true, window);
             }
@@ -50779,192 +58474,11 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Debug.Debugger, Jeeel.file.Jeeel.Debug.
 
 })();
 
-/**
- * 未完成
- *
- * @ignore
- */
-Jeeel.Debug.Debugger.Observer = function () {
-    this._listeners = [];
-    this._observing = false;
-};
-
-Jeeel.Debug.Debugger.Observer.prototype = {
-
-    /**
-     * @type Function[]
-     * @private
-     */
-    _listeners: [],
-
-    /**
-     * @type Boolean
-     * @private
-     */
-    _observing: false,
-
-    observe: function (object, name, deepObserve) {
-
-        var self = this;
-        
-        name = name || object.constructor.name;
-
-        for (var property in object) {
-
-            if (Jeeel.Type.isFunction(object[property])) {
-                if ('_jeeel_observe' in object[property]) {
-                    return;
-                } else if ('ignore' in object[property]) {
-                    continue;
-                }
-
-                var method = object[property];
-
-                object[property] = (function (name_, property_, method_) {
-
-                    return function () {
-                        if (self._observing) {
-                            self._notifyBeforeCall(name_, property_, arguments);
-                        }
-
-                        var rv =  method_.apply(this, arguments);
-
-                        if (self._observing) {
-                            self._notifyAfterCall(name_, property_, arguments);
-                        }
-                        
-                        return rv;
-                    };
-                })(name, property, method);
-
-                for (var staticProperty in method) {
-                    object[property][staticProperty] = method[staticProperty];
-                }
-
-                object[property].prototype = method.prototype;
-                object[property]._jeeel_observe = true;
-            }
-            
-            if (deepObserve) {
-                var ObjName;
-
-                if (Jeeel.Type.isHash(object[property])) {
-                    ObjName = name + '.' + property;
-                    arguments.callee.call(self, object[property], ObjName, deepObserve);
-                }
-                else if (Jeeel.Type.isFunction(object[property])) {
-                    ObjName = name + '#' + property;
-                    arguments.callee.call(self, object[property], ObjName, deepObserve);
-                }
-            }
-        }
-    },
-
-    addListener: function (listener) {
-        this._listeners.push(listener);
-
-        return this;
-    },
-
-    start: function () {
-        this._observing = true;
-
-        return this;
-    },
-
-    stop: function () {
-        this._observing = false;
-
-        return this;
-    },
-
-    _notifyBeforeCall: function (name, property, args) {
-        this._observing = false;
-
-        for(var i = 0; i < this._listeners.length; i++) {
-            this._listeners[i].beforeCall(name, property, args);
-        }
-
-        this._observing = true;
-    },
-
-    _notifyAfterCall: function (name, property, args) {
-        this._observing = false;
-
-        for(var i = 0; i < this._listeners.length; i++) {
-            this._listeners[i].afterCall(name, property, args);
-        }
-
-        this._observing = true;
-    }
-};
-
-/**
- * 未完成
- *
- * @ignore
- */
-Jeeel.Debug.Debugger.StackTracer = function () {
-    this._stack = [];
-};
-
-Jeeel.Debug.Debugger.StackTracer.StackObj = function (name, property, args) {
-    this.parent = name;
-    this.method = property;
-    this.args   = args;
-    this.toString = function () {
-        return this.parent + '::' + this.method;
-    };
-};
-
-Jeeel.Debug.Debugger.StackTracer.prototype = {
-    _stack: [],
-
-    beforeCall: function (name, property, args) {
-        var obj = new Jeeel.Debug.Debugger.StackTracer.StackObj(name, property, args);
-        this._stack.push(obj);
-    },
-
-    afterCall: function (name, property, args) {
-        this._stack.pop();
-    }
-};
-
-
-/**
- * 未完成
- *
- * @ignore
- */
-Jeeel.Debug.Debugger.Profiler = function () {
-    this._records = {};
-    this._start = null;
-};
-
-Jeeel.Debug.Debugger.Profiler.prototype = {
-
-    _records: {},
-    _start: null,
-
-    beforeCall: function (name, property, args) {
-        this._start = new Date();
-    },
-
-    afterCall: function (name, property, args) {
-        var key = name + "::" + property;
-
-        if (typeof this._records[key] == "undefined"){
-            this._records[key] = [];
-        }
-        
-        this._records[key].push( (new Date()) - this._start);
-    }
-};
-
 (function (createPacker) {
 
     /**
-     * 未完成
+     * @staticClass ファイルを圧縮するスタティッククラス
+     * @ignore 未完成
      */
     Jeeel.Debug.Compressor = {
         
@@ -50992,7 +58506,10 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
     };
 
 })(function() {
-  
+    
+    /**
+     * @ignore
+     */
     var base2 = {
         name: "base2",
         version: "1.0.1(pre)",
@@ -51113,6 +58630,10 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                 ancestorOf: delegate(_11),
                 extend: _9,
                 forEach: delegate(_8),
+                
+                /**
+                 * @ignore
+                 */
                 implement: function(a) {
                     if (typeof a == "function") {
                         if (_11(Base, a)) {
@@ -51239,7 +58760,7 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                 return d;
             }}
         );
-          
+        
         
         function _12(a, b) {
             for (var c in b) {
@@ -51538,6 +59059,10 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                 if (arguments.length == 1) {
                     var l = this;
                     var m = this[_15];
+                    
+                    /**
+                     * @ignore
+                     */
                     j = function(a) {
                         if (a) {
                             var b, c = 1, i = 0;
@@ -51600,7 +59125,7 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                         } else {
                             var Q = /'/.test(b.replace(/\\./g, "")) ? '"' : "'";
                             b = b.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\$(\d+)/g, Q + "+(arguments[$1]||" + Q + Q + ")+" + Q);
-                            b = new Function("return " + Q + b.replace(/(['"])\1\+(.*)\+\1\1$/, "$1") + Q)
+                            b = new Function("return " + Q + b.replace(/(['"])\1\+(.*)\+\1\1$/, "$1") + Q);
                         }
                     }
                     this.length = RegGrp.count(a);
@@ -51618,25 +59143,46 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                 }, this)
             }};
         if ((new Date).getYear() > 1900) {
+            /**
+             * @ignore
+             */
             Date.prototype.getYear = function() {
                 return this.getFullYear() - 1900
             };
+            
+            /**
+             * @ignore
+             */
             Date.prototype.setYear = function(a) {
                 return this.setFullYear(a + 1900)
             }
         }
-        Function.prototype.prototype = {};
+        
+        /**
+         * @ignore
+         */
+        (Function || {}).prototype.prototype = {};
+        
         if ("".replace(/^/, K("$$")) == "$") {
             extend(String.prototype, "replace", function(a, b) {
                 if (typeof b == "function") {
                     var c = b;
+                    
+                    /**
+                     * @ignore
+                     */
                     b = function() {
                         return String(c.apply(null, arguments)).split("$").join("$$")
-                    }
+                    };
                 }
-                return this.base(a, b)
-            })
+                
+                return this.base(a, b);
+            });
         }
+        
+        /**
+         * @ignore
+         */
         var Array2 = _23(Array, Array, "concat,join,pop,push,reverse,shift,slice,sort,splice,unshift", [Enumerable, {combine: function(d, e) {
                     if (!e)
                         e = d;
@@ -51711,14 +59257,20 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                     return a
                 }}]);
         Array2.reduce = Enumerable.reduce;
+        
+        /**
+         * @ignore
+         */
         Array2.like = function(a) {
             return !!(a && typeof a == "object" && typeof a.length == "number")
         };
+        
         var _25 = /^((-\d+|\d{4,})(-(\d{2})(-(\d{2}))?)?)?T((\d{2})(:(\d{2})(:(\d{2})(\.(\d{1,3})(\d)?\d*)?)?)?)?(([+-])(\d{2})(:(\d{2}))?|Z)?$/;
         var _26 = {FullYear: 2,Month: 4,Date: 6,Hours: 8,Minutes: 10,Seconds: 12,Milliseconds: 14};
         var _27 = {Hectomicroseconds: 15,UTC: 16,Sign: 17,Hours: 18,Minutes: 20};
         var _28 = /(((00)?:0+)?:0+)?\.0+$/;
         var _29 = /(T[0-9:.]+)$/;
+        
         var Date2 = _23(Date, function(a, b, c, h, m, s, d) {
             switch (arguments.length) {
                 case 0:
@@ -51728,26 +59280,43 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                 default:
                     return new Date(a, b, arguments.length == 2 ? 1 : c, h || 0, m || 0, s || 0, d || 0)
             }
-        }, "", [{toISOString: function(c) {
+        }, "", [{
+            toISOString: function(c) {
                     var d = "####-##-##T##:##:##.###";
+                    
                     for (var e in _26) {
                         d = d.replace(/#+/, function(a) {
                             var b = c["getUTC" + e]();
-                            if (e == "Month")
+                            if (e == "Month") {
                                 b++;
-                            return ("000" + b).slice(-a.length)
-                        })
+                            }
+                            
+                            return ("000" + b).slice(-a.length);
+                        });
                     }
-                    return d.replace(_28, "").replace(_29, "$1Z")
-                }}]);
+                    
+                    return d.replace(_28, "").replace(_29, "$1Z");
+                }
+            }
+        ]);
+            
+        /**
+         * @ignore
+         */
         Date2.now = function() {
-            return (new Date).valueOf()
+            return (new Date).valueOf();
         };
+        
+        /**
+         * @ignore
+         */
         Date2.parse = function(a, b) {
             if (arguments.length > 1) {
-                assertType(b, "number", "defaultDate should be of type 'number'.")
+                assertType(b, "number", "defaultDate should be of type 'number'.");
             }
+            
             var c = String(a).match(_25);
+            
             if (c) {
                 if (c[_26.Month])
                     c[_26.Month]--;
@@ -51774,9 +59343,17 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                 return Date.parse(a)
             }
         };
+        
+        /**
+         * @ignore
+         */
         var String2 = _23(String, function(a) {
             return new String(arguments.length == 0 ? "" : a)
         }, "charAt,charCodeAt,concat,indexOf,lastIndexOf,match,replace,search,slice,split,substr,substring,toLowerCase,toUpperCase", [{trim: trim}]);
+        
+        /**
+         * @ignore
+         */
         function _23(c, d, e, f) {
             var g = Module.extend();
             forEach(e.match(/\w+/g), function(a) {
@@ -51799,7 +59376,10 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                 delete h.forEach;
             return h
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function extend(a, b) {
             if (a && b) {
                 if (arguments.length > 2) {
@@ -51845,7 +59425,10 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
             }
             return a
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function _11(a, b) {
             while (b) {
                 if (!b.ancestor)
@@ -51856,9 +59439,16 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
             }
             return false
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function _22(c, d, e) {
             var f = c[d];
+            
+            /**
+             * @ignore
+             */
             function _30() {
                 var a = this.base;
                 this.base = f;
@@ -51866,35 +59456,50 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                 this.base = a;
                 return b
             }
-            ;
+            
             _30.ancestor = f;
             _30.method = e;
+            
+            /**
+             * @ignore
+             */
             _30.toString = function() {
                 return String(e)
             };
-            c[d] = _30
+            
+            c[d] = _30;
         }
-        ;
+        
         if (typeof StopIteration == "undefined") {
             StopIteration = new Error("StopIteration")
         }
+        
+        /**
+         * @ignore
+         */
         function forEach(a, b, c, d) {
-            if (a == null)
+            if (a == null) {
                 return;
+            }
+            
             if (!d) {
                 if (typeof a == "function" && a.call) {
-                    d = Function
+                    d = Function;
                 } else if (typeof a.forEach == "function" && a.forEach != arguments.callee) {
                     a.forEach(b, c);
-                    return
+                    return;
                 } else if (typeof a.length == "number") {
                     _24(a, b, c);
-                    return
+                    return;
                 }
             }
-            _8(d || Object, a, b, c)
+            
+            _8(d || Object, a, b, c);
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function _24(a, b, c) {
             if (a == null)
                 return;
@@ -51910,7 +59515,10 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                 }
             }
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function _8(g, h, j, k) {
             var l = function() {
                 this.i = 1
@@ -51936,7 +59544,10 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
             };
             _8(g, h, j, k)
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function instanceOf(a, b) {
             if (typeof b != "function") {
                 throw new TypeError("Invalid 'instanceOf' operand.");
@@ -51970,13 +59581,19 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
             }
             return false
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function assert(a, b, c) {
             if (!a) {
                 throw new (c || Error)(b || "Assertion failed.");
             }
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function assertArity(a, b, c) {
             if (b == null)
                 b = a.callee.length;
@@ -51984,110 +59601,178 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                 throw new SyntaxError(c || "Not enough arguments.");
             }
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function assertType(a, b, c) {
             if (b && (typeof b == "function" ? !instanceOf(a, b) : typeof a != b)) {
                 throw new TypeError(c || "Invalid type.");
             }
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function assignID(a) {
-            if (!a.base2ID)
+            if (!a.base2ID) {
                 a.base2ID = "b2_" + counter();
-            return a.base2ID
+            }
+            
+            return a.base2ID;
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function counter() {
-            return _7++
+            return _7++;
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function copy(a) {
+          
+            /**
+             * @ignore
+             */
             var b = function() {
             };
+            
             b.prototype = a;
-            return new b
+            
+            return new b;
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function format(c) {
             var d = arguments;
             var e = new RegExp("%([1-" + arguments.length + "])", "g");
+            
             return String(c).replace(e, function(a, b) {
-                return b < d.length ? d[b] : a
-            })
+                return b < d.length ? d[b] : a;
+            });
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function match(a, b) {
             return String(a).match(b) || []
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function rescape(a) {
             return String(a).replace(_3, "\\$1")
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function trim(a) {
-            return String(a).replace(_1, "").replace(_2, "")
+            return String(a).replace(_1, "").replace(_2, "");
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function I(i) {
-            return i
+            return i;
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function K(k) {
             return function() {
-                return k
+                return k;
             }
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function bind(a, b) {
             var c = slice(arguments, 2);
+            
+            /**
+             * @ignore
+             */
             var d = function() {
-                return a.apply(b, c.concat(slice(arguments)))
+                return a.apply(b, c.concat(slice(arguments)));
             };
+            
             d._31 = assignID(a);
-            return d
+            
+            return d;
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function delegate(a, b) {
             return function() {
-                return a.apply(b, [this].concat(slice(arguments)))
-            }
+                return a.apply(b, [this].concat(slice(arguments)));
+            };
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function flip(a) {
             return function() {
-                return a.apply(this, Array2.swap(arguments, 0, 1))
-            }
+                return a.apply(this, Array2.swap(arguments, 0, 1));
+            };
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function not(a) {
             return function() {
-                return !a.apply(this, arguments)
-            }
+                return !a.apply(this, arguments);
+            };
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function partial(a) {
             var b = slice.call(arguments, 1);
+            
             return function() {
-                return a.apply(this, b.concat(slice(arguments)))
-            }
+                return a.apply(this, b.concat(slice(arguments)));
+            };
         }
-        ;
+        
+        /**
+         * @ignore
+         */
         function unbind(b) {
             return function(a) {
                 return b.apply(a, slice(arguments, 1))
             }
         }
-        ;
+        
+        
         base2 = new Package(this, base2);
         eval(this.exports);
         base2.extend = extend;
         forEach(Enumerable, function(a, b) {
-            if (!Module[b])
-                base2.addName(b, bind(a, Enumerable))
+            if (!Module[b]) {
+                base2.addName(b, bind(a, Enumerable));
+            }
         });
+        
         JavaScript = new Package(this, JavaScript);
-        eval(this.exports)
+        eval(this.exports);
     };
+    
     new function(_) {
         var DOM = new base2.Package(this, {name: "DOM",version: "1.0 (beta 1)",exports: "Interface, Binding, Node, Document, Element, AbstractView, Event, EventTarget, DocumentEvent, " + "NodeSelector, DocumentSelector, ElementSelector, StaticNodeList, " + "ViewCSS, HTMLDocument, HTMLElement, Selector, Traversal, XPathParser",bind: function(a) {
                 if (a && a.nodeType) {
@@ -52135,11 +59820,18 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                 closures[e] = b;
                 b = null;
                 c = null;
-                if (!closures[d])
+                if (!closures[d]) {
                     closures[d] = {};
+                }
+                
                 var f = closures[d][e];
-                if (f)
+                if (f) {
                     return f;
+                }
+                
+                /**
+                 * @ignore
+                 */
                 var g = function() {
                     var a = document.all[d];
                     return a ? closures[e].apply(a, arguments) : undefined
@@ -52148,10 +59840,13 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                 closures[d][e] = g;
                 return g
             });
+            
             attachEvent("onunload", function() {
-                closures = null
-            })
+                closures = null;
+            });
         }
+        
+        
         var Interface = Module.extend(null, {implement: function(c) {
                 if (typeof c == "object") {
                     forEach(c, function(a, b) {
@@ -52186,18 +59881,21 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
             }});
         var Node = Binding.extend({"@!(element.compareDocumentPosition)": {compareDocumentPosition: function(a, b) {
                     if (Traversal.contains(a, b)) {
-                        return 4 | 16
+                        return 4 | 16;
                     } else if (Traversal.contains(b, a)) {
-                        return 2 | 8
+                        return 2 | 8;
                     }
+                    
                     var c = _34(a);
                     var d = _34(b);
+                    
                     if (c < d) {
-                        return 4
+                        return 4;
                     } else if (c > d) {
-                        return 2
+                        return 2;
                     }
-                    return 0
+                    
+                    return 0;
                 }}});
         var _34 = document.documentElement.sourceIndex ? function(a) {
             return a.sourceIndex
@@ -52423,20 +60121,28 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                     }}}});
         var DOMContentLoadedEvent = Base.extend({constructor: function(b) {
                 var c = false;
+                
+                /**
+                 * @ignore
+                 */
                 this.fire = function() {
                     if (!c) {
                         c = true;
+                        
                         setTimeout(function() {
                             var a = DocumentEvent.createEvent(b, "Events");
                             Event.initEvent(a, "DOMContentLoaded", false, false);
-                            EventTarget.dispatchEvent(b, a)
-                        }, 1)
+                            EventTarget.dispatchEvent(b, a);
+                        }, 1);
                     }
                 };
+                
                 EventTarget.addEventListener(b, "DOMContentLoaded", function() {
-                    c = true
+                    c = true;
                 }, false);
-                EventTarget.addEventListener(Traversal.getDefaultView(b), "load", this.fire, false)
+                
+                EventTarget.addEventListener(Traversal.getDefaultView(b), "load", this.fire, false);
+                
             },"@(attachEvent)": {constructor: function() {
                     this.base(document);
                     Traversal.getDefaultView(document).attachEvent("onload", this.fire)
@@ -52445,12 +60151,16 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                     if (a.readyState != "complete") {
                         var b = this;
                         a.write("<script id=__ready defer src=//:><\/script>");
+                        
+                        /**
+                         * @ignore
+                         */
                         a.all.__ready.onreadystatechange = function() {
                             if (this.readyState == "complete") {
                                 this.removeNode();
-                                b.fire()
+                                b.fire();
                             }
-                        }
+                        };
                     }
                 }},"@KHTML": {constructor: function(a) {
                     this.base(a);
@@ -52531,9 +60241,13 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
         var StaticNodeList = Base.extend({constructor: function(b) {
                 b = b || [];
                 this.length = b.length;
+                
+                /**
+                 * @ignore
+                 */
                 this.item = function(a) {
-                    return b[a]
-                }
+                    return b[a];
+                };
             },length: 0,forEach: function(a, b) {
                 for (var i = 0; i < this.length; i++) {
                     a.call(b, this.item(i), i, this)
@@ -52541,9 +60255,13 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
             },item: Undefined,"@(XPathResult)": {constructor: function(b) {
                     if (b && b.snapshotItem) {
                         this.length = b.snapshotLength;
+                        
+                        /**
+                         * @ignore
+                         */
                         this.item = function(a) {
                             return b.snapshotItem(a)
-                        }
+                        };
                     } else
                         this.base(b)
                 }}});
@@ -52844,7 +60562,12 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                         d = reg.length - 1
                     }
                     return "if(" + format(g, b, d) + "){"
-                }});
+                }
+            });
+            
+            /**
+             * @ignore
+             */
             Selector.parse = function(a) {
                 if (!_65[a]) {
                     reg = [];
@@ -52912,210 +60635,354 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
         var JSB = new base2.Package(this, {name: "JSB",version: "0.7",imports: "DOM",exports: "Behavior, Rule, RuleList"});
         eval(this.imports);
         var Behavior = Abstract.extend();
-        var Call = Base.extend({constructor: function(a, b, c, d) {
+        var Call = Base.extend({
+            constructor: function(a, b, c, d) {
+                /**
+                 * @ignore
+                 */
                 this.release = function() {
                     b.apply(a, c)
                 };
-                this.rank = d || (100 + Call.list.length)
-            }}, {list: [],defer: function(a, b) {
+                
+                this.rank = d || (100 + Call.list.length);
+            }
+        }, {
+            list: [],
+            
+            defer: function(a, b) {
                 return function() {
                     if (Call.list) {
-                        Call.list.push(new Call(this, a, arguments, b))
+                        Call.list.push(new Call(this, a, arguments, b));
                     } else {
-                        a.apply(this, arguments)
+                        a.apply(this, arguments);
                     }
-                }
-            },init: function() {
+                };
+            },
+            
+            init: function() {
                 EventTarget.addEventListener(document, "DOMContentLoaded", function() {
                     if (Call.list) {
                         DOM.bind(document);
                         Call.list.sort(function(a, b) {
                             return a.rank - b.rank
                         });
+                        
                         invoke(Call.list, "release");
                         delete Call.list;
+                        
                         setTimeout(function() {
+                          
                             var a = DocumentEvent.createEvent(document, "Events");
                             Event.initEvent(a, "ready", false, false);
-                            EventTarget.dispatchEvent(document, a)
-                        }, 1)
+                            EventTarget.dispatchEvent(document, a);
+                        }, 1);
                     }
-                }, false)
-            }});
+                }, false);
+            }
+        });
+        
         var _66 = /^on[a-z]+$/;
-        var Rule = Base.extend({constructor: function(e, f) {
+        
+        var Rule = Base.extend({
+            constructor: function(e, f) {
                 e = new Selector(e);
+                
                 if (Behavior.ancestorOf(f)) {
-                    f = f.prototype
+                    f = f.prototype;
                 }
+                
                 var g = {}, h = {}, i = f.style, j = {};
+                
                 forEach(f, function(a, b) {
                     if (b.charAt(0) == "@") {
                         if (detect(b.slice(1))) {
-                            forEach(a, arguments.callee)
+                            forEach(a, arguments.callee);
                         }
                     } else if (typeof a == "function" && _66.test(b)) {
-                        h[b.slice(2)] = a
+                        h[b.slice(2)] = a;
                     } else if (b != "style") {
-                        g[b] = a
+                        g[b] = a;
                     }
                 });
+                
                 function addBehavior(a) {
                     var b = assignID(a);
+                    
                     if (!j[b]) {
                         j[b] = true;
                         DOM.bind(a);
                         extend(a, g);
                         extend(a.style, i);
+                        
                         for (var c in h) {
                             var target = a;
                             var d = h[c];
                             if (c.indexOf("document") == 0) {
                                 target = document;
                                 c = c.slice(8);
-                                d = bind(d, a)
+                                d = bind(d, a);
                             }
-                            target.addEventListener(c, d, false)
+                            
+                            target.addEventListener(c, d, false);
                         }
                     }
                 }
-                ;
+                
                 this.refresh = Call.defer(function() {
-                    e.exec(document).forEach(addBehavior)
+                    e.exec(document).forEach(addBehavior);
                 });
+                
                 this.toString = K(String(e));
                 this.refresh()
-            },refresh: Undefined});
-        var RuleList = Collection.extend({constructor: function(a) {
+            },
+            
+            refresh: Undefined
+        });
+        
+        var RuleList = Collection.extend({
+            constructor: function(a) {
                 this.base(a);
-                this.globalize()
-            },globalize: Call.defer(function() {
+                this.globalize();
+            },
+            
+            globalize: Call.defer(function() {
                 var e = /[^\s,]+/g;
                 var f = /^#[\w-]+$/;
                 forEach(this, function(c, d) {
                     forEach(match(d, e), function(a) {
                         if (f.test(a)) {
                             var b = ViewCSS.toCamelCase(a.slice(1));
-                            window[b] = Document.querySelector(document, a)
+                            window[b] = Document.querySelector(document, a);
                         }
-                    })
+                    });
                 })
-            }, 10),refresh: function() {
-                this.invoke("refresh")
-            }}, {Item: Rule});
-        eval(this.exports)
+            }, 10),
+            
+            refresh: function() {
+                this.invoke("refresh");
+            }
+        }, {Item: Rule});
+        
+        eval(this.exports);
     };
+    
     eval(base2.namespace);
+    
     var DEFAULT = "@0";
     var IGNORE = RegGrp.IGNORE;
-    var Colorizer = RegGrp.extend({constructor: function(c, d, e) {
+    
+    var Colorizer = RegGrp.extend({
+        constructor: function(c, d, e) {
             this.extend(e);
             this.patterns = c || {};
+            
             var f = {}, i;
+            
             forEach(c, function(a, b) {
-                f[b] = d[b] || DEFAULT
+                f[b] = d[b] || DEFAULT;
             });
+            
             forEach(d, function(a, b) {
-                f[b] = d[b]
+                f[b] = d[b];
             });
-            this.base(f)
-        },patterns: null,tabStop: 4,urls: true,copy: function() {
+            
+            this.base(f);
+        },
+        
+        patterns: null,
+        
+        tabStop: 4,
+        
+        urls: true,
+        
+        copy: function() {
             var a = this.base();
             a.patterns = copy(this.patterns);
-            return a
-        },exec: function(a, b) {
+            
+            return a;
+        }, 
+        
+        exec: function(a, b) {
             a = this.base(this.escape(a));
-            if (!b) {
+            
+            if ( ! b) {
                 a = this._67(a);
-                if (this.urls)
-                    a = Colorizer.urls.exec(a)
-            }
-            return this.unescape(a)
-        },escape: function(a) {
-            return String(a).replace(/</g, "\x01").replace(/&/g, "\x02")
-        },put: function(c, d) {
-            if (!instanceOf(c, RegGrp.Item)) {
-                if (typeof d == "string") {
-                    d = d.replace(/@(\d)/, function(a, b) {
-                        return format(Colorizer.FORMAT, c, b)
-                    })
+                
+                if (this.urls) {
+                    a = Colorizer.urls.exec(a);
                 }
-                c = this.patterns[c] || Colorizer.patterns[c] || c;
-                if (instanceOf(c, RegExp))
-                    c = c.source;
-                c = this.escape(c)
             }
-            return this.base(c, d)
-        },unescape: function(a) {
-            return a.replace(/\x01/g, "&lt;").replace(/\x02/g, "&amp;")
-        },_67: function(c) {
+            
+            return this.unescape(a);
+        },
+        
+        escape: function(a) {
+            return String(a).replace(/</g, "\x01").replace(/&/g, "\x02");
+        },
+        
+        put: function(c, d) {
+            if ( ! instanceOf(c, RegGrp.Item)) {
+                if (typeof d === "string") {
+                    d = d.replace(/@(\d)/, function(a, b) {
+                        return format(Colorizer.FORMAT, c, b);
+                    });
+                }
+                
+                c = this.patterns[c] || Colorizer.patterns[c] || c;
+                
+                if (instanceOf(c, RegExp)) {
+                    c = c.source;
+                }
+                
+                c = this.escape(c);
+            }
+            
+            return this.base(c, d);
+        },
+        
+        unescape: function(a) {
+            return a.replace(/\x01/g, "&lt;").replace(/\x02/g, "&amp;");
+        },
+        
+        _67: function(c) {
             var d = this.tabStop;
+            
             if (d > 0) {
                 var e = Array(d + 1).join(" ");
+                
                 return c.replace(Colorizer.TABS, function(a) {
                     a = a.replace(Colorizer.TAB, e);
                     if (d > 1) {
                         var b = (a.length - 1) % d;
-                        if (b)
-                            a = a.slice(0, -b)
+                        
+                        if (b) {
+                            a = a.slice(0, -b);
+                        }
                     }
-                    return a.replace(/ /g, "&nbsp;")
-                })
+                    
+                    return a.replace(/ /g, "&nbsp;");
+                });
             }
-            return c
-        },"@MSIE": {_67: function(a) {
-                return this.base(a).replace(/\r?\n/g, "<br>")
-            }}}, {version: "0.8",FORMAT: '<span class="%1">$%2</span>',DEFAULT: DEFAULT,IGNORE: IGNORE,TAB: /\t/g,TABS: /\n([\t \xa0]+)/g,init: function() {
+            
+            return c;
+        },
+        
+        "@MSIE": {
+            _67: function(a) {
+                return this.base(a).replace(/\r?\n/g, "<br>");
+            }
+        }
+    }, {
+        version: "0.8",
+        FORMAT: '<span class="%1">$%2</span>',
+        DEFAULT: DEFAULT,
+        IGNORE: IGNORE,
+        TAB: /\t/g,
+        TABS: /\n([\t \xa0]+)/g,
+        init: function() {
             forEach(this.patterns, function(c, d, e) {
                 if (instanceOf(c, Array)) {
                     e[d] = reduce(c, function(a, b) {
                         a.add(e[b]);
-                        return a
-                    }, new RegGrp)
+                        
+                        return a;
+                    }, new RegGrp);
                 }
             });
+            
             this.urls = this.patterns.urls.copy();
             this.urls.putAt(0, '<a href="mailto:$0">$0</a>');
-            this.urls.putAt(1, '<a href="$0">$0</a>')
-        },addScheme: function(a, b, c, d) {
-            this[a] = new this(b, c, d)
-        },patterns: {block_comment: /\/\*[^*]*\*+([^\/][^*]*\*+)*\//,email: /([\w.+-]+@[\w.-]+\.\w+)/,line_comment: /\/\/[^\r\n]*/,number: /\b\-?(0|[1-9]\d*)(\.\d+)?([eE][-+]?\d+)?\b/,string1: /'(\\.|[^'\\])*'/,string2: /"(\\.|[^"\\])*"/,url: /(http:\/\/+[\w\/\-%&#=.,?+$]+)/,comment: ["block_comment", "line_comment"],string: ["string1", "string2"],urls: ["email", "url"]},urls: null});
+            this.urls.putAt(1, '<a href="$0">$0</a>');
+        },
+        
+        addScheme: function(a, b, c, d) {
+            this[a] = new this(b, c, d);
+        },
+        
+        patterns: {
+            block_comment: /\/\*[^*]*\*+([^\/][^*]*\*+)*\//,
+            email: /([\w.+-]+@[\w.-]+\.\w+)/,
+            line_comment: /\/\/[^\r\n]*/,
+            number: /\b\-?(0|[1-9]\d*)(\.\d+)?([eE][-+]?\d+)?\b/,
+            string1: /'(\\.|[^'\\])*'/,
+            string2: /"(\\.|[^"\\])*"/,
+            url: /(http:\/\/+[\w\/\-%&#=.,?+$]+)/,
+            comment: ["block_comment", "line_comment"],
+            string: ["string1", "string2"],
+            urls: ["email", "url"]
+        },
+        
+        urls: null
+    });
+    
     base2.addPackage("code");
     base2.code.addName("Colorizer", Colorizer);
-    with (base2.code.Colorizer)
+    
+    with (base2.code.Colorizer) {
         addScheme("xml", {attribute: /(\w+)=("[^"]*"|'[^']*')/,cdata: /<!\[CDATA\[([^\]]|\][^\]]|\]\][^>])*\]\]>/,comment: /<!\s*(--([^-]|[\r\n]|-[^-])*--\s*)>/,entity: /&#?\w+;/,"processing-instruction": /<\?[\w-]+[^>]+>/,tag: /(<\/?)([\w:-]+)/,text: /[>;][^<>&]*/}, {cdata: IGNORE,tag: "$1@2",attribute: '@1=<span class="attribute value">$2</span>',text: IGNORE}, {tabStop: 1});
-    with (base2)
-        code.Colorizer.addScheme("html", {conditional: /<!(--)?\[[^\]]*\]>|<!\[endif\](--)?>/,doctype: /<!(DOCTYPE|doctype)[^>]+>/,inline: /<(script|style)([^>]*)>((\\.|[^\\])*)<\/\1>/}, {inline: function(a, b, c, d) {
-                return format(this.INLINE, b, this.exec(c, true), d)
-            }}, {INLINE: '&lt;<span class="tag">%1</span>%2&gt;%3&lt;/<span class="tag">%1</span>&gt;',tabStop: 1});
-    with (base2.code.Colorizer)
+    }
+    
+    with (base2) {
+        code.Colorizer.addScheme("html", {
+            conditional: /<!(--)?\[[^\]]*\]>|<!\[endif\](--)?>/,
+            doctype: /<!(DOCTYPE|doctype)[^>]+>/,
+            inline: /<(script|style)([^>]*)>((\\.|[^\\])*)<\/\1>/
+        }, {
+            inline: function(a, b, c, d) {
+                return format(this.INLINE, b, this.exec(c, true), d);
+            }
+        }, {
+            INLINE: '&lt;<span class="tag">%1</span>%2&gt;%3&lt;/<span class="tag">%1</span>&gt;',
+            tabStop: 1
+        });
+    }
+    
+    with (base2.code.Colorizer) {
         html.merge(xml);
-    with (base2.code.Colorizer)
+    }
+    
+    with (base2.code.Colorizer) {
         addScheme("css", {at_rule: /@[\w\s]+/,bracketed: /\([^'\x22)]*\)/,comment: patterns.block_comment,property: /(\w[\w-]*\s*):([^;}]+)/,special: /(\-[\w-]*\s*):/,selector: /([\w-:\[.#][^{};]*)\{/}, {bracketed: IGNORE,selector: "@1{",special: "@1:",property: '@1:<span class="property value">$2</span>'});
-    with (base2.code.Colorizer)
+    }
+    
+    with (base2.code.Colorizer) {
         addScheme("javascript", {conditional: /\/\*@if\s*\([^\)]*\)|\/\*@[\s\w]*|@\*\/|\/\/@\w+|@else[\s\w]*/,global: /\b(clearInterval|clearTimeout|constructor|document|escape|hasOwnProperty|Infinity|isNaN|NaN|parseFloat|parseInt|prototype|setInterval|setTimeout|toString|unescape|valueOf|window)\b/,keyword: /\b(&&|\|\||arguments|break|case|continue|default|delete|do|else|false|for|function|if|in|instanceof|new|null|return|switch|this|true|typeof|var|void|while|with|undefined)\b/,regexp: /([\[(\^=,{}:;&|!*?]\s*)(\/(\\\/|[^\/*])(\\.|[^\/\n\\])*\/[mgi]*)/,special: /\b(assert\w*|alert|catch|confirm|console|debug|debugger|eval|finally|prompt|throw|try)\b/}, {comment: DEFAULT,string: DEFAULT,regexp: "$1@2",number: DEFAULT});
-    with (base2)
-        with (code)
-            Colorizer["html-multi"] = Colorizer.html.union({inline: function(a, b, c, d) {
+    }
+    
+    with (base2) {
+        with (code) {
+            Colorizer["html-multi"] = Colorizer.html.union({
+                inline: function(a, b, c, d) {
                     var e = b == "style" ? "css" : "javascript";
                     d = Colorizer[e].exec(d, true);
                     d = format('<span class="%1">%2</span>', e, d);
-                    return format(this.INLINE, b, this.exec(c, true), d)
-                }});
+                    
+                    return format(this.INLINE, b, this.exec(c, true), d);
+                }
+            });
+        }
+    }
+              
     with (base2.code.Colorizer.javascript) {
         add("\\b(" + (base2.exports + ",base,base2,merge,union,implement,Array2,Date2,String2").match(/[^\s,]+/g).join("|") + ")\\b", '<span class="base2">$0</span>');
         insertAt(0, /("@[^"]+"):/, '<span class="special">$1</span>:');
-        tabStop = 2
+        tabStop = 2;
     }
+    
     eval(base2.namespace);
     eval(DOM.namespace);
     eval(JSB.namespace);
+    
     var bindings = new RuleList;
-    bindings.add("pre", {ondocumentready: function() {
+    
+    bindings.add("pre", {
+        ondocumentready: function() {
             if (this.hasClass("js")) {
-                this.addClass("javascript")
+                this.addClass("javascript");
             }
+            
             var a = this.className.split(/\s+/);
+            
             for (var i = 0; i < a.length; i++) {
                 var b = a[i];
                 var c = Colorizer[b];
@@ -53123,16 +60990,21 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
                     var d = Traversal.getTextContent(this);
                     this.innerHTML = c.exec(d);
                     this.addClass("highlight");
-                    if (b == "html-multi")
+                    
+                    if (b === "html-multi") {
                         this.addClass("html");
+                    }
+                    
                     break
                 }
             }
-        }});
+        }
+    });
+    
     function updateFlag() {
         this.nextSibling.style.color = this.value ? "#898E79" : "#A03333"
     }
-    ;
+    
     bindings.add("input.required,textarea.required", {ondocumentready: updateFlag,ondocumentmouseup: updateFlag,ondocumentkeyup: updateFlag});
 
     eval(base2.namespace);
@@ -53144,201 +61016,220 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
     var WORDS = /\w+/g;
 
     var Packer = Base.extend({
-      minify: function(script) {
-        script = script.replace(Packer.CONTINUE, "");
-        script = Packer.data.exec(script);
-        script = Packer.whitespace.exec(script);
-        script = Packer.clean.exec(script);
-        return script;
-      },
+        minify: function(script) {
+            script = script.replace(Packer.CONTINUE, "");
+            script = Packer.data.exec(script);
+            script = Packer.whitespace.exec(script);
+            script = Packer.clean.exec(script);
+            
+            return script;
+        },
 
-      pack: function(script, base62, shrink) {
-        script = this.minify(script + "\n");
-        if (shrink) script = this._shrinkVariables(script);
-        if (base62) script = this._base62Encode(script);	
-        return script;
-      },
+        pack: function(script, base62, shrink) {
+            script = this.minify(script + "\n");
+            
+            if (shrink) {
+                script = this._shrinkVariables(script);
+            }
+            
+            if (base62) {
+                script = this._base62Encode(script);	
+            }
+            
+            return script;
+        },
 
-      _base62Encode: function(script) {
-        var words = new Words(script);
-        var encode = function(word) {
-          return words.get(word).encoded;
-        };
+        _base62Encode: function(script) {
+            var words = new Words(script);
+            
+            var encode = function(word) {
+                return words.get(word).encoded;
+            };
 
-        /* build the packed script */
+            /* build the packed script */
 
-        var p = this._escape(script.replace(WORDS, encode));		
-        var a = Math.min(Math.max(words.size(), 2), 62);
-        var c = words.size();
-        var k = words;
-        var e = Packer["ENCODE" + (a > 10 ? a > 36 ? 62 : 36 : 10)];
-        var r = a > 10 ? "e(c)" : "c";
+            var p = this._escape(script.replace(WORDS, encode));		
+            var a = Math.min(Math.max(words.size(), 2), 62);
+            var c = words.size();
+            var k = words;
+            var e = Packer["ENCODE" + (a > 10 ? a > 36 ? 62 : 36 : 10)];
+            var r = a > 10 ? "e(c)" : "c";
 
-        // the whole thing
-        return format(Packer.UNPACK, p,a,c,k,e,r);
-      },
+            // the whole thing
+            return format(Packer.UNPACK, p,a,c,k,e,r);
+        },
 
-      _escape: function(script) {
-        // single quotes wrap the final string so escape them
-        // also escape new lines required by conditional comments
-        return script.replace(/([\\'])/g, "\\$1").replace(/[\r\n]+/g, "\\n");
-      },
+        _escape: function(script) {
+            // single quotes wrap the final string so escape them
+            // also escape new lines required by conditional comments
+            return script.replace(/([\\'])/g, "\\$1").replace(/[\r\n]+/g, "\\n");
+        },
 
-      _shrinkVariables: function(script) {
-        // Windows Scripting Host cannot do regexp.test() on global regexps.
-        var global = function(regexp) {
-          // This function creates a global version of the passed regexp.
-          return new RegExp(regexp.source, "g");
-        };
+        _shrinkVariables: function(script) {
+            // Windows Scripting Host cannot do regexp.test() on global regexps.
+            var global = function(regexp) {
+                // This function creates a global version of the passed regexp.
+                return new RegExp(regexp.source, "g");
+            };
 
-        var data = []; // encoded strings and regular expressions
-        var REGEXP = /^[^'"]\//;
-        var store = function(string) {
-          var replacement = "#" + data.length;
-          if (REGEXP.test(string)) {
-            replacement = string.charAt(0) + replacement;
-            string = string.slice(1);
-          }
-          data.push(string);
-          return replacement;
-        };
+            var data = []; // encoded strings and regular expressions
+            var REGEXP = /^[^'"]\//;
+            var store = function(string) {
+                var replacement = "#" + data.length;
+                
+                if (REGEXP.test(string)) {
+                    replacement = string.charAt(0) + replacement;
+                    string = string.slice(1);
+                }
+                
+                data.push(string);
+                
+                return replacement;
+            };
 
-        // Base52 encoding (a-Z)
-        var encode52 = function(c) {
-          return (c < 52 ? '' : arguments.callee(parseInt(c / 52))) +
-            ((c = c % 52) > 25 ? String.fromCharCode(c + 39) : String.fromCharCode(c + 97));
-        };
+            // Base52 encoding (a-Z)
+            var encode52 = function(c) {
+                return (c < 52 ? '' : arguments.callee(parseInt(c / 52)))
+                     + ((c = c % 52) > 25 ? String.fromCharCode(c + 39) : String.fromCharCode(c + 97));
+            };
 
-        // identify blocks, particularly identify function blocks (which define scope)
-        var BLOCK = /(function\s*[\w$]*\s*\(\s*([^\)]*)\s*\)\s*)?(\{([^{}]*)\})/;
-        var VAR_ = /var\s+/g;
-        var VAR_NAME = /var\s+[\w$]+/g;
-        var COMMA = /\s*,\s*/;
-        var blocks = []; // store program blocks (anything between braces {})
-        // encoder for program blocks
-        var encode = function(block, func, args) {
-          if (func) { // the block is a function block
+            // identify blocks, particularly identify function blocks (which define scope)
+            var BLOCK = /(function\s*[\w$]*\s*\(\s*([^\)]*)\s*\)\s*)?(\{([^{}]*)\})/;
+            var VAR_ = /var\s+/g;
+            var VAR_NAME = /var\s+[\w$]+/g;
+            var COMMA = /\s*,\s*/;
+            var blocks = []; // store program blocks (anything between braces {})
+            // encoder for program blocks
+            
+            var encode = function(block, func, args) {
+                if (func) { // the block is a function block
 
-            // decode the function block (THIS IS THE IMPORTANT BIT)
-            // We are retrieving all sub-blocks and will re-parse them in light
-            // of newly shrunk variables
-            block = decode(block);
+                    // decode the function block (THIS IS THE IMPORTANT BIT)
+                    // We are retrieving all sub-blocks and will re-parse them in light
+                    // of newly shrunk variables
+                    block = decode(block);
 
-            // create the list of variable and argument names 
-            var vars = match(block, VAR_NAME).join(",").replace(VAR_, "");
-            var ids = Array2.combine(args.split(COMMA).concat(vars.split(COMMA)));
+                    // create the list of variable and argument names 
+                    var vars = match(block, VAR_NAME).join(",").replace(VAR_, "");
+                    var ids = Array2.combine(args.split(COMMA).concat(vars.split(COMMA)));
 
-            // process each identifier
-            var count = 0, shortId;
-            forEach (ids, function(id) {
-              id = trim(id);
-              if (id && id.length > 1) { // > 1 char
-                id = rescape(id);
-                // find the next free short name (check everything in the current scope)
-                do shortId = encode52(count++);
-                while (new RegExp("[^\\w$.]" + shortId + "[^\\w$:]").test(block));
-                // replace the long name with the short name
-                var reg = new RegExp("([^\\w$.])" + id + "([^\\w$:])");
-                while (reg.test(block)) block = block.replace(global(reg), "$1" + shortId + "$2");
-                var reg = new RegExp("([^{,\\w$.])" + id + ":", "g");
-                block = block.replace(reg, "$1" + shortId + ":");
-              }
+                    // process each identifier
+                    var count = 0, shortId;
+                    forEach (ids, function(id) {
+                        id = trim(id);
+                        
+                        if (id && id.length > 1) { // > 1 char
+                            id = rescape(id);
+                            // find the next free short name (check everything in the current scope)
+                            do shortId = encode52(count++);
+                            while (new RegExp("[^\\w$.]" + shortId + "[^\\w$:]").test(block));
+                            // replace the long name with the short name
+                            var reg = new RegExp("([^\\w$.])" + id + "([^\\w$:])");
+                            while (reg.test(block)) block = block.replace(global(reg), "$1" + shortId + "$2");
+                            var reg = new RegExp("([^{,\\w$.])" + id + ":", "g");
+                            block = block.replace(reg, "$1" + shortId + ":");
+                        }
+                    });
+                }
+                
+                var replacement = "~" + blocks.length + "~";
+                
+                blocks.push(block);
+                
+                return replacement;
+            };
+
+            // decoder for program blocks
+            var ENCODED = /~(\d+)~/;
+            var decode = function(script) {
+                while (ENCODED.test(script)) {
+                    script = script.replace(global(ENCODED), function(match, index) {
+                        return blocks[index];
+                    });
+                }
+                
+                return script;
+            };
+
+            // encode strings and regular expressions
+            script = Packer.data.exec(script, store);
+
+            // remove closures (this is for base2 namespaces only)
+            script = script.replace(/new function\(_\)\s*\{/g, "{;#;");
+
+            // encode blocks, as we encode we replace variable and argument names
+            while (BLOCK.test(script)) {
+                script = script.replace(global(BLOCK), encode);
+            }
+
+            // put the blocks back
+            script = decode(script);
+
+            // put back the closure (for base2 namespaces only)
+            script = script.replace(/\{;#;/g, "new function(_){");
+
+            // put strings and regular expressions back
+            script = script.replace(/#(\d+)/g, function(match, index) {		
+                return data[index];
             });
-          }
-          var replacement = "~" + blocks.length + "~";
-          blocks.push(block);
-          return replacement;
-        };
 
-        // decoder for program blocks
-        var ENCODED = /~(\d+)~/;
-        var decode = function(script) {
-          while (ENCODED.test(script)) {
-            script = script.replace(global(ENCODED), function(match, index) {
-              return blocks[index];
-            });
-          }
-          return script;
-        };
-
-        // encode strings and regular expressions
-        script = Packer.data.exec(script, store);
-
-        // remove closures (this is for base2 namespaces only)
-        script = script.replace(/new function\(_\)\s*\{/g, "{;#;");
-
-        // encode blocks, as we encode we replace variable and argument names
-        while (BLOCK.test(script)) {
-          script = script.replace(global(BLOCK), encode);
+            return script;
         }
-
-        // put the blocks back
-        script = decode(script);
-
-        // put back the closure (for base2 namespaces only)
-        script = script.replace(/\{;#;/g, "new function(_){");
-
-        // put strings and regular expressions back
-        script = script.replace(/#(\d+)/g, function(match, index) {		
-          return data[index];
-        });
-
-        return script;
-      }
     }, {
-      CONTINUE: /\\\r?\n/g,
+        CONTINUE: /\\\r?\n/g,
 
-      ENCODE10: "String",
-      ENCODE36: "function(c){return c.toString(a)}",
-      ENCODE62: "function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))}",
+        ENCODE10: "String",
+        ENCODE36: "function(c){return c.toString(a)}",
+        ENCODE62: "function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))}",
 
-      UNPACK: "eval(function(p,a,c,k,e,r){e=%5;if(!''.replace(/^/,String)){while(c--)r[%6]=k[c]" +
-              "||%6;k=[function(e){return r[e]}];e=function(){return'\\\\w+'};c=1};while(c--)if(k[c])p=p." +
-          "replace(new RegExp('\\\\b'+e(c)+'\\\\b','g'),k[c]);return p}('%1',%2,%3,'%4'.split('|'),0,{}))",
+        UNPACK: "eval(function(p,a,c,k,e,r){e=%5;if(!''.replace(/^/,String)){while(c--)r[%6]=k[c]"
+              + "||%6;k=[function(e){return r[e]}];e=function(){return'\\\\w+'};c=1};while(c--)if(k[c])p=p."
+              + "replace(new RegExp('\\\\b'+e(c)+'\\\\b','g'),k[c]);return p}('%1',%2,%3,'%4'.split('|'),0,{}))",
 
-      init: function() {
-        this.data = reduce(this.data, function(data, replacement, expression) {
-          data.put(this.javascript.exec(expression), replacement);
-          return data;
-        }, new RegGrp, this);
-        this.clean = this.data.union(this.clean);
-        this.whitespace = this.data.union(this.whitespace);
-      },
+        init: function() {
+            this.data = reduce(this.data, function(data, replacement, expression) {
+                data.put(this.javascript.exec(expression), replacement);
+                return data;
+            }, new RegGrp, this);
 
-      clean: {
-        "\\(\\s*;\\s*;\\s*\\)": "(;;)", // for (;;) loops
-        "throw[^};]+[};]": IGNORE, // a safari 1.3 bug
-        ";+\\s*([};])": "$1"
-      },
+            this.clean = this.data.union(this.clean);
+            this.whitespace = this.data.union(this.whitespace);
+        },
 
-      data: {
-        // strings
-        "STRING1": IGNORE,
-        'STRING2': IGNORE,
-        "CONDITIONAL": IGNORE, // conditional comments
-        "(COMMENT1)\\n\\s*(REGEXP)?": "\n$3",
-        "(COMMENT2)\\s*(REGEXP)?": " $3",
-        "([\\[(\\^=,{}:;&|!*?])\\s*(REGEXP)": "$1$2"
-      },
+        clean: {
+            "\\(\\s*;\\s*;\\s*\\)": "(;;)", // for (;;) loops
+            "throw[^};]+[};]": IGNORE, // a safari 1.3 bug
+            ";+\\s*([};])": "$1"
+        },
 
-      javascript: new RegGrp({
-        COMMENT1:    /(\/\/|;;;)[^\n]*/.source,
-        COMMENT2:    /\/\*[^*]*\*+([^\/][^*]*\*+)*\//.source,
-        CONDITIONAL: /\/\*@|@\*\/|\/\/@[^\n]*\n/.source,
-        REGEXP:      /\/(\\[\/\\]|[^*\/])(\\.|[^\/\n\\])*\/[gim]*/.source,
-        STRING1:     /'(\\.|[^'\\])*'/.source,
-        STRING2:     /"(\\.|[^"\\])*"/.source
-      }),
+        data: {
+            // strings
+            "STRING1": IGNORE,
+            'STRING2': IGNORE,
+            "CONDITIONAL": IGNORE, // conditional comments
+            "(COMMENT1)\\n\\s*(REGEXP)?": "\n$3",
+            "(COMMENT2)\\s*(REGEXP)?": " $3",
+            "([\\[(\\^=,{}:;&|!*?])\\s*(REGEXP)": "$1$2"
+        },
 
-      whitespace: {
-        "(\\d)\\s+(\\.\\s*[a-z\\$_\\[(])": "$1 $2", // http://dean.edwards.name/weblog/2007/04/packer3/#comment84066
-        "([+-])\\s+([+-])": "$1 $2", // c = a++ +b;
-        "\\b\\s+\\$\\s+\\b": " $ ", // var $ in
-        "\\$\\s+\\b": "$ ", // object$ in
-        "\\b\\s+\\$": " $", // return $object
-        "\\b\\s+\\b": SPACE,
-        "\\s+": REMOVE
-      }
+        javascript: new RegGrp({
+            COMMENT1:    /(\/\/|;;;)[^\n]*/.source,
+            COMMENT2:    /\/\*[^*]*\*+([^\/][^*]*\*+)*\//.source,
+            CONDITIONAL: /\/\*@|@\*\/|\/\/@[^\n]*\n/.source,
+            REGEXP:      /\/(\\[\/\\]|[^*\/])(\\.|[^\/\n\\])*\/[gim]*/.source,
+            STRING1:     /'(\\.|[^'\\])*'/.source,
+            STRING2:     /"(\\.|[^"\\])*"/.source
+        }),
+
+        whitespace: {
+            "(\\d)\\s+(\\.\\s*[a-z\\$_\\[(])": "$1 $2", // http://dean.edwards.name/weblog/2007/04/packer3/#comment84066
+            "([+-])\\s+([+-])": "$1 $2", // c = a++ +b;
+            "\\b\\s+\\$\\s+\\b": " $ ", // var $ in
+            "\\$\\s+\\b": "$ ", // object$ in
+            "\\b\\s+\\$": " $", // return $object
+            "\\b\\s+\\b": SPACE,
+            "\\s+": REMOVE
+        }
     });
 
     var Words = Collection.extend({
@@ -53373,16 +61264,21 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
             var empty = function() {
                 return ""
             };
+            
             var index = 0;
+            
             forEach(this, function(word) {
                 if (encoded.has(word)) {
                     word.index = encoded.get(word);
                     word.toString = empty;
                 } else {
-                    while (this.has(encode(index)))
+                    while (this.has(encode(index))) {
                         index++;
+                    }
+                    
                     word.index = index++;
                 }
+                
                 word.encoded = encode(word.index);
             }, this);
 
@@ -53398,8 +61294,12 @@ Jeeel.Debug.Debugger.Profiler.prototype = {
     }, {
         Item: {
             constructor: function(word) {
+              
+                /**
+                 * @ignore
+                 */
                 this.toString = function() {
-                    return word
+                    return word;
                 };
             },
 

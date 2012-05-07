@@ -79,7 +79,7 @@ Jeeel.Filter.Each.prototype = {
     /**
      * @private
      */
-    _filterArray: function (params) {
+    _filterEach: function (params) {
         var result = {};
         var filter = this.getInnerFilter();
 

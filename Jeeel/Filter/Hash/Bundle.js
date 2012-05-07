@@ -42,7 +42,7 @@ Jeeel.Filter.Hash.Bundle.prototype = {
     /**
      * @private
      */
-    _filterArray: function (array) {
+    _filterEach: function (array) {
         var res = {};
         
         Jeeel.Hash.forEach(array,

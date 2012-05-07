@@ -45,8 +45,14 @@ Jeeel.String.sprintf = function (format, var_args) {
     return res.join('');
 };
 
+/**
+ * @ignore
+ */
 Jeeel._Object.JeeelString.PLACEHOLDER_REGS = /%([+\-# 0]*)?([1-9][0-9]*)?(?:\.(|[0-9]*))?([^0-9]|$)/;
 
+/**
+ * @ignore
+ */
 Jeeel._Object.JeeelString.PLACEHOLDERS = {
     
     /**
@@ -406,6 +412,9 @@ Jeeel._Object.JeeelString.PLACEHOLDERS = {
     }
 };
 
+/**
+ * @ignore
+ */
 Jeeel._Object.JeeelString.convertPlaceholder = function (placeholder, value, res) {
   
     placeholder = placeholder.match(this.PLACEHOLDER_REGS);

@@ -15,12 +15,17 @@ Jeeel.directory.Jeeel.Dom.ElementOperator = {
  * コンストラクタ
  *
  * @class 複数のElementを一度に操作する特殊なクラス
- * @param {Hash} elementList 対象Elementまたは複数のElementリスト(Jeeel.Dom.ElementOperatorやJeeel.Dom.Element自体やリストでも可能)
+ * @param {String|Hash} elementList セレクタ文字列もしくは、対象Element及び複数のElementリスト(Jeeel.Dom.ElementOperatorやJeeel.Dom.Element自体やリストでも可能)
  */
 Jeeel.Dom.ElementOperator = function (elementList) {
-    elementList = this.constructor._flat(elementList);
     
-    for (var i = 0, l = elementList.length; i < l; i++) {
+    if (Jeeel.Type.isString(elementList)) {
+        elementList = Jeeel.Document.getElementsBySelector(elementList);
+    } else {
+        elementList = this.constructor._flat(elementList);
+    }
+    
+    for (var i = elementList.length; i--;) {
         this[i] = elementList[i];
         elementList[i] = new Jeeel.Dom.Element(elementList[i]);
     }
@@ -38,7 +43,7 @@ Jeeel.Dom.ElementOperator = function (elementList) {
 /**
  * インスタンスを作成する
  *
- * @param {Hash} elementList 対象Elementまたは複数のElementリスト(Jeeel.Dom.ElementOperatorやJeeel.Dom.Element自体やリストでも可能)
+ * @param {String|Hash} elementList セレクタ文字列もしくは、対象Element及び複数のElementリスト(Jeeel.Dom.ElementOperatorやJeeel.Dom.Element自体やリストでも可能)
  * @return {Jeeel.Dom.ElementOperator} 作成したインスタンス
  */
 Jeeel.Dom.ElementOperator.create = function (elementList) {
@@ -71,57 +76,36 @@ Jeeel.Dom.ElementOperator._flat = (function (elementList) {
  */
 Jeeel.Dom.ElementOperator._flatExec = function (elementList) {
 
-    var Type = Jeeel.Type;
-    var Element = Jeeel.Dom.Element, Submit = Jeeel.Net.Form;
-    var getValues = Jeeel.Hash.getValues;
-    
-    var res = [], stack = [], idxStack = [], stackLen = 0, target = [elementList], i = 0, l = 1, cnt = 0, node;
-    
-    while (true) {
-        
-        if (i >= l) {
-            
-            if ( ! stackLen) {
-                break;
-            }
-            
-            stackLen--;
-            
-            target = stack[stackLen];
-            i = idxStack[stackLen];
-            l = target.length;
-        }
-        
-        node = target[i++];
-        
-        if (Type.isElement(node)) {
-            res[cnt++] = node;
-            continue;
-        }
-        else if ( ! Type.isHash(node)) {
-            continue;
-        }
-        else if (node instanceof this) {
-            node = node.getAll();
-        }
-        else if (node instanceof Element) {
-            node = [node.getElement()];
-        }
-        else if (node instanceof Submit) {
-            node = [node.getForm()];
-        }
-        else {
-            node = getValues(node);
-        }
-        
-        stack[stackLen] = target;
-        idxStack[stackLen] = i;
-        stackLen++;
-        target = node;
-        l = target.length;
-        i = 0;
+    if (Jeeel.Type.isNode(elementList)) {
+        return [elementList];
     }
-    
+    else if (elementList instanceof this) {
+        return elementList.getAll();
+    }
+    else if (elementList instanceof Jeeel.Dom.Element) {
+        return [elementList.getElement()];
+    }
+    else if (elementList instanceof Jeeel.Net.Form) {
+        return [elementList.getForm()];
+    }
+    else if ( ! Jeeel.Type.isHash(elementList)) {
+        return [];
+    }
+    else if ( ! Jeeel.Type.isArray(elementList)) {
+        elementList = Jeeel.Hash.getValues(elementList);
+    }
+
+    var res = [];
+
+    for (var i = 0, l = elementList.length; i < l; i++) {
+        if (Jeeel.Type.isNode(elementList[i])) {
+            res[res.length] = elementList[i];
+        } else if (Jeeel.Type.isHash(elementList[i])) {
+            var tmp = this._flatExec(elementList[i]);
+            res = res.concat(tmp);
+        }
+    }
+
     return res;
 };
 
@@ -177,7 +161,7 @@ Jeeel.Dom.ElementOperator.prototype = {
     getAll: function () {
         var res = [];
         
-        for (var i = 0; i < this.length; i++) {
+        for (var i = this.length; i--;) {
             res[i] = this[i];
         }
         
@@ -193,7 +177,7 @@ Jeeel.Dom.ElementOperator.prototype = {
     getIndex: function (element) {
         var res = -1;
         
-        for (var i = 0; i < this.length; i++) {
+        for (var i = this.length; i--;) {
             if (this[i] === element) {
                 res = i;
             }
@@ -299,7 +283,7 @@ Jeeel.Dom.ElementOperator.prototype = {
     /**
      * 全ての要素の子供を全て削除する
      *
-     * @return {Jeeel.Dom.Element} 自インスタンス
+     * @return {Jeeel.Dom.ElementOperator} 自インスタンス
      */
     clearChildNodes: function () {
         return this._callMethod('clearChildNodes');
@@ -504,6 +488,7 @@ Jeeel.Dom.ElementOperator.prototype = {
      * @param {String} css スタイル名
      * @param {Integer} [index] インデックス(省略は0)
      * @return {String} スタイル値
+     * @see Jeeel.Dom.Style
      */
     getCss: function (css, index) {
         return this._getCall(index, 'getStyle', [css]);
@@ -515,6 +500,7 @@ Jeeel.Dom.ElementOperator.prototype = {
      * @param {String} css スタイル名
      * @param {String} value スタイル値
      * @return {Jeeel.Dom.ElementOperator} 自インスタンス
+     * @see Jeeel.Dom.Style
      */
     setCss: function (css, value) {
         return this._callMethod('setStyle', [css, value]);
@@ -528,6 +514,58 @@ Jeeel.Dom.ElementOperator.prototype = {
      */
     setCssList: function (cssList) {
         return this._callMethod('setStyleList', [cssList]);
+    },
+    
+    /**
+     * 指定要素からDOMの独自データを取得する(属性値data-&#8727;)<br />
+     * IE8以下ではメモリリークを起こす非推奨メソッド
+     * 
+     * @param {String} key データキー
+     * @param {Integer} [index] インデックス(省略は0)
+     * @return {String} データ
+     */
+    getData: function (key, index) {
+        return this._getCall(index, 'getData', [key]);
+    },
+    
+    /**
+     * DOMの独自データを全ての要素に設定する(属性値data-&#8727;)<br />
+     * IE8以下ではメモリリークを起こす非推奨メソッド
+     * 
+     * @param {String} key データキー
+     * @param {String} data データ
+     * @return {Jeeel.Dom.ElementOperator} 自インスタンス
+     */
+    setData: function (key, data) {
+        return this._callMethod('setData', [key, data]);
+    },
+    
+    /**
+     * 指定要素からJeeelの独自データを取得する<brr />
+     * IE以外ではプロパティが拡張されるので注意(詳しくはJeeel.Storage.Objectを参照)<br />
+     * またネームスペースは初期値を用いる
+     * 
+     * @param {String} key データキー
+     * @param {Integer} [index] インデックス(省略は0)
+     * @return {Mixied} データ
+     * @see Jeeel.Storage.Object
+     */
+    getCustomData: function (key, index) {
+        return this._getCall(index, 'getCustomData', [key]);
+    },
+    
+    /**
+     * Jeeelの独自データを全ての要素に設定する<brr />
+     * IE以外ではプロパティが拡張されるので注意(詳しくはJeeel.Storage.Objectを参照)<br />
+     * またネームスペースは初期値を用いる
+     * 
+     * @param {String} key データキー
+     * @param {Mixied} data データ
+     * @return {Jeeel.Dom.ElementOperator} 自インスタンス
+     * @see Jeeel.Storage.Object
+     */
+    setCustomData: function (key, data) {
+        return this._callMethod('setCustomData', [key, data]);
     },
     
     /**
@@ -558,6 +596,16 @@ Jeeel.Dom.ElementOperator.prototype = {
      */
     getRect: function (index) {
         return this._getCall(index, 'getRect');
+    },
+    
+    /**
+     * 指定要素のスクロール位置を取得する
+     * 
+     * @param {Integer} [index] インデックス(省略は0)
+     * @return {Jeeel.Object.Point} スクロール位置
+     */
+    getScrollPos: function (index) {
+        return this._getCall(index, 'getScrollPosition');
     },
 
     /**
@@ -619,7 +667,7 @@ Jeeel.Dom.ElementOperator.prototype = {
     getValAll: function () {
         var res = [];
 
-        for (var i = 0; i < this.length; i++) {
+        for (var i = this.length; i--;) {
             res[i] = this.getVal(i);
         }
 
@@ -1269,6 +1317,76 @@ Jeeel.Dom.ElementOperator.prototype = {
     },
     
     /**
+     * 全ての要素の子リストからセレクタにヒットするのHTML要素を取得する
+     *
+     * @param {String} selector CSSと同じ絞り込みセレクタ
+     * @return {Jeeel.Dom.ElementOperator} 取得したElement配列ラッパー
+     * @see Jeeel.Dom.Selector
+     */
+    $QUERY: function (selector) {
+        if ( ! selector) {
+            return this.constructor.create([], this);
+        }
+
+        var res = [];
+
+        this._each(
+            function () {
+                var tmp = this.getElementsBySelector(selector);
+
+                if (tmp.length) {
+                    res = Jeeel.Hash.merge(res, tmp);
+                }
+            }
+        );
+
+        return this.constructor.create(res, this);
+    },
+    
+    /**
+     * 全ての要素の次の要素を検索取得する
+     * 
+     * @param {Integer} [nextCount] いくつ次を参照するか
+     * @return {Jeeel.Dom.ElementOperator} 取得したElement配列ラッパー
+     */
+    $NEXT: function (nextCount) {
+        if (nextCount === 0) {
+            return this.clone(false);
+        }
+
+        var res = this._getCalls('getNextNode', [nextCount]);
+
+        return this.constructor.create(res, this);
+    },
+    
+    /**
+     * 全ての要素の前の要素を検索取得する
+     * 
+     * @param {Integer} [prevCount] いくつ前を参照するか
+     * @return {Jeeel.Dom.ElementOperator} 取得したElement配列ラッパー
+     */
+    $PREV: function (prevCount) {
+        if (prevCount === 0) {
+            return this.clone(false);
+        }
+
+        var res = this._getCalls('getPrevNode', [prevCount]);
+
+        return this.constructor.create(res, this);
+    },
+    
+    /**
+     * 全ての要素の子要素を取得する
+     * 
+     * @return {Jeeel.Dom.ElementOperator} 取得したElement配列ラッパー
+     */
+    $CHILDREN: function () {
+        var res = this._getCalls('getChildren');
+
+        return this.constructor.create(res, this);
+    },
+    
+    /**
      * 全ての要素の子リストからHTML要素を指定範囲検索する
      *
      * @param {Jeeel.Object.Rect} rect 対象範囲
@@ -1333,7 +1451,7 @@ Jeeel.Dom.ElementOperator.prototype = {
         
         return this;
     },
-
+    
     /**
      * 全ての要素をDom上から取り除く
      *
@@ -1503,6 +1621,18 @@ Jeeel.Dom.ElementOperator.prototype = {
      */
     shiftTo: function (x, y) {
         return this._callMethod('shiftTo', [x, y]);
+    },
+    
+    /**
+     * 全ての要素のスクロールを行う
+     * 
+     * @param {Integer} x X座標
+     * @param {Integer} y Y座標
+     * @return {Jeeel.Dom.ElementOperator} 自インスタンス
+     * @ignore
+     */
+    scroll: function (x, y) {
+        return this._callMethod('scroll', [x, y]);
     },
 
     /**
@@ -1757,12 +1887,18 @@ Jeeel.Dom.ElementOperator.prototype = {
     },
     
     /**
-     * このインスタンスの複製を作る
+     * インスタンスを複製する
      *
-     * @return {Jeeel.Dom.ElementOperator} 複製したインスタンス
+     * @param {Boolean} [isDeep] 要素まで複製するかどうか
+     * @return {Jeeel.Dom.ElementOperator} 複製後のインスタンス
      */
-    clone: function () {
-        return this.constructor.create(this._elementList, this._prev);
+    clone: function (isDeep) {
+        
+        if (isDeep) {
+            return new this.constructor(this._getCalls('clone', [true]), this._prev);
+        }
+        
+        return new this.constructor(this._elementList, this._prev);
     },
     
     /**
@@ -1857,12 +1993,18 @@ Jeeel.Dom.ElementOperator.prototype = {
         return res;
     },
     
+    /**
+     * @ignore
+     */
     _init: function () {
         var ief = new Jeeel.Filter.Html.Form(),
             ivf = new Jeeel.Filter.Html.FormValue(),
             ref = new Jeeel.Filter.String.RegularExpressionEscape(),
             auf = new Jeeel.Filter.Hash.Unique(true, true);
         
+        /**
+         * @ignore
+         */
         this.filterName = function (name, submitSearch) {
             if ( ! Jeeel.Type.isArray(name)) {
                 name = [name];
@@ -1901,6 +2043,9 @@ Jeeel.Dom.ElementOperator.prototype = {
             return this.constructor.create(res, this);
         };
         
+        /**
+         * @ignore
+         */
         this.revFilterName = function (name, submitSearch) {
             if ( ! Jeeel.Type.isArray(name)) {
                 name = [name];
@@ -1939,6 +2084,9 @@ Jeeel.Dom.ElementOperator.prototype = {
             return this.constructor.create(res, this);
         };
         
+        /**
+         * @ignore
+         */
         this.getInput = function (index) {
             if ( ! index) {
                 index = 0;
@@ -1949,6 +2097,9 @@ Jeeel.Dom.ElementOperator.prototype = {
             return ief.filter(this[index]);
         };
         
+        /**
+         * @ignore
+         */
         this.getInputVal = function (index) {
             if ( ! index) {
                 index = 0;
@@ -1959,6 +2110,9 @@ Jeeel.Dom.ElementOperator.prototype = {
             return ivf.filter(this[index]);
         };
         
+        /**
+         * @ignore
+         */
         this.getCommonParent = function () {
             var elms = this._elementList,
                 min = -1,

@@ -1,6 +1,6 @@
 
 /**
- * canvasのcontextに使用できるcontextIdの列挙体
+ * @namespace canvasのcontextに使用できるcontextIdの列挙体
  */
 Jeeel.Graphics.Raster.Canvas.Context.Type = {
   

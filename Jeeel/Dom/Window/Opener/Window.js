@@ -83,7 +83,7 @@ Jeeel.Dom.Window.Opener.Window.prototype = {
         var window = this._window.open('', markerName, options.join(','));
         
         if ( ! window) {
-            throw Error('ウィンドウを作成出来ませんでした。');
+            throw new Error('ウィンドウを作成出来ませんでした。');
         }
         
         var submitter = Jeeel.Net.Form.newForm(this._url, this._method);

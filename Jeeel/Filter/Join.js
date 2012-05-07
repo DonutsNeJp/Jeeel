@@ -53,7 +53,7 @@ Jeeel.Filter.Join.prototype = {
     /**
      * @private
      */
-    _filterArray: function (array) {
+    _filterEach: function (array) {
         var keys = this._keys || Jeeel.Hash.getKeys(array);
 
         var params = Jeeel.Parameter.create(array)

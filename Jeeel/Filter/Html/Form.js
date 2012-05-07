@@ -79,7 +79,7 @@ Jeeel.Filter.Html.Form.prototype = {
     /**
      * @private
      */
-    _filterArray: function (vals) {
+    _filterEach: function (vals) {
 
         if (Jeeel.Type.isElement(vals)) {
             return this._filter(vals);

@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.UserAgent = {
 };
 
 /**
- * ブラウザの情報を判別するためのクラス
+ * @staticClass ブラウザの情報を判別するためのクラス
  */
 Jeeel.UserAgent = {
 
@@ -22,57 +22,80 @@ Jeeel.UserAgent = {
      * @type String
      * @private
      */
-    _info: navigator.userAgent,
+    _ua: Jeeel._global.navigator && Jeeel._global.navigator.userAgent || '',
+    
+    /**
+     * ブラウザのバージョン文字列
+     * 
+     * @type String
+     * @private
+     */
+    _browserVersion: '0',
+    
+    /**
+     * スキーム文字列
+     * 
+     * @type String
+     * @private
+     */
+    _scheme: Jeeel._global.location && Jeeel._global.location.protocol && Jeeel._global.location.protocol.replace(':', '') || '',
+    
+    /**
+     * クエリ文字列
+     * 
+     * @type String
+     * @private
+     */
+    _query: Jeeel._global.location && Jeeel._global.location.search && Jeeel._global.location.search.replace(/^\?/, '') || '',
+    
+    /**
+     * クエリフィルター
+     * 
+     * @type Jeeel.Filter.Url.QueryParameter
+     * @private
+     */
+    _queryFilter: new Jeeel.Filter.Url.QueryParameter(),
+        
+    /**
+     * ブラウザがInternetExplorerかどうかを返す
+     *
+     * @param {Integer|String} [version] バージョンを指定したい場合に指定する(例: 6)
+     * @return {Boolean} InternetExplorerかどうか
+     */
+    isInternetExplorer: function (version) {},
+
+    /**
+     * ブラウザがFirefoxかどうかを返す
+     *
+     * @param {Integer|String} [version] バージョンを指定したい場合に指定する(例: 3)
+     * @return {Boolean} FireFoxかどうか
+     */
+    isFirefox: function (version) {},
+    
+    /**
+     * ブラウザがChromeかどうかを返す
+     *
+     * @param {Integer|String} [version] バージョンを指定したい場合に指定する(例: 13)
+     * @return {Boolean} Chromeかどうか
+     */
+    isChrome: function (version) {},
     
     /**
      * ブラウザがSafariかどうかを返す
      *
+     * @param {Integer|String} [version] バージョンを指定したい場合に指定する(例: 5)
      * @return {Boolean} Safariかどうか
      */
-    isSafari: function () {},
-
-    /**
-     * ブラウザがFireFoxかどうかを返す
-     *
-     * @return {Boolean} FireFoxかどうか
-     */
-    isFireFox: function () {},
+    isSafari: function (version) {},
 
     /**
      * ブラウザがOperaかどうかを返す
      *
+     * @param {Integer|String} [version] バージョンを指定したい場合に指定する(例: 10)
      * @return {Boolean} Operaかどうか
      */
-    isOpera: function () {},
+    isOpera: function (version) {},
 
-    /**
-     * ブラウザがNetscapeかどうかを返す
-     *
-     * @return {Boolean} Netscapeかどうか
-     */
-    isNetscape: function () {},
-    
-    /**
-     * ブラウザがNetscape.4かどうかを返す
-     *
-     * @return {Boolean} Netscape.4かどうか
-     */
-    isNetscape4: function () {},
-
-    /**
-     * ブラウザがInternetExplorerかどうかを返す
-     *
-     * @return {Boolean} InternetExplorerかどうか
-     */
-    isInternetExplorer: function () {},
-
-    /**
-     * ブラウザがInternetExplorer6かどうかを返す
-     *
-     * @return {Boolean} InternetExplorer6かどうか
-     */
-    isInternetExplorer6: function () {},
-    
     /**
      * iPhoneかどうかを返す
      * 
@@ -146,21 +169,12 @@ Jeeel.UserAgent = {
     },
 
     /**
-     * ブラウザのコードネームを取得する
-     *
-     * @return {String} ブラウザのコードネーム
-     */
-    getCodeName: function () {
-        return navigator.appCodeName;
-    },
-
-    /**
      * ブラウザのバージョンを取得する
      *
      * @return {String} ブラウザのバージョン
      */
     getVersion: function () {
-        return navigator.appVersion;
+        return this._browserVersion || navigator.appVersion;
     },
 
     /**
@@ -169,7 +183,7 @@ Jeeel.UserAgent = {
      * @return {String} ブラウザのユーザエージェント
      */
     getUserAgent: function () {
-        return this._info;
+        return this._ua;
     },
 
     /**
@@ -198,6 +212,20 @@ Jeeel.UserAgent = {
     getPath: function () {
         return location.pathname;
     },
+    
+    /**
+     * 現在のベースURLを取得する
+     * 
+     * @return {String} ベースURL
+     */
+    getBaseUrl: function () {
+        var port = this.getPort();
+        
+        return this.getScheme()
+             + '://'
+             + this.getHostname()
+             + (port && ':' + port);
+    },
 
     /**
      * 現在のURLを取得する
@@ -214,6 +242,10 @@ Jeeel.UserAgent = {
      * @param {String} url 遷移対象URL
      */
     setUrl: function (url) {
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
         location.href = url;
     },
     
@@ -245,21 +277,16 @@ Jeeel.UserAgent = {
     },
 
     /**
-     * 現在のプロトコルを取得する
-     *
-     * @return {String} プロトコル
-     */
-    getProtocol: function () {},
-    
-    /**
-     * 現在のスキーマを取得する
+     * 現在のスキームを取得する
      * 
-     * @return {String} スキーマ
+     * @return {String} スキーム
      */
-    getSchema: function () {},
+    getScheme: function () {
+        return this._scheme;
+    },
 
     /**
-     * 現在のホストを取得する
+     * 現在のホストを取得する(host = hostname + port)
      *
      * @return {String} ホスト
      */
@@ -268,11 +295,11 @@ Jeeel.UserAgent = {
     },
 
     /**
-     * 現在のドメインを取得する
+     * 現在のホスト名を取得する
      *
-     * @return {String} ドメイン
+     * @return {String} ホスト名
      */
-    getDomain: function () {
+    getHostname: function () {
         return location.hostname;
     },
 
@@ -283,7 +310,7 @@ Jeeel.UserAgent = {
      * @return {String} Urlパラメータを示す文字列
      */
     getQueryString: function () {
-        return '';
+        return this._query;
     },
 
     /**
@@ -303,8 +330,28 @@ Jeeel.UserAgent = {
      * @param {String} [overwriteName] 本来上書きされてしまう要素を取得したい時に使用する名前(内部はJeeel.Object.Item[]になる)
      * @return {Hash} URLパラメータの連想配列
      */
-    getQueryParameters: function (overwriteName) {
-        return {};
+    getQuery: function (overwriteName) {
+        return (overwriteName ? new Jeeel.Filter.Url.QueryParameter(overwriteName) : this._queryFilter).filter(this._query);
+    },
+    
+    /**
+     * 現在のURLを解析して結果を返す
+     * 
+     * @return {Hash} URL解析結果の連想配列
+     */
+    parseUrl: function () {
+        var parser = Jeeel.Filter.Url.Parser.create();
+        
+        return parser.parse(this.getUrl());
+    },
+    
+    /**
+     * 現在のURLの履歴を残さずに次のURLに移行する
+     * 
+     * @param {String} url 移行先URL
+     */
+    redirect: function (url) {
+        location.replace(url);
     },
 
     /**
@@ -379,66 +426,171 @@ Jeeel.UserAgent = {
         }
     },
     
+    /**
+     * @ignore
+     */
     _init: function () {
         
-        var uao = navigator && navigator.userAgent;
-        var ua = navigator && navigator.userAgent && navigator.userAgent.toLowerCase();
-        
-        if ( ! ua) {
+        var uao = this._ua;
+
+        if ( ! uao) {
             delete this._init;
             return;
         }
         
-        var trueF = function () {
-            return true;
-        };
+        var trueF  = Jeeel.Function.Template.RETURN_TRUE;
+        var falseF = Jeeel.Function.Template.RETURN_FALSE;
         
-        var falseF = function () {
-            return false;
-        };
+        this.isSecure = (this._scheme === 'https' ? trueF : falseF);
         
-        var pro = location && location.protocol && location.protocol.replace(':', '');
-        var scm = pro && (pro + '://');
-        var qs  = location && location.search && location.search.replace(/^\?/, '');
-        var qsf = new Jeeel.Filter.Url.QueryParameter();
+        if ( ! this._query) {
+            this.getQuery = Jeeel.Function.Template.RETURN_EMPTY_HASH;
+        }
+
+        var idx;
         
-        this.isSafari = (ua.indexOf("safari") !== -1 ? trueF : falseF);
-        this.isFireFox = (ua.indexOf("firefox") !== -1 ? trueF : falseF);
-        this.isOpera = (ua.indexOf("opera") !== -1 ? trueF : falseF);
-        this.isNetscape = (ua.indexOf("netscape") !== -1 ? trueF : falseF);
-        this.isNetscape4 = (ua.indexOf("mozilla/4") !== -1 ? trueF : falseF);
-        this.isInternetExplorer = (ua.indexOf("msie") !== -1 ? trueF : falseF);
-        this.isInternetExplorer6 = (ua.indexOf("msie 6") !== -1 ? trueF : falseF);
         this.isIPhone = (uao.indexOf("(iPhone;") !== -1 ? trueF : falseF);
         this.isIPad = (uao.indexOf("(iPad;") !== -1 ? trueF : falseF);
         this.isIPod = (uao.indexOf("(iPod;") !== -1 ? trueF : falseF);
         this.isMobile = (uao.indexOf("Mobile") !== -1 ? trueF : falseF);
         this.isAndroid = (uao.indexOf("Android") !== -1 ? trueF : falseF);
-        
-        this.isTridentEngine = (this.isInternetExplorer() || ua.indexOf("trident/") !== -1 ? trueF : falseF);
-        this.isGeckoEngine = (ua.match(/gecko\/(\d{4})/) !== -1 ? trueF : falseF);
-        this.isWebkitEngine = (ua.indexOf("applewebkit/") !== -1 ? trueF : falseF);
-        this.isPrestoEngine = (ua.indexOf("presto/") !== -1 ? trueF : falseF);
 
-        if (pro) {
-            this.isSecure = (pro === 'https' ? trueF : falseF);
-            this.getProtocol = function () {
-                return pro;
-            };
-            this.getSchema = function () {
-                return scm;
-            };
-        }
+        idx = uao.indexOf("Firefox");
         
-        if (qs) {
-            this.getQueryString = function () {
-                return qs;
+        if (idx !== -1) {
+            
+            this._browserVersion = uao.substring(idx + 8, uao.length);
+            
+            /**
+             * @ignore
+             */
+            this.isFirefox = function (version) {
+                if (version) {
+                    return this._ua.indexOf("Firefox/" + version + '.') !== -1;
+                }
+                
+                return true;
             };
             
-            this.getQueryParameters = function (overwriteName) {
-                return (overwriteName ? new Jeeel.Filter.Url.QueryParameter(overwriteName) : qsf).filter(qs);
+            /**
+             * @ignore
+             */
+            this.getBrowserName = function () {
+                return 'Mozilla Firefox';
             };
+        } else {
+            this.isFirefox = falseF;
         }
+        
+        idx = uao.indexOf("MSIE");
+        
+        if (idx !== -1) {
+            
+            this._browserVersion = uao.substring(idx + 5, uao.indexOf(';', idx));
+            
+            /**
+             * @ignore
+             */
+            this.isInternetExplorer = function (version) {
+                if (version) {
+                    return this._ua.indexOf("MSIE " + version + '.') !== -1;
+                }
+                
+                return true;
+            };
+            
+            /**
+             * @ignore
+             */
+            this.getBrowserName = function () {
+                return 'Microsoft Internet Explorer';
+            };
+        } else {
+            this.isInternetExplorer = falseF;
+        }
+        
+        idx = uao.indexOf("Chrome");
+        
+        if (idx !== -1) {
+            this._browserVersion = uao.substring(idx + 7, uao.indexOf(' ', idx));
+            
+            /**
+             * @ignore
+             */
+            this.isChrome = function (version) {
+                if (version) {
+                    return this._ua.indexOf("Chrome/" + version + '.') !== -1;
+                }
+                
+                return true;
+            };
+            
+            /**
+             * @ignore
+             */
+            this.getBrowserName = function () {
+                return 'Google Chrome';
+            };
+        } else {
+            this.isChrome = falseF;
+        }
+        
+        if (uao.indexOf("Safari") !== -1 && idx === -1) {
+            idx = uao.indexOf("Version");
+            
+            this._browserVersion = uao.substring(idx + 8, uao.indexOf(' ', idx));
+            
+            /**
+             * @ignore
+             */
+            this.isSafari = function (version) {
+                if (version) {
+                    return this._ua.indexOf("Version/" + version + '.') !== -1;
+                }
+                
+                return true;
+            };
+            
+            /**
+             * @ignore
+             */
+            this.getBrowserName = function () {
+                return 'Apple Safari';
+            };
+        } else {
+            this.isSafari = falseF;
+        }
+        
+        if (uao.indexOf("Opera") !== -1) {
+            idx = uao.indexOf("Version");
+            
+            this._browserVersion = uao.substring(idx + 8, uao.length);
+            
+            /**
+             * @ignore
+             */
+            this.isOpera = function (version) {
+                if (version) {
+                    return this._ua.indexOf("Version/" + version + '.') !== -1;
+                }
+                
+                return true;
+            };
+            
+            /**
+             * @ignore
+             */
+            this.getBrowserName = function () {
+                return 'ASA Opera';
+            };
+        } else {
+            this.isOpera = falseF;
+        }
+        
+        this.isTridentEngine = (this.isInternetExplorer() || uao.indexOf("Trident/") !== -1 ? trueF : falseF);
+        this.isGeckoEngine = (uao.indexOf("Gecko/") !== -1 ? trueF : falseF);
+        this.isWebkitEngine = (uao.indexOf("AppleWebKit/") !== -1 ? trueF : falseF);
+        this.isPrestoEngine = (uao.indexOf("Presto/") !== -1 ? trueF : falseF);
         
         delete this._init;
     }
@@ -448,7 +600,7 @@ Jeeel.UserAgent._init();
 
 Jeeel.file.Jeeel.UserAgent = [];
 
-if (Jeeel._extendMode.Geolocation && typeof navigator !== 'undefined' && navigator.geolocation) {
+if (Jeeel._extendMode.Geolocation && Jeeel._global.navigator && Jeeel._global.navigator.geolocation) {
     Jeeel.file.Jeeel.UserAgent[Jeeel.file.Jeeel.UserAgent.length] = 'Geolocation';
 }
 

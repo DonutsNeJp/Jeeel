@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Graphics.Raster.Canvas.Context = {
 };
 
 /**
- * Canvasのコンテキストに関するネームスペース
+ * @namespace Canvasのコンテキストに関するネームスペース
  */
 Jeeel.Graphics.Raster.Canvas.Context = {
     
@@ -32,6 +32,7 @@ Jeeel.Graphics.Raster.Canvas.Context = {
      * 
      * @class 2次元のグラフィックスを扱うクラス
      * @param {Canvas} canvas キャンバスElement
+     * @name Jeeel.Graphics.Raster.Canvas.Context.2d
      * @constructor
      */
     '2d': function (canvas) {
@@ -43,10 +44,16 @@ Jeeel.Graphics.Raster.Canvas.Context = {
         
         var self = this, rp = this._refreshPen, rb = this._refreshBrush;
         
+        /**
+         * @ignore
+         */
         this._refreshPen = function () {
             rp.apply(self, arguments);
         };
         
+        /**
+         * @ignore
+         */
         this._refreshBrush = function () {
             rb.apply(self, arguments);
         };
@@ -59,6 +66,9 @@ Jeeel.Graphics.Raster.Canvas.Context = {
     }
 };
 
+/**
+ * @lends Jeeel.Graphics.Raster.Canvas.Context.2d.prototype
+ */
 Jeeel.Graphics.Raster.Canvas.Context['2d'].prototype = {
   
     /**

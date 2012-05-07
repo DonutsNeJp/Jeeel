@@ -21,6 +21,8 @@ Jeeel.directory.Jeeel.Gui.ColorPicker = {
 Jeeel.Gui.ColorPicker = function (appendTarget) {
     Jeeel.Gui.Abstract.call(this);
     
+    this._targets = [];
+//    this._pickerSize = {};
     this._init(appendTarget);
 };
 
@@ -188,7 +190,7 @@ Jeeel.Gui.ColorPicker.initStyle = function () {
 };
 
 /**
- * スタイル定義に使う定数
+ * @namespace スタイル定義に使う定数
  */
 Jeeel.Gui.ColorPicker.STYLE = {
     COLOR_PICKER_PADDING: 5,
@@ -200,7 +202,7 @@ Jeeel.Gui.ColorPicker.STYLE = {
 };
 
 /**
- * カラーピッカーのクラス名
+ * @namespace カラーピッカーのクラス名
  */
 Jeeel.Gui.ColorPicker.CLASS = {
     COLOR_PICKER: 'jeeel-gui-color-picker',
@@ -228,7 +230,8 @@ Jeeel.Gui.ColorPicker.CLASS = {
 Jeeel.Gui.ColorPicker.createLength = 0;
 
 Jeeel.Gui.ColorPicker.prototype = {
-    _target: null,
+    _targets: [],
+    _currentTarget: null,
     _callback: null,
     _color: null,
     _size: {
@@ -236,6 +239,11 @@ Jeeel.Gui.ColorPicker.prototype = {
         height: 150,
         grid: 1,
         gridie: 2
+    },
+    
+    _pickerSize: {
+        width: 189,
+        height: 209
     },
     
     _colorPicker: null,
@@ -260,7 +268,7 @@ Jeeel.Gui.ColorPicker.prototype = {
     },
     
     /**
-     * このインスタンスを紐付けるターゲットをセットする(コールバックの設定はキャンセルされる)
+     * このインスタンスを紐付けるターゲットを追加する(コールバックの設定はキャンセルされる)
      * 
      * @param {Element} commonTarget 対象のElement(他の引数を指定しない場合このElementが他の引数と共通になる)
      * @param {Element} [textTarget] Textの値を受け取り専用のElement<br />
@@ -271,11 +279,63 @@ Jeeel.Gui.ColorPicker.prototype = {
      *                              falseを渡せばBGカラーの値の受け取りが無くなる
      * @return {Jeeel.Gui.ColorPicker} 自インスタンス
      */
+    addTarget: function (commonTarget, textTarget, bgTarget) {
+        
+        var idx = this._targets.length;
+        
+        this._targets[idx] = {
+            click: commonTarget,
+            text: Jeeel.Type.isEmpty(textTarget) && commonTarget || textTarget,
+            bg: Jeeel.Type.isEmpty(bgTarget) && commonTarget || bgTarget
+        };
+        
+        Jeeel.Dom.Event.addEventListener(commonTarget, Jeeel.Dom.Event.Type.CLICK, this._toggle, this);
+        
+        this._callback = {
+            func: this._targetCallback,            
+            thisArg: this
+        };
+        
+        return this;
+    },
+    
+    /**
+     * このインスタンスを紐付けるターゲットを削除する
+     * 
+     * @param {Element} commonTarget 対象のElement
+     * @return {Jeeel.Gui.ColorPicker} 自インスタンス
+     */
+    removeTarget: function (commonTarget) {
+        
+        for (var i = this._targets.length; i--;) {
+            if (this._targets[i].click === commonTarget) {
+                Jeeel.Dom.Event.removeEventListener(commonTarget, Jeeel.Dom.Event.Type.CLICK, this._toggle);
+                this._targets.splice(i, 1);
+                break;
+            }
+        }
+        
+        return this;
+    },
+    
+    /**
+     * このインスタンスを紐付けるターゲットをセットする(コールバックの設定はキャンセルされる)
+     * 
+     * @param {Element} commonTarget 対象のElement(他の引数を指定しない場合このElementが他の引数と共通になる)
+     * @param {Element} [textTarget] Textの値を受け取り専用のElement<br />
+     *                                nullを渡すと省略と同じ意味になり、<br />
+     *                                falseを渡せばTextの値の受け取りが無くなる
+     * @param {Element} [bgTarget] BGカラー受け取り専用のElement<br />
+     *                              nullを渡すと省略と同じ意味になり、<br />
+     *                              falseを渡せばBGカラーの値の受け取りが無くなる
+     * @return {Jeeel.Gui.ColorPicker} 自インスタンス
+     * @deprecated じきに無くなります
+     */
     setTarget: function (commonTarget, textTarget, bgTarget) {
       
         this._resetTarget();
       
-        this._target = {
+        this._currentTarget = {
             click: commonTarget,
             text: Jeeel.Type.isEmpty(textTarget) && commonTarget || textTarget,
             bg: Jeeel.Type.isEmpty(bgTarget) && commonTarget || bgTarget
@@ -284,31 +344,7 @@ Jeeel.Gui.ColorPicker.prototype = {
         Jeeel.Dom.ElementOperator.create(commonTarget).addClick(this._toggle, this);
         
         this._callback = {
-            func: function (color, colorText) {
-                var rgb = color.toRgb();
-                var hsl = color.toHsl();
-                
-                if (this._target.bg) {
-                    this._target.bg.style.backgroundColor = rgb.toString();
-                }
-                
-                if (this._target.text && 'value' in this._target.text) {
-                    this._target.text.value = colorText;
-                    
-                    if (this._target.bg === this._target.text) {
-                        var fontColor;
-
-                        if (hsl.luminance < 0.6) {
-                            fontColor = '#ffffff';
-                        } else {
-                            fontColor = '#000000';
-                        }
-
-                        this._target.text.style.color = fontColor;
-                    }
-                }
-            },
-            
+            func: this._targetCallback,            
             thisArg: this
         };
         
@@ -414,29 +450,81 @@ Jeeel.Gui.ColorPicker.prototype = {
      */
     constructor: Jeeel.Gui.ColorPicker,
     
-    _toggle: function (ev, elm) {
+    /**
+     * 内部的に表示を切り替える
+     * 
+     * @param {Jeeel.Dom.Event} e イベントオブジェクト
+     */
+    _toggle: function (e) {
         
-        var rect = Jeeel.Dom.Element.create(elm).getRect();
+        var target = e.currentTarget;
+        var isUnMatch = true;
+        
+        for (var i = this._targets.length; i--;) {
+            if (this._targets[i].click === target) {
+                if (this._currentTarget === this._targets[i]) {
+                    isUnMatch = false;
+                }
+                
+                this._currentTarget = this._targets[i];
+                break;
+            }
+        }
+        
+        var rect = Jeeel.Dom.Element.create(target).getRect();
         
         this.move(rect.endPoint.x + 10, rect.y);
+        
+        // 前のターゲットと違うターゲットで表示状態のままであった場合移動だけで終了する
+        if (isUnMatch && this._colorPicker.style.display !== 'none') {
+            return;
+        }
         
         this.toggle();
     },
     
+    /**
+     * ターゲットを初期化する
+     */
     _resetTarget: function () {
-        if ( ! this._target) {
+        if ( ! this._currentTarget) {
             return;
         }
         
-        Jeeel.Dom.ElementOperator.create(this._target.click).removeClick(this._toggle);
+        Jeeel.Dom.ElementOperator.create(this._currentTarget.click).removeClick(this._toggle);
         
-        this._target = null;
+        this._currentTarget = null;
+    },
+    
+    _targetCallback: function (color, colorText) {
+        var rgb = color.toRgb();
+        var hsl = color.toHsl();
+
+        if (this._currentTarget.bg) {
+            this._currentTarget.bg.style.backgroundColor = rgb.toString();
+        }
+
+        if (this._currentTarget.text && 'value' in this._currentTarget.text) {
+            this._currentTarget.text.value = colorText;
+
+            if (this._currentTarget.bg === this._currentTarget.text) {
+                var fontColor;
+
+                if (hsl.luminance < 0.6) {
+                    fontColor = '#ffffff';
+                } else {
+                    fontColor = '#000000';
+                }
+
+                this._currentTarget.text.style.color = fontColor;
+            }
+        }
     },
     
     _showElement: function (elm, rate) {
         elm = $ELM(elm);
         
-        var size = elm.getSize();
+        var size = this._pickerSize;
         var scalingSpeed = {w: size.width * rate / 100, h: size.height * rate / 100};
         var s = {w: 0, h: 0};
         
@@ -681,13 +769,13 @@ Jeeel.Gui.ColorPicker.prototype = {
         var key = ev && ev.getKeyCode();
         
         switch (key) {
-            case Jeeel.Code.KeyCode.Up:
-            case Jeeel.Code.KeyCode.Down:
-            case Jeeel.Code.KeyCode.Left:
-            case Jeeel.Code.KeyCode.Right:
-            case Jeeel.Code.KeyCode.Home:
-            case Jeeel.Code.KeyCode.End:
-            case Jeeel.Code.KeyCode.Ctrl:
+            case Jeeel.Dom.Event.KeyCode.Up:
+            case Jeeel.Dom.Event.KeyCode.Down:
+            case Jeeel.Dom.Event.KeyCode.Left:
+            case Jeeel.Dom.Event.KeyCode.Right:
+            case Jeeel.Dom.Event.KeyCode.Home:
+            case Jeeel.Dom.Event.KeyCode.End:
+            case Jeeel.Dom.Event.KeyCode.Ctrl:
                 return;
                 break;
             
@@ -988,7 +1076,7 @@ Jeeel.Gui.ColorPicker.prototype = {
     },
     
     _initFinish: function (appendTarget) {
-        Jeeel.Dom.Element.create(this._colorPicker).hide().setBackgroundIframe();
+        Jeeel.Dom.Element.create(this._colorPicker).hide().setShim();
 
         this._drawPallet();
         this._drawLuminanceBar();

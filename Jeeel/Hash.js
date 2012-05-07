@@ -72,7 +72,7 @@ Jeeel.Hash.getKeys = function (hash, value, strict) {
     var valSet = Jeeel.Type.isSet(value);
     var res = [];
 
-    if (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash) || Jeeel.Type.isElementCollection(hash) || Jeeel.Type.isNodeList(hash)) {
+    if (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash) || Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash)) {
         for (var i = 0, l = hash.length; i < l; i++) {
             
             if (valSet) {
@@ -115,12 +115,22 @@ Jeeel.Hash.getValues = function (hash) {
     if ( ! Jeeel.Type.isHash(hash)) {
         throw new Error('hashが配列・連想配列ではありません');
     }
+    
+    var res;
 
     if (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash)) {
         return Array.prototype.slice.call(hash, 0, hash.length);
+    } else if (Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash)) {
+        res = [];
+        
+        for (var i = hash.length; i--;) {
+            res[i] = hash[i];
+        }
+        
+        return res;
     }
 
-    var res = [];
+    res = [];
 
     for (var key in hash) {
         res[res.length] = hash[key];
@@ -134,11 +144,12 @@ Jeeel.Hash.getValues = function (hash) {
  * 配列等に関しても全て返す
  *
  * @param {Hash} hash 配列・連想配列
+ * @param {Boolean} [sort] ソートするかどうか
  * @param {Boolean} [enableChainKey] プロトタイプチェーンのキーを全て参照するかどうか(__proto__が定義されていないブラウザには意味がない)
  * @return {Jeeel.Object.Item[]} キーと値のリスト(valueはセキュリティ系のエラーの場合、値ではなくエラーオブジェクトを代入する)
  * @throws {Error} hashが配列式でない場合に起こる
  */
-Jeeel.Hash.getPairs = function (hash, enableChainKey) {
+Jeeel.Hash.getPairs = function (hash, sort, enableChainKey) {
     
     if (Jeeel.Type.isEmpty(hash)) {
         throw new Error('hashが配列・連想配列ではありません');
@@ -192,6 +203,18 @@ Jeeel.Hash.getPairs = function (hash, enableChainKey) {
     
     if ( ! ('__proto__' in hash) && Object.getPrototypeOf) {
         pair[pair.length] = new Jeeel.Object.Item('__proto__', Object.getPrototypeOf(hash));
+    }
+    
+    if (sort) {
+        pair.sort(function (a, b) {
+            if (a.key > b.key) {
+                return 1;
+            } else if(a.key < b.key) {
+                return -1;
+            }
+            
+            return 0;
+        });
     }
 
     return pair;
@@ -290,10 +313,10 @@ Jeeel.Hash.toArray = function (hash) {
     else if (Jeeel.Type.isArguments(hash)) {
         return (hash.length === 1 ? [hash[0]] : Array.apply(null, hash));
     }
-    else if (Jeeel.Type.isElementCollection(hash) || Jeeel.Type.isNodeList(hash)) {
+    else if (Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash)) {
         var arr = [];
 
-        for (var i = 0, l = hash.length; i < l; i++) {
+        for (var i = hash.length; i--;) {
             arr[i] = hash[i];
         }
 
@@ -1127,6 +1150,10 @@ Jeeel.Hash.prototype = {
      */
     sort: function (compareFunction) {
         if ( ! compareFunction ) {
+          
+            /**
+             * @ignore
+             */
             compareFunction = function (a, b) {
                 a = '' + a;
                 b = '' + b;
@@ -1135,6 +1162,9 @@ Jeeel.Hash.prototype = {
             };
         }
         
+        /**
+         * @ignore
+         */
         var middle = function (h, t) {
             return h + ((t - h) >>> 1);
         };
@@ -1372,7 +1402,7 @@ Jeeel.Hash.prototype = {
         
         var keys = [], vals = [];
         
-        if ('length' in hash && (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash) || Jeeel.Type.isElementCollection(hash) || Jeeel.Type.isNodeList(hash))) {
+        if ('length' in hash && (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash) || Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash))) {
             for (var i = 0, l = hash.length; i < l; i++) {
                 keys[i] = '' + i;
                 vals[i] = hash[i];
@@ -1426,6 +1456,9 @@ Jeeel.Hash.prototype = {
         return res;
     },
     
+    /**
+     * 
+     */
     _resetLastIndex: function (key, set) {
         
         if ( ! Jeeel.Type.isSet(key)) {

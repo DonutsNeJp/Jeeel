@@ -3,6 +3,7 @@
  * コンストラクタ
  * 
  * @class コンテキストメニューを管理するクラス
+ * @ignore 未完成
  */
 Jeeel.Gui.ContextMenu = function () {
     this._init();

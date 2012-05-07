@@ -197,6 +197,9 @@ Jeeel.Dom.Document.prototype = {
             depth = wrap[0];
 
             div = this.createElement('div');
+            div.style.display = 'none';
+            
+            this.appendToBody(div);
 
             // Go to html and back, then peel off extra wrappers
             div.innerHTML = wrap[1] + html + wrap[2];
@@ -235,8 +238,20 @@ Jeeel.Dom.Document.prototype = {
 
         var children = div.childNodes;
 
-        for (var i = 0, l = children.length; i < l; i++) {
+        for (var i = children.length; i--;) {
             res[i] = children[i];
+        }
+        
+        var child;
+        
+        while (child = div.firstChild) {
+            div.removeChild(child);
+        }
+        
+        if (div.parentNode) {
+            var parent = div.parentNode;
+            
+            parent.removeChild(div);
         }
 
         return res;
@@ -381,7 +396,7 @@ Jeeel.Dom.Document.prototype = {
      *
      * @param {String} selector CSSセレクタ
      * @return {Element[]} 取得したElement配列
-     * @ignore
+     * @see Jeeel.Dom.Selector
      */
     getElementsBySelector: function (selector) {
         return this._searcher.getElementsBySelector(selector);
@@ -477,23 +492,6 @@ Jeeel.Dom.Document.prototype = {
     },
 
     /**
-     * イメージ全てに対してロールオーバー動作を定義づける
-     * 
-     * @return {Jeeel.Dom.Document} 自インスタンス
-     * @ignore
-     */
-    rolloverImages: function () {
-        var inputs = this.getElementsByTagName('input');
-        var images = this.getElementsByTagName('img');
-        
-        var rollover = new Jeeel.Dom.Event.Rollover.Image();
-        
-        rollover.rollover(inputs.concat(images));
-        
-        return this;
-    },
-
-    /**
      * コンストラクタ
      * 
      * @param {Document} [document] 対象のドキュメント(iframe等で階層が違う場合に指定)
@@ -501,6 +499,9 @@ Jeeel.Dom.Document.prototype = {
      */
     constructor: Jeeel.Dom.Document,
     
+    /**
+     * @ignore
+     */
     _init: function () {
       
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
@@ -513,6 +514,9 @@ Jeeel.Dom.Document.prototype = {
         
         var _option, _rect;
 
+        /**
+         * @ignore
+         */
         function _searchRange(res, target) {
             var trect = Jeeel.Dom.Element.create(target).getRect();
 
@@ -532,9 +536,10 @@ Jeeel.Dom.Document.prototype = {
             }
         }
         
-        var self = this;
-        
-        self.searchElementsByRange = function (rect, option) {
+        /**
+         * @ignore
+         */
+        this.searchElementsByRange = function (rect, option) {
             if ( ! rect) {
                 return [];
             }
@@ -554,12 +559,19 @@ Jeeel.Dom.Document.prototype = {
         };
         
         if ('scrollWidth' in doc.documentElement) {
+            
+            /**
+             * @ignore
+             */
             this.getDocumentSize = function () {
                 var root = this.getDocumentElement();
                 
                 return new Jeeel.Object.Size(root.scrollWidth, root.scrollHeight);
             };
         } else {
+            /**
+             * @ignore
+             */
             this.getDocumentSize = function () {
                 var root = this.getBody();
                 
@@ -569,7 +581,11 @@ Jeeel.Dom.Document.prototype = {
         
         // createElementNSが存在しないブラウザはネームスペースを無視
         if ( ! doc.createElementNS) {
-            self.createElementNS = function (namespaceUri, tagName) {
+          
+            /**
+             * @ignore
+             */
+            this.createElementNS = function (namespaceUri, tagName) {
                 return this.createElement(tagName);
             };
         }
@@ -601,6 +617,9 @@ if (Jeeel._doc) {
     div.setAttribute("className", "t");
     div.innerHTML = "   <link/><table></table><a href='/a' style='top:1px;float:left;opacity:.55;'>a</a><input type='checkbox'/>";
 
+    /**
+     * @namespace サポート用ネームスペース
+     */
     Jeeel.Dom.Document.Supports = ({
         leadingWhitespace: ( div.firstChild.nodeType === 3 ),
 
@@ -629,6 +648,9 @@ if (Jeeel._doc) {
         rxhtmlTag: /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
         rtagName: /<([\w:]+)/,
         
+        /**
+         * @ignore
+         */
         _init: function () {
             this.wrapMap.optgroup = this.wrapMap.option;
             this.wrapMap.tbody = this.wrapMap.tfoot = this.wrapMap.colgroup = this.wrapMap.caption = this.wrapMap.thead;

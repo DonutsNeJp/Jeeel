@@ -1,4 +1,8 @@
 
+/**
+ * @class スピードに関するクラス
+ * @static
+ */
 Jeeel.Dom.Style.Animation.Speed = {
     
     getSpeed: function (duration) {
@@ -15,7 +19,7 @@ Jeeel.Dom.Style.Animation.Speed = {
 };
 
 /**
- * 規定の速度を示す列挙体
+ * @namespace 規定の速度を示す列挙体
  */
 Jeeel.Dom.Style.Animation.Speed.SPEEDS = {
     /**

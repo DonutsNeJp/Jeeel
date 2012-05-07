@@ -37,7 +37,7 @@ Jeeel.Filter.Html.HiddenString.prototype = {
         throw new Error('keyを作成時に指定せずに配列式が使えない値に対しては対応していません。');
     },
 
-    _filterArray: function (vals) {
+    _filterEach: function (vals) {
 
         if (this._key) {
             return this._scanArray(this._key, vals);
@@ -100,3 +100,7 @@ Jeeel.Filter.Html.HiddenString.prototype = {
 };
 
 Jeeel.Class.extend(Jeeel.Filter.Html.HiddenString, Jeeel.Filter.Abstract);
+
+if (Jeeel._auto) {
+    Jeeel._tmp();
+}

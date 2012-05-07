@@ -43,7 +43,7 @@ Jeeel.Filter.Hash.KeySpecify.prototype = {
     /**
      * @private
      */
-    _filterArray: function (array) {
+    _filterEach: function (array) {
 
         var res = {};
 

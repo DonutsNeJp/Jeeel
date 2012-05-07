@@ -1,15 +1,71 @@
 
 /**
- * HTML特殊文字に関する列挙体
+ * @namespace HTML特殊文字に関する列挙体
  */
 Jeeel.Code.HtmlCode = {
+  
+    /**
+     * (&nbsp;)半角空白
+     * 
+     * @type String
+     * @constant
+     */
     HalfWidthSpace: '&nbsp;',
+    
+    /**
+     * (&emsp;)全角空白
+     * 
+     * @type String
+     * @constant
+     */
     FullWidthSpace: '&emsp;',
+    
+    /**
+     * "
+     * 
+     * @type String
+     * @constant
+     */
     DoubleQuote: '&quot;',
+    
+    /**
+     * &amp;
+     * 
+     * @type String
+     * @constant
+     */
     Ampersand: '&amp;',
+    
+    /**
+     * &lt;
+     * 
+     * @type String
+     * @constant
+     */
     LessThan: '&lt;',
+    
+    /**
+     * &gt;
+     * 
+     * @type String
+     * @constant
+     */
     GreaterThan: '&gt;',
+    
+    /**
+     * &crarr;
+     * 
+     * @type String
+     * @constant
+     */
     CarriageReturn: '&crarr;',
+    
+    /**
+     * &copy;
+     * 
+     * @type String
+     * @constant
+     */
     Copyright: '&copy;',
     TradeMark: '&trade;',
     RegisteredTrademark : '&reg;',

@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Graphics.Raster.Canvas = {
 };
 
 /**
- * Canvasに関してのネームスペース
+ * @namespace Canvasに関してのネームスペース
  */
 Jeeel.Graphics.Raster.Canvas = {
   

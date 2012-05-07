@@ -1,6 +1,6 @@
 
 /**
- * メッセージをHTML上に表示するためのモジュール
+ * @staticClass メッセージをHTML上に表示するためのモジュール
  */
 Jeeel.Debug.ErrorMessage = {
     

@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.File = {
 };
 
 /**
- * ファイルに関するネームスペース
+ * @namespace ファイルに関するネームスペース
  */
 Jeeel.File = {
   

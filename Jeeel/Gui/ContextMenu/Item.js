@@ -1,4 +1,10 @@
 
+/**
+ * コンストラクタ
+ * 
+ * @class コンテキストメニューの項目を示すクラス
+ * @ignore
+ */
 Jeeel.Gui.ContextMenu.Item = function (text) {
     this._init(text);
 };

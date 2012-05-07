@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Object = {
 };
 
 /**
- * 汎用オブジェクト関連のネームスペース
+ * @namespace 汎用オブジェクト関連のネームスペース
  */
 Jeeel.Object = {
 

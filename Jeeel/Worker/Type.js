@@ -1,6 +1,6 @@
 
 /**
- * Worker内で使用されるイベントタイプを示す列挙体
+ * @namespace Worker内で使用されるイベントタイプを示す列挙体
  */
 Jeeel.Worker.Type = {
     

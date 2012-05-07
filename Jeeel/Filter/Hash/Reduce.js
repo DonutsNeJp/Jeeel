@@ -53,7 +53,7 @@ Jeeel.Filter.Hash.Reduce.prototype = {
     /**
      * @private
      */
-    _filterArray: function (val) {
+    _filterEach: function (val) {
         var res = {};
 
         Jeeel.Hash.forEach(val,

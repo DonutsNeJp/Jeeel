@@ -43,7 +43,7 @@ Jeeel.Filter.Map.prototype = {
     /**
      * @private
      */
-    _filterArray: function (vals) {
+    _filterEach: function (vals) {
         var res = {};
         
         Jeeel.Hash.forEach(vals,

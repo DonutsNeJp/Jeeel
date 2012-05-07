@@ -11,6 +11,9 @@ Jeeel.directory.Jeeel.Filter = {
     }
 };
 
+/**
+ * @namespace フィルターに関するネームスペース
+ */
 Jeeel.Filter = {
 
     /**
@@ -31,7 +34,7 @@ Jeeel.Filter.Abstract.prototype = {
      */
     filter: function (val) {
         if (Jeeel.Type.isHash(val)) {
-            val = this._filterArray(val);
+            val = this._filterEach(val);
         } else {
             val = this._filter(val);
         }
@@ -59,7 +62,7 @@ Jeeel.Filter.Abstract.prototype = {
      * @return {Mixied} フィルターを掛けた後の値
      * @protected
      */
-    _filterArray: function (arr) {
+    _filterEach: function (arr) {
         var result = {};
 
         Jeeel.Hash.forEach(arr,

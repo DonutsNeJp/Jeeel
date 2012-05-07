@@ -1,6 +1,6 @@
 
 /**
- * オブジェクトの型の種類を示す列挙体
+ * @namespace オブジェクトの型の種類を示す列挙体
  */
 Jeeel.Type.ObjectType = {
     /**

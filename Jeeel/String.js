@@ -103,11 +103,17 @@ Jeeel.String.trim = function (str) {
     if ( ! str) {
         return '';
     }
+    
+    str = str.toString();
+    
+    if (str.trim) {
+        return str.trim();
+    }
 
     var trimLeft  = /^\s+/;
-    var trimRight = /\s+$/;
+    var trimRight = /\s\s*$/;
 
-    return str.toString().replace(trimLeft, '').replace(trimRight, '');
+    return str.replace(trimLeft, '').replace(trimRight, '');
 };
 
 /**
@@ -118,7 +124,7 @@ Jeeel.String.trim = function (str) {
  * @return {String} 変換後の文字列
  */
 Jeeel.String.toCamelCase = function (str) {
-    return ('' + str).replace(/(-|_)([a-z])/g, function (str, p1, p2){return p2.toUpperCase();});
+    return ('' + str).replace(/(?:-|_)([a-z])/g, function (str, p){return p.toUpperCase();});
 };
 
 /**
@@ -141,6 +147,16 @@ Jeeel.String.toSnakeCase = function (str) {
  */
 Jeeel.String.toHyphenation = function (str) {
     return ('' + str).replace(/([A-Z])/g, '-$1').replace(/_/g, '-').toLowerCase();
+};
+
+/**
+ * 対象文字列の単語の先頭をだけを大文字にする
+ * 
+ * @param {String} str 対象文字列
+ * @return {String} 変換後の文字列
+ */
+Jeeel.String.toTitleCase = function (str) {
+    return ('' + str).toLowerCase().replace(/(^|\s)([a-z])/g, function (str, p1, p2){return p1 + p2.toUpperCase();});
 };
 
 /**
@@ -213,6 +229,68 @@ Jeeel.String.multiInsert = function (str, indexArr, insertStrArr) {
     return res.join('');
 };
 
+/**
+ * テキストのサイズを取得する
+ * 
+ * @param {String} text サイズを知りたいテキスト
+ * @param {Hash} [styleList] スタイルのキーと値のリスト
+ * @return {Jeeel.Object.Size} ピクセル単位のテキストのサイズ
+ */
+Jeeel.String.getTextSize = function (text, styleList) {
+    var span;
+    
+    if (this.getTextWidth._span) {
+        span = this.getTextWidth._span;
+    } else {
+        span = Jeeel.Document.createElement('span');
+        span.style.cssText = 'display: inline; position: absolute; top: 0px; margin: 0; white-space: nowrap; border: none; visibility: hidden;';
+        
+        Jeeel.Document.appendToBody(span);
+        
+        span = new Jeeel.Dom.Element(span);
+        
+        this.getTextWidth._span = span;
+    }
+    
+    if ( ! styleList) {
+        styleList = {};
+    }
+    
+    delete styleList.visibility;
+    delete styleList.position;
+    
+    span.setStyleList(styleList);
+    
+    if (text.charAt(text.length - 1) === '\n') {
+        text += ' ';
+    }
+    
+    span.setText(text);
+    
+    return span.getSize();
+};
+
+/**
+ * テキストの幅を取得する
+ * 
+ * @param {String} text 幅を知りたいテキスト
+ * @param {Hash} [styleList] スタイルのキーと値のリスト
+ * @return {Integer} ピクセル単位のテキストの幅
+ */
+Jeeel.String.getTextWidth = function (text, styleList) {
+    return this.getTextSize(text, styleList).width;
+};
+
+/**
+ * テキストの高さを取得する
+ * 
+ * @param {String} text 高さを知りたいテキスト
+ * @param {Hash} [styleList] スタイルのキーと値のリスト
+ * @return {Integer} ピクセル単位のテキストの高さ
+ */
+Jeeel.String.getTextHeight = function (text, styleList) {
+    return this.getTextSize(text, styleList).height;
+};
 
 Jeeel.String.prototype = {
   
@@ -228,6 +306,7 @@ Jeeel.String.prototype = {
      * 行数
      * 
      * @type Integer
+     * @private
      */
     _lineCount: null,
     
@@ -235,6 +314,7 @@ Jeeel.String.prototype = {
      * 改行部分のインデックス配列
      * 
      * @type Integer[]
+     * @private
      */
     _lineIndex: null,
     
@@ -274,6 +354,36 @@ Jeeel.String.prototype = {
         var last  = this._lineIndex[line];
         
         return this._str.slice(first, last);
+    },
+    
+    /**
+     * 文字列のサイズを取得する
+     * 
+     * @param {Hash} [styleList] スタイルのキーと値のリスト
+     * @return {Jeeel.Object.Size} ピクセル単位のテキストのサイズ
+     */
+    getTextSize: function (styleList) {
+        return this.constructor.getTextSize(this._str, styleList);
+    },
+    
+    /**
+     * 文字列の幅を取得する
+     * 
+     * @param {Hash} [styleList] スタイルのキーと値のリスト
+     * @return {Integer} ピクセル単位のテキストの幅
+     */
+    getTextWidth: function (styleList) {
+        return this.constructor.getTextWidth(this._str, styleList);
+    },
+    
+    /**
+     * 文字列の高さを取得する
+     * 
+     * @param {Hash} [styleList] スタイルのキーと値のリスト
+     * @return {Integer} ピクセル単位のテキストの高さ
+     */
+    getTextHeight: function (styleList) {
+        return this.constructor.getTextHeight(this._str, styleList);
     },
     
     /**
@@ -433,6 +543,17 @@ Jeeel.String.prototype = {
      */
     hyphenation: function () {
         this._str = this.constructor.toHyphenation(this._str);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列をタイトルケースに変更する
+     * 
+     * @return {Jeeel.String} 自インスタンス
+     */
+    titleCase: function () {
+        this._str = this.constructor.toTitleCase(this._str);
         
         return this._reset();
     },

@@ -65,7 +65,7 @@ Jeeel.directory.Jeeel.Config = {
     };
     
     /**
-     * コンフィグファイルの読み込みを行う<br />
+     * コンフィグファイルの読み込みを同期的に行う<br />
      * キャッシングも行い同じコンフィグへのアクセスは早くなる
      * 
      * @param {String} url コンフィグへのURL
@@ -75,8 +75,36 @@ Jeeel.directory.Jeeel.Config = {
         if (cash[url]) {
             return cash[url];
         }
-        
+
         return cash[url] = new this(Jeeel.Dom.Xml.load(url));
+    };
+    
+    /**
+     * コンフィグファイルの読み込みを非同期行う<br />
+     * キャッシングも行い同じコンフィグへのアクセスは早くなる
+     * 
+     * @param {String} url コンフィグへのURL
+     * @param {Function} callback 指定すると非同期読み込みになり引数にコンフィグが渡される<br />
+     *                               void callback(Jeeel.Config config)
+     */
+    Jeeel.Config.loadAsync = function (url, callback) {
+        if ( ! callback) {
+            return;
+        }
+        
+        if (cash[url]) {
+            callback(cash[url]);
+        } else {
+            var self = this;
+            
+            Jeeel.Dom.Xml.loadAsync(url, function (xml) {
+                cash[url] = new self(xml);
+                
+                callback(cash[url]);
+                
+                self = null;
+            });
+        }
     };
 })();
 

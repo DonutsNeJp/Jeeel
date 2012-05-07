@@ -518,6 +518,39 @@ Jeeel.Net.Form.prototype = {
     getOverwrittenElements: function () {},
     
     /**
+     * selectタグのoptionを全て取得する
+     * 
+     * @param {String} key selectタグのname
+     * @return {Element[]} オプションリスト
+     */
+    getOptions: function (key) {
+        var select = this.getElement(key),
+            nodeName = select && select.nodeName;
+        
+        if ( ! nodeName || nodeName.toUpperCase() !== 'SELECT') {
+            return [];
+        }
+        
+        return Jeeel.Hash.toArray(select.options);
+    },
+    
+    /**
+     * selectタグのoptionの値を全て取得する
+     * 
+     * @param {String} key selectタグのname
+     * @return {String[]} オプションの値のリスト
+     */
+    getOptionValues: function (key) {
+        var options = this.getOptions(key);
+        
+        for (var i = options.length; i--;) {
+            options[i] = options[i].value;
+        }
+        
+        return options;
+    },
+    
+    /**
      * 指定キーのinput要素を破棄する
      *
      * @param {String} key キー
@@ -538,7 +571,7 @@ Jeeel.Net.Form.prototype = {
      * @param {Hash} options オプションの値に使う値と表示値のリスト({value1: text1, value2: text2, ...})
      * @return {Jeeel.Net.Form} 自インスタンス
      */
-    replaceSelectOptions: function (key, options) {
+    replaceOptions: function (key, options) {
         var select = this.getElement(key),
             nodeName = select && select.nodeName;
         
@@ -574,6 +607,10 @@ Jeeel.Net.Form.prototype = {
      * @return {Jeeel.Net.Form} 自身のインスタンス
      */
     submit: function () {
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(this.getAction(), '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
         if (this._pseudoForm) {
             this._setAllForm(this.getAll());
         }
@@ -609,31 +646,47 @@ Jeeel.Net.Form.prototype = {
         var foef = new Jeeel.Filter.Html.Form(false, null, oName);
         var uef  = new Jeeel.Filter.Url.Escape();
         
-        var self = this;
-        
-        self.getAll = function () {
+        /**
+         * @ignore
+         */
+        this.getAll = function () {
             return fnvf.filter(this._pseudoForm || this._form);
         };
         
-        self.getDefaultAll = function () {
+        /**
+         * @ignore
+         */
+        this.getDefaultAll = function () {
             return fdvf.filter(this._pseudoForm || this._form);
         };
         
-        self.getElementAll = function () {
+        /**
+         * @ignore
+         */
+        this.getElementAll = function () {
             return fnef.filter(this._pseudoForm || this._form);
         };
         
-        self.getUnknownElements = function () {
+        /**
+         * @ignore
+         */
+        this.getUnknownElements = function () {
             var parm = fuef.filter(this._pseudoForm || this._form)[uName];
 
             return Jeeel.Hash.getValues(parm || []);
         };
         
-        self.getOverwrittenElements = function () {
+        /**
+         * @ignore
+         */
+        this.getOverwrittenElements = function () {
             return foef.filter(this._pseudoForm || this._form)[oName];
         };
         
-        self._setAllForm = function (vals) {
+        /**
+         * @ignore
+         */
+        this._setAllForm = function (vals) {
             var inputs = fnef.filter(this._form);
 
             Jeeel.Hash.forEach(vals,
@@ -645,7 +698,10 @@ Jeeel.Net.Form.prototype = {
             return this;
         };
         
-        self._set = function (key, val, input, toForm) {
+        /**
+         * @ignore
+         */
+        this._set = function (key, val, input, toForm) {
             // inputがElementの場合
             if (Jeeel.Type.isElement(input)) {
 

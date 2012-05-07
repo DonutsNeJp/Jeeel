@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Debug.Profiler = {
 };
 
 /**
- * メソッドのプロファイリング機能を提供するスタティッククラス
+ * @staticClass メソッドのプロファイリング機能を提供するスタティッククラス
  */
 Jeeel.Debug.Profiler = {
   

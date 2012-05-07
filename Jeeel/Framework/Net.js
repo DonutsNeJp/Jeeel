@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Framework.Net = {
 };
 
 /**
- * ネット関連のネームスペース
+ * @namespace ネット関連のネームスペース
  */
 Jeeel.Framework.Net = {
 

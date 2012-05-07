@@ -54,7 +54,7 @@ Jeeel.Filter.Hash.Difference.prototype = {
     /**
      * @private
      */
-    _filterArray: function (array) {
+    _filterEach: function (array) {
       
         array = new Jeeel.Hash(array);
 

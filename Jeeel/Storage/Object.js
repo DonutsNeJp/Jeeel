@@ -5,7 +5,7 @@
     var instances = {};
     
     /**
-     * コンストラクタ
+     * コンストラクタ(newなしで呼んでも動作する)
      * 
      * @class Objectストレージ、Objectに対して疑似的に保存を行うクラス(Jeeel.Parameterと合わせても使えるが基本単独で使う)
      * @augments Jeeel.Storage.Abstract
@@ -40,6 +40,27 @@
         instances[name][uniqueId] = this;
         this._params = {};
     };
+    
+    /**
+     * インスタンスが既に作成されているかどうかを返す
+     * 
+     * @param {Object} object 疑似保存対象のObject
+     * @param {String} [name] ネームスペースを指定する場合に指定
+     * @return {Boolean} 既に作成されているかどうか
+     */
+    Jeeel.Storage.Object.exists = function (object, name) {
+        var uniqueId = object.uniqueID || object[Jeeel.UNIQUE_ID];
+        
+        if ( ! uniqueId) {
+            return false;
+        }
+        
+        if ( ! name) {
+            name = defaultName;
+        }
+        
+        return !!(instances[name] && instances[name][uniqueId]);
+    };
 })();
 
 /**
@@ -52,6 +73,17 @@
  */
 Jeeel.Storage.Object.create = function (object, name) {
     return new this(object, name);
+};
+
+/**
+ * 議事保存対象のObjectが既にユニークIDを保持しているかどうかを取得する<br />
+ * この確認作業を行う事で不要な拡張を防ぐことが出来る
+ * 
+ * @param {Object} object 疑似保存対象のObject
+ * @return {Boolean} ユニークIDを持っているかどうか
+ */
+Jeeel.Storage.Object.hasUniqueId = function (object) {
+    return !!(object.uniqueID || object[Jeeel.UNIQUE_ID]);
 };
 
 Jeeel.Storage.Object.prototype = {
@@ -104,7 +136,7 @@ Jeeel.Storage.Object.prototype = {
      * @param {Mixed} value 保存値
      * @return {Jeeel.Storage.Object} 自インスタンス
      */
-    saveData: function (key, value) {
+    set: function (key, value) {
         this._params[key] = value;
         
         return this;
@@ -116,7 +148,7 @@ Jeeel.Storage.Object.prototype = {
      * @param {String} key 読み込みキー
      * @return {Mixed} 読み込んだデータ
      */
-    loadData: function (key) {
+    get: function (key) {
         return this._params[key];
     },
     

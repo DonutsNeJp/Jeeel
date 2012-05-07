@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Framework.Mvc = {
 };
 
 /**
- * MVCモデル関連のネームスペース
+ * @namespace MVCモデル関連のネームスペース
  */
 Jeeel.Framework.Mvc = {
     

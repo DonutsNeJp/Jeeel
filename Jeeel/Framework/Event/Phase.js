@@ -1,8 +1,6 @@
 
 /**
- * イベントフェーズの列挙体
- * 
- * @enum {Integer}
+ * @namespace イベントフェーズの列挙体
  */
 Jeeel.Framework.Event.Phase = {
   

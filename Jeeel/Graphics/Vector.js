@@ -17,7 +17,6 @@ Jeeel.directory.Jeeel.Graphics.Vector = {
  * @class ベクター系のグラフィックス処理機能を提供するクラス
  * @augments Jeeel.Graphics.Abstract
  * @param {Jeeel.Graphics.Vector.*} adapter 内部アダプター
- * @ignore 未完
  */
 Jeeel.Graphics.Vector = function (adapter) {
     Jeeel.Graphics.Abstract.call(this);

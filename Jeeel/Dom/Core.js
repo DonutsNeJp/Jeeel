@@ -11,6 +11,9 @@ Jeeel.directory.Jeeel.Dom.Core = {
     }
 };
 
+/**
+ * @namespace DOMの関連のクラスの核になる機能を保有
+ */
 Jeeel.Dom.Core = {
     
 };

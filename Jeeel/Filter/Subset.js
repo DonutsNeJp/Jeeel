@@ -57,7 +57,7 @@ Jeeel.Filter.Subset.prototype = {
     /**
      * @private
      */
-    _filterArray: function (array) {
+    _filterEach: function (array) {
 
         var globalDefault = null;
         var defaults;

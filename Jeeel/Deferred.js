@@ -27,27 +27,24 @@
      * 
      * @param {Mixied} [x] 引数
      */
-    Jeeel.Deferred.success = {func: function (x) {
-        return x;
-    }};
+    Jeeel.Deferred.success = {func: Jeeel.Function.Template.RETURN_ARGUMENT};
 
     /**
      * デフォルトのメソッド失敗時の挙動
      * 
      * @param {Mixied} [x] 引数
      */
-    Jeeel.Deferred.error = {func: function (x) {
-        throw x;
-    }};
+    Jeeel.Deferred.error = {func: Jeeel.Function.Template.THROW_ARGUMENT};
 
     /**
      * 指定したメソッドを遅延実行する
      * 
      * @param {Function} callback 遅延実行対象のメソッド
      * @param {Mixied} [thisArg] コールバック中のthisに相当する値(デフォルトは作成したインスタンスになる)
+     * @param {Integer} [delayTime] 遅延時間(デフォルトは0)
      * @return {Jeeel.Deferred} 作成したインスタンス
      */
-    Jeeel.Deferred.next = function (callback, thisArg) {
+    Jeeel.Deferred.next = function (callback, thisArg, delayTime) {
         var df = new this();
         
         if ( ! deferredQueue[0]) {
@@ -56,16 +53,22 @@
                 var dq = deferredQueue.shift();
 
                 if (deferredQueue[0]) {
-                    id = setTimeout(arguments.callee, 0);
+                    id = setTimeout(arguments.callee, dq._delayTime);
                     
+                    /**
+                     * @ignore
+                     */
                     deferredQueue[0]._canceller = function () {
                         clearTimeout(id);
                     };
                 }
                 
                 dq.call();
-            }, 0);
+            }, +delayTime || 0);
 
+            /**
+             * @ignore
+             */
             df._canceller = function () {
                 clearTimeout(id);
             };
@@ -74,6 +77,8 @@
         deferredQueue[deferredQueue.length] = function () {
             df.call();
         };
+        
+        deferredQueue[deferredQueue.length - 1]._delayTime = +delayTime || 0;
 
         if (callback) {
             df.next(callback, thisArg);
@@ -149,7 +154,7 @@ Jeeel.Deferred.prototype = {
      * @return {Jeeel.Deferred} 自インスタンス
      */
     cancel: function () {
-        (this._canceller || function () {})();
+        (this._canceller || Jeeel.Function.Template.EMPTY)();
         
         return this.reset();
     },

@@ -18,7 +18,7 @@ Jeeel.Session.Core = function (params, expires, domain, path) {
     this.created = (arguments[4] ? new Date(arguments[4]) : new Date());
     this.expires = (Jeeel.Type.isInteger(expires) ? expires : 1440);
     this.path    = (Jeeel.Type.isString(path) ? path : '/');
-    this.domain  = (Jeeel.Type.isString(domain) ? domain : Jeeel.UserAgent.getDomain());
+    this.domain  = (Jeeel.Type.isString(domain) ? domain : Jeeel.UserAgent.getHostname());
 };
 
 /**
@@ -67,7 +67,7 @@ Jeeel.Session.Core.isSessionObject = function (val) {
  * @return {Boolean} 許可されたドメインならばtrueそれ以外はfalseを返す
  */
 Jeeel.Session.Core.isAllowDomain = function (target) {
-    var domain = Jeeel.UserAgent.getDomain();
+    var domain = Jeeel.UserAgent.getHostname();
 
     var reg = new RegExp('^'+target.replace('.', '\\.'));
 
@@ -191,7 +191,7 @@ Jeeel.Session.Core.expires = 1440;
  *
  * @type String
  */
-Jeeel.Session.Core.domain = Jeeel.UserAgent.getDomain();
+Jeeel.Session.Core.domain = Jeeel.UserAgent.getHostname();
 
 if (Jeeel.Session.Core.domain === 'localhost') {
     Jeeel.Session.Core.domain = '';
@@ -356,7 +356,7 @@ Jeeel.Session.Core.prototype = {
      * @return {Boolean} 許可されたドメインならばtrueそれ以外はfalseを返す
      */
     isAllowDomain: function () {
-        var domain = Jeeel.UserAgent.getDomain();
+        var domain = Jeeel.UserAgent.getHostname();
 
         var reg = new RegExp('^'+this.domain.replace('.', '\\.'));
 

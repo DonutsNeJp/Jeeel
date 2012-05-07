@@ -4,11 +4,19 @@
  *
  * @class 日付関係に関する操作を手助けするクラス
  * @param {Date|String|Integer|Jeeel.Object.Date} [date] 基となるDateオブジェクトやDateString(省略は現時刻)
+ * @param {Integer} [offset] 指定した日付を示すタイムゾーンのオフセット(日本なら+540)
  */
-Jeeel.Object.Date = function (date) {
-
+Jeeel.Object.Date = function (date, offset) {
+    
+    var dateOffset;
+    
     if (Jeeel.Type.isString(date)) {
         date = new Date(date.replace(/-/g, '/'));
+        
+        if (offset) {
+            dateOffset = (offset + date.getTimezoneOffset()) * 60000;
+            date = new Date(date.getTime() + dateOffset);
+        }
     } else if (Jeeel.Type.isInteger(date)) {
         date = new Date(date);
     } else if (date instanceof Jeeel.Object.Date) {
@@ -21,6 +29,9 @@ Jeeel.Object.Date = function (date) {
 
     this._date = date;
     
+    // ローカルを基準とした表示なのでグリニッジを標準とする
+    this._offset = offset || -date.getTimezoneOffset();
+    
     this._refreshProperty();
     
     this._timestamp = new Date();
@@ -30,10 +41,11 @@ Jeeel.Object.Date = function (date) {
  * インスタンスの作成を行う
  *
  * @param {Date|String|Integer|Jeeel.Object.Date} [date] 基となるDateオブジェクトやDateString(省略は現時刻)
+ * @param {Integer} [offset] 指定した日付を示すタイムゾーンのオフセット(日本なら+540)
  * @return {Jeeel.Object.Date} 作成したインスタンス
  */
-Jeeel.Object.Date.create = function (date) {
-    return new this(date);
+Jeeel.Object.Date.create = function (date, offset) {
+    return new this(date, offset);
 };
 
 /**
@@ -46,9 +58,10 @@ Jeeel.Object.Date.create = function (date) {
  * @param {Integer} [minute] 分
  * @param {Integer} [second] 秒
  * @param {Integer} [millisecond] ミリ秒
+ * @param {Integer} [offset] 指定した日付を示すタイムゾーンのオフセット(日本なら+540)
  * @return {Jeeel.Object.Date} 作成したインスタンス
  */
-Jeeel.Object.Date.createDate = function (year, month, day, hour, minute, second, millisecond) {
+Jeeel.Object.Date.createDate = function (year, month, day, hour, minute, second, millisecond, offset) {
     var i, l = arguments.length;
     
     for (i = 0; i < l; i++) {
@@ -64,7 +77,7 @@ Jeeel.Object.Date.createDate = function (year, month, day, hour, minute, second,
         l++;
     }
     
-    return new this(Jeeel.Function.toNative(Jeeel._global, 'Date', true).apply(null, arguments));
+    return new this(Jeeel.Function.toNative(Jeeel._global, 'Date', true).apply(null, arguments).toGMTString(), offset);
 };
 
 /**
@@ -90,6 +103,26 @@ Jeeel.Object.Date.checkDate = function (year, month, day, hour, minute, second, 
         && date.second === (+second || 0)
         && date.millisecond === (+millisecond || 0);
 };
+
+if (Jeeel._global && Jeeel._global.Date && Jeeel._global.Date.now) {
+  
+    /**
+     * 1970年1月1日0時0分0秒(UTC)からの経過ミリ秒を取得する(オフセットを考慮)
+     * 
+     * @return {Integer} 経過ミリ秒
+     */
+    Jeeel.Object.Date.now = function () {
+        return Date.now();
+    };
+} else {
+  
+    /**
+     * @ignore
+     */
+    Jeeel.Object.Date.now = function () {
+        return (new Date()).getTime();
+    };
+}
 
 /**
  * 指定した日付文字列を1970年1月1日0時0分0秒(UTC)からの経過ミリ秒に変換する
@@ -157,6 +190,14 @@ Jeeel.Object.Date.prototype = {
      * @type Date
      */
     _date: null,
+    
+    /**
+     * タイムゾーンによるオフセット
+     * 
+     * 
+     * @type Integer
+     */
+    _offset: null,
 
     /**
      * このインスタンスを作成した日付
@@ -215,6 +256,13 @@ Jeeel.Object.Date.prototype = {
     millisecond: 0,
     
     /**
+     * 曜日
+     * 
+     * @type Integer
+     */
+    day: 0,
+    
+    /**
      * 1970年1月1日0時0分0秒(UTC)からの経過ミリ秒
      * 
      * @type Integer
@@ -236,7 +284,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 年
      */
     getYear: function () {
-        return this._date.getFullYear();
+        return this.year;
     },
     
     /**
@@ -245,7 +293,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 月(1～12)
      */
     getMonth: function () {
-        return this._date.getMonth() + 1;
+        return this.month;
     },
     
     /**
@@ -254,7 +302,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 日
      */
     getDate: function () {
-        return this._date.getDate();
+        return this.date;
     },
     
     /**
@@ -263,7 +311,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 時
      */
     getHour: function () {
-        return this._date.getHours();
+        return this.hour;
     },
     
     /**
@@ -272,7 +320,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 分
      */
     getMinute: function () {
-        return this._date.getMinutes();
+        return this.minute;
     },
     
     /**
@@ -281,7 +329,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 秒
      */
     getSecond: function () {
-        return this._date.getSeconds();
+        return this.second;
     },
     
     /**
@@ -290,7 +338,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} ミリ秒
      */
     getMillisecond: function () {
-        return this._date.getMilliseconds();
+        return this.millisecond;
     },
     
     /**
@@ -299,7 +347,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 経過ミリ秒
      */
     getTime: function () {
-        return this._date.getTime();
+        return this.time;
     },
     
     /**
@@ -317,7 +365,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer} 曜日を示す数(0～6)
      */
     getDay: function () {
-        return this._date.getDay();
+        return this.day;
     },
     
     /**
@@ -326,7 +374,36 @@ Jeeel.Object.Date.prototype = {
      * @return {String} 曜日の短縮名(日,月,火,...等)
      */
     getDayName: function () {
-        return this.constructor.DAYS[this._date.getDay()];
+        return this.constructor.DAYS[this.day];
+    },
+    
+    /**
+     * このインスタンスのタイムゾーンオフセットを返す
+     * 
+     * @return {Integer} タイムゾーンオフセット(分数で、GMTからの差分: 日本なら+540)
+     */
+    getOffset: function () {
+        return this._offset;
+    },
+    
+    /**
+     * このインスタンスのタイムゾーンオフセットを設定する<br />
+     * 変更した際に自動的にプロパティの値がそのタイムゾーンでの値に書き換わる
+     * 
+     * @param {Integer} offset タイムゾーンオフセット
+     * @return {Jeeel.Object.Date} 自インスタンス
+     */
+    setOffset: function (offset) {
+        offset = +offset;
+        
+        if (offset) {
+            var tmp = this._offset;
+            this._offset = offset;
+            
+            this._refreshProperty(tmp);
+        }
+        
+        return this;
     },
 
     /**
@@ -372,7 +449,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer[]} 日リスト
      */
     getDatesOfWeek: function () {
-        var date = new Date(this.year, this._date.getMonth(), this.date - this.getDay());
+        var date = new Date(this.year, this.month - 1, this.date - this.day);
         var res  = [];
 
         do {
@@ -390,7 +467,7 @@ Jeeel.Object.Date.prototype = {
      * @return {Integer[]} 日リスト
      */
     getDatesOfMonth: function () {
-        var month = this._date.getMonth();
+        var month = this.month - 1;
         var date  = new Date(this.year, month, 1);
         var res   = [];
 
@@ -575,7 +652,7 @@ Jeeel.Object.Date.prototype = {
         var minute   = this.minute;
         var second   = this.second;
         var unixTime = this.getUnixTime();
-        var day      = this._date.getDay();
+        var day      = this.day;
 
         var lastDate = (new Date(year, month, 0)).getDate();
 
@@ -655,14 +732,22 @@ Jeeel.Object.Date.prototype = {
      * @private
      */
     _refreshProperty: function () {
-        this.year  = this.getYear();
-        this.month = this.getMonth();
-        this.date  = this.getDate();
-        this.hour  = this.getHour();
-        this.minute = this.getMinute();
-        this.second = this.getSecond();
-        this.millisecond = this.getMillisecond();
-        this.time = this.getTime();
+        
+        var date = this._date;
+        
+        if (this._offset) {
+            date = new Date(date.getTime() - (this._offset + date.getTimezoneOffset()) * 60000);
+        }
+        
+        this.year  = date.getFullYear();
+        this.month = date.getMonth() + 1;
+        this.date  = date.getDate();
+        this.hour  = date.getHours();
+        this.minute = date.getMinutes();
+        this.second = date.getSeconds();
+        this.millisecond = date.getMilliseconds();
+        this.day = date.getDay();
+        this.time = this._date.getTime();
         
         return this;
     }

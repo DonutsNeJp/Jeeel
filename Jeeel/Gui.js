@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Gui = {
 };
 
 /**
- * GUI関連のネームスペース
+ * @namespace GUI関連のネームスペース
  */
 Jeeel.Gui = {
     

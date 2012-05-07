@@ -48,8 +48,20 @@ Jeeel.Net.Beacon.prototype = {
      */
     _beacon: null,
     
+    /**
+     * ビーコンの通信成功時のコールバック
+     * 
+     * @type Hash
+     * @private
+     */
     _loadCallback: null,
     
+    /**
+     * ビーコンの通信失敗時のコールバック
+     * 
+     * @type Hash
+     * @private
+     */
     _errorCallback: null,
     
     /**
@@ -169,6 +181,10 @@ Jeeel.Net.Beacon.prototype = {
      * @return {Jeeel.Net.Beacon} 自インスタンス
      */
     execute: function () {
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(this._url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
         var url = this._url + '?' + this._params.toQueryString();
         
         var beacon = new Image();
@@ -178,12 +194,15 @@ Jeeel.Net.Beacon.prototype = {
         beacon.onload = this._onLoad;
         beacon.onerror = this._onError;
         
+        this._beacon = beacon;
+        
         return this;
     },
     
     /**
      * コンストラクタ
      * 
+     * @param {String} url データ送信先URL
      * @constructor
      */
     constructor: Jeeel.Net.Beacon,

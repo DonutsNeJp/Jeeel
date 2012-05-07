@@ -224,6 +224,10 @@ Jeeel.Net.Jsonp.prototype = {
      * @return {Jeeel.Net.Jsonp} 自インスタンス
      */
     execute: function () {
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(this._url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+      
         var url = this._url + '?' + this._params.toQueryString();
         
         this._script = Jeeel.Loader.loadScript(url, this._loaded);

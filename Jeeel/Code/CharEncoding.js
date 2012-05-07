@@ -1,6 +1,6 @@
 
 /**
- * 文字のエンコーディングに関する列挙体
+ * @namespace 文字のエンコーディングに関する列挙体
  */
 Jeeel.Code.CharEncoding = {
 

@@ -46,6 +46,9 @@
 
             delta.value = defaultPrm;
             
+            /**
+             * @ignore
+             */
             var res = {
                 init: {},
                 
@@ -85,6 +88,9 @@
 
             delta.value = -defaultPrm;
             
+            /**
+             * @ignore
+             */
             var res = {
                 init: {},
                 

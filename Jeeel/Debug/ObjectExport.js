@@ -4,7 +4,7 @@
  * @param {Mixied} obj 展開するオブジェクト
  * @return {String} 展開したオブジェクト
  */
-Jeeel.Debug.ObjectExport = function (obj) {
+Jeeel.Debug.objectExport = function (obj) {
     var res = typeof obj;
     var cnt = (arguments[1] ? arguments[1] : 0);
     var i, l;

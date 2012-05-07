@@ -13,7 +13,7 @@ Jeeel.directory.Jeeel.Debug.Debugger = {
 };
 
 /**
- * 専門的なデバッグを行うためのモジュール等を保持するネームスペース
+ * @staticClass 専門的なデバッグを行うためのモジュール等を保持するスタティッククラス
  */
 Jeeel.Debug.Debugger = {
 
@@ -341,11 +341,20 @@ Jeeel.Debug.Debugger = {
     /**
      * 呼び出し元のメソッドのトレースを取得する
      *
+     * @param {Integer} [nestCount]
      * @return {Jeeel.Object.Technical.Trace[]} トレース内容のリスト
      */
-    getTrace: function () {
+    getTrace: function (nestCount) {
         var res = [];
         var func = arguments.callee;
+        
+        if ( ! (nestCount >= 0)) {
+            nestCount = 0;
+        }
+        
+        while(func.caller && nestCount--) {
+            func = func.caller;
+        }
 
         while(func.caller) {
 
@@ -375,16 +384,33 @@ Jeeel.Debug.Debugger = {
             return false;
         } else if (this.INFORMATION_NAME in object) {
             return false;
+        } else if (object instanceof Jeeel.Session.Core) {
+            return false;
         }
+        
+        var isPrototype = arguments[4];
 
         if (Jeeel.Type.isFunction(object) && object.prototype) {
             object.prototype.constructor = object;
         }
         
-        object[this.INFORMATION_NAME] = new Jeeel.Object.Technical.Information(name, arguments[3]);
+        if (isPrototype) {
+            object[this.INFORMATION_NAME] = new Jeeel.Object.Technical.Information(name + '.prototype', arguments[3]);
+        } else {
+            object[this.INFORMATION_NAME] = new Jeeel.Object.Technical.Information(name, arguments[3]);
+        }
 
         if (deepSet) {
-            for (var property in object) {
+            var keys = Jeeel.Hash.getKeys(object);
+            
+            if (Jeeel.Type.isFunction(object) && object.prototype) {
+                keys.push('prototype');
+            }
+            
+            for (var i = 0, l = keys.length; i < l; i++) {
+                
+                var property = keys[i];
+                
                 if (property === 'constructor') {
                     continue;
                 } else if ( ! object.hasOwnProperty(property)) {
@@ -392,7 +418,13 @@ Jeeel.Debug.Debugger = {
                 }
                 
                 try {
-                    arguments.callee.call(this, object[property], name + '.' + property, deepSet, object);
+                    var childName = isPrototype ? name + '#' + property : name + '.' + property;
+                    
+                    if (property === 'prototype') {
+                        childName = name;
+                    }
+
+                    this.setInformation(object[property], childName, deepSet, object, property === 'prototype');
                 } catch (e) {}
             }
         }
@@ -487,7 +519,7 @@ Jeeel.Debug.Debugger = {
     }
 };
 
-Jeeel.file.Jeeel.Debug.Debugger = ['Observer', 'StackTracer', 'Profiler'];
+Jeeel.file.Jeeel.Debug.Debugger = [];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Debug.Debugger, Jeeel.file.Jeeel.Debug.Debugger);
 
@@ -497,12 +529,15 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Debug.Debugger, Jeeel.file.Jeeel.Debug.
         return;
     }
 
+    // 現在のJeeelを保存
     var Jeeel = window.Jeeel;
 
     var listener =  function () {
         var state = document.readyState.toLowerCase();
         
-        if (state.match(/loaded|complete/) && ((Jeeel.Object || {}).Technical || {}).Information) {
+        if (state.match(/loaded|complete/) && Jeeel.Object && Jeeel.Object.Technical && Jeeel.Object.Technical.Information) {
+          
+            // 現在のJeeelと保存したJeeelが同一の場合のみ実行
             if (Jeeel === window.Jeeel) {
                 Jeeel.Debug.Debugger.setInformation(Jeeel, 'Jeeel', true, window);
             }

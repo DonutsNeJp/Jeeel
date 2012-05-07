@@ -1,5 +1,5 @@
 /**
- * Json関連のモジュール
+ * @staticClass Json関連のモジュール
  */
 Jeeel.Json = {
     

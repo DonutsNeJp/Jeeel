@@ -1,8 +1,6 @@
 
 /**
- * イベントタイプの列挙体
- * 
- * @enum {String}
+ * @namespace イベントタイプの列挙体
  */
 Jeeel.Framework.Event.Type = {
   

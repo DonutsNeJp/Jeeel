@@ -64,7 +64,7 @@ Jeeel.Filter.Hash.Flat.prototype = {
     /**
      * @private
      */
-    _filterArray: function (rows) {
+    _filterEach: function (rows) {
         var result = this._arrayWhile(0, rows);
 
         return result;

@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Class = {
 };
 
 /**
- * クラスに関するネームスペース 
+ * @namespace クラスに関するネームスペース
  */
 Jeeel.Class = {
     

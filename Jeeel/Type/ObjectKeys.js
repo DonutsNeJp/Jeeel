@@ -1,6 +1,6 @@
 
 /**
- * オブジェクトが元々保持しているキーのリストの列挙体
+ * @namespace オブジェクトが元々保持しているキーのリストの列挙体
  */
 Jeeel.Type.ObjectKeys = {
 
@@ -90,7 +90,7 @@ Jeeel.Type.ObjectKeys = {
      * @type String[]
      * @constant
      */
-    ELEMENT: ['name', 'id', 'className', 'tagName', 'nodeName', 'nodeType', 'firstChild', 'lastChild', 'nextSibling', 'previousSibling', 'parentNode', 'children', 'childNodes', 'hasChildNodes', 'style', 'appendChild', 'removeChild', 'replaceChild', 'insertBefore', 'setAttribute', 'getAttribute', 'removeAttribute', 'blur', 'focus', 'cloneNode', 'tabIndex', 'innerHTML'],
+    ELEMENT: ['name', 'id', 'className', 'tagName', 'nodeName', 'nodeType', 'firstChild', 'lastChild', 'nextSibling', 'previousSibling', 'parentNode', 'children', 'childNodes', 'hasChildNodes', 'style', 'appendChild', 'removeChild', 'replaceChild', 'insertBefore', 'setAttribute', 'getAttribute', 'removeAttribute', 'blur', 'focus', 'cloneNode', 'tabIndex', 'innerHTML', 'onabort', 'onbeforecopy', 'onbeforecut', 'onbeforepaste', 'onbeforeunload', 'onblur', 'onchange', 'onclick', 'oncontextmenu', 'oncopy', 'oncut', 'ondblclick', 'ondrag', 'ondragend', 'ondragenter', 'ondragleave', 'ondragover', 'ondragstart', 'ondrop', 'onerror', 'onfocus', 'onhashchange', 'oninput', 'oninvalid', 'onkeydown', 'onkeypress', 'onkeyup', 'onload', 'onmessage', 'onmousedown', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup', 'onmousewheel', 'onoffline', 'ononline', 'onpaste', 'onpopstate', 'onreset', 'onresize', 'onscroll', 'onsearch', 'onselect', 'onselectstart', 'onstorage', 'onsubmit', 'onunload'],
 
     /**
      * Attribute型のキーリスト
@@ -154,7 +154,7 @@ Jeeel.Type.ObjectKeys = {
      * @type String[]
      * @constant
      */
-    ERROR: ['name', 'message', 'toString'],
+    ERROR: ['name', 'message', 'stack', 'toString'],
     
     /**
      * Math型のキーリスト

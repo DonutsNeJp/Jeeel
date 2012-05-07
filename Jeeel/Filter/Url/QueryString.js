@@ -25,7 +25,7 @@ Jeeel.Filter.Url.QueryString.prototype = {
         throw new Error('valは配列式でなければなりません。');
     },
 
-    _filterArray: function (params) {
+    _filterEach: function (params) {
         var tmp, res = [];
 
         for (var key in params) {

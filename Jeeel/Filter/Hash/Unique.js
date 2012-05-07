@@ -54,7 +54,7 @@ Jeeel.Filter.Hash.Unique.prototype = {
     /**
      * @private
      */
-    _filterArray: function (array) {
+    _filterEach: function (array) {
       
         array = Jeeel.Hash.create(array);
 

@@ -13,7 +13,7 @@ Jeeel.directory.Jeeel.Graphics = {
 };
 
 /**
- * グラフィックス関連のネームスペース
+ * @namespace グラフィックス関連のネームスペース
  */
 Jeeel.Graphics = {
 

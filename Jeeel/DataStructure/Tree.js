@@ -15,7 +15,6 @@ Jeeel.directory.Jeeel.DataStructure.Tree = {
  * コンストラクタ
  * 
  * @class 木構造を扱うクラス
- * @ignore 未完成
  */
 Jeeel.DataStructure.Tree = function () {
     

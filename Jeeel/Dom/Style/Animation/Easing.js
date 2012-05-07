@@ -1,10 +1,9 @@
 
 /**
- * イージング関数を保持するネームスペース
- * 
- * t: currentTime(経過時間: 秒)
- * b: beginningValue(初期値)
- * c: changeInValue(変動値)
+ * @namespace イージング関数を保持するネームスペース<br />
+ * t: currentTime(経過時間: 秒)<br />
+ * b: beginningValue(初期値)<br />
+ * c: changeInValue(変動値)<br />
  * d: duration(継続時間: 秒)
  */
 Jeeel.Dom.Style.Animation.Easing = {

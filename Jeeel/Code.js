@@ -13,12 +13,12 @@ Jeeel.directory.Jeeel.Code = {
 };
 
 /**
- * コード関連のネームスペース
+ * @namespace コード関連のネームスペース
  */
 Jeeel.Code = {
 
 };
 
-Jeeel.file.Jeeel.Code = ['KeyCode', 'CharCode', 'CharEncoding', 'HtmlCode'];
+Jeeel.file.Jeeel.Code = ['CharCode', 'CharEncoding', 'HtmlCode'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Code, Jeeel.file.Jeeel.Code);

@@ -16,34 +16,67 @@ Jeeel.directory.Jeeel.Dom.Selector = {
  *
  * @class セレクタを扱うクラス
  * @param {String} selector CSSセレクタ
- * @param {Document} [doc] 検索階層のDocument
+ * @example
+ * 以下が対応もしくは認識するセレクタの一覧
+ * *
+ * E
+ * E[foo]
+ * E[foo="bar"]
+ * E[foo~="bar"]
+ * E[foo^="bar"]
+ * E[foo$="bar"]
+ * E[foo*="bar"]
+ * E[foo|="en"]
+ * E:root
+ * E:nth-child(n)
+ * E:nth-last-child(n)
+ * E:nth-of-type(n)
+ * E:nth-last-of-type(n)
+ * E:first-child
+ * E:last-child
+ * E:first-of-type
+ * E:last-of-type
+ * E:only-child
+ * E:only-of-type
+ * E:empty
+ * E:link
+ * E:visited
+ * E:active
+ * E:hover
+ * E:focus
+ * E:target
+ * E:lang(fr)
+ * E:enabled
+ * E:disabled
+ * E:checked
+ * E:first-line
+ * E:first-letter
+ * E:before
+ * E:after
+ * E.warning
+ * E#myid
+ * E:not(s)
+ * E F
+ * E > F
+ * E + F
+ * E ~ F
+ * ただし、:link, :visitedはセキュリティ上の理由でCSSと違った挙動をし、:before, :after, :first-line, :first-letterは完全に無視される。
+ * また、:active, :hover, :focusは今のところ全て空になる
  */
-Jeeel.Dom.Selector = function (selector, doc) {
-
-    if ( ! doc) {
-        doc = Jeeel._doc;
-    }
-
-    this._selector = selector.replace(/(^ +|\r\n|\n| +$)/g, ' ')
-                             .replace(/ *, */, ',')
-                             .replace(/ *> */, '>')
-                             .replace(/ *\+ */, '+')
-                             .replace(/ +/, ' ');
-    this._document = doc;
+Jeeel.Dom.Selector = function (selector) {
+    this._selector = selector;
     
-    this._analyze();
+    this._compile();
 };
 
 /**
  * インスタンスの作成を行う
  *
  * @param {String} selector CSSセレクタ
- * @param {Document} [doc] 検索階層のDocument
  * @return {Jeeel.Dom.Selector} 作成したインスタンス
- * @ignore 未完
  */
-Jeeel.Dom.Selector.create = function (selector, doc) {
-    return new this(selector, doc);
+Jeeel.Dom.Selector.create = function (selector) {
+    return new this(selector);
 };
 
 Jeeel.Dom.Selector.prototype = {
@@ -59,40 +92,276 @@ Jeeel.Dom.Selector.prototype = {
     /**
      * CSSセレクタの対象別リスト
      *
-     * @type Jeeel.Dom.Selector.Data[]
+     * @type Jeeel.Dom.Selector.NodeList[]
      * @private
      */
-    _selectorDataList: [],
-
-    /**
-     * 対象Document
-     *
-     * @type Document
-     * @private
-     */
-    _document: null,
+    _nodeLists: [],
 
     /**
      * セレクタの情報からElementのリストを得る
      *
+     * @param {Element} root 検索ルート要素
      * @return {Element[]} Elementリスト
      */
-    getElements: function () {
-        var result = [];
-        var idx, len = this._selectorDataList.length;
+    search: function (root) {
+        
+        if (Jeeel.Type.isDocument(root)) {
+            root = root.documentElement;
+        }
+        
+        if (root.uniqueID) {
+            return this._quickSearch(root);
+        }
+        
+        return this._search(root);
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     */
+    constructor: Jeeel.Dom.Selector,
+    
+    /**
+     * 通常検索を行う
+     * 
+     * @param {Element} root 検索のルートノード
+     * @return {Element[]} 検索結果のリスト
+     */
+    _search: function (root) {
+        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        var nodeLists = this._nodeLists;
+        
+        var i, l = 0, res = [];
+        
+        for (i = nodeLists.length; i--;) {
+            res[i] = [];
+        }
+        
+        var search = function (target) {
+            
+            for (var i = nodeLists.length; i--;) {
+                if (nodeLists[i][0].isMatch(target)) {
+                    res[i].push(target);
+                }
+            }
 
-        var _search = Jeeel.Function.create(function (target) {
+            var child = target.firstChild;
 
-            var tmp = this._selectorDataList[idx].search(target);
+            while(child) {
 
-            result = result.concat(tmp);
-        }).bind(this);
+                if (child.nodeType === nodeType) {
+                    search(child);
+                }
 
-        for (idx = 0; idx < len; idx++) {
-            _search(this._document.documentElement);
+                child = child.nextSibling;
+            }
+        };
+      
+        search(root);
+        
+        for (i = nodeLists.length; i--;) {
+            
+            if (l < nodeLists[i].length) {
+                l = nodeLists[i].length;
+            }
+            
+            nodeLists[i].init(nodeLists[i][0].filter(res[i]));
+        }
+        
+        while (--l) {
+            for (i = nodeLists.length; i--;) {
+                res[i] = nodeLists[i].search();
+                
+                nodeLists[i].next();
+            }
+        }
+        
+        var tmp = res;
+        
+        res = [];
+        
+        for (i = nodeLists.length; i--;) {
+            res = tmp[i].concat(res);
         }
 
-        return result;
+        return this._uniqueSort(root, res);
+    },
+    
+    /**
+     * IEのuniqueIDを使用して検索速度を速めた検索を行う(正確にはソーティングを高速化する)
+     * 
+     * @param {Element} root 検索のルートノード
+     * @return {Element[]} 検索結果のリスト
+     */
+    _quickSearch: function (root) {
+        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        var nodeLists = this._nodeLists;
+        
+        var idx = 0, indexes = {};
+        var i, l = 0, res = [];
+        
+        for (i = nodeLists.length; i--;) {
+            res[i] = [];
+        }
+        
+        var search = function (target) {
+            
+            indexes[target.uniqueID] = idx++;
+            
+            for (var i = nodeLists.length; i--;) {
+                if (nodeLists[i][0].isMatch(target)) {
+                    res[i].push(target);
+                }
+            }
+
+            var child = target.firstChild;
+
+            while(child) {
+
+                if (child.nodeType === nodeType) {
+                    search(child);
+                }
+
+                child = child.nextSibling;
+            }
+        };
+      
+        search(root);
+        
+        for (i = nodeLists.length; i--;) {
+            
+            if (l < nodeLists[i].length) {
+                l = nodeLists[i].length;
+            }
+            
+            nodeLists[i].init(nodeLists[i][0].filter(res[i]));
+        }
+        
+        while (--l) {
+            for (i = nodeLists.length; i--;) {
+                res[i] = nodeLists[i].search();
+                
+                nodeLists[i].next();
+            }
+        }
+        
+        var tmp = res;
+        
+        res = [];
+        
+        for (i = nodeLists.length; i--;) {
+            res = tmp[i].concat(res);
+        }
+        
+        res.sort(function (a, b) {
+            var aIdx = indexes[a.uniqueID], bIdx = indexes[b.uniqueID];
+            
+            if (aIdx < bIdx) {
+                return -1;
+            } else if (aIdx > bIdx) {
+                return 1;
+            }
+            
+            return 0;
+        });
+        
+        tmp = res;
+        
+        res = [];
+        
+        var belm;
+        
+        for (i = 0, l = tmp.length; i < l; i++) {
+            if (belm !== tmp[i]) {
+                res.push(tmp[i]);
+            }
+            
+            belm = tmp[i];
+        }
+        
+        return res;
+    },
+    
+    /**
+     * 指定した要素のリストをソーティングし、且重複を削除してする
+     * 
+     * @param {Element} root ルートノード
+     * @param {Element[]} elements 要素リスト
+     * @param {Element[]} ソート・フィルタ後の要素リスト
+     */
+    _uniqueSort: function (root, elements) {
+        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
+        var i, l, p, cnt, element, nodes = [];
+        var idxLength = 0;
+        
+        for (i = 0, l = elements.length; i < l; i++) {
+            element = elements[i];
+            nodes[i] = {
+                node: element,
+                idxs: []
+            };
+            
+            while (element && element !== root) {
+                p = element.previousSibling;
+                cnt = 1;
+
+                while (p) {
+                    if (p.nodeType === nodeType) {
+                        cnt++;
+                    }
+
+                    p = p.previousSibling;
+                }
+
+                nodes[i].idxs.push(cnt);
+                
+                element = element.parentNode;
+            }
+            
+            nodes[i].idxs.reverse();
+            
+            if (idxLength < nodes[i].idxs.length) {
+                idxLength = nodes[i].idxs.length;
+            }
+        }
+        
+        nodes.sort(function (a, b) {
+            var aidxs = a.idxs;
+            var bidxs = b.idxs;
+            
+            for (var i = 0; i < idxLength; i++) {
+                if ( ! aidxs[i] && ! bidxs[i]) {
+                    break;
+                } else if ( ! aidxs[i]) {
+                    return -1;
+                } else if ( ! bidxs[i]) {
+                    return 1;
+                }
+                
+                if (aidxs[i] < bidxs[i]) {
+                    return -1;
+                } else if (aidxs[i] > bidxs[i]) {
+                    return 1;
+                }
+            }
+            
+            return 0;
+        });
+        
+        var belm, res = [];
+        
+        for (i = 0, l = nodes.length; i < l; i++) {
+            
+            if (belm !== nodes[i].node) {
+                res.push(nodes[i].node);
+            }
+            
+            belm = nodes[i].node;
+        }
+        
+        return res;
     },
 
     /**
@@ -100,16 +369,11 @@ Jeeel.Dom.Selector.prototype = {
      *
      * @private
      */
-    _analyze: function () {
-        this._selectorDataList = [];
-        var css = this._selector.split(',');
-
-        for (var i = 0, l = css.length; i < l; i++) {
-            this._selectorDataList[i] = new Jeeel.Dom.Selector.Data(css[i]);
-        }
+    _compile: function () {
+        this._nodeLists = this.constructor.Compiler.compile(this._selector);
     }
 };
 
-Jeeel.file.Jeeel.Dom.Selector = ['Searcher', 'Matcher', 'Data'];
+Jeeel.file.Jeeel.Dom.Selector = ['Compiler', 'NodeList', 'Node', 'Mock'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Selector, Jeeel.file.Jeeel.Dom.Selector);

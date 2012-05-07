@@ -63,8 +63,8 @@ Jeeel.Filter.Hash.CopyKey.prototype = {
     /**
      * @private
      */
-    _filterArray: function (vals) {
-      
+    _filterEach: function (vals) {
+        
         var res = {};
         var map = this.getCopyMap();
 

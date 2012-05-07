@@ -12,12 +12,12 @@ Jeeel.directory.Jeeel.Filter.Url = {
 };
 
 /**
- * Url関連のフィルター管理ネームスペース
+ * @namespace Url関連のフィルター管理ネームスペース
  */
 Jeeel.Filter.Url = {
 
 };
 
-Jeeel.file.Jeeel.Filter.Url = ['Escape', 'QueryString', 'QueryParameter'];
+Jeeel.file.Jeeel.Filter.Url = ['Escape', 'QueryString', 'QueryParameter', 'Parser'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Filter.Url, Jeeel.file.Jeeel.Filter.Url);

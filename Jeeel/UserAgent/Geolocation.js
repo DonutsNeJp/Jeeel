@@ -17,6 +17,7 @@ Jeeel.directory.Jeeel.UserAgent.Geolocation = {
  * @class 位置情報について操作するクラス
  */
 Jeeel.UserAgent.Geolocation = function () {
+    
 };
 
 /**

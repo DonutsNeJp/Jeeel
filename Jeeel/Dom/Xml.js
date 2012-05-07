@@ -34,8 +34,7 @@ Jeeel.Dom.Xml.create = function (xmlDocument) {
 };
 
 /**
- * XMLを読み込んでインスタンスの作成を行う<br />
- * 同期的に読み込むので注意
+ * XMLを読み込んでインスタンスの作成を同期的行う
  * 
  * @param {String} url XMLのURL
  * @param {Hash} [params] XML取得の際にサーバーに渡すパラメータ
@@ -48,6 +47,28 @@ Jeeel.Dom.Xml.load = function (url, params) {
                     .execute();
     
     return new this(ajax.getResponse().responseXML);
+};
+
+/**
+ * XMLを読み込んでインスタンスの作成を非同期で行う
+ * 
+ * @param {String} url XMLのURL
+ * @param {Function} callback 指定すると非同期読み込みになり引数にXMLが渡される<br />
+ *                             void callback(Jeeel.Dom.Xml xml)
+ * @param {Hash} [params] XML取得の際にサーバーに渡すパラメータ
+ */
+Jeeel.Dom.Xml.loadAsync = function (url, callback, params) {
+  
+    if ( ! callback) {
+        return;
+    }
+  
+    var ajax = Jeeel.Net.Ajax.create(url);
+    
+    ajax.setAll(params || {})
+        .setSuccessMethod(function (response) {
+            callback(new this(response.responseXML));
+        }, this).execute();
 };
 
 Jeeel.Dom.Xml.prototype = {

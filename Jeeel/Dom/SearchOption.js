@@ -1,6 +1,6 @@
 
 /**
- * 特殊検索に使用する列挙体
+ * @namespace 特殊検索に使用する列挙体
  */
 Jeeel.Dom.SearchOption = {
     /**

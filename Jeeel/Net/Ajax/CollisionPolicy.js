@@ -1,6 +1,6 @@
 
 /**
- * 並列リクエストをした時の動作ポリシー列挙体
+ * @namespace 並列リクエストをした時の動作ポリシー列挙体
  */
 Jeeel.Net.Ajax.CollisionPolicy = {
   

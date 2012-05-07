@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Gui.Mouse = {
 };
 
 /**
- * マウス関連のGUIネームスペース
+ * @namespace マウス関連のGUIネームスペース
  */
 Jeeel.Gui.Mouse = {
 

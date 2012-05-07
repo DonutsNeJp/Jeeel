@@ -293,7 +293,7 @@ Jeeel.Net.Ajax.Request.prototype = {
                 this._complete = true;
                 (this.options['on' + response.status] ||
                  this.options['on' + (this.isSuccess() ? 'Success' : 'Failure')] ||
-                 this.emptyFunction)(response, response.headerJSON);
+                 Jeeel.Function.Template.EMPTY)(response, response.headerJSON);
             } catch (e) {
                 this.dispatchException(e);
             }
@@ -308,14 +308,14 @@ Jeeel.Net.Ajax.Request.prototype = {
         }
 
         try {
-            (this.options['on' + state] || this.emptyFunction)(response, response.headerJSON);
+            (this.options['on' + state] || Jeeel.Function.Template.EMPTY)(response, response.headerJSON);
             Jeeel.Net.Ajax.Request.dispatch('on' + state, this, response, response.headerJSON);
         } catch (e) {
             this.dispatchException(e);
         }
 
         if (state == 'Complete') {
-            this.transport.onreadystatechange = this.emptyFunction;
+            this.transport.onreadystatechange = Jeeel.Function.Template.EMPTY;
             clearTimeout(this._timeoutId);
         }
     },
@@ -368,12 +368,7 @@ Jeeel.Net.Ajax.Request.prototype = {
      */
     isSameOrigin: function () {
         var m = this.url.match(/^\s*https?:\/\/[^\/]*/);
-        var tpl = Jeeel.Template.create();
-        return !m || (m[0] == tpl.assignAll({
-            protocol: location.protocol,
-            domain: Jeeel._doc.domain,
-            port: location.port ? ':' + location.port : ''
-        }).fetchTemplate('#{protocol}//#{domain}#{port}'));
+        return !m || (m[0] == (location.protocol + '//' + Jeeel._doc.domain + (location.port ? ':' + location.port : '')));
     },
 
     /**
@@ -388,10 +383,5 @@ Jeeel.Net.Ajax.Request.prototype = {
         } else {
             throw error;
         }
-    },
-
-    /**
-     * 何もしないメソッド
-     */
-    emptyFunction: function (){}
+    }
 };

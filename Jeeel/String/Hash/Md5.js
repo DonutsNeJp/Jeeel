@@ -9,6 +9,9 @@ Jeeel.String.Hash.md5 = function (data) {
     return Jeeel._Object.JeeelStringHash.Md5.hexHash('' + data);
 };
 
+/**
+ * @ignore
+ */
 Jeeel._Object.JeeelStringHash.Md5 = {
   
     /**
@@ -164,11 +167,11 @@ Jeeel._Object.JeeelStringHash.Md5 = {
     },
     
     init: function () {
-        if (arguments.callee.ignore) {
+        if (this.init.ignore) {
             return;
         }
         
-        arguments.callee.ignore = true;
+        this.init.ignore = true;
         
         var merge = {
             T: [
@@ -235,9 +238,24 @@ Jeeel._Object.JeeelStringHash.Md5 = {
                 [ 2,15,63], [ 9,21,64]
             ],
 
+            /**
+             * @ignore
+             */
             F: function (x, y, z) {return (x & y) | (~x & z);},
+            
+            /**
+             * @ignore
+             */
             G: function (x, y, z) {return (x & z) | (y & ~z);},
+            
+            /**
+             * @ignore
+             */
             H: function (x, y, z) {return x ^ y ^ z;},
+            
+            /**
+             * @ignore
+             */
             I: function (x, y, z) {return y ^ (x | ~z);}
         };
     

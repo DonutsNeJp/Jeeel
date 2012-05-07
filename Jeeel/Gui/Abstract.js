@@ -1,4 +1,9 @@
 
+/**
+ * コンストラクタ
+ * 
+ * @abstractClass GUIクラスを作る際の抽象クラス
+ */
 Jeeel.Gui.Abstract = function () {
     
 };

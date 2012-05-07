@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Filter.Hash = {
 };
 
 /**
- * 配列・連想配列関連のフィルター管理ネームスペース
+ * @namespace 配列・連想配列関連のフィルター管理ネームスペース
  */
 Jeeel.Filter.Hash = {
 

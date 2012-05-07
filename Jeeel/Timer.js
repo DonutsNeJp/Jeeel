@@ -65,6 +65,9 @@ Jeeel.Timer.create = function (func, interval, var_args) {
 Jeeel.Timer.setLimitInterval = function (func, interval, limit, var_args) {
     var baseFunc = func;
     
+    /**
+     * @ignore
+     */
     func = function () {
         if (arguments[0]) {
             arguments[0] = this._count;
@@ -93,6 +96,9 @@ Jeeel.Timer.setLimitInterval = function (func, interval, limit, var_args) {
 Jeeel.Timer.setTimeout = function (func, delayTime, var_args) {
     var args = Array.prototype.slice.call(arguments, 2, arguments.length);
 
+    /**
+     * @ignore
+     */
     var _func = function () {
         return func.apply(this, args);
     };

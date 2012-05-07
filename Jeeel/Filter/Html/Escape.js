@@ -41,8 +41,17 @@ Jeeel.Filter.Html.Escape.prototype = {
                  .replace(/>/g, '&gt;');
 
         if (this._replaceSpaceAndLineFeed) {
-            val = val.replace(/ /g, '&nbsp;')
-                     .replace(/\n/g, '<br />');
+          
+            // IEではスペースが入らない改行後に文字が入らないとその改行を無視するのでスペースを挿入
+            if (Jeeel.UserAgent.isInternetExplorer()) {
+                val = val.replace(/ /g, '&nbsp;')
+                         .replace(/\r\n/g, '\n')
+                         .replace(/\n\n/g, '<br />&nbsp;<br />')
+                         .replace(/\n/g, '<br />');
+            } else {
+                val = val.replace(/ /g, '&nbsp;')
+                         .replace(/\n/g, '<br />');
+            }
         }
 
         return val;

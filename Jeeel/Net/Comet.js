@@ -207,6 +207,10 @@ Jeeel.Net.Comet.prototype = {
      */
     open: function (url) {
         
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
         if ( ! url) {
             return this;
         } else if (this._source) {

@@ -82,6 +82,10 @@ Jeeel.Net.Ajax.createXMLHttpRequest = function () {
  */
 Jeeel.Net.Ajax.serverResponse = function (url, parameter) {
 
+    if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+        Jeeel.Acl.throwError('Access Error', 404);
+    }
+
     if ( ! Jeeel.Type.isHash(parameter)) {
         parameter = {};
     }
@@ -153,6 +157,14 @@ Jeeel.Net.Ajax.prototype = {
      * @private
      */
     _fields: null,
+    
+    /**
+     * リトライ情報
+     * 
+     * @type 
+     * @private
+     */
+    _retry: null,
 
     /**
      * Ajax対象のURL
@@ -393,6 +405,36 @@ Jeeel.Net.Ajax.prototype = {
     },
     
     /**
+     * リトライの設定を行う<br />
+     * リトライを行った際は本来呼ばれるメソッドは呼ばれなくなる
+     * 
+     * @param {Integer} limit リトライ回数(0で無制限、-1で無効)
+     * @param {Integer} [delayTime] 遅延秒数(ミリ秒、デフォルトでは30000ミリ秒)
+     * @param {Function} [callback] リトライ時に呼ばれるメソッド<br />
+     *                               コールバックメソッドに渡される引数は存在しない<br />
+     *                               void callback()
+     * @param {Mixied} [thisArg] コールバック中のthisに相当する値(デフォルトはこのインスタンスになる)
+     * @return {Jeeel.Net.Ajax} 自身のインスタンス
+     */
+    setRetry: function (limit, delayTime, callback, thisArg) {
+      
+        if (limit < 0) {
+            this._retry = null;
+            
+            return this;
+        }
+        
+        this._retry = {
+            count: 0,
+            limit: +limit,
+            delayTime: delayTime || 30000,
+            callback: callback && {func: callback, thisArg: thisArg}
+        };
+        
+        return this;
+    },
+    
+    /**
      * 非同期通信時のタイムアウトまでの時間を取得する
      * 
      * @return {Integer} タイムアウト時間、0で無制限(ミリ秒)
@@ -607,7 +649,7 @@ Jeeel.Net.Ajax.prototype = {
 
         return this;
     },
-
+    
     /**
      * Ajaxパラメータの全取得
      *
@@ -810,7 +852,11 @@ Jeeel.Net.Ajax.prototype = {
      * @return {Jeeel.Net.Ajax} 自インスタンス
      */
     execute: function () {
-      
+        
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(this._url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
         // 通信中だった場合コリジョンポリシーに基づき動作を変える
         if (this._executing) {
             
@@ -821,8 +867,18 @@ Jeeel.Net.Ajax.prototype = {
             }
         }
         
+        if (this._retry && this._retry.retrying) {
+            var callback = this._retry.callback;
+            
+            if (callback) {
+                callback.func.call(callback.thisArg || this);
+            }
+            
+            this._retry.retrying = false;
+        }
+        
         var self = this;
-
+        
         this._request = new this.constructor.Request(this._url, {
             method: this._method,
             parameters: this._params.toQueryString(),
@@ -845,17 +901,31 @@ Jeeel.Net.Ajax.prototype = {
                 self._callMethod('_success', [response, jsonHeader]);
             },
             onFailure: function (response, jsonHeader){
-                if (self._failure) {
-                    self._callMethod('_failure', [response, jsonHeader]);
+                if (self._retry && ! self._retry.limit || (self._retry.count < self._retry.limit)) {
+                    self._retry.retrying = true;
+                    self._retry.count++;
+                    
+                    Jeeel.Deferred.next(self.execute, self, self._retry.delayTime);
                 } else {
-                    Jeeel.errorHtmlDump('Failure', response.statusText + '(' + response.status + ')', response.responseText);
+                    if (self._failure) {
+                        self._callMethod('_failure', [response, jsonHeader]);
+                    } else {
+                        Jeeel.errorHtmlDump('Failure', response.statusText + '(' + response.status + ')', response.responseText);
+                    }
                 }
             },
             onAbort: function (response, jsonHeader) {
                 self._callMethod('_abort', [response, jsonHeader]);
             },
             onTimeout: function (response, jsonHeader) {
-                self._callMethod('_timeout', [response, jsonHeader]);
+                if (self._retry && ! self._retry.limit || (self._retry.count < self._retry.limit)) {
+                    self._retry.retrying = true;
+                    self._retry.count++;
+                    
+                    Jeeel.Deferred.next(self.execute, self, self._retry.delayTime);
+                } else {
+                    self._callMethod('_timeout', [response, jsonHeader]);
+                }
             },
             onInteractive: function (response, jsonHeader) {
                 self._callMethod('_interactive', [response, jsonHeader]);
@@ -880,7 +950,7 @@ Jeeel.Net.Ajax.prototype = {
                 }
             }
         });
-
+        
         return this;
     },
     

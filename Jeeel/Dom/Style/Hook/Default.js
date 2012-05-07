@@ -10,14 +10,17 @@
     var cssWidth = ['Left', 'Right'],
         cssHeight = ['Top', 'Bottom'];
     
+    /**
+     * @ignore
+     */
     function getWidth(elm, style) {
         var val = elm.offsetWidth;
         
-        if ( val > 0 ) {
-            for (var i = 0, l = cssWidth.length; i < l; i++) {
+        if (val > 0) {
+            for (var i = cssWidth.length; i--;) {
                 val -= parseFloat(style.getStyle('padding' + cssWidth[i])) || 0;
 
-                val -= parseFloat(style.getStyle('border' + cssWidth[i] + 'Width') ) || 0;
+                val -= parseFloat(style.getStyle('border' + cssWidth[i] + 'Width')) || 0;
             }
 
             return val + 'px';
@@ -26,14 +29,17 @@
         return 0 + 'px';
     }
     
+    /**
+     * @ignore
+     */
     function getHeight(elm, style) {
         var val = elm.offsetHeight;
         
-        if ( val > 0 ) {
-            for (var i = 0, l = cssHeight.length; i < l; i++) {
+        if (val > 0) {
+            for (var i = cssHeight.length; i--;) {
                 val -= parseFloat(style.getStyle('padding' + cssHeight[i])) || 0;
 
-                val -= parseFloat(style.getStyle('border' + cssHeight[i] + 'Width') ) || 0;
+                val -= parseFloat(style.getStyle('border' + cssHeight[i] + 'Width')) || 0;
             }
 
             return val + 'px';

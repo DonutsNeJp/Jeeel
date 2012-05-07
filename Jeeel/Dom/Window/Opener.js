@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Dom.Window.Opener = {
 };
 
 /**
- * ウィンドウやダイアログを開くためのクラスがあるネームスペース
+ * @namespace ウィンドウやダイアログを開くためのクラスがあるネームスペース
  */
 Jeeel.Dom.Window.Opener = {
 

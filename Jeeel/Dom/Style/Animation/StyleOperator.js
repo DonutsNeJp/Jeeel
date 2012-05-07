@@ -12,7 +12,8 @@ Jeeel.directory.Jeeel.Dom.Style.Animation.StyleOperator = {
 };
 
 /**
- * アニメーションの値に特殊な加工を施して変換するクラス
+ * @class アニメーションの値に特殊な加工を施して変換するクラス
+ * @static
  */
 Jeeel.Dom.Style.Animation.StyleOperator = {
     

@@ -12,7 +12,7 @@ Jeeel.directory.Jeeel.Storage.Session = {
 };
 
 /**
- * Session関連を扱うストレージのネームスペース
+ * @namespace Session関連を扱うストレージのネームスペース
  */
 Jeeel.Storage.Session = {
 

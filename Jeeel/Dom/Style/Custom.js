@@ -16,9 +16,11 @@ Jeeel.directory.Jeeel.Dom.Style.Custom = {
  * 
  * @class カスタムスタイルに対して操作を行うクラス
  * @param {Style} style 要素のスタイル
+ * @param {Style} [computedStyle] 計算済みスタイル
  */
-Jeeel.Dom.Style.Custom = function (style) {
+Jeeel.Dom.Style.Custom = function (style, computedStyle) {
     this._style = style;
+    this._computedStyle = computedStyle || {};
 };
 
 /**
@@ -55,6 +57,8 @@ Jeeel.Dom.Style.Custom.createPart = function (name, get, set, originName, filter
         return set.call(this, val);
     };
 
+    f.get = get;
+    f.set = set;
     f.partName = name;
     f.originName = originName || null;
     f.usableFilter = !!filter;
@@ -65,6 +69,8 @@ Jeeel.Dom.Style.Custom.createPart = function (name, get, set, originName, filter
 Jeeel.Dom.Style.Custom.prototype = {
     
     _style: null,
+    
+    _computedStyle: null,
     
     /**
      * コンストラクタ

@@ -1,6 +1,6 @@
 
 /**
- * Nodeに関する事を保持するネームスペース
+ * @namespace Nodeに関する事を保持するネームスペース
  */
 Jeeel.Dom.Node = {
     

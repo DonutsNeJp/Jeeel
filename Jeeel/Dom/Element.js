@@ -84,6 +84,8 @@ Jeeel.Dom.Element.prototype = {
      * @private
      */
     _style: null,
+    
+    _moveCache: [],
 
     /**
      * 基となるElementを取得する
@@ -186,7 +188,7 @@ Jeeel.Dom.Element.prototype = {
      *
      * @param {String} selector CSSと同じ絞り込みセレクタ
      * @return {Element[]} 絞り込んだElement配列
-     * @ignore
+     * @see Jeeel.Dom.Selector
      */
     getElementsBySelector: function (selector) {
         return this._searcher.getElementsBySelector(selector);
@@ -355,6 +357,10 @@ Jeeel.Dom.Element.prototype = {
      * @return {Mixied} プロパティ値
      */
     getProperty: function (property) {
+        if (property === 'value' && Jeeel.Dom.Behavior.Placeholder.isHolded(this._element)) {
+            return '';
+        }
+      
         return this._element[property];
     },
 
@@ -376,6 +382,7 @@ Jeeel.Dom.Element.prototype = {
      *
      * @param {String} style スタイル名
      * @return {String} スタイル値
+     * @see Jeeel.Dom.Style
      */
     getStyle: function (style) {
         return this._style.getStyle(style);
@@ -387,6 +394,7 @@ Jeeel.Dom.Element.prototype = {
      * @param {String} style スタイル名
      * @param {String} value スタイル値
      * @return {Jeeel.Dom.Element} 自インスタンス
+     * @see Jeeel.Dom.Style
      */
     setStyle: function (style, value) {
         this._style.setStyle(style, value);
@@ -403,6 +411,55 @@ Jeeel.Dom.Element.prototype = {
     setStyleList: function (styles) {
         this._style.setStyleList(styles);
 
+        return this;
+    },
+    
+    /**
+     * DOMの独自データを取得する(属性値data-&#8727;)<br />
+     * IE8以下ではメモリリークを起こす非推奨メソッド
+     * 
+     * @param {String} key データキー
+     * @return {String} データ
+     */
+    getData: function (key) {},
+    
+    /**
+     * DOMの独自データを設定する(属性値data-&#8727;)<br />
+     * IE8以下ではメモリリークを起こす非推奨メソッド
+     * 
+     * @param {String} key データキー
+     * @param {String} data データ
+     * @return {Jeeel.Dom.Element} 自インスタンス
+     */
+    setData: function (key, data) {},
+    
+    /**
+     * Jeeelの独自データを取得する<brr />
+     * IE以外ではプロパティが拡張されるので注意(詳しくはJeeel.Storage.Objectを参照)<br />
+     * またネームスペースは初期値を用いる
+     * 
+     * @param {String} key データキー
+     * @return {Mixied} データ
+     * @see Jeeel.Storage.Object
+     */
+    getCustomData: function (key) {
+        return Jeeel.Storage.Object(this._element).get(key);
+    },
+    
+    /**
+     * Jeeelの独自データを設定する<brr />
+     * IE以外ではプロパティが拡張されるので注意(詳しくはJeeel.Storage.Objectを参照)<br />
+     * またネームスペースは初期値を用いる
+     * 
+     * @param {String} key データキー
+     * @param {Mixied} data データ
+     * @return {Jeeel.Dom.Element} 自インスタンス
+     * @see Jeeel.Storage.Object
+     */
+    setCustomData: function (key, data) {
+        
+        Jeeel.Storage.Object(this._element).set(key, data);
+        
         return this;
     },
 
@@ -600,7 +657,7 @@ Jeeel.Dom.Element.prototype = {
         var children = this._element.children;
         var res = [];
 
-        for (var i = 0, l = children.length; i < l; i++) {
+        for (var i = children.length; i--;) {
             res[i] = children[i];
         }
 
@@ -793,17 +850,13 @@ Jeeel.Dom.Element.prototype = {
      * @return {Jeeel.Dom.Element} 自インスタンス
      */
     removeChild: function (child) {
-        if (Jeeel.Type.isArray(child)) {
-            var tmp = this._doc.createDocumentFragment();
-            
-            for (var i = 0, l = child.length; i < l; i++) {
-                tmp.appendChild(child[i]);
-            }
-            
-            child = tmp;
+        if ( ! Jeeel.Type.isArray(child)) {
+            child = [child];
         }
 
-        this._element.removeChild(child);
+        for (var i = child.length; i--;) {
+            this._element.removeChild(child[i]);
+        }
 
         return this;
     },
@@ -1034,14 +1087,100 @@ Jeeel.Dom.Element.prototype = {
      * @param {Element|Element[]} dispatchTargets このElement上でマウスを押し込むと移動を始める(デフォルトはこのElement)
      * @return {Jeeel.Dom.Element} 自インスタンス
      */
-    movable: function (dispatchTargets) {},
+    movable: function (dispatchTargets) {
+        var i, l, cache, index = this._searchMoveCacheIndex();
+
+        if ( ! dispatchTargets) {
+            dispatchTargets = [this._element];
+        } else if ( ! Jeeel.Type.isArray(dispatchTargets)) {
+            dispatchTargets = [dispatchTargets];
+        }
+
+        if (index >= 0) {
+            cache = this._moveCache[index];
+
+            for (i = 0, l = cache.dispatch.length; i < l; i++) {
+                Jeeel.Dom.Event.removeEventListener(cache.dispatch[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cache.down, this);
+            }
+
+            for (i = 0, l = dispatchTargets.length; i < l; i++) {
+                Jeeel.Dom.Event.addEventListener(dispatchTargets[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cache.down, this);
+            }
+
+            cache.dispatch = dispatchTargets;
+
+            return this;
+        }
+
+        cache = this._moveCache[this._moveCache.length] = {
+            dispatch: dispatchTargets,
+            target: this._element,
+            position: '',
+            point: null,
+            down: function (ev) {
+                ev.stop();
+
+                this._doc.addEventListener(Jeeel.Dom.Event.Type.MOUSE_MOVE, cache.move, this)
+                          .addEventListener(Jeeel.Dom.Event.Type.MOUSE_UP, cache.up, this);
+
+                cache.point = ev.getRelativeMousePoint(this._element);
+            },
+            move: function (ev) {
+                ev.stop();
+
+                var p = ev.mousePoint;
+
+                var top  = p.y - cache.point.y;
+                var left = p.x - cache.point.x;
+
+                this.setStyleList({
+                    top: top + 'px',
+                    left: left + 'px'
+                });
+            },
+            up: function (ev) {
+                ev.stop();
+
+                this._doc.removeEventListener(Jeeel.Dom.Event.Type.MOUSE_MOVE, cache.move)
+                          .removeEventListener(Jeeel.Dom.Event.Type.MOUSE_UP, cache.up);
+            }
+        };
+
+        for (i = dispatchTargets.length; i--;) {
+            Jeeel.Dom.Event.addEventListener(dispatchTargets[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cache.down, this);
+        }
+
+        cache.position = this.getStyle('position');
+
+        this.setStyle('position', 'absolute');
+
+        return this;
+    },
     
     /**
      * このElementを移動不可能にする
      * 
      * @return {Jeeel.Dom.Element} 自インスタンス
      */
-    immovable: function () {},
+    immovable: function () {
+        var index = this._searchMoveCacheIndex();
+
+        if (index < 0) {
+            return this;
+        }
+
+        var cache = this._moveCache[index];
+
+        for (var i = cache.dispatch.length; i--;) {
+            Jeeel.Dom.Event.removeEventListener(cache.dispatch[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cache.down, this);
+        }
+
+        this.setStyle('position', cache.position);
+
+        this._moveCache.splice(index, 1);
+
+        return this;
+    },
     
     /**
      * IE6のためのバグ回避を簡単に行うメソッド<br />
@@ -1050,7 +1189,7 @@ Jeeel.Dom.Element.prototype = {
      * @param {Hash} [style] BGのiframeのスタイルをカスタムに指定するための値(基本は指定しない)
      * @return {Jeeel.Dom.Element} 自インスタンス
      */
-    setBackgroundIframe: function (style) {},
+    setShim: function (style) {},
     
     /**
      * このElementを指定座標に移動する
@@ -1246,6 +1385,24 @@ Jeeel.Dom.Element.prototype = {
      */
     constructor: Jeeel.Dom.Element,
     
+    /**
+     * 移動のためのキャッシュのインデックスを取得する
+     * 
+     * @return {Integer} インデックス
+     */
+    _searchMoveCacheIndex: function () {
+        for (var i = this._moveCache.length; i--;) {
+            if (this._element === this._moveCache[i].target) {
+                return i;
+            }
+        }
+
+        return -1;
+    },
+    
+    /**
+     * @ignore
+     */
     _init: function () {
         if ( ! Jeeel._doc) {
             delete this._init;
@@ -1260,6 +1417,9 @@ Jeeel.Dom.Element.prototype = {
         var ef = new Jeeel.Filter.Html.Escape(true);
         var slice = Array.prototype.slice;
         
+        /**
+         * @ignore
+         */
         function _searchRange(res, target) {
             var trect = Jeeel.Dom.Element.create(target).getRect();
 
@@ -1281,6 +1441,9 @@ Jeeel.Dom.Element.prototype = {
             }
         }
         
+        /**
+         * @ignore
+         */
         function _searchTxt(res, target) {
             if (target.nodeType === txt) {
                 res[res.length] = target.data;
@@ -1296,9 +1459,10 @@ Jeeel.Dom.Element.prototype = {
             }
         }
         
-        var self = this;
-
-        self.searchElementsByRange = function (rect, option) {
+        /**
+         * @ignore
+         */
+        this.searchElementsByRange = function (rect, option) {
             if ( ! rect) {
                 return [];
             }
@@ -1318,11 +1482,18 @@ Jeeel.Dom.Element.prototype = {
         };
         
         if (div.classList) {
-            self.getClassNames = function () {
+            
+            /**
+             * @ignore
+             */
+            this.getClassNames = function () {
                 return slice.call(this._element.classList);
             };
             
-            self.addClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.addClassName = function (className) {
                 if ( ! className) {
                     return this;
                 }
@@ -1340,7 +1511,10 @@ Jeeel.Dom.Element.prototype = {
                 return this;
             };
             
-            self.removeClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.removeClassName = function (className) {
                 if ( ! className) {
                     return this;
                 }
@@ -1357,7 +1531,10 @@ Jeeel.Dom.Element.prototype = {
                 return this;
             };
             
-            self.toggleClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.toggleClassName = function (className) {
                 if ( ! className) {
                     return this;
                 }
@@ -1374,16 +1551,26 @@ Jeeel.Dom.Element.prototype = {
                 return this;
             };
             
-            self.hasClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.hasClassName = function (className) {
                 return this._element.classList.contains(className);
             };
             
         } else {
-            self.getClassNames = function () {
+          
+            /**
+             * @ignore
+             */
+            this.getClassNames = function () {
                 return this._element.className.split(/\s+/);
             };
             
-            self.addClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.addClassName = function (className) {
                 if ( ! className) {
                     return this;
                 }
@@ -1409,7 +1596,10 @@ Jeeel.Dom.Element.prototype = {
                 return this;
             };
             
-            self.removeClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.removeClassName = function (className) {
                 if ( ! className) {
                     return this;
                 }
@@ -1433,7 +1623,10 @@ Jeeel.Dom.Element.prototype = {
                 return this;
             };
             
-            self.toggleClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.toggleClassName = function (className) {
                 if ( ! className) {
                     return this;
                 }
@@ -1455,7 +1648,10 @@ Jeeel.Dom.Element.prototype = {
                 return this;
             };
             
-            self.hasClassName = function (className) {
+            /**
+             * @ignore
+             */
+            this.hasClassName = function (className) {
                 if ( ! className) {
                     return false;
                 }
@@ -1467,7 +1663,59 @@ Jeeel.Dom.Element.prototype = {
             };
         }
         
-        self.getText = function () {
+        if (div.dataset) {
+          
+            /**
+             * @ignore
+             */
+            this.getData = function (key) {
+                key = Jeeel.String.toCamelCase(key);
+                
+                if (key in this._element.dataset) {
+                    return this._element.dataset[key];
+                }
+                
+                return null;
+            };
+            
+            /**
+             * @ignore
+             */
+            this.setData = function (key, data) {
+                key = Jeeel.String.toCamelCase(key);
+                
+                this._element.dataset[key] = data;
+                
+                return this;
+            };
+        } else {
+            
+            /**
+             * @ignore
+             */
+            this.getData = function (key) {
+                key = 'data-' + Jeeel.String.toHyphenation(key);
+                
+                return this._element.getAttribute(key);
+            };
+            
+            /**
+             * @ignore
+             */
+            this.setData = function (key, data) {
+                key = 'data-' + Jeeel.String.toHyphenation(key);
+                data = '' + data;
+                
+                this._element.setAttribute(key, data);
+                
+                return this;
+            };
+        }
+        
+        /**
+         * @ignore
+         */
+        this.getText = function () {
             var res = [];
 
             _searchTxt(res, this._element);
@@ -1475,14 +1723,21 @@ Jeeel.Dom.Element.prototype = {
             return res.join('');
         };
         
-        self.setText = function (text) {
+        /**
+         * @ignore
+         */
+        this.setText = function (text) {
             this._element.innerHTML = ef.filter(text);
 
             return this;
         };
         
-        if (Jeeel.UserAgent.isInternetExplorer6()) {
-            self.setBackgroundIframe = function (style) {
+        if (Jeeel.UserAgent.isInternetExplorer(6)) {
+          
+            /**
+             * @ignore
+             */
+            this.setShim = function (style) {
                 var child = this._element.firstChild;
                 var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
 
@@ -1552,114 +1807,11 @@ Jeeel.Dom.Element.prototype = {
                 return this.insertTop(elm);
             };
         } else {
-            self.setBackgroundIframe = function (style) {
-                return this;
-            };
+            /**
+             * @ignore
+             */
+            this.setShim = Jeeel.Function.Template.RETURN_THIS;
         }
-        
-        var moveCash = [];
-        
-        function _searchMoveCashIndex(self) {
-            for (var i = 0, l = moveCash.length; i < l; i++) {
-                if (self._element === moveCash[i].target) {
-                    return i;
-                }
-            }
-            
-            return -1;
-        }
-        
-        self.movable = function (dispatchTargets) {
-            
-            var i, l, cash, index = _searchMoveCashIndex(this);
-            
-            if ( ! dispatchTargets) {
-                dispatchTargets = [this._element];
-            } else if ( ! Jeeel.Type.isArray(dispatchTargets)) {
-                dispatchTargets = [dispatchTargets];
-            }
-            
-            if (index >= 0) {
-                cash = moveCash[index];
-                
-                for (i = 0, l = cash.dispatch.length; i < l; i++) {
-                    Jeeel.Dom.Event.removeEventListener(cash.dispatch[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cash.down, this);
-                }
-                
-                for (i = 0, l = dispatchTargets.length; i < l; i++) {
-                    Jeeel.Dom.Event.addEventListener(dispatchTargets[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cash.down, this);
-                }
-                
-                cash.dispatch = dispatchTargets;
-                
-                return this;
-            }
-            
-            cash = moveCash[moveCash.length] = {
-                dispatch: dispatchTargets,
-                target: this._element,
-                position: '',
-                point: null,
-                down: function (ev) {
-                    ev.stop();
-                    
-                    this._doc.addEventListener(Jeeel.Dom.Event.Type.MOUSE_MOVE, cash.move, this)
-                             .addEventListener(Jeeel.Dom.Event.Type.MOUSE_UP, cash.up, this);
-                             
-                    cash.point = ev.getRelativeMousePoint(this._element);
-                },
-                move: function (ev) {
-                    ev.stop();
-                    
-                    var p = ev.mousePoint;
-                    
-                    var top  = p.y - cash.point.y;
-                    var left = p.x - cash.point.x;
-                    
-                    this.setStyleList({
-                        top: top + 'px',
-                        left: left + 'px'
-                    });
-                },
-                up: function (ev) {
-                    ev.stop();
-                    
-                    this._doc.removeEventListener(Jeeel.Dom.Event.Type.MOUSE_MOVE, cash.move)
-                             .removeEventListener(Jeeel.Dom.Event.Type.MOUSE_UP, cash.up);
-                }
-            };
-            
-            for (i = 0, l = dispatchTargets.length; i < l; i++) {
-                Jeeel.Dom.Event.addEventListener(dispatchTargets[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cash.down, this);
-            }
-
-            cash.position = this.getStyle('position');
-            
-            this.setStyle('position', 'absolute');
-            
-            return this;
-        };
-        
-        self.immovable = function () {
-            
-            var index = _searchMoveCashIndex(this);
-            
-            if (index < 0) {
-                return this;
-            }
-            
-            var cash = moveCash[index];
-            
-            for (var i = 0, l = cash.dispatch.length; i < l; i++) {
-                Jeeel.Dom.Event.removeEventListener(cash.dispatch[i], Jeeel.Dom.Event.Type.MOUSE_DOWN, cash.down, this);
-            }
-            
-            this.setStyle('position', cash.position);
-            
-            moveCash.splice(index, 1);
-            
-            return this;
-        };
  
         delete this._init;
     }

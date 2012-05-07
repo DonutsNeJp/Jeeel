@@ -96,6 +96,17 @@ Jeeel.Dom.Element.Animator.prototype = {
         
         return this;
     },
+    
+    /**
+     * アニメーションの対象のスタイルを全て破棄する
+     * 
+     * @return {Jeeel.Dom.Element.Animator} 自インスタンス
+     */
+    clear: function () {
+        this._params = {};
+        
+        return this;
+    },
   
     /**
      * アニメーション完了時間を設定する
@@ -198,7 +209,7 @@ Jeeel.Dom.Element.Animator.prototype = {
      * 
      * @return {Jeeel.Dom.Element.Animator} 自インスタンス
      */
-    clear: function () {
+    clearQueue: function () {
         this._style.clear();
         
         return this;

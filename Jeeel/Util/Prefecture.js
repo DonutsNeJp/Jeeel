@@ -1,5 +1,7 @@
 /**
- * 都道府県に関するモジュール
+ * @staticClass 都道府県に関するモジュール
+ * 
+ * @deprecated 今後削除される可能性あり
  */
 Jeeel.Util.Prefecture = {
     /**

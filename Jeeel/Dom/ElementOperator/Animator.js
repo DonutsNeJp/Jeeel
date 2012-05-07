@@ -40,6 +40,15 @@ Jeeel.Dom.ElementOperator.Animator.prototype = {
     setAll: function (params) {
         return this._callMethod('setAll', [params]);
     },
+    
+    /**
+     * アニメーションの対象のスタイルを全て破棄する
+     * 
+     * @return {Jeeel.Dom.ElementOperator.Animator} 自インスタンス
+     */
+    clear: function () {
+        return this._callMethod('clear');
+    },
   
     /**
      * アニメーション完了時間を設定する
@@ -126,8 +135,8 @@ Jeeel.Dom.ElementOperator.Animator.prototype = {
      * 
      * @return {Jeeel.Dom.ElementOperator.Animator} 自インスタンス
      */
-    clear: function () {
-        return this._callMethod('clear');
+    clearQueue: function () {
+        return this._callMethod('clearQueue');
     },
     
     /**

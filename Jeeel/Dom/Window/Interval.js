@@ -25,6 +25,9 @@ Jeeel.Dom.Window.Interval = function (window) {
     
     var self = this, interval = this.interval;
     
+    /**
+     * @ignore
+     */
     this.interval = function () {
         interval.call(self);
     };
