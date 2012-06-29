@@ -727,7 +727,7 @@ Jeeel.Dom.ElementOperator.prototype = {
                 var tmp = this.getClassNames();
 
                 for (var i = 0, l = tmp.length; i < l; i++) {
-                    if (Jeeel.Type.inArray(tmp[i], className)) {
+                    if (Jeeel.Hash.inHash(tmp[i], className)) {
                         return this;
                     }
                 }
@@ -762,7 +762,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getTagName();
 
-                if (Jeeel.Type.inArray(tmp, tag)) {
+                if (Jeeel.Hash.inHash(tmp, tag)) {
                     return this;
                 }
             }
@@ -788,7 +788,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getAttribute(attribute);
 
-                if (Jeeel.Type.inArray(tmp, value)) {
+                if (Jeeel.Hash.inHash(tmp, value)) {
                     return this;
                 }
             }
@@ -813,7 +813,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getProperty(property);
 
-                if (Jeeel.Type.inArray(tmp, value)) {
+                if (Jeeel.Hash.inHash(tmp, value)) {
                     return this;
                 }
             }
@@ -838,7 +838,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getStyle(css);
 
-                if (Jeeel.Type.inArray(tmp, value)) {
+                if (Jeeel.Hash.inHash(tmp, value)) {
                     return this;
                 }
             }
@@ -887,7 +887,7 @@ Jeeel.Dom.ElementOperator.prototype = {
         var res = [];
         
         for (var i = 0; i < this.length; i++) {
-            if (Jeeel.Type.inArray(this[i], element)) {
+            if (Jeeel.Hash.inHash(this[i], element)) {
                 res[res.length] = this[i];
             }
         }
@@ -912,7 +912,7 @@ Jeeel.Dom.ElementOperator.prototype = {
                 var tmp = this.getClassNames();
 
                 for (var i = 0, l = tmp.length; i < l; i++) {
-                    if ( ! Jeeel.Type.inArray(tmp[i], className)) {
+                    if ( ! Jeeel.Hash.inHash(tmp[i], className)) {
                         return this;
                     }
                 }
@@ -947,7 +947,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getTagName();
 
-                if ( ! Jeeel.Type.inArray(tmp, tag)) {
+                if ( ! Jeeel.Hash.inHash(tmp, tag)) {
                     return this;
                 }
             }
@@ -972,7 +972,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getAttribute(attribute);
 
-                if ( ! Jeeel.Type.inArray(tmp, value)) {
+                if ( ! Jeeel.Hash.inHash(tmp, value)) {
                     return this;
                 }
             }
@@ -997,7 +997,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getProperty(property);
 
-                if ( ! Jeeel.Type.inArray(tmp, value)) {
+                if ( ! Jeeel.Hash.inHash(tmp, value)) {
                     return this;
                 }
             }
@@ -1022,7 +1022,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getStyle(css);
 
-                if ( !  Jeeel.Type.inArray(tmp, value)) {
+                if ( !  Jeeel.Hash.inHash(tmp, value)) {
                     return this;
                 }
             }
@@ -1072,7 +1072,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getElement();
 
-                if ( ! Jeeel.Type.inArray(tmp, element)) {
+                if ( ! Jeeel.Hash.inHash(tmp, element)) {
                     return this;
                 }
             }
@@ -1999,7 +1999,6 @@ Jeeel.Dom.ElementOperator.prototype = {
     _init: function () {
         var ief = new Jeeel.Filter.Html.Form(),
             ivf = new Jeeel.Filter.Html.FormValue(),
-            ref = new Jeeel.Filter.String.RegularExpressionEscape(),
             auf = new Jeeel.Filter.Hash.Unique(true, true);
         
         /**
@@ -2014,7 +2013,7 @@ Jeeel.Dom.ElementOperator.prototype = {
 
             if (submitSearch) {
                 for (var i = name.length; i--;) {
-                    name[i] = new RegExp('^' + ref.filter(name[i]) + '(?:$|\\[)');
+                    name[i] = new RegExp('^' + Jeeel.String.escapeRegExp(name[i]) + '(?:$|\\[)');
                 }
 
                 res = this._each(
@@ -2033,7 +2032,7 @@ Jeeel.Dom.ElementOperator.prototype = {
                     function () {
                         var tmp = this.getName();
 
-                        if (Jeeel.Type.inArray(tmp, name)) {
+                        if (Jeeel.Hash.inHash(tmp, name)) {
                             return this;
                         }
                     }
@@ -2055,7 +2054,7 @@ Jeeel.Dom.ElementOperator.prototype = {
 
             if (submitSearch) {
                 for (var i = name.length; i--;) {
-                    name[i] = new RegExp('^' + ref.filter(name[i]) + '(?:$|\\[)');
+                    name[i] = new RegExp('^' + Jeeel.String.escapeRegExp(name[i]) + '(?:$|\\[)');
                 }
 
                 res = this._each(
@@ -2074,7 +2073,7 @@ Jeeel.Dom.ElementOperator.prototype = {
                     function () {
                         var tmp = this.getName();
 
-                        if ( ! Jeeel.Type.inArray(tmp, name)) {
+                        if ( ! Jeeel.Hash.inHash(tmp, name)) {
                             return this;
                         }
                     }

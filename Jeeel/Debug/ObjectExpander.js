@@ -244,12 +244,13 @@ Jeeel.Debug.ObjectExpander.prototype = {
      * @param {String} [key] オブジェクトに対応するキー
      * @param {Boolean} [isSimple=false] シンプルな形で取得するかどうか
      * @param {Boolean} [isFirst=false] 最初の呼び出しかどうか
+     * @param {Boolean} [isHided=false] この展開キーが隠されているかどうか
      * @return {Element} テーブルタグのHTML要素
      * @private
      */
-    _createExpander: function (obj, key, isSimple, isFirst) {
+    _createExpander: function (obj, key, isSimple, isFirst, isHided) {
 
-        var elm = this._expandObject.call(this, obj, key, isFirst);
+        var elm = this._expandObject.call(this, obj, key, isHided, isFirst);
 
         if (isSimple && ! elm.canExpand && ! elm.isError) {
             return elm;
@@ -396,25 +397,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
      * @return {String} 名前
      * @private
      */
-    _getUnknownObjectName: function (obj) {
-        var objType;
-
-        if (obj.__proto__ && obj.__proto__.constructor && obj.__proto__.constructor[Jeeel.Debug.Debugger.INFORMATION_NAME]) {
-            objType = obj.__proto__.constructor[Jeeel.Debug.Debugger.INFORMATION_NAME].name;
-        }
-        else if ( ! obj.__proto__ && obj.constructor && obj.constructor[Jeeel.Debug.Debugger.INFORMATION_NAME]) {
-            objType = obj.constructor[Jeeel.Debug.Debugger.INFORMATION_NAME].name;
-        }
-        else if(obj.constructor && obj.constructor.name) {
-            objType = obj.constructor.name;
-        }
-        else {
-            objType = Object.prototype.toString.call(obj);
-            objType = objType.substring(8, objType.length - 1);
-        }
-
-        return objType;
-    },
+    _getUnknownObjectName: Jeeel._Object.JeeelDebug.getUnknownObjectName,
 
     /**
      * 不特定なオブジェクトの展開を定義づける
@@ -437,13 +420,14 @@ Jeeel.Debug.ObjectExpander.prototype = {
      * @return {Element} 要素を示す文字列等を含むHTML要素
      * @private
      */
-    _expandObject: function (obj, key, isFirst) {
+    _expandObject: function (obj, key, isHided, isFirst) {
 
         var elm = Jeeel.Document.createElement('font');
         var type;
         var canExpand = true;
         var isError   = false;
         var isElement = false;
+        var isArray   = false;
 
         try {
             type = Jeeel.Type.getType(obj);
@@ -455,7 +439,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
         switch (type) {
             case Jeeel.Type.ObjectType.STRING:
                 elm.color = 'red';
-                elm.innerHTML = '&quot;' + Jeeel.Filter.Html.Escape.create(true).filter(obj) + '&quot;';
+                elm.innerHTML = '&quot;' + Jeeel.String.escapeHtml(obj, true) + '&quot;';
 
                 if (obj.match(/^(https?|ttp):\/\/.+/)) {
                     var url = (obj.match(/^ttp:\/\/.+/) ? 'h' + obj : obj);
@@ -468,13 +452,13 @@ Jeeel.Debug.ObjectExpander.prototype = {
 
             case Jeeel.Type.ObjectType.REGULAR_EXPRESSION:
                 elm.color = 'violet';
-                elm.innerHTML = Jeeel.Filter.Html.Escape.create(true).filter('' + obj);
+                elm.innerHTML = Jeeel.String.escapeHtml('' + obj, true);
                 canExpand = false;
                 break;
 
             case Jeeel.Type.ObjectType.DATE:
                 elm.color = 'black';
-                elm.innerHTML = Jeeel.Filter.Html.Escape.create(true).filter(obj.toString());
+                elm.innerHTML = Jeeel.String.escapeHtml(obj.toString(), true);
                 break;
 
             case Jeeel.Type.ObjectType.BOOLEAN:
@@ -493,7 +477,9 @@ Jeeel.Debug.ObjectExpander.prototype = {
 
             case Jeeel.Type.ObjectType.ARGUMENTS:
             case Jeeel.Type.ObjectType.ARRAY:
-                if ( ! isFirst) {
+                isArray = true;
+                
+                if ( ! isFirst || obj.length > 100) {
                     elm.innerHTML = type + '[' + obj.length + ']';
                     break;
                 }
@@ -540,7 +526,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
                 break;
 
             case Jeeel.Type.ObjectType.FUNCTION:
-                var func = Jeeel.Filter.Html.Escape.create(false).filter('' + obj).toString().replace(/(\r\n|\n)/g, '&crarr;');
+                var func = Jeeel.String.escapeHtml('' + obj).replace(/(\r\n|\n)/g, '&crarr;');
                 elm.color = 'black';
                 elm.innerHTML = (func.length > 100 ? func.substr(0, 100) + ' ...' : func);
                 break;
@@ -600,7 +586,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
                 name.innerHTML = obj.name;
                 
                 elm.color = '#1A1AA6';
-                elm.innerHTML = Jeeel.Filter.Html.Escape.create(true).filter('"' + obj.value + '"');
+                elm.innerHTML = Jeeel.String.escapeHtml('"' + obj.value + '"', true);
                 
                 div.appendChild(name);
                 div.appendChild(elm);
@@ -620,7 +606,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
 
                 var replaceCR = !(obj.data.match(/^(\r|\n|\t| )*$/) && true);
                 elm.color = 'black';
-                elm.innerHTML = Jeeel.Filter.Html.Escape.create(replaceCR).filter('"' + obj.data + '"');
+                elm.innerHTML = Jeeel.String.escapeHtml('"' + obj.data + '"', replaceCR);
 
                 canExpand = false;
                 break;
@@ -634,7 +620,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
                 }
                 
                 elm.color = '#236E25';
-                elm.innerHTML = Jeeel.Filter.Html.Escape.create(true).filter('<!--' + obj.data + '-->');
+                elm.innerHTML = Jeeel.String.escapeHtml('<!--' + obj.data + '-->', true);
                 canExpand = false;
                 break;
 
@@ -647,7 +633,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
 
             case Jeeel.Type.ObjectType.ERROR:
                 elm.color = 'red';
-                elm.innerHTML = Jeeel.Filter.Html.Escape.create(true).filter(obj.name + ': ' + obj.message);
+                elm.innerHTML = Jeeel.String.escapeHtml(obj.name + ': ' + obj.message, true);
                 canExpand = false;
                 isError = true;
                 break;
@@ -678,8 +664,13 @@ Jeeel.Debug.ObjectExpander.prototype = {
             var tre = Jeeel.Document.createElement('tr');
             var the = Jeeel.Document.createElement('th');
             var tde = Jeeel.Document.createElement('td');
+            var col = '881391';
+            
+            if (isHided) {
+                col = 'B771BD';
+            }
 
-            the.innerHTML = '<font color="#881391">' + key + '</font>:&nbsp;&nbsp;';
+            the.innerHTML = '<font color="#' + col + '">' + key + '</font>:&nbsp;&nbsp;';
 
             the.style.verticalAlign = 'top';
             tde.appendChild(elm);
@@ -695,6 +686,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
         elm.canExpand = canExpand;
         elm.isError   = isError;
         elm.isElement = isElement;
+        elm.isArray   = isArray;
         
         return elm;
     },
@@ -717,13 +709,13 @@ Jeeel.Debug.ObjectExpander.prototype = {
             return;
         }
 
-        var i, l, th;
+        var i, l, tmp, th;
 
         th = tbody.firstChild.firstChild;
         th.innerHTML = Jeeel.Debug.ObjectExpander.EXPAND_ARROW;
 
         if (isFirst) {
-            var tr, td;
+            var tr;
             var list = Jeeel.Hash.getPairs(obj);
             var flag = Jeeel._doc.createDocumentFragment();
             
@@ -731,19 +723,34 @@ Jeeel.Debug.ObjectExpander.prototype = {
                 var key = list[i].key;
                 var val = list[i].value;
                 
-                tr = Jeeel.Document.createElement('tr');
-                th = Jeeel.Document.createElement('th');
-                td = Jeeel.Document.createElement('td');
+                if (Object.getOwnPropertyDescriptor && Object.prototype.hasOwnProperty && Object.prototype.hasOwnProperty.call(obj, key)) {
+                  
+                    try {
+                        tmp = Object.getOwnPropertyDescriptor(obj, key);
+                    } catch (e) {
+                        tmp = {
+                            enumerable: key !== '__proto__'
+                        };
+                    }
 
-                var elm = this._createExpander.call(this, val, key);
+                    if (tmp && (tmp.get || tmp.set)) {
+                        if (tmp.get) {
+                            tr = this._createExpanderTr(tmp.get, 'get ' + key, ! tmp.enumerable);
+                            flag.appendChild(tr);
+                        }
 
-                td.appendChild(elm);
-                
-                tr.appendChild(th);
-                tr.appendChild(td);
-                tr.className = this.constructor.EXPAND_CHILD_CLASS;
-                
-                flag.appendChild(tr);
+                        if (tmp.set) {
+                            tr = this._createExpanderTr(tmp.set, 'set ' + key, ! tmp.enumerable);
+                            flag.appendChild(tr);
+                        }
+                    } else {
+                        tr = this._createExpanderTr(val, key, !tmp || !tmp.enumerable);
+                        flag.appendChild(tr);
+                    }
+                } else {
+                    tr = this._createExpanderTr(val, key, key === '__proto__');
+                    flag.appendChild(tr);
+                }
             }
             
             tbody.appendChild(flag);
@@ -756,6 +763,22 @@ Jeeel.Debug.ObjectExpander.prototype = {
                 }
             }
         }
+    },
+    
+    _createExpanderTr: function (val, key, isHided) {
+        var tr = Jeeel.Document.createElement('tr');
+        var th = Jeeel.Document.createElement('th');
+        var td = Jeeel.Document.createElement('td');
+
+        var elm = this._createExpander.call(this, val, key, false, false, isHided);
+
+        td.appendChild(elm);
+
+        tr.appendChild(th);
+        tr.appendChild(td);
+        tr.className = this.constructor.EXPAND_CHILD_CLASS;
+
+        return tr;
     },
 
     /**
@@ -821,19 +844,8 @@ Jeeel.Debug.ObjectExpander.prototype = {
                 if (Jeeel.Type.isText(children[i]) && children[i].data.match(/^(\r|\n|\t| )*$/)) {
                     continue;
                 }
-
-                tr = Jeeel.Document.createElement('tr');
-                th = Jeeel.Document.createElement('th');
-                td = Jeeel.Document.createElement('td');
-
-                var elm = this._createExpander.call(this, children[i]);
-
-                td.appendChild(elm);
                 
-                tr.appendChild(th);
-                tr.appendChild(td);
-                tr.className = this.constructor.EXPAND_CHILD_CLASS;
-
+                tr = this._createExpanderTr(children[i]);
                 flag.appendChild(tr);
             }
 
@@ -933,25 +945,14 @@ Jeeel.Debug.ObjectExpander.prototype = {
         th.innerHTML = this.constructor.EXPAND_ARROW;
 
         if (isFirst) {
-            var tr, td;
+            var tr;
             var flag = Jeeel.Document.createDocumentFragment();
             var length = obj.childNodes.length;
 
             for (i = 0; i < length; i++) {
                 var val = obj.childNodes[i];
-
-                tr = Jeeel.Document.createElement('tr');
-                th = Jeeel.Document.createElement('th');
-                td = Jeeel.Document.createElement('td');
                 
-                var elm = this._createExpander.call(this, val);
-
-                td.appendChild(elm);
-
-                tr.appendChild(th);
-                tr.appendChild(td);
-                tr.className = this.constructor.EXPAND_CHILD_CLASS;
-                
+                tr = this._createExpanderTr(val);
                 flag.appendChild(tr);
             }
             
@@ -1120,7 +1121,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
                     multiLine = true;
                 }
                 
-                var txt = (isOpendElm ? Jeeel.Filter.Html.Escape.create(true).filter(innerText) : '_');
+                var txt = (isOpendElm ? Jeeel.String.escapeHtml(innerText, true) : '_');
                 
                 if (isOpendElm && multiLine) {
                     txt = '<br />' + txt + '<br />';
@@ -1141,7 +1142,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
     _isAlwaysOpenedElement: function (element) {
         var closeElm = ['SCRIPT', 'STYLE'];
 
-//        if (Jeeel.Type.inArray(element.tagName.toUpperCase(), closeElm)) {
+//        if (Jeeel.Hash.inHash(element.tagName.toUpperCase(), closeElm)) {
 //            return true;
 //        }
 

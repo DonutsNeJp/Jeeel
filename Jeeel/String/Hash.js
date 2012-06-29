@@ -19,7 +19,7 @@ Jeeel.String.Hash = {
 };
 
 /**
- * @ignore
+ * @private
  */
 Jeeel._Object.JeeelStringHash = {
     

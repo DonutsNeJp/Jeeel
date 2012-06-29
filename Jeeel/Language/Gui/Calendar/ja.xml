@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+  <selectdate>日付を選択してください</selectdate>
+  <draggable>ドラッグ可能</draggable>
+  <help>ヘルプ</help>
+  <cancel>キャンセル</cancel>
+  <format>m月d日(D)</format>
+</language>

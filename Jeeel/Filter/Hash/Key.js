@@ -75,7 +75,7 @@ Jeeel.Filter.Hash.Key.prototype = {
                 Jeeel.Hash.forEach(row,
                     function (val, key) {
                         if (key === this._key) {
-                            allow = Jeeel.Type.inArray(val, this._allowList);
+                            allow = Jeeel.Hash.inHash(val, this._allowList);
                            return Jeeel.Hash.FOR_EACH_EXIT;
                         }
                     }, this

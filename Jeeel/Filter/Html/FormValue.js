@@ -144,7 +144,7 @@ Jeeel.Filter.Html.FormValue.prototype = {
                         res = [];
 
                         for (i = 0, l = ops.length; i < l; i++) {
-                            if (ops[i].getAttribute('selected')) {
+                            if (ops[i].getAttribute('selected') !== null) {
                                 res[res.length] = ops[i].getAttribute(propName);
                             }
                         }
@@ -152,8 +152,8 @@ Jeeel.Filter.Html.FormValue.prototype = {
                         return res;
                     }
                     
-                    for (i = 0, l = ops.length; i < l; i++) {
-                        if (ops[i].getAttribute('selected')) {
+                    for (i = ops.length; i--;) {
+                        if (ops[i].getAttribute('selected') !== null) {
                             return ops[i].getAttribute(propName);
                         }
                     }

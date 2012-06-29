@@ -135,7 +135,7 @@ Jeeel.Framework.Event.prototype = {
      * 
      * @return {Boolean} バブリング処理をするかどうか
      */
-    getBubbles: function () {
+    useBubbles: function () {
         return this._bubbles;
     },
     
@@ -144,7 +144,7 @@ Jeeel.Framework.Event.prototype = {
      * 
      * @return {Boolean} フォーリング処理をするかどうか
      */
-    getFalls: function () {
+    useFalls: function () {
         return this._falls;
     },
     

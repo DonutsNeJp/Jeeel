@@ -33,10 +33,8 @@ Jeeel.Object.Color.Hsl = function (hue, saturation, luminance, alpha) {
         case 1:
             var hslString = '' + arguments[0];
             
-            hslString = hslString.replace(/^(#|0x)/, '');
-            
-            if (hslString.match(/^hsla?\(/)) {
-                hslString = hslString.replace(/^hsla?\(/, '').replace(')', '').replace(/ /g, '');
+            if (hslString.match(/^hsla?\(/i)) {
+                hslString = hslString.replace(/^hsla?\(/i, '').replace(')', '').replace(/ /g, '');
                 
                 var hsl = hslString.split(',');
                 

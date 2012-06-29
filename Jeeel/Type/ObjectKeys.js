@@ -90,7 +90,7 @@ Jeeel.Type.ObjectKeys = {
      * @type String[]
      * @constant
      */
-    ELEMENT: ['name', 'id', 'className', 'tagName', 'nodeName', 'nodeType', 'firstChild', 'lastChild', 'nextSibling', 'previousSibling', 'parentNode', 'children', 'childNodes', 'hasChildNodes', 'style', 'appendChild', 'removeChild', 'replaceChild', 'insertBefore', 'setAttribute', 'getAttribute', 'removeAttribute', 'blur', 'focus', 'cloneNode', 'tabIndex', 'innerHTML', 'onabort', 'onbeforecopy', 'onbeforecut', 'onbeforepaste', 'onbeforeunload', 'onblur', 'onchange', 'onclick', 'oncontextmenu', 'oncopy', 'oncut', 'ondblclick', 'ondrag', 'ondragend', 'ondragenter', 'ondragleave', 'ondragover', 'ondragstart', 'ondrop', 'onerror', 'onfocus', 'onhashchange', 'oninput', 'oninvalid', 'onkeydown', 'onkeypress', 'onkeyup', 'onload', 'onmessage', 'onmousedown', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup', 'onmousewheel', 'onoffline', 'ononline', 'onpaste', 'onpopstate', 'onreset', 'onresize', 'onscroll', 'onsearch', 'onselect', 'onselectstart', 'onstorage', 'onsubmit', 'onunload'],
+    ELEMENT: ['name', 'id', 'className', 'tagName', 'nodeName', 'nodeType', 'firstChild', 'lastChild', 'nextSibling', 'previousSibling', 'parentNode', 'children', 'childNodes', 'hasChildNodes', 'getElementsByClassName', 'getElementsByTagName', 'querySelectorAll', 'querySelector', 'style', 'appendChild', 'removeChild', 'replaceChild', 'insertBefore', 'setAttribute', 'getAttribute', 'removeAttribute', 'blur', 'focus', 'cloneNode', 'tabIndex', 'innerHTML', 'onabort', 'onbeforecopy', 'onbeforecut', 'onbeforepaste', 'onbeforeunload', 'onblur', 'onchange', 'onclick', 'oncontextmenu', 'oncopy', 'oncut', 'ondblclick', 'ondrag', 'ondragend', 'ondragenter', 'ondragleave', 'ondragover', 'ondragstart', 'ondrop', 'onerror', 'onfocus', 'onhashchange', 'oninput', 'oninvalid', 'onkeydown', 'onkeypress', 'onkeyup', 'onload', 'onmessage', 'onmousedown', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup', 'onmousewheel', 'onoffline', 'ononline', 'onpaste', 'onpopstate', 'onreset', 'onresize', 'onscroll', 'onsearch', 'onselect', 'onselectstart', 'onstorage', 'onsubmit', 'onunload'],
 
     /**
      * Attribute型のキーリスト
@@ -130,7 +130,7 @@ Jeeel.Type.ObjectKeys = {
      * @type String[]
      * @constant
      */
-    DOCUMENT: ['nodeType', 'getElementById', 'getElementsByName', 'getElementsByTagName', 'documentElement', 'body', 'childNodes', 'write', 'writeln', 'open', 'close', 'cookie', 'createElement', 'createTextNode', 'createDocumentFragment', 'createComment', 'createAttribute'],
+    DOCUMENT: ['nodeType', 'getElementById', 'getElementsByClassName', 'querySelectorAll', 'querySelector', 'getElementsByName', 'getElementsByTagName', 'documentElement', 'body', 'childNodes', 'write', 'writeln', 'open', 'close', 'cookie', 'createElement', 'createTextNode', 'createDocumentFragment', 'createComment', 'createAttribute'],
 
     /**
      * Window型のキーリスト

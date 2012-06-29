@@ -48,7 +48,7 @@ Jeeel.Filter.Hash.DeleteKey.prototype = {
         Jeeel.Hash.forEach(vals,
             function (val, key) {
 
-                if ( ! Jeeel.Type.inArray(key, this._deleteKeys)) {
+                if ( ! Jeeel.Hash.inHash(key, this._deleteKeys)) {
                     res[key] = val;
                 }
             }, this

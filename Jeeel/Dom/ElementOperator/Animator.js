@@ -12,9 +12,21 @@ Jeeel.Dom.ElementOperator.Animator = function (animators, returnInstance) {
 };
 
 Jeeel.Dom.ElementOperator.Animator.prototype = {
-  
+    
+    /**
+     * アニメーターリスト
+     * 
+     * @type Jeeel.Dom.Element.Animator[]
+     * @private
+     */
     _animators: null,
     
+    /**
+     * 戻り値インスタンス
+     * 
+     * @type Jeeel.Dom.ElementOperator
+     * @private
+     */
     _returnInstance: null,
 
     /**
@@ -148,6 +160,21 @@ Jeeel.Dom.ElementOperator.Animator.prototype = {
         this._callMethod('animate');
         
         return this._returnInstance;
+    },
+    
+    /**
+     * アニメーションが実行中かどうかを返す
+     * 
+     * @return {Boolean} 実行中かどうか
+     */
+    isAnimated: function () {
+        for (var i = this._animators.length; i--;) {
+            if (this._animators[i].isAnimated()) {
+                return true;
+            }
+        }
+        
+        return false;
     },
     
     _callMethod: function (key, args) {

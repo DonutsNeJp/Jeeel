@@ -19,7 +19,7 @@ Jeeel.directory.Jeeel.Database.Relation.Table.Key = {
  * @see Jeeel.Database.Relation.Table.Key.Type
  */
 Jeeel.Database.Relation.Table.Key = function (type) {
-    if ( ! Jeeel.Type.inArray(type, Jeeel.Database.Relation.Table.Key.Type, true)) {
+    if ( ! Jeeel.Hash.inHash(type, Jeeel.Database.Relation.Table.Key.Type, true)) {
         throw new Error('キーの種類が間違っています。');
     }
 
@@ -90,7 +90,7 @@ Jeeel.Database.Relation.Table.Key.prototype = {
      * @return {Jeeel.Database.Relation.Table.Key} 自インスタンス
      */
     setType: function (type) {
-        if ( ! Jeeel.Type.inArray(type, Jeeel.Database.Relation.Table.Key.Type, true)) {
+        if ( ! Jeeel.Hash.inHash(type, Jeeel.Database.Relation.Table.Key.Type, true)) {
             throw new Error('キーの種類が間違っています。');
         }
 

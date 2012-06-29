@@ -9,16 +9,20 @@
  * @param {String} [domain] 許可ドメイン
  * @param {String} [path] 許可パス
  */
-Jeeel.Session.Core = function (params, expires, domain, path) {
+Jeeel.Session.Core = function (params, expires, domain, path, id) {
     if ( ! Jeeel.Type.isHash(params)) {
         throw new Error('paramsがHashではありません。');
     }
 
     this.params  = params;
-    this.created = (arguments[4] ? new Date(arguments[4]) : new Date());
-    this.expires = (Jeeel.Type.isInteger(expires) ? expires : 1440);
+    this.created = (arguments[5] ? new Date(arguments[5]) : new Date());
+    this.expires = (Jeeel.Type.isInteger(expires) ? expires : 0);
     this.path    = (Jeeel.Type.isString(path) ? path : '/');
     this.domain  = (Jeeel.Type.isString(domain) ? domain : Jeeel.UserAgent.getHostname());
+    
+    if (id) {
+        this.id = id;
+    }
 };
 
 /**
@@ -54,6 +58,9 @@ Jeeel.Session.Core.isSessionObject = function (val) {
         return false;
     }
     else if ( ! Jeeel.Type.isString(val.path)) {
+        return false;
+    }
+    else if ( ! Jeeel.Type.isString(val.id)) {
         return false;
     }
 
@@ -134,7 +141,7 @@ Jeeel.Session.Core.unserialize = function (serializeObj) {
             if ( ! this.isSessionObject(val)) {
                 val = this.create({});
             } else {
-                val = new this(val.params, val.expires, val.domain, val.path, val.created);
+                val = new this(val.params, val.expires, val.domain, val.path, val.id, val.created);
             }
 
             if (val.isTimeOver()) {
@@ -159,7 +166,7 @@ Jeeel.Session.Core.unserialize = function (serializeObj) {
  * @return {Jeeel.Session.Core} 作成したインスタンス
  */
 Jeeel.Session.Core.loadCookie = function (cookieObj) {
-    var objs = cookieObj.split(/:|; /);
+    var objs = cookieObj.split('; ');
 
     var params = {};
 
@@ -180,11 +187,12 @@ Jeeel.Session.Core.loadCookie = function (cookieObj) {
 
 /**
  * Sessionの保存期限の初期値(秒)<br />
+ * 0を指定でブラウザを閉じるまでで(cookieのみ)、<br />
  * マイナスを指定すると無制限になる
  *
  * @type Integer
  */
-Jeeel.Session.Core.expires = 1440;
+Jeeel.Session.Core.expires = 0;
 
 /**
  * Sessionの読み込み可能ドメインの初期値
@@ -202,7 +210,7 @@ if (Jeeel.Session.Core.domain === 'localhost') {
  *
  * @type String
  */
-Jeeel.Session.Core.path = '/';
+Jeeel.Session.Core.path = Jeeel.UserAgent.getPath();
 
 Jeeel.Session.Core.prototype = {
     
@@ -222,11 +230,12 @@ Jeeel.Session.Core.prototype = {
 
     /**
      * Sessionの保存期限(秒)<br />
+     * 0を指定でブラウザを閉じるまでで(cookieのみ)、<br />
      * マイナスを指定すると無制限になる
      *
      * @type Integer
      */
-    expires: -1,
+    expires: 0,
 
     /**
      * Sessionの読み込み可能パス
@@ -243,6 +252,13 @@ Jeeel.Session.Core.prototype = {
     domain: '',
     
     /**
+     * Sessionが作成されたID
+     * 
+     * @type String
+     */
+    id: Jeeel.UNIQUE_ID,
+    
+    /**
      * シリアライズが可能なオブジェクトを返す
      *
      * @return {Object} シリアライズ可能オブジェクト
@@ -253,7 +269,8 @@ Jeeel.Session.Core.prototype = {
             created: this.created.toGMTString(),
             expires: this.expires,
             domain:  this.domain,
-            path:    this.path
+            path:    this.path,
+            id:      Jeeel.UNIQUE_ID
         };
     },
 
@@ -305,25 +322,32 @@ Jeeel.Session.Core.prototype = {
     /**
      * Session情報をクッキーに保存できる形式に変換して返す
      *
-     * @return {String} クッキー保存形式の文字列
+     * @return {String[]} クッキー保存形式の文字列
      */
-    getCookie: function () {
+    getCookies: function () {
         var expires = new Date(this.created.toString());
 
-        expires.setSeconds(expires.getSeconds() + this.expires);
+        expires.setSeconds(expires.getSeconds() + (this.expires < 0 ? Math.pow(2, 32) : this.expires));
         expires = expires.toGMTString();
 
-        var params = [];
+        var res = [];
+        var ext = (this.expires === 0 ? '' : ';expires=' + expires) + (this.domain == '' ? '' : ';domain=' + this.domain) + ';path=' + this.path + ';';
+        var rmExt = new Date();
+        
+        rmExt.setDate(rmExt.getDate() - 1);
+        rmExt = ';expires=' + rmExt.toGMTString() + (this.domain == '' ? '' : ';domain=' + this.domain) + ';path=' + this.path + ';';
 
         for (var key in this.params) {
-            if (Jeeel.Type.isString(this.params[key])) {
-                params[params.length] = key + '=' + encodeURIComponent(this.params[key]);
+            if (Jeeel.Type.isUndefined(this.params[key])) {
+                res[res.length] = key + '=null' + rmExt;
+            } else if (Jeeel.Type.isString(this.params[key])) {
+                res[res.length] = key + '=' + encodeURIComponent(this.params[key]) + ext;
             } else {
-                params[params.length] = key + '=' + encodeURIComponent(Jeeel.Json.encode(this.params[key]));
+                res[res.length] = key + '=' + encodeURIComponent(Jeeel.Json.encode(this.params[key])) + ext;
             }
         }
 
-        return params.join(':') + (this.expires < 0 ? '' : ';expires=' + expires) + (this.domain == '' ? '' : ';domain=' + this.domain) + ';path=' + this.path + ';';
+        return res;
     },
 
     /**
@@ -335,6 +359,8 @@ Jeeel.Session.Core.prototype = {
 
         if (this.expires < 0) {
             return false;
+        } else if (this.expires === 0) {
+            this.expires = 86400;
         }
 
         var expires = new Date(this.created.toString());
@@ -358,7 +384,7 @@ Jeeel.Session.Core.prototype = {
     isAllowDomain: function () {
         var domain = Jeeel.UserAgent.getHostname();
 
-        var reg = new RegExp('^'+this.domain.replace('.', '\\.'));
+        var reg = new RegExp('^' + this.domain.replace('.', '\\.'));
 
         if (domain.match(reg)) {
             return true;
@@ -375,7 +401,7 @@ Jeeel.Session.Core.prototype = {
     isAllowPath: function () {
         var path = Jeeel.UserAgent.getPath();
 
-        var reg = new RegExp('^'+this.path+(this.path.charAt(this.path.length-1) == '/' ? '' : '(/|$)'));
+        var reg = new RegExp('^' + this.path+(this.path.charAt(this.path.length-1) == '/' ? '' : '(/|$)'));
 
         if (path.match(reg)) {
             return true;

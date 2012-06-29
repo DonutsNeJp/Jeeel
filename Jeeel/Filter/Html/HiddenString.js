@@ -9,7 +9,9 @@
 Jeeel.Filter.Html.HiddenString = function (key) {
     Jeeel.Filter.Abstract.call(this);
     
-    this._key = key || null;
+    if (key || key === 0) {
+        this._key = key;
+    }
 };
 
 /**
@@ -25,12 +27,11 @@ Jeeel.Filter.Html.HiddenString.create = function (key) {
 Jeeel.Filter.Html.HiddenString.prototype = {
     _key: null,
     
-    _mFilter: Jeeel.Filter.Chain.create().add(new Jeeel.Filter.Url.Escape())
-                                       .add(new Jeeel.Filter.Html.Escape()),
+    _mFilter: new Jeeel.Filter.Url.Escape(),
   
     _filter: function (vals) {
 
-        if (this._key) {
+        if (this._key || this._key === 0) {
             return this._makeHiddenString(this._key, vals);
         }
         
@@ -39,7 +40,7 @@ Jeeel.Filter.Html.HiddenString.prototype = {
 
     _filterEach: function (vals) {
 
-        if (this._key) {
+        if (this._key || this._key === 0) {
             return this._scanArray(this._key, vals);
         }
 
@@ -95,12 +96,9 @@ Jeeel.Filter.Html.HiddenString.prototype = {
 
     _makeHiddenString: function (key, val) {
         val = this._mFilter.filter(val);
+        val = Jeeel.String.escapeHtml(val);
         return '<input type="hidden" name="' + key + '" value="' + val + '" />';
     }
 };
 
 Jeeel.Class.extend(Jeeel.Filter.Html.HiddenString, Jeeel.Filter.Abstract);
-
-if (Jeeel._auto) {
-    Jeeel._tmp();
-}

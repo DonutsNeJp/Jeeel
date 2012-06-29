@@ -37,10 +37,10 @@ Jeeel.Object.Color.Rgb = function (red, green, blue, alpha) {
                 rgbString = Jeeel.Object.Color.Code[rgbString];
             }
             
-            rgbString = rgbString.replace(/^(#|0x)/, '');
+            rgbString = rgbString.replace(/^(#|0x)/i, '');
             
-            if (rgbString.match(/^RGBA?\(/i)) {
-                rgbString = rgbString.replace(/^RGBA?\(/i, '').replace(')', '').replace(/ /g, '');
+            if (rgbString.match(/^rgba?\(/i)) {
+                rgbString = rgbString.replace(/^rgba?\(/i, '').replace(')', '').replace(/ /g, '');
                 
                 var rgb = rgbString.split(',');
                 
@@ -49,13 +49,13 @@ Jeeel.Object.Color.Rgb = function (red, green, blue, alpha) {
                 blue  = +rgb[2];
                 alpha = rgb[3] ? +rgb[3] : 1;
             } else {
-                if (rgbString.length != 3 && rgbString.length != 6) {
+                if (rgbString.length !== 3 && rgbString.length !== 6) {
                     throw new Error('rgb文字列の長さが不自然です。');
                 } else if ( ! Jeeel.Type.isHexadecimalNumber(rgbString)) {
                     throw new Error('rgb文字列の形式が正しくありません。');
                 }
 
-                if (rgbString.length == 3) {
+                if (rgbString.length === 3) {
                     red   = ('0x' + rgbString.charAt(0)) * 17;
                     green = ('0x' + rgbString.charAt(1)) * 17;
                     blue  = ('0x' + rgbString.charAt(2)) * 17;

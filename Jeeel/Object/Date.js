@@ -13,7 +13,7 @@ Jeeel.Object.Date = function (date, offset) {
     if (Jeeel.Type.isString(date)) {
         date = new Date(date.replace(/-/g, '/'));
         
-        if (offset) {
+        if (offset || offset === 0) {
             dateOffset = (offset + date.getTimezoneOffset()) * 60000;
             date = new Date(date.getTime() + dateOffset);
         }
@@ -30,11 +30,19 @@ Jeeel.Object.Date = function (date, offset) {
     this._date = date;
     
     // ローカルを基準とした表示なのでグリニッジを標準とする
-    this._offset = offset || -date.getTimezoneOffset();
+    this._offset = (offset || offset === 0 ? offset : -date.getTimezoneOffset());
     
     this._refreshProperty();
     
     this._timestamp = new Date();
+    
+    if ( ! Jeeel.Object.Date._lock && ! Jeeel.Language.hasLanguage('Object.Date')) {
+        Jeeel.Object.Date._lock = true;
+        
+        Jeeel.Language.loadLanguage('Object.Date', function () {
+            Jeeel.Object.Date._lock = false;
+        });
+    }
 };
 
 /**
@@ -175,12 +183,21 @@ Jeeel.Object.Date.timeToSecond = function (time) {
 };
 
 /**
- * 曜日と曜日を表す数値のペアリスト
- *
- * @type String[]
- * @constant
+ * 曜日のリストを取得する
+ * 
+ * @return {String[]} 曜日のリスト
  */
-Jeeel.Object.Date.DAYS = ['日', '月', '火', '水', '木', '金', '土'];
+Jeeel.Object.Date.getDays = function () {
+    var lang = Jeeel.Language.getLanguage('Object.Date');
+    
+    var res = [];
+    
+    for (var i = 7; i--;) {
+        res[i] = lang['d' + i]['short'];
+    }
+    
+    return res;
+};
 
 Jeeel.Object.Date.prototype = {
 
@@ -371,10 +388,12 @@ Jeeel.Object.Date.prototype = {
     /**
      * 曜日名を取得する
      *
-     * @return {String} 曜日の短縮名(日,月,火,...等)
+     * @return {String} 曜日の短縮名(Sun,Mon,日,月,...等)
      */
     getDayName: function () {
-        return this.constructor.DAYS[this.day];
+        var lang = Jeeel.Language.getLanguage('Object.Date');
+        
+        return lang['d' + this.day]['short'];
     },
     
     /**
@@ -634,10 +653,11 @@ Jeeel.Object.Date.prototype = {
     /**
      * 指定したフォーマットに従って文字列変換する<br />
      * フォーマットはphpのdateフォーマットと同等である<br />
-     * なお一部は日本語化されており、英語での表記は出ないので注意
+     * 曜日名は現在設定されているロケールによって変化する
      *
      * @param {String} [format] フォーマット(省略時はDateTime形式になる)
      * @return {String} 変換後の文字列
+     * @see Jeeel.Language
      */
     toString: function (format) {
 
@@ -662,15 +682,15 @@ Jeeel.Object.Date.prototype = {
         if (halfHour == 0) {
             halfHour = 12;
         }
+        
+        var lang = Jeeel.Language.getLanguage('Object.Date');
 
         /**
          * @ignore
          */
         var formatList = {
             d: this._getNum(date),
-            D: this.constructor.DAYS[day],
             j: date,
-            l: this.constructor.DAYS[day] + '曜日',
             N: (day == 0 ? 7 : day),
             w: day,
             m: this._getNum(month),
@@ -686,7 +706,9 @@ Jeeel.Object.Date.prototype = {
             H: this._getNum(hour),
             i: this._getNum(minute),
             s: this._getNum(second),
-            U: unixTime
+            U: unixTime,
+            D: lang['d' + day]['short'],
+            l: lang['d' + day]['full']
         };
 
         for (var key in formatList) {
@@ -716,13 +738,7 @@ Jeeel.Object.Date.prototype = {
      * @private
      */
     _getNum: function (num) {
-        num = '' + num;
-
-        if (num.length < 2) {
-            num = '0' + num;
-        }
-
-        return num;
+        return Jeeel.String.padLeft(num, 2, '0');
     },
     
     /**
@@ -735,9 +751,7 @@ Jeeel.Object.Date.prototype = {
         
         var date = this._date;
         
-        if (this._offset) {
-            date = new Date(date.getTime() - (this._offset + date.getTimezoneOffset()) * 60000);
-        }
+        date = new Date(date.getTime() - (this._offset + date.getTimezoneOffset()) * 60000);
         
         this.year  = date.getFullYear();
         this.month = date.getMonth() + 1;
@@ -752,3 +766,12 @@ Jeeel.Object.Date.prototype = {
         return this;
     }
 };
+
+// 言語設定ファイルの初期ロード
+if ( ! Jeeel.Object.Date._lock && ! Jeeel.Language.hasLanguage('Object.Date')) {
+    Jeeel.Object.Date._lock = true;
+
+    Jeeel.Language.loadLanguage('Object.Date', function () {
+        Jeeel.Object.Date._lock = false;
+    });
+}

@@ -10,7 +10,9 @@ Jeeel.Filter.Html.Hidden = function (key) {
 
     Jeeel.Filter.Abstract.call(this);
     
-    this._key = key || null;
+    if (key || key === 0) {
+        this._key = key;
+    }
 };
 
 /**
@@ -30,7 +32,7 @@ Jeeel.Filter.Html.Hidden.prototype = {
     
     _filter: function (vals) {
 
-        if (this._key) {
+        if (this._key || this._key === 0) {
             return this._makeHiddenString(this._key, vals);
         }
 
@@ -39,7 +41,7 @@ Jeeel.Filter.Html.Hidden.prototype = {
 
     _filterEach: function (vals) {
 
-        if (this._key) {
+        if (this._key || this._key === 0) {
             return this._scanArray(this._key, vals);
         }
         

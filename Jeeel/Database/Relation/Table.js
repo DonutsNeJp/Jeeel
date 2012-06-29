@@ -122,7 +122,7 @@ Jeeel.Database.Relation.Table.prototype = {
      */
     setPrimaryKey: function (var_args) {
 
-        if (arguments.length == 0) {
+        if (arguments.length === 0) {
             throw new Error('キーは少なくとも1つは指定してください。');
         }
 
@@ -152,7 +152,7 @@ Jeeel.Database.Relation.Table.prototype = {
      */
     addUniqueKey: function (var_args) {
       
-        if (arguments.length == 0) {
+        if (arguments.length === 0) {
             throw new Error('キーは少なくとも1つは指定してください。');
         }
         
@@ -181,7 +181,7 @@ Jeeel.Database.Relation.Table.prototype = {
      * @return {Jeeel.Database.Relation.Table} 自インスタンス
      */
     addIndexKey: function (var_args) {
-        if (arguments.length == 0) {
+        if (arguments.length === 0) {
             throw new Error('キーは少なくとも1つは指定してください。');
         }
 

@@ -1,6 +1,6 @@
 
 /**
- * キーの種類についての列挙対
+ * @namespace キーの種類についての列挙体
  */
 Jeeel.Database.Relation.Table.Key.Type = {
 

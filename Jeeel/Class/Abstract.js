@@ -14,8 +14,8 @@ Jeeel.Class.Abstract.prototype = {
      * 親クラスのプロトタイプ
      * 
      * @type Object
+     * @protected
      * @readOnly
      */
     _super: null
 };
-    

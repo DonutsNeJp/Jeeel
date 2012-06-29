@@ -4,6 +4,22 @@
  * @class 配列もしくは連想配列について複雑な処理をするクラス<br />
  *         そのままの連想配列やJeeel.Parameterよりも高速に連想配列にアクセス出来るが、初期化にかなりのロスを伴う
  * @param {Hash} [hash] 基となるHash
+ * @example
+ * 配列・連想配列に対して様々な処理を行うクラス
+ * インスタンス化すると連想配列を配列の様に扱い高速アクセスや配列に備わっているメソッドを使用できるようにする
+ * 
+ * 例：
+ * var hash = Jeeel.Hash.create({a: 55, b: 777});
+ * hash.getValues(); // 値のリストを取得する、[55, 777]
+ * hash.getKeys(); // キーのリストを取得する、['a', 'b']
+ * hash.search(777); // 内部の値を検索してヒットしたらキーを返しヒットしなかったらnullを返す
+ * 
+ * 他にも以下のようなメソッドが良く使用される
+ * 
+ * Jeeel.Hash.merge({a: 55, b: 888}, {b: 66, c: 45}); // 2つ配列、連想配列を混合して新しく連想配列を生成する
+ * Jeeel.Hash.forEach(function (val, key) {  // 配列・連想配列に対してその要素に順次アクセスを行う
+ *     console.log(key + ': ' + val);
+ * }, {a: 1, b: 2, c: 3});
  */
 Jeeel.Hash = function (hash) {
     this._init(hash);
@@ -27,6 +43,42 @@ Jeeel.Hash.create = function (hash) {
  */
 Jeeel.Hash.FOR_EACH_EXIT = {
     exit: true
+};
+
+/**
+ * 指定したキーが配列式型に存在するかどうかを返す
+ *
+ * @param {String|Integer} key 判定値
+ * @param {Hash} hash 配列式型
+ * @return {Boolean} 判定結果
+ * @throws {TypeError} arrayが配列式でない場合に起こる
+ */
+Jeeel.Hash.keyExists = function (key, hash) {
+    return key in hash;
+};
+
+/**
+ * 指定した値が配列式型の中に存在するかどうかを返す
+ *
+ * @param {Mixied} val 判定値
+ * @param {Hash} hash 配列式型
+ * @param {Boolean} [strict] 厳密に型のチェックをするかどうか
+ * @return {Boolean} 判定結果
+ * @throws {Error} arrayが配列式でない場合に起こる
+ */
+Jeeel.Hash.inHash = function (val, hash, strict) {
+    var check = false;
+
+    Jeeel.Hash.forEach(hash,
+        function (elm) {
+            if (( ! strict && val == elm) || (strict && val === elm)) {
+                check = true;
+                return Jeeel.Hash.FOR_EACH_EXIT;
+            }
+        }
+    );
+
+    return check;
 };
 
 /**
@@ -157,12 +209,13 @@ Jeeel.Hash.getPairs = function (hash, sort, enableChainKey) {
 
     var type = Jeeel.Type.getType(hash);
     var list = Jeeel.Type.getKeys(type);
-    var retryWhere = !!( ! enableChainKey && (hash.__proto__ || Object.getPrototypeOf) && hash.hasOwnProperty);
+    var ownConstructor = hash.constructor && (Object.prototype.hasOwnProperty && ! Object.prototype.hasOwnProperty.call(hash, 'constructor') || hash.constructor !== Object);
+    var retryWhere = !!( ! enableChainKey && (hash.__proto__ || Object.getPrototypeOf || ownConstructor) && Object.prototype.hasOwnProperty);
     var pair = [], key;
 
     for (key in hash) {
 
-        if (retryWhere && ! hash.hasOwnProperty(key)) {
+        if (retryWhere && ! Object.prototype.hasOwnProperty.call(hash, key)) {
             continue;
         }
 
@@ -186,7 +239,7 @@ Jeeel.Hash.getPairs = function (hash, sort, enableChainKey) {
     for (var i = 0, l = list.length; i < l; i++) {
         key = list[i];
         
-        if (key !== '__proto__' && retryWhere && ! hash.hasOwnProperty(key)) {
+        if (key !== '__proto__' && retryWhere && ! Object.prototype.hasOwnProperty.call(hash, key)) {
             continue;
         }
         
@@ -201,15 +254,21 @@ Jeeel.Hash.getPairs = function (hash, sort, enableChainKey) {
         }
     }
     
-    if ( ! ('__proto__' in hash) && Object.getPrototypeOf) {
-        pair[pair.length] = new Jeeel.Object.Item('__proto__', Object.getPrototypeOf(hash));
+    if (retryWhere &&  ! ('__proto__' in hash)) {
+        if (Object.getPrototypeOf) {
+            pair[pair.length] = new Jeeel.Object.Item('__proto__', Object.getPrototypeOf(hash));
+        } else if (ownConstructor && Object.prototype.hasOwnProperty && ! Object.prototype.hasOwnProperty.call(hash, 'constructor')) {
+            pair[pair.length] = new Jeeel.Object.Item('__proto__', hash.constructor.prototype);
+        } else if (ownConstructor && hash.constructor !== Object) {
+            pair[pair.length] = new Jeeel.Object.Item('__proto__', hash._super || Object.prototype);
+        }
     }
     
     if (sort) {
         pair.sort(function (a, b) {
             if (a.key > b.key) {
                 return 1;
-            } else if(a.key < b.key) {
+            } else if (a.key < b.key) {
                 return -1;
             }
             
@@ -828,7 +887,7 @@ Jeeel.Hash.prototype = {
                 if (Jeeel.Type.isArray(arr[i])) {
                     _flatten(arr[i]);
                     continue;
-                } else if(arr[i] instanceof this.constructor) {
+                } else if (arr[i] instanceof this.constructor) {
                     _flatten(arr[i].getValues());
                     continue;
                 }

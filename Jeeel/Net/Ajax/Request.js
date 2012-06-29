@@ -172,7 +172,7 @@ Jeeel.Net.Ajax.Request.prototype = {
         this.method = this.options.method;
         var params = Jeeel.Method.clone(this.options.parameters);
 
-        if ( ! Jeeel.Type.inArray(this.method, ['get', 'post'])) {
+        if ( ! Jeeel.Hash.inHash(this.method, ['get', 'post'])) {
             params['_method'] = this.method;
             this.method = 'post';
         }
@@ -285,38 +285,36 @@ Jeeel.Net.Ajax.Request.prototype = {
      * @param {String} readyState 現在のステートを表す文字列
      */
     readyStateChange: function (readyState) {
-        var state = Jeeel.Net.Ajax.Request.Events[readyState];
-        var response = new Jeeel.Net.Ajax.Response(this);
+        
+        try {
+            var state = Jeeel.Net.Ajax.Request.Events[readyState];
+            var response = new Jeeel.Net.Ajax.Response(this);
 
-        if (state == 'Complete') {
-            try {
+            if (state == 'Complete') {
                 this._complete = true;
                 (this.options['on' + response.status] ||
-                 this.options['on' + (this.isSuccess() ? 'Success' : 'Failure')] ||
-                 Jeeel.Function.Template.EMPTY)(response, response.headerJSON);
-            } catch (e) {
-                this.dispatchException(e);
+                this.options['on' + (this.isSuccess() ? 'Success' : 'Failure')] ||
+                Jeeel.Function.Template.EMPTY)(response, response.headerJSON);
+
+                var contentType = response.getHeader('Content-type');
+
+                if (this.options.evalJS == 'force'
+                    || (this.options.evalJS && this.isSameOrigin() && contentType
+                        && contentType.match(/^\s*(text|application)\/(x-)?(java|ecma)script(;.*)?\s*$/i)))
+                {
+                    this.evalResponse();
+                }
             }
 
-            var contentType = response.getHeader('Content-type');
-            if (this.options.evalJS == 'force'
-                || (this.options.evalJS && this.isSameOrigin() && contentType
-                    && contentType.match(/^\s*(text|application)\/(x-)?(java|ecma)script(;.*)?\s*$/i)))
-            {
-                this.evalResponse();
-            }
-        }
-
-        try {
             (this.options['on' + state] || Jeeel.Function.Template.EMPTY)(response, response.headerJSON);
             Jeeel.Net.Ajax.Request.dispatch('on' + state, this, response, response.headerJSON);
+
+            if (state == 'Complete') {
+                this.transport.onreadystatechange = Jeeel.Function.Template.EMPTY;
+                clearTimeout(this._timeoutId);
+            }
         } catch (e) {
             this.dispatchException(e);
-        }
-
-        if (state == 'Complete') {
-            this.transport.onreadystatechange = Jeeel.Function.Template.EMPTY;
-            clearTimeout(this._timeoutId);
         }
     },
 
@@ -330,7 +328,7 @@ Jeeel.Net.Ajax.Request.prototype = {
             'Accept': 'text/javascript, text/html, application/xml, text/xml, */*'
         };
 
-        if (this.method == 'post') {
+        if (this.method === 'post') {
             headers['Content-type'] = this.options.contentType +
             (this.options.encoding ? '; charset=' + this.options.encoding : '');
 
@@ -341,7 +339,7 @@ Jeeel.Net.Ajax.Request.prototype = {
             }
         }
 
-        if (typeof this.options.requestHeaders == 'object') {
+        if (typeof this.options.requestHeaders === 'object') {
             var extras = this.options.requestHeaders;
 
             if (Jeeel.Type.isFunction(extras.push)) {
@@ -383,5 +381,14 @@ Jeeel.Net.Ajax.Request.prototype = {
         } else {
             throw error;
         }
-    }
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     * @param {String} url 対象URL
+     * @param {Hash} options オプション
+     */
+    constructor: Jeeel.Net.Ajax.Request
 };

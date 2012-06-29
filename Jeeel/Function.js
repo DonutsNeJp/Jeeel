@@ -14,23 +14,27 @@ Jeeel.directory.Jeeel.Function = {
 /**
  * コンストラクタ
  *
- * @class メソッドを拡張するクラス(name, length等の部分は初期化される)
- * @param {Function} target 基となるメソッド
- * @throws {Error} targetがメソッドでない場合に起こる
+ * @class 関数を拡張するクラス(name, length等の部分は初期化される)
+ * @param {Function} target 基となる関数
+ * @throws {Error} targetが関数でない場合に起こる
  * @example
+ * このクラスは関数をラッパーし幾つかの機能を追加するクラスである
+ * thisの固定や引数の固定、繰り返しや遅延実行などを使用する場合にこの機能を使う
+ * 
+ * 例：
  * var base = function (name, id) {
- * &nbsp;   return 'id: ' + id + ' name: ' + name + this;
+ *     return 'id: ' + id + ' name: ' + name + this;
  * }
  * var func = Jeeel.Function.create(base);
- * func.bind(' hello!!');
+ * func.bind(' hello!!'); // thisの束縛
  *
  * var b = func('devid', 22);
- * //b = 'id: 22 name: devid hello!!'
+ * // b = 'id: 22 name: devid hello!!'
  */
 Jeeel.Function = function (target) {
 
     if ( ! Jeeel.Type.isFunction(target)) {
-        throw new Error('targetがメソッドではありません。');
+        throw new Error('targetが関数ではありません。');
     }
 
     /**
@@ -45,7 +49,7 @@ Jeeel.Function = function (target) {
     }
     
     /**
-     * 対象のメソッド
+     * 対象の関数
      *
      * @type Function
      * @private
@@ -53,7 +57,7 @@ Jeeel.Function = function (target) {
     f._target = target;
 
     /**
-     * 変換後のメソッド
+     * 変換後の関数
      *
      * @type Function
      * @private
@@ -72,7 +76,7 @@ Jeeel.Function = function (target) {
 /**
  * インスタンスの作成を行う
  *
- * @param {Function} target 基となるメソッド
+ * @param {Function} target 基となる関数
  * @return {Jeeel.Function} 作成したインスタンス
  */
 Jeeel.Function.create = function (target) {
@@ -81,10 +85,10 @@ Jeeel.Function.create = function (target) {
 
 /**
  * 関数ネイティブ化を行う<br />
- * コンストラクタやapplyのないIEのためのメソッド
+ * コンストラクタやapplyのないIEのための関数
  * 
  * @param {Mixied} obj 親オブジェクト
- * @param {String} methodName ネイティブにしたいメソッドの名前
+ * @param {String} methodName ネイティブにしたい関数の名前
  * @param {Boolean} [useNew] インスタンス化するかどうか
  * @return {Function} ネイティブ化した関数
  */
@@ -108,12 +112,12 @@ Jeeel.Function.toNative = function (obj, methodName, useNew) {
 };
 
 /**
- * 単にthisをbindするメソッド<br />
+ * 単にthisをbindする関数<br />
  * メモリ消費等が少ないがエラー処理等は一切しない
  * 
- * @param {Function} target bind対象のメソッド
+ * @param {Function} target bind対象の関数
  * @param {Mixied} thisArg thisの部分にあたる値
- * @return {Function} bind後のメソッド
+ * @return {Function} bind後の関数
  */
 Jeeel.Function.simpleBind = function (target, thisArg) {
     return function () {
@@ -124,7 +128,7 @@ Jeeel.Function.simpleBind = function (target, thisArg) {
 Jeeel.Function.prototype = {
   
     /**
-     * 対象のメソッド
+     * 対象の関数
      *
      * @type Function
      * @private
@@ -132,7 +136,7 @@ Jeeel.Function.prototype = {
     _target: null,
     
     /**
-     * 変換後のメソッド
+     * 変換後の関数
      *
      * @type Function
      * @private
@@ -140,7 +144,7 @@ Jeeel.Function.prototype = {
     _cnvTarget: null,
     
     /**
-     * メソッドないのthisの部分を定義する<br />
+     * 関数内のthisの部分を定義する<br />
      * 一度しか意味がない
      *
      * @param {Mixied} thisArg thisの部分にあたる値
@@ -157,8 +161,8 @@ Jeeel.Function.prototype = {
     },
 
     /**
-     * メソッドの遅延実行を定義する<br />
-     * メソッドの戻り値はタイムアウトIDに変更される
+     * 関数の遅延実行を定義する<br />
+     * 関数の戻り値はタイムアウトIDに変更される
      *
      * @param {Integer} delayTime 遅延時間(ミリ秒)
      * @return {Jeeel.Function} 自インスタンス
@@ -182,9 +186,9 @@ Jeeel.Function.prototype = {
     },
 
     /**
-     * メソッドを複数回実行する<br />
-     * メソッドの戻り値はJeeel.Timerのインスタンスになる<br />
-     * メソッド内部のthisはこのメソッド前にbindしていない限りJeeel.Timerのインスタンスになる
+     * 関数を複数回実行する<br />
+     * 関数の戻り値はJeeel.Timerのインスタンスになる<br />
+     * 関数内部のthisはこの関数前にbindしていない限りJeeel.Timerのインスタンスになる
      *
      * @param {Integer} interval 実行間隔(ミリ秒)
      * @param {Integer} count 実行回数
@@ -206,38 +210,36 @@ Jeeel.Function.prototype = {
     },
 
     /**
-     * 複数のメソッドを結合する<br />
-     * 現在のメソッドが最初に実行される<br />
-     * メソッドの戻り値は複数のメソッドの戻り値のリストになる
+     * 複数の関数を結合する<br />
+     * 現在の関数が最初に実行される<br />
+     * 関数の戻り値は複数の関数の戻り値のリストになる
      *
-     * @param {Mixied} var_args 結合するメソッドを順に渡す
+     * @param {Function} var_args 結合する関数を順に渡す
      * @return {Jeeel.Function} 自インスタンス
-     * @throws {Error} 引数にメソッド以外を渡した場合に起こる
+     * @throws {Error} 引数に関数以外を渡した場合に起こる
      * @example
-     * <pre>
      * var f1 = function (n) {
-     * &nbsp;   return a + 1;
+     *     return a + 1;
      * };
      * var f2 = function (n) {
-     * &nbsp;   return a + 2;
+     *     return a + 2;
      * };
      * var f3 = function (n) {
-     * &nbsp;   return a + 3;
+     *     return a + 3;
      * };
      * var sf = Jeeel.Function.create(f1);
      * sf.join(f2, f3);
      *
      * var res = sf(2);
      *
-     * //res = [3, 4, 5]
-     * </pre>
+     * // res = [3, 4, 5]
      */
     join: function (var_args) {
         var funcs = Array.prototype.slice.call(arguments, 0, arguments.length);
 
         for (var i = 0, l = funcs.length; i < l; i++) {
             if ( ! Jeeel.Type.isFunction(funcs[i])) {
-                throw new Error('引数にメソッド以外が含まれています。');
+                throw new Error('引数に関数以外が含まれています。');
             }
         }
 
@@ -261,23 +263,22 @@ Jeeel.Function.prototype = {
     },
 
     /**
-     * 複数のメソッドを切り替えて実行する機能を付加する<br />
-     * 現在のメソッドを起点として、引数に指定したメソッドを呼び出す毎に切り替えて実行する<br />
+     * 複数の関数を切り替えて実行する機能を付加する<br />
+     * 現在の関数を起点として、引数に指定した関数を呼び出す毎に切り替えて実行する<br />
      * 最後まで実行したら自動的に最初に戻る
      *
-     * @param {Mixied} var_args 順次実行するメソッドを順に渡す
+     * @param {Function} var_args 順次実行する関数を順に渡す
      * @return {Jeeel.Function} 自インスタンス
-     * @throws {Error} 引数にメソッド以外を渡した場合に起こる
+     * @throws {Error} 引数に関数以外を渡した場合に起こる
      * @example
-     * <pre>
      * var f1 = function (n) {
-     * &nbsp;   return a + 1;
+     *     return n + 1;
      * };
      * var f2 = function (n) {
-     * &nbsp;   return a + 2;
+     *     return n + 2;
      * };
      * var f3 = function (n) {
-     * &nbsp;   return a + 3;
+     *     return n + 3;
      * };
      * var sf = Jeeel.Function.create(f1);
      * sf.iterate(f2, f3);
@@ -285,18 +286,17 @@ Jeeel.Function.prototype = {
      * var res = [];
      *
      * for (var i = 0; i &lt; 3; i++) {
-     * &nbsp;   res[i] = sf(i);
+     *     res[i] = sf(i);
      * }
      *
-     * //res = [1, 3, 5]
-     * </pre>
+     * // res = [1, 3, 5]
      */
     iterate: function (var_args) {
         var funcs = Array.prototype.slice.call(arguments, 0, arguments.length);
 
         for (var i = 0, l = funcs.length; i < l; i++) {
             if ( ! Jeeel.Type.isFunction(funcs[i])) {
-                throw new Error('引数にメソッド以外が含まれています。');
+                throw new Error('引数に関数以外が含まれています。');
             }
         }
 
@@ -327,16 +327,14 @@ Jeeel.Function.prototype = {
      * @param {Mixied} var_args 定義づけるパラメータを左から順に渡す
      * @return {Jeeel.Function} 自インスタンス
      * @example
-     * <pre>
      * var f = function (a, b, c) {
-     * &nbsp;   return a + b + c;
+     *     return a + b + c;
      * };
      * var sf = Jeeel.Function.create(f);
      * sf.curry('Hello! ', 'World ');
      *
      * var res = sf('Jhon!!');
-     * //res = 'Hello! World Jhon!!'
-     * </pre>
+     * // res = 'Hello! World Jhon!!'
      */
     curry: function (var_args) {
         var slice = Array.prototype.slice;
@@ -357,7 +355,7 @@ Jeeel.Function.prototype = {
     },
 
     /**
-     * メソッドの変更を元に戻す
+     * 関数の変更を元に戻す
      * 
      * @return {Jeeel.Function} 自インスタンス
      */
@@ -368,15 +366,15 @@ Jeeel.Function.prototype = {
     },
 
     /**
-     * ベースとなったメソッドを取得する
+     * ベースとなった関数を取得する
      *
-     * @return {Function} ベースになったメソッド
+     * @return {Function} ベースになった関数
      */
     getBaseMethod: function () {
         return this._target;
     }
 };
 
-Jeeel.file.Jeeel.Function = ['Template'];
+Jeeel.file.Jeeel.Function = ['Template', 'Callback'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Function, Jeeel.file.Jeeel.Function);

@@ -15,10 +15,16 @@ Jeeel.directory.Jeeel.Dom.Xml = {
  * コンストラクタ
  * 
  * @class XMLを簡単にアクセス可能にするクラス
- * @param {Document} xmlDocument XMLドキュメント
+ * @param {Document|String} xmlDocument XMLドキュメント
  * @throws {Error} xmlDocumentがXMLのドキュメントオブジェクトでない場合に発生
  */
 Jeeel.Dom.Xml = function (xmlDocument) {
+    
+    // 文字列はXML文字列として処理する
+    if (Jeeel.Type.isString(xmlDocument)) {
+        xmlDocument = this.constructor.Parser.parse(xmlDocument);
+    }
+    
     this._init(xmlDocument);
 };
 
@@ -46,7 +52,9 @@ Jeeel.Dom.Xml.load = function (url, params) {
                     .setAll(params || {})
                     .execute();
     
-    return new this(ajax.getResponse().responseXML);
+    var response = ajax.getResponse();
+    
+    return new this(response.responseXML || response.responseText);
 };
 
 /**
@@ -67,7 +75,7 @@ Jeeel.Dom.Xml.loadAsync = function (url, callback, params) {
     
     ajax.setAll(params || {})
         .setSuccessMethod(function (response) {
-            callback(new this(response.responseXML));
+            callback(new this(response.responseXML || response.responseText));
         }, this).execute();
 };
 
@@ -216,6 +224,8 @@ Jeeel.Dom.Xml.prototype = {
 
         var nodes = xmlDocument.childNodes;
         
+        this._childNodes = [];
+        
         for (var i = 0, l = nodes.length; i < l; i++) {
             this._childNodes[i] = new Jeeel.Dom.Xml.Node(nodes[i]);
             
@@ -226,6 +236,6 @@ Jeeel.Dom.Xml.prototype = {
     }
 };
 
-Jeeel.file.Jeeel.Dom.Xml = ['Node'];
+Jeeel.file.Jeeel.Dom.Xml = ['Node', 'Parser'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Xml, Jeeel.file.Jeeel.Dom.Xml);

@@ -35,7 +35,9 @@ Jeeel.Filter.Html.Form.create = function (useDefaultValue, unknownName, overwrit
 };
 
 Jeeel.Filter.Html.Form.prototype = {
-  
+    
+    _radioToArray: false,
+    
     _useDefaultValue: false,
     
     _unknownName: '',
@@ -43,6 +45,18 @@ Jeeel.Filter.Html.Form.prototype = {
     _overwrittenName: null,
     
     _avoidValues: [],
+    
+    /**
+     * 正確なリストを有効にするかどうかを設定する
+     * 
+     * @param {Boolean} [enable] 有効かどうか
+     * @return {Jeeel.Filter.Html.Form} 自インスタンス
+     */
+    enableAccurateList: function (enable) {
+        this._radioToArray = !!enable;
+        
+        return this;
+    },
     
     /**
      * @private
@@ -133,8 +147,10 @@ Jeeel.Filter.Html.Form.prototype = {
     },
     
     _setParams: function (res, name, element) {
-
-        if (element.tagName.toUpperCase() === 'INPUT') {
+        
+        var tagName = element.tagName.toUpperCase();
+        
+        if ( ! this._radioToArray && tagName === 'INPUT') {
             if (element.type.toLowerCase() === 'radio' && ! this._getProp(element, 'checked')) {
                 return;
             }
@@ -150,7 +166,7 @@ Jeeel.Filter.Html.Form.prototype = {
 
             key = names[i] || this._getMaxCount(res);
 
-            if (i < l -1) {
+            if (i < l - 1) {
                 if (Jeeel.Type.isElement(res[key])) {
                     this._avoidValues[this._avoidValues.length] = new Jeeel.Object.Item(this._repairName(names.slice(0, i + 1)), res[key]);
                     
@@ -161,11 +177,25 @@ Jeeel.Filter.Html.Form.prototype = {
             }
         }
         
-        if (key in res) {
+        if (key in res && ! Jeeel.Type.isArray(res[key])) {
             this._avoidValues = this._avoidValues.concat(this._repairValue(res[key]));
         }
         
-        res[key] = element;
+        if (this._radioToArray && tagName === 'INPUT' && element.type.toLowerCase() === 'radio') {
+            if ( ! res[key]) {
+                res[key] = [];
+                res[key]._checkRadio = null;
+                res[key].valueOf = this._getRadio;
+            }
+            
+            if (this._getProp(element, 'checked')) {
+                res[key]._checkRadio = element;
+            }
+            
+            res[key].push(element);
+        } else {
+            res[key] = element;
+        }
     },
     
     _getMaxCount: function (res) {
@@ -181,6 +211,10 @@ Jeeel.Filter.Html.Form.prototype = {
         }
 
         return (cnt === null ? 0 : cnt + 1);
+    },
+    
+    _getRadio: function () {
+        return this._checkRadio;
     }
 };
 

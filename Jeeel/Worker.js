@@ -17,7 +17,11 @@ Jeeel.directory.Jeeel.Worker = {
  * @class マルチスレッドを提供するクラス(1インスタンスにつき1スレッド)
  */
 Jeeel.Worker = function () {
-    var script = Jeeel.directory.Jeeel.Worker + 'Thread.js';
+    var script = Jeeel.directory.Jeeel.Worker + 'Thread.js?lang=' + Jeeel.Language.getLocale();
+    
+    if (Jeeel.QUERY) {
+        script += '&' + Jeeel.QUERY.replace(/lang=[a-z]+&?/g, '');
+    }
     
     this._worker = new Worker(script);
     this._errors = [];
@@ -78,7 +82,7 @@ Jeeel.Worker.prototype = {
         var event = Jeeel.Dom.Event.getEventObject();
         var data = event.data;
         
-        if (Jeeel.Type.inArray(data.type, [Jeeel.Worker.Type.EXECUTE_SCRIPT])) {
+        if (Jeeel.Hash.inHash(data.type, [Jeeel.Worker.Type.EXECUTE_SCRIPT])) {
             return;
         }
         
@@ -134,10 +138,7 @@ Jeeel.Worker.prototype = {
         
         var i, l, script = [];
         var globalValues = [
-            '_JEEEL_CLEAN_MODE_',
-            '_JEEEL_DEBUG_MODE_',
-            '_JEEEL_EXTEND_MODE_',
-            '_JEEEL_FULL_MODE_'
+            'jeeelConfig'
         ];
 
         for (i = 0, l = globalValues.length; i < l; i++) {
@@ -146,7 +147,7 @@ Jeeel.Worker.prototype = {
         
         var scriptData = {
             type: Jeeel.Worker.Type.EXECUTE_SCRIPT,
-            data: '_JEEEL_MANUAL_LOAD_ = true;\n' + script.join('\n')
+            data: script.join('\n') + '\nif ( ! jeeelConfig) {jeeelConfig = {manualLoad: true};}\n'
         };
         
         this._worker.postMessage(Jeeel.Json.encode(scriptData));
@@ -191,7 +192,7 @@ Jeeel.Worker.prototype = {
             data: task
         };
         
-        this._post(Jeeel.Json.encode(taskData));
+        this._post(Jeeel.Json.encode(taskData, true));
         
         return this;
     },
@@ -237,7 +238,7 @@ Jeeel.Worker.prototype = {
     execute: function (data) {
         var messageData = {
             type: Jeeel.Worker.Type.EXECUTE_TASK,
-            data: (Jeeel.Type.isSet(data) ? data : null)
+            data: Jeeel.Type.isSet(data) ? data : null
         };
         
         this._post(Jeeel.Json.encode(messageData, true));

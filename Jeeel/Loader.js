@@ -1,6 +1,16 @@
 
 /**
- * @namespace 読み込み関連のメソッドを提供するModule
+ * @staticClass 読み込み関連のメソッドを提供するスタティッククラス
+ * @example
+ * CSS、JSの読み込み、埋め込み機能を主とするクラス
+ * CSSやJSを途中から読み込みたい場合や文字列をCSSとして解釈したい場合などに使用する
+ * 
+ * 例：
+ * Jeeel.Loader.loadScript('/st/js/test.js'); // 新しくJSを読み込む
+ * Jeeel.Loader.loadStyle('/st/css/test.css'); // 新しくCSSを読み込む
+ * Jeeel.Loader.addScript('#test {color: red;}'); // JS文字列を指定してスクリプトを実行させる
+ * Jeeel.Loader.addStyle('#test {color: red;}'); // CSS文字列を指定してスタイルを有効にする
+ * Jeeel.Loader.preloadFile('/st/img/test.png'); // 今後JSで読み込む予定のファイルを事前読み込みしておき読み込んだ後にすぐ使えるようにする
  */
 Jeeel.Loader = {
 
@@ -208,6 +218,10 @@ Jeeel.Loader = {
              * @ignore
              */
             this.preloadFile = function (url) {
+                if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+                    Jeeel.Acl.throwError('Access Error', 404);
+                }
+                
                 new Image().src = url;
             };
         } else {

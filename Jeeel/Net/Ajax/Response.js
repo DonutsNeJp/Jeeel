@@ -14,14 +14,14 @@ Jeeel.Net.Ajax.Response = function (request) {
     var transport = self.transport = request.transport;
     var readyState = self.readyState = transport.readyState;
 
-    if((readyState > 2 && ! Jeeel.UserAgent.isInternetExplorer()) || readyState == 4) {
+    if ((readyState > 2 && ! Jeeel.UserAgent.isInternetExplorer()) || readyState == 4) {
         self.status       = self.getStatus();
         self.statusText   = self.getStatusText();
         self.responseText = (transport.responseText ? transport.responseText : '');
         self.headerJSON   = self._getHeaderJSON();
     }
 
-    if(readyState == 4) {
+    if (readyState == 4) {
         var xml = transport.responseXML;
         self.responseXML  = Jeeel.Type.isUndefined(xml) ? null : xml;
         self.responseJSON = self._getResponseJSON();
@@ -89,7 +89,7 @@ Jeeel.Net.Ajax.Response.prototype = {
      * @return {Mixied} 値
      */
     getField: function (key, defaultValue) {
-        return (Jeeel.Type.isSet(this.fields[key]) ? this.fields[key] : defaultValue);
+        return Jeeel.Type.isSet(this.fields[key]) ? this.fields[key] : defaultValue;
     },
 
     /**
@@ -178,7 +178,7 @@ Jeeel.Net.Ajax.Response.prototype = {
         var options = this.request.options;
         
         try {
-            res = Jeeel.Json.decode(decodeURIComponent(this.responseText), ( ! options.sanitizeJSON && this.request.isSameOrigin()));
+            res = Jeeel.Json.decode(decodeURIComponent(this.responseText), ! options.sanitizeJSON && this.request.isSameOrigin());
         } catch (e) {
             res = {};
         }
@@ -188,7 +188,7 @@ Jeeel.Net.Ajax.Response.prototype = {
     
     /**
      * 戻り値を強制的にXMLに変換して取得する<br />
-     * 変換できなかった場合は空の連想配列になる
+     * 変換できなかった場合はnullになる
      *
      * @return {Jeeel.Dom.Xml} 変換後のXMLインスタンス
      */
@@ -196,7 +196,7 @@ Jeeel.Net.Ajax.Response.prototype = {
         var res;
 
         try {
-            res = new Jeeel.Dom.Xml(this.responseXML);
+            res = new Jeeel.Dom.Xml(this.responseXML || this.responseText);
         } catch (e) {
             res = null;
         }
@@ -242,7 +242,7 @@ Jeeel.Net.Ajax.Response.prototype = {
         }
 
         try {
-            return Jeeel.Json.decode(decodeURIComponent(this.responseText), ( ! options.sanitizeJSON && this.request.isSameOrigin()));
+            return Jeeel.Json.decode(decodeURIComponent(this.responseText), ! options.sanitizeJSON && this.request.isSameOrigin());
         } catch (e) {
             this.request.dispatchException(e);
         }

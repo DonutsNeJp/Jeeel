@@ -19,7 +19,7 @@ Jeeel.Validator.Helper = function (val, plugins) {
     
     for (var name in plugins) {
         
-        if (Jeeel.Type.inArray(name, notValidator)) {
+        if (Jeeel.Hash.inHash(name, notValidator)) {
             continue;
         }
 
@@ -30,9 +30,9 @@ Jeeel.Validator.Helper = function (val, plugins) {
 
     for (var property in this) {
 
-        if (property[0] === '_' || Jeeel.Type.inArray(property, notValidator)) {
+        if (property[0] === '_' || Jeeel.Hash.inHash(property, notValidator)) {
             continue;
-        } else if (Jeeel.Type.keyExists(property, plugins)) {
+        } else if (Jeeel.Hash.keyExists(property, plugins)) {
             this[property] = (function (_property, method) {
                 return function () {
                     var args = [self._value];
@@ -180,7 +180,7 @@ Jeeel.Validator.Helper.prototype = {
      * @return {Boolean} エラーがあったらtrueそれ以外はfalseを返す
      */
     hasError: function (name) {
-        return Jeeel.Type.inArray(name, this._errors);
+        return Jeeel.Hash.inHash(name, this._errors);
     },
     
     /**

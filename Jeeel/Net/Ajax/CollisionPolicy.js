@@ -18,5 +18,17 @@ Jeeel.Net.Ajax.CollisionPolicy = {
      * @type Integer
      * @constant
      */
-    CHANGE: 1
+    CHANGE: 1,
+    
+    /**
+     * 現在通信中のリクエストの終了後に次の通信を行う用にキューにリクエストを入れる
+     *
+     * @type Integer
+     * @constant
+     */
+    ENQUEUE: 2
 };
+
+if (Jeeel._auto) {
+    Jeeel._tmp();
+}

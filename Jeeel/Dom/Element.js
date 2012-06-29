@@ -34,23 +34,6 @@ Jeeel.Dom.Element.create = function (element) {
     return new this(element);
 };
 
-/**
- * 指定したElementと任意のElementを交換する
- *
- * @param {Element} element 指定Element
- * @param {Element} replaceElement 交換Element
- * @return {Element} 挿入されていない方のElement
- */
-Jeeel.Dom.Element.replace = function (element, replaceElement) {
-    if ( ! element || ! element.parentNode || ! replaceElement) {
-        return replaceElement;
-    }
-
-    var parent = element.parentNode;
-    parent.replaceChild(replaceElement, element);
-    return element;
-};
-
 Jeeel.Dom.Element.prototype = {
 
     /**
@@ -576,7 +559,11 @@ Jeeel.Dom.Element.prototype = {
      * @param {String} text 設定文字列
      * @return {Jeeel.Dom.Element} 自インスタンス
      */
-    setText: function (text) {},
+    setText: function (text) {
+        this._element.innerHTML = Jeeel.String.escapeHtml(text, true);
+
+        return this;
+    },
     
     /**
      * このElementの次のElementを取得する
@@ -1236,17 +1223,19 @@ Jeeel.Dom.Element.prototype = {
     },
 
     /**
-     * このElementと任意のElementを交換する
+     * このElementの位置を任意のElementに置き換える
      *
-     * @param {Element} replaceElement 交換Element
+     * @param {Element} replaceElement 置き換えElement
      * @return {Jeeel.Dom.Element} 自インスタンス
      */
     replace: function (replaceElement) {
         var parent = this._element.parentNode;
+        
         parent.replaceChild(replaceElement, this._element);
+        
         return this;
     },
-
+    
     /**
      * このElementを上に移動する
      *
@@ -1306,7 +1295,7 @@ Jeeel.Dom.Element.prototype = {
         
         return this;
     },
-
+    
     /**
      * このElementを一番上に移動する
      * 
@@ -1414,7 +1403,6 @@ Jeeel.Dom.Element.prototype = {
         var div = Jeeel._elm;
         
         var _first, _option, _rect;
-        var ef = new Jeeel.Filter.Html.Escape(true);
         var slice = Array.prototype.slice;
         
         /**
@@ -1564,7 +1552,7 @@ Jeeel.Dom.Element.prototype = {
              * @ignore
              */
             this.getClassNames = function () {
-                return this._element.className.split(/\s+/);
+                return this._element.className.replace(/\s+/g, ' ').split(' ');
             };
             
             /**
@@ -1584,7 +1572,7 @@ Jeeel.Dom.Element.prototype = {
                 for (var i = 0, l = className.length; i < l; i++) {
                     if ( ! className[i]) {
                         continue;
-                    } else if(ec === className[i] || ec.search('\\b' + className[i] + '\\b') !== -1) {
+                    } else if (ec === className[i] || ec.search('\\b' + className[i] + '\\b') !== -1) {
                         continue;
                     }
                     
@@ -1638,7 +1626,7 @@ Jeeel.Dom.Element.prototype = {
                 var classNames = this.getClassNames();
 
                 for (var i = 0, l = className.length; i < l; i++) {
-                    if (Jeeel.Type.inArray(className[i], classNames, true)) {
+                    if (Jeeel.Hash.inHash(className[i], classNames, true)) {
                         this.removeClassName(className[i]);
                     } else {
                         this.addClassName(className[i]);
@@ -1721,15 +1709,6 @@ Jeeel.Dom.Element.prototype = {
             _searchTxt(res, this._element);
 
             return res.join('');
-        };
-        
-        /**
-         * @ignore
-         */
-        this.setText = function (text) {
-            this._element.innerHTML = ef.filter(text);
-
-            return this;
         };
         
         if (Jeeel.UserAgent.isInternetExplorer(6)) {

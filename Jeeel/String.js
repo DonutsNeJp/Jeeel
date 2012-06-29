@@ -16,6 +16,31 @@ Jeeel.directory.Jeeel.String = {
  * 
  * @class 文字列の複雑な処理をするクラス
  * @param {String} [string] 基となる文字列
+ * @example
+ * 文字列に対して複雑な処理を行うことが出来るクラス
+ * sprintfを使用したりキャメルケース、スネークケース等の変換からHTMLとして文字列を埋め込んだ際の幅や高さの取得まで幅広い文字列操作を行うことが出来る
+ * インスタンス化して使用する事も可能だがインスタンス化する必要があることは殆ど無い
+ * 
+ * 例：
+ * var str = '  test-case-sort  ';
+ * str = Jeeel.String.trim(str); // 前後の余分は空白等を取り除く
+ * str = Jeeel.String.toCamelCase(str); // スネークケース、ハイフネーションをキャメルケースに変換する
+ * str = Jeeel.String.padLeft(str, 15, '*'); // 左側を15文字になるまで*で埋める
+ * 
+ * // str => '***testCaseSort'
+ * 
+ * 他にも以下のような機能が良く使われる
+ * 
+ * Jeeel.String.escapeRegExp('$hoge'): // 正規表現で使用するメタ文字をエスケープする
+ * Jeeel.String.escapeHtml('<p>tag</p>'); // HTMLで使用する特殊文字(<, >, "など)をエスケープする
+ * Jeeel.String.stripTags('<p>test</p>'); // HTMLタグを全て取り除く
+ * Jeeel.String.toSnakeCase('test-hyphen'); // キャメルケース、ハイフネーションをスネークケースに変換する
+ * Jeeel.String.toHyphenation('test_snake'); // キャメルケース、スネークケースをハイフネーションに変換する
+ * Jeeel.String.toTitleCase('test case'); // 単語の頭文字を全て大文字に変換する
+ * Jeeel.String.sprintf('%02d:%02d', 1, 22); // C言語でお馴染みのsprintf関数を再現したものである
+ * Jeeel.String.Hash.md5('678'); // 指定された文字列のMD5を取得する
+ * Jeeel.String.Hash.Base64.encode('654'); // 指定された文字列に対してBASE64エンコードを行う
+ * Jeeel.String.Hash.Base64.decode('NjU0'); // 指定されたBASE64に対してデコードを行い元の文字列に戻す
  */
 Jeeel.String = function (string) {
     
@@ -61,6 +86,73 @@ Jeeel.String.fromBinary = function (binary) {
     }
 
     return new this(String.fromCharCode.apply(null, tmp));
+};
+
+/**
+ * 正規表現のメタ文字をエスケープする
+ * 
+ * @param {String} string 対象文字列
+ * @return {String} エスケープ後の文字列
+ */
+Jeeel.String.escapeRegExp = function (string) {
+    var reg = /([\/()\[\]{}|*+-.,\^$?\\])/g;
+    
+    return ('' + string).replace(reg, '\\$1');
+};
+
+/**
+ * HTML内で使用できない文字を特殊文字にエスケープする
+ * 
+ * @param {String} html 対象文字列
+ * @param {Boolean} [replaceSpaceAndLineFeed] 改行とスペースを置き換えるかどうか(デフォルトは置き換えない)
+ * @return {String} エスケープ後の文字列
+ */
+Jeeel.String.escapeHtml = function (html, replaceSpaceAndLineFeed) {
+    html = '' + html;
+
+    html = html.replace(/&/g, '&amp;')
+               .replace(/"/g, '&quot;')
+               .replace(/</g, '&lt;')
+               .replace(/>/g, '&gt;');
+
+    if (replaceSpaceAndLineFeed) {
+
+        // IEではスペースが入らない改行後に文字が入らないとその改行を無視するのでスペースを挿入
+        if (Jeeel.UserAgent.isInternetExplorer()) {
+            html = html.replace(/ /g, '&nbsp;')
+                       .replace(/\r\n/g, '\n')
+                       .replace(/\n\n/g, '<br />&nbsp;<br />')
+                       .replace(/\n/g, '<br />');
+        } else {
+            html = html.replace(/ /g, '&nbsp;')
+                       .replace(/\n/g, '<br />');
+        }
+    }
+
+    return html;
+};
+
+/**
+ * HTML内の特殊文字にを元に戻す(但し対象はHTML内でテキストとして存在出来ない文字列のみである)
+ * 
+ * @param {String} txt 対象文字列
+ * @param {Boolean} [replaceNbspAndBr] brタグとスペース特殊文字を置き換えるかどうか(デフォルトは置き換えない)
+ * @return {String} エスケープ後の文字列
+ */
+Jeeel.String.unescapeHtml = function (txt, replaceNbspAndBr) {
+    txt = '' + txt;
+
+    txt = txt.replace(/&amp;|&#38;|&#x26;/g, '&')
+             .replace(/&quot;|&#34;|&#x22;/g, '"')
+             .replace(/&lt;|&#60;|&#x3C;/g, '<')
+             .replace(/&gt;|&#62;|&#x3E;/g, '>');
+
+    if (replaceNbspAndBr) {
+        txt = txt.replace(/&nbsp;|&#160;|&#xA0;/g, ' ')
+                 .replace(/<br *(\/)?>/g, '\n');
+    }
+
+    return txt;
 };
 
 /**
@@ -117,14 +209,80 @@ Jeeel.String.trim = function (str) {
 };
 
 /**
+ * 文字列を反転させる
+ *
+ * @param {String} str 対象の文字列
+ * @return {String} 反転させた後の値
+ */
+Jeeel.String.reverse = function (str) {
+    return ('' + str).split('').reverse().join('');
+};
+
+/**
+ * 指定した文字列を指定した長さになるまで左側を空白もしくは指定文字列で埋める<br />
+ * 但し、必要とされる埋める文字数がpadStrの長さで均等に分割出来ない場合割り切れる一番長い数まで行い終了する
+ * 
+ * @param {String} str 対象文字列
+ * @param {Integer} length 処理後の文字列の長さ
+ * @param {String} [padStr] 空白以外を使用したい時に指定
+ * @return {String} 処理後の文字列
+ */
+Jeeel.String.padLeft = function (str, length, padStr) {
+    str = '' + str;
+    padStr = '' + (padStr || ' ');
+    
+    var padLength = padStr.length;
+
+    while ((str.length + padLength) <= length) {
+        str = padStr + str;
+    }
+    
+    return str;
+};
+
+/**
+ * 指定した文字列を指定した長さになるまで右側を空白もしくは指定文字列で埋める<br />
+ * 但し、必要とされる埋める文字数がpadStrの長さで均等に分割出来ない場合割り切れる一番長い数まで行い終了する
+ * 
+ * @param {String} str 対象文字列
+ * @param {Integer} length 処理後の文字列の長さ
+ * @param {String} [padStr] 空白以外を使用したい時に指定
+ * @return {String} 処理後の文字列
+ */
+Jeeel.String.padRight = function (str, length, padStr) {
+    str = '' + str;
+    padStr = '' + (padStr || ' ');
+    
+    var padLength = padStr.length;
+
+    while ((str.length + padLength) <= length) {
+        str += padStr;
+    }
+    
+    return str;
+};
+
+/**
  * 対象文字列をキャメルケースに変更する(パスカルケースではない)<br />
- * 変換対象はハイフネーションまたはスネークケースが対象となる
+ * 変換対象はパスカルケース、ハイフネーションまたはスネークケースが対象となる
  * 
  * @param {String} str 対象文字列
  * @return {String} 変換後の文字列
  */
 Jeeel.String.toCamelCase = function (str) {
-    return ('' + str).replace(/(?:-|_)([a-z])/g, function (str, p){return p.toUpperCase();});
+    str = ('' + str).replace(/(?:-|_)([a-z])/g, function (str, p){return p.toUpperCase();});
+    return str.replace(/^[A-Z]/, function (chr) {return chr.toLowerCase();});
+};
+
+/**
+ * 対象文字列をパスカルケースに変更する<br />
+ * 変換対象はハイフネーションまたはスネークケースが対象となる
+ * 
+ * @param {String} str 対象文字列
+ * @return {String} 変換後の文字列
+ */
+Jeeel.String.toPascalCase = function (str) {
+    return ('' + str).replace(/(?:^|-|_)([a-z])/g, function (str, p){return p.toUpperCase();});
 };
 
 /**
@@ -156,7 +314,65 @@ Jeeel.String.toHyphenation = function (str) {
  * @return {String} 変換後の文字列
  */
 Jeeel.String.toTitleCase = function (str) {
-    return ('' + str).toLowerCase().replace(/(^|\s)([a-z])/g, function (str, p1, p2){return p1 + p2.toUpperCase();});
+    return ('' + str).toLowerCase().replace(/(^|\b)([a-z])/g, function (str, p1, p2){return p1 + p2.toUpperCase();});
+};
+
+/**
+ * 全角文字を半角文字に変換する<br />
+ * 対象となる文字は英数字、スペース、記号となる
+ * 
+ * @param {String} str 対象文字列
+ * @return {String} 変換後の文字列
+ */
+Jeeel.String.toHalfWidth = function (str) {
+    return ('' + str).replace(/[！＃-＆（-／０-９：-＠Ａ-Ｚ［-｀ａ-ｚ｛-～　]+/g, function (chars) {
+
+        var res = [];
+
+        for (var i = chars.length; i--;) {
+            var code = chars[i].charCodeAt(0);
+
+            // 全角スペースは特殊なので個別に変換
+            if (code === 12288) {
+                code = 32;
+            } else {
+                code -= 65248;
+            }
+
+            res[i] = code;
+        }
+
+        return String.fromCharCode.apply(null, res);
+    });
+};
+
+/**
+ * 半角文字を全角文字に変換する<br />
+ * 対象となる文字は英数字、スペース、記号となる
+ * 
+ * @param {String} str 対象文字列
+ * @return {String} 変換後の文字列
+ */
+Jeeel.String.toFullWidth = function (str) {
+    return ('' + str).replace(/[!#-&(-/0-9:-@A-Z\[-`a-z{-~ ]+/g, function (chars) {
+
+        var res = [];
+
+        for (var i = chars.length; i--;) {
+            var code = chars[i].charCodeAt(0);
+
+            // 半角スペースは特殊なので個別に変換
+            if (code === 32) {
+                code = 12288;
+            } else {
+                code += 65248;
+            }
+
+            res[i] = code;
+        }
+
+        return String.fromCharCode.apply(null, res);
+    });
 };
 
 /**
@@ -464,7 +680,7 @@ Jeeel.String.prototype = {
      * @return {Jeeel.String} 自インスタンス
      */
     escapeHtml: function (replaceSpaceAndLineFeed) {
-        this._str = Jeeel.Filter.Html.Escape.create(replaceSpaceAndLineFeed).filter(this._str);
+        this._str = this.constructor.escapeHtml(this._str, replaceSpaceAndLineFeed);
         
         return this._reset();
     },
@@ -472,11 +688,11 @@ Jeeel.String.prototype = {
     /**
      * エスケープされたHtml文字列を元に戻す
      * 
-     * @param {Boolean} [replaceSpaceAndLineFeed] 改行とスペースを置き換えるかどうか(デフォルトは置き換えない)
+     * @param {Boolean} [replaceNbspAndBr] brタグとスペース特殊文字を置き換えるかどうか(デフォルトは置き換えない)
      * @return {Jeeel.String} 自インスタンス
      */
-    unescapeHtml: function (replaceSpaceAndLineFeed) {
-        this._str = Jeeel.Filter.Html.Unescape.create(replaceSpaceAndLineFeed).filter(this._str);
+    unescapeHtml: function (replaceNbspAndBr) {
+        this._str = this.constructor.unescapeHtml(this._str, replaceNbspAndBr);
         
         return this._reset();
     },
@@ -487,7 +703,7 @@ Jeeel.String.prototype = {
      * @return {Jeeel.String} 自インスタンス
      */
     escapeRegExp: function () {
-        this._str = Jeeel.Filter.String.RegularExpressionEscape.create().filter(this._str);
+        this._str = this.constructor.escapeRegExp(this._str);
         
         return this._reset();
     },
@@ -515,12 +731,62 @@ Jeeel.String.prototype = {
     },
     
     /**
+     * 文字列を反転させる
+     *
+     * @return {Jeeel.String} 自インスタンス
+     */
+    reverse: function () {
+        this._str = this.constructor.reverse(this._str);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列を指定した長さになるまで左側を空白もしくは指定文字列で埋める<br />
+     * 但し、必要とされる埋める文字数がpadStrの長さで均等に分割出来ない場合割り切れる一番長い数まで行い終了する
+     * 
+     * @param {Integer} length 処理後の文字列の長さ
+     * @param {String} [padStr] 空白以外を使用したい時に指定
+     * @return {Jeeel.String} 自インスタンス
+     */
+    padLeft: function (length, padStr) {
+        this._str = this.constructor.padLeft(this._str, length, padStr);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列を指定した長さになるまで右側を空白もしくは指定文字列で埋める<br />
+     * 但し、必要とされる埋める文字数がpadStrの長さで均等に分割出来ない場合割り切れる一番長い数まで行い終了する
+     * 
+     * @param {Integer} length 処理後の文字列の長さ
+     * @param {String} [padStr] 空白以外を使用したい時に指定
+     * @return {String} 処理後の文字列
+     */
+    padRight: function (length, padStr) {
+        this._str = this.constructor.padRight(this._str, length, padStr);
+        
+        return this._reset();
+    },
+    
+    /**
      * 文字列をキャメルケースに変更する
      * 
      * @return {Jeeel.String} 自インスタンス
      */
     camelCase: function () {
         this._str = this.constructor.toCamelCase(this._str);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列をパスカルケースに変更する
+     * 
+     * @return {Jeeel.String} 自インスタンス
+     */
+    pascalCase: function () {
+        this._str = this.constructor.toPascalCase(this._str);
         
         return this._reset();
     },
@@ -590,7 +856,7 @@ Jeeel.String.prototype = {
      * 
      * @return {Hash} 変換後の連想配列
      */
-    toQueryParameters: function () {
+    toQuery: function () {
         return Jeeel.Filter.Url.QueryParameter.create().filter(this._str);
     },
     

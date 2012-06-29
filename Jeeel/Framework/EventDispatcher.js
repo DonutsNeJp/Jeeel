@@ -154,13 +154,13 @@ Jeeel.Framework.EventDispatcher.prototype = {
                 break;
                 
             case Jeeel.Framework.Event.Phase.TARGETING:
-                if (event.getBubbles() || event.getFalls()) {
-                    if (event.getBubbles()) {
+                if (event.useBubbles() || event.useFalls()) {
+                    if (event.useBubbles()) {
                         event._phase = Jeeel.Framework.Event.Phase.BUBBLING;
                         this._flowBubblingPhaseEvent(event);
                     }
                     
-                    if (event.getFalls()) {
+                    if (event.useFalls()) {
                         event._phase = Jeeel.Framework.Event.Phase.FALLING;
                         this._flowFallingPhaseEvent(event);
                     }
@@ -171,13 +171,13 @@ Jeeel.Framework.EventDispatcher.prototype = {
                 break;
             
             case Jeeel.Framework.Event.Phase.BUBBLING:
-                if (event.getBubbles()) {
+                if (event.useBubbles()) {
                     this._flowBubblingPhaseEvent(event);
                 }
                 break;
                 
             case Jeeel.Framework.Event.Phase.FALLING:
-                if (event.getFalls()) {
+                if (event.useFalls()) {
                     this._flowFallingPhaseEvent(event);
                 }
                 break;

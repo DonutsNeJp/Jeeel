@@ -114,7 +114,8 @@ Jeeel.Dom.Style.create = function (style) {
 
             body.appendChild(iframe);
 
-            var iframeDoc = (iframe.contentWindow || iframe.contentDocument).document;
+            var iframeDoc = iframe.contentDocument || iframe.contentWindow && iframe.contentWindow.document;
+            
             iframeDoc.write((Jeeel.Document.getDocument().compatMode === 'CSS1Compat' ? '<!doctype html>' : '' ) + '<html><body>');
             iframeDoc.close();
 
@@ -255,45 +256,21 @@ Jeeel.Dom.Style.prototype = {
      * @return {Jeeel.Dom.Style} 自インスタンス
      */
     setStyleList: function (styles) {
-        var cssText = [];
-        var replaces = [];
-        
         styles = this._bundler.bundle(styles);
         
         for (var style in styles) {
-            var styleName  = Jeeel.String.toCamelCase(style);
-            var styleValue = styles[style];
+            var styleName = Jeeel.String.toCamelCase(style);
+            
+            try {
+                if (this._customStyle[styleName]) {
+                    this._customStyle[styleName](styles[style]);
 
-            // カスタムスタイルが存在したら実行もしくは名前を変更する
-            if (this._customStyle[styleName]) {
-                if (this._customStyle[styleName].usableFilter) {
-                    styleValue = this._customStyle[styleName](styleValue, true);
-                    styleName = this._customStyle[styleName].originName;
-                } else if (this._customStyle[styleName].originName) {
-                    styleName = this._customStyle[styleName].originName;
-                } else {
-                    this._customStyle[styleName](styleValue);
                     continue;
                 }
-            } else {
-                styleName = Jeeel.String.toHyphenation(style);
-            }
-            
-            // 数字の0または値が存在するとき値を設定し、空の場合は値を削除する
-            if (styleValue || styleValue === 0) {
-                cssText[cssText.length] = styleName + ':' + styleValue;
-            } else {
-                replaces.push(new RegExp(styleName + ':[^;]+;', 'i'));
-            }
+
+                this._style[styleName] = styles[style];
+            } catch (e) {}
         }
-        
-        var baseCss = this._style.cssText;
-        
-        for (var i = replaces.length; i--;) {
-            baseCss = baseCss.replace(replaces[i], '');
-        }
-        
-        this._style.cssText = baseCss + ';' + cssText.join(';');
         
         return this;
     },

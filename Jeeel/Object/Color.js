@@ -16,7 +16,7 @@ Jeeel.directory.Jeeel.Object.Color = {
  * コンストラクタ
  *
  * @class 色を扱うクラス
- * @param {Mixied} color 色を表す値
+ * @param {String|Jeeel.Object.Color.Rgb|Jeeel.Object.Color.Hsl} color 色を表す値
  */
 Jeeel.Object.Color = function (color) {
     var rgb, hsl;
@@ -27,10 +27,32 @@ Jeeel.Object.Color = function (color) {
     } else if (color instanceof this.constructor.Hsl) {
         hsl = color;
         rgb = this.constructor.hslToRgb(hsl);
+    } else if (Jeeel.Type.isString(color)) {
+        if (color.match(/^hsla?\(/i)) {
+            color = new this.constructor.Hsl(color);
+        } else {
+            color = new this.constructor.Rgb(color);
+        }
+        
+        this.constructor.call(this, color);
+        
+        return;
+    } else {
+        throw new Error('color is unknown type.');
     }
     
     this._rgb = rgb;
     this._hsl = hsl;
+};
+
+/**
+ * インスタンスの作成を行う
+ * 
+ * @param {String|Jeeel.Object.Color.Rgb|Jeeel.Object.Color.Hsl} color 色を表す値
+ * @return {Jeeel.Object.Color} 作成したインスタンス
+ */
+Jeeel.Object.Color.create = function (color) {
+    return new this(color);
 };
 
 /**
@@ -192,9 +214,9 @@ Jeeel.Object.Color.calculateRgb = function (hue, saturation, luminance) {
 
             if (hVal < 60) {
                 list[i] = min + sub * hVal / 60;
-            } else if(hVal < 180) {
+            } else if (hVal < 180) {
                 list[i] = max;
-            } else if(hVal < 240) {
+            } else if (hVal < 240) {
                 list[i] = min + sub * (240 - hVal) / 60;
             } else {
                 list[i] = min;
@@ -202,7 +224,7 @@ Jeeel.Object.Color.calculateRgb = function (hue, saturation, luminance) {
 
             if (i === 0) {
                 hVal = h;
-            } else if(i === 1) {
+            } else if (i === 1) {
                 hVal = h - 120;
 
                 if (hVal < 0) {

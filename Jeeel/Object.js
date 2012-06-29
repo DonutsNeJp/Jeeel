@@ -18,6 +18,6 @@ Jeeel.Object = {
 
 };
 
-Jeeel.file.Jeeel.Object = ['Item', 'Point', 'Size', 'Rect', 'Color', 'Date', 'Fraction', 'Font', 'Technical'];
+Jeeel.file.Jeeel.Object = ['Item', 'Point', 'Size', 'Rect', 'Color', 'Date', 'Font', 'Technical'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Object, Jeeel.file.Jeeel.Object);

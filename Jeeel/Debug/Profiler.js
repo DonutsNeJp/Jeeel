@@ -83,7 +83,7 @@ Jeeel.Debug.Profiler = {
     /**
      * 指定したオブジェクト以下のメソッドをプロファイリング対象にする
      * 
-     * @param {Object} object プロファイリング対象のメソッドを保持するオブジェクト
+     * @param {Object|Function} object プロファイリング対象のメソッドを保持するオブジェクトもしくは関数
      * @param {String} name オブジェクトの名前
      * @param {Boolean} [deepSet] オブジェクトのプロパティに対して再帰的にプロファイリングするかどうか
      * @return {Jeeel.Debug.Profiler} 自クラス
@@ -245,7 +245,7 @@ Jeeel.Debug.Profiler = {
             }
             
             avg = this._times[methodName] / this._counts[methodName];
-            manager.addProfile(new this.Profile(methodName, avg));
+            manager.addProfile(new this.Profile(methodName, null, avg));
         }
         
         return manager;
@@ -308,7 +308,7 @@ Jeeel.Debug.Profiler = {
             }
         }
         
-        return new this.Profile(key, max);
+        return new this.Profile(key, null, max);
     },
     
     /**
@@ -331,11 +331,11 @@ Jeeel.Debug.Profiler = {
                 time;
 
             if ( ! self._hierarchy) {
-                self._accessData = self._data = new self.Profile(fullName);
+                self._accessData = self._data = new self.Profile(fullName, this);
             } else {
                 tmp = self._accessData;
 
-                self._accessData = tmp.calls[tmp.calls.length] = new self.Profile(fullName);
+                self._accessData = tmp.calls[tmp.calls.length] = new self.Profile(fullName, this);
             }
 
             self._hierarchy++;
@@ -345,7 +345,7 @@ Jeeel.Debug.Profiler = {
             try {
                 
                 // このクロージャインスタンスだったらインスタンスの作成を行う
-                if (this instanceof arguments.callee) {
+                if (this instanceof arguments.callee && this.constructor === arguments.callee.prototype.constructor) {
                   
                     owner[self.TEMPORARY_METHOD_NAME] = func;
                     

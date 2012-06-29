@@ -88,9 +88,9 @@ Jeeel.Dom.Behavior.EditInplace = {
             var input = inputs[i];
             var nodeName = input.nodeName.toUpperCase();
 
-            if ( ! Jeeel.Type.inArray(nodeName, this.USABLE_LIST.NODES, true)) {
+            if ( ! Jeeel.Hash.inHash(nodeName, this.USABLE_LIST.NODES, true)) {
                 continue;
-            } else if (nodeName === 'INPUT' && ! Jeeel.Type.inArray(input.type, this.USABLE_LIST.TYPES, true)) {
+            } else if (nodeName === 'INPUT' && ! Jeeel.Hash.inHash(input.type, this.USABLE_LIST.TYPES, true)) {
                 continue;
             }
             

@@ -289,7 +289,7 @@ Jeeel.Framework.Acl.Role.Abstract.prototype = {
         
         // 実際にリソースに存在する権限かどうかを確認してフィルターをかける
         for (var i = authorizations.length; i--;) {
-            if (authorizations[i] === '*' || Jeeel.Type.inArray(authorizations[i], resourcePerms, true)) {
+            if (authorizations[i] === '*' || Jeeel.Hash.inHash(authorizations[i], resourcePerms, true)) {
                 perms.push(authorizations[i]);
             }
         }
@@ -321,7 +321,7 @@ Jeeel.Framework.Acl.Role.Abstract.prototype = {
             if (authorizations[type][id].perms !== '*') {
                 
                 // 追加権限に*を含んでいた場合は強制的に全権限になる
-                if (Jeeel.Type.inArray('*', perms, true)) {
+                if (Jeeel.Hash.inHash('*', perms, true)) {
                     authorizations[type][id].perms = '*';
                 } else {
                     var tmp = Jeeel.Hash.merge(authorizations[type][id].perms, perms);
@@ -350,7 +350,7 @@ Jeeel.Framework.Acl.Role.Abstract.prototype = {
         
         // 実際にリソースに存在する権限かどうかを確認してフィルターをかける
         for (i = authorizations.length; i--;) {
-            if (authorizations[i] === '*' || Jeeel.Type.inArray(authorizations[i], resourcePerms, true)) {
+            if (authorizations[i] === '*' || Jeeel.Hash.inHash(authorizations[i], resourcePerms, true)) {
                 perms.push(authorizations[i]);
             }
         }
@@ -378,13 +378,13 @@ Jeeel.Framework.Acl.Role.Abstract.prototype = {
             var clear = false;
             var tmp;
             
-            if (Jeeel.Type.inArray('*', perms, true)) {
+            if (Jeeel.Hash.inHash('*', perms, true)) {
                 clear = true;
             } else if (authorizations[type][id].perms === '*') {
                 tmp = [];
                 
                 for (i = resourcePerms.length; i--;) {
-                    if ( ! Jeeel.Type.inArray(resourcePerms[i], perms, true)) {
+                    if ( ! Jeeel.Hash.inHash(resourcePerms[i], perms, true)) {
                         tmp.push(resourcePerms[i]);
                     }
                 }
@@ -396,7 +396,7 @@ Jeeel.Framework.Acl.Role.Abstract.prototype = {
                 var tmp = [];
                 
                 for (i = authorizations[type][id].perms.length; i--;) {
-                    if (Jeeel.Type.inArray(authorizations[type][id].perms[i], perms, true)) {
+                    if (Jeeel.Hash.inHash(authorizations[type][id].perms[i], perms, true)) {
                         tmp.push(authorizations[type][id].perms[i]);
                     }
                 }
@@ -430,7 +430,7 @@ Jeeel.Framework.Acl.Role.Abstract.prototype = {
             var rperms = resource.getAuthorizations();
             
             for (i = rperms.length; i--;) {
-                if ( ! Jeeel.Type.inArray(rperms[i], alloweds, true)) {
+                if ( ! Jeeel.Hash.inHash(rperms[i], alloweds, true)) {
                     return false;
                 }
             }
@@ -467,7 +467,7 @@ Jeeel.Framework.Acl.Role.Abstract.prototype = {
         }
         
         for (var i = denieds.length; i--;) {
-            if (Jeeel.Type.inArray(denieds[i], authorizations, true)) {
+            if (Jeeel.Hash.inHash(denieds[i], authorizations, true)) {
                 return true;
             }
         }

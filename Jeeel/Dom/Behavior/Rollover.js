@@ -92,8 +92,6 @@ Jeeel.Dom.Behavior.Rollover = {
         
         var over, out;
         
-        var regFilter = new Jeeel.Filter.String.RegularExpressionEscape();
-        
         (function (pover, pout, sover, sout) {
             
             /**
@@ -103,7 +101,7 @@ Jeeel.Dom.Behavior.Rollover = {
                 var src = this.src;
                 
                 if (pout || pover) {
-                    src = src.replace(new RegExp('/?' + regFilter.filter(pout) + '([^/]*)$'), '/' + pover + '$1');
+                    src = src.replace(new RegExp('/?' + Jeeel.String.escapeRegExp(pout) + '([^/]*)$'), '/' + pover + '$1');
                 }
                 
                 if (sout || sover) {
@@ -120,7 +118,7 @@ Jeeel.Dom.Behavior.Rollover = {
                 var src = this.src;
                 
                 if (pover || pout) {
-                    src = src.replace(new RegExp('/?' + regFilter.filter(pover) + '([^/]*)$'), '/' + pout + '$1');
+                    src = src.replace(new RegExp('/?' + Jeeel.String.escapeRegExp(pover) + '([^/]*)$'), '/' + pout + '$1');
                 }
                 
                 if (sover || sout) {
@@ -131,7 +129,7 @@ Jeeel.Dom.Behavior.Rollover = {
             };
         })(this._prefix.on, this._prefix.off, this._suffix.on, this._suffix.off);
         
-        var reg = new RegExp('\\/?' + regFilter.filter(this._prefix.off) + '[^/]*' + regFilter.filter(this._suffix.off) + '\\.[^.]+$');
+        var reg = new RegExp('\\/?' + Jeeel.String.escapeRegExp(this._prefix.off) + '[^/]*' + Jeeel.String.escapeRegExp(this._suffix.off) + '\\.[^.]+$');
         
         for (var i = elements.length; i--;) {
             var element = elements[i];

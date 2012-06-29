@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+  <d0>
+    <short>Sun</short>
+    <full>Sunday</full>
+  </d0>
+  <d1>
+    <short>Mon</short>
+    <full>Monday</full>
+  </d1>
+  <d2>
+    <short>Tue</short>
+    <full>Tuesday</full>
+  </d2>
+  <d3>
+    <short>Wed</short>
+    <full>Wednesday</full>
+  </d3>
+  <d4>
+    <short>Thu</short>
+    <full>Thursday</full>
+  </d4>
+  <d5>
+    <short>Fri</short>
+    <full>Friday</full>
+  </d5>
+  <d6>
+    <short>Sat</short>
+    <full>Saturday</full>
+  </d6>
+</language>

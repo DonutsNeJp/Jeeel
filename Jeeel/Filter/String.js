@@ -18,6 +18,6 @@ Jeeel.Filter.String = {
 
 };
 
-Jeeel.file.Jeeel.Filter.String = ['Split', 'Replace', 'RegularExpressionEscape'];
+Jeeel.file.Jeeel.Filter.String = ['Split', 'Replace'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Filter.String, Jeeel.file.Jeeel.Filter.String);

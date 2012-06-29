@@ -6,6 +6,30 @@
  * @param {Function} func 一定時間毎に呼び出されるコールバック(関数内のthisはここで作成するインスタンスになる)
  * @param {Integer} interval コールバックを呼び出す間隔(ミリ秒)
  * @param {Mixied} var_args 可変引数、コールバックに渡す引数
+ * @example
+ * setIntervalやsetTimeoutのタイマーを管理するクラス
+ * intervalを途中で一時停止したり、呼びだされるコールバックに引数を渡す機能を使いたい場合に使用する(引数はブラウザのバグや未実装の影響でsetIntervalやsetTimeoutを直接使うとクロスブラウザでなくなる)
+ * またタイマーが呼び出された回数や最後のタイマーの戻り値なども取得できる
+ * 
+ * 例：
+ * function test (a, b) {
+ *     return (a + b) * Math.random();
+ * }
+ * 
+ * var timer = Jeeel.Timer.create(test, 3000, 12, 45);
+ * 
+ * // 3秒経過
+ * 
+ * timer.getLastResult(); // 0 ～ 57の間の数が返ってくる
+ * timer.stop(); // タイマーを一時停止する
+ * 
+ * // 3秒経過
+ * 
+ * timer.start(); // タイマーを再開する
+ * 
+ * // 6秒経過
+ * 
+ * timer.getCount(); // 3が返ってくる(3回コールバックが実行された意味になる)
  */
 Jeeel.Timer = function (func, interval, var_args) {
 
@@ -88,7 +112,7 @@ Jeeel.Timer.setLimitInterval = function (func, interval, limit, var_args) {
 /**
  * 指定時間後にメソッドを実行する
  *
- * @param {Function} func コールバックメソッド
+ * @param {Function|Jeeel.Function.Callback} func コールバックメソッド
  * @param {Integer} delayTime コールバックを呼び出す遅延時間(ミリ秒)
  * @param {Mixied} var_args コールバックに渡す引数を可変的に渡す
  * @return {Integer} タイムアウトID
@@ -99,7 +123,9 @@ Jeeel.Timer.setTimeout = function (func, delayTime, var_args) {
     /**
      * @ignore
      */
-    var _func = function () {
+    var _func = (func instanceof Jeeel.Function.Callback) ? function () {
+        return func.apply(args);
+    } : function () {
         return func.apply(this, args);
     };
 

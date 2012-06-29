@@ -19,19 +19,19 @@ Jeeel.Debug.objectExport = function (obj) {
             return '"' + obj + '"';
         }
         
-        return obj;
+        return '' + obj;
     }
 
     if (Jeeel.Type.isFunction(obj)) {
         var str = obj.toString();
         var remove = str.match(/ +}$/gi);
         if (remove) {
-            remove = remove[0].substring(0, remove[0].length-1);
-            var regExp = new RegExp('(\\n|\\r\\n)'+remove, 'ig');
+            remove = remove[0].substring(0, remove[0].length - 1);
+            var regExp = new RegExp('(\\n|\\r\\n)' + remove, 'ig');
             str = str.replace(regExp, '\n');
         }
 
-        return str.replace(/(\n|\r\n)/ig, '$1'+sp);
+        return str.replace(/(\n|\r\n)/ig, '$1' + sp);
     }
 
     cnt++;
@@ -43,9 +43,9 @@ Jeeel.Debug.objectExport = function (obj) {
             res[i] = sp + '    ' + i + ': ' + arguments.callee(obj[i], cnt);
         }
 
-        return 'array {\n' + res.join(',\n') + '\n' + sp + '}';
+        return 'Array {\n' + res.join(',\n') + '\n' + sp + '}';
     } else {
-        var className = res;
+        var className = Jeeel._Object.JeeelDebug.getUnknownObjectName(obj);
         
         res = [];
 

@@ -76,14 +76,14 @@ Jeeel.Dom.Behavior.Placeholder = {
             
             if ( ! plc) {
                 continue;
-            } else if ( ! Jeeel.Type.inArray(nodeName, this.USABLE_LIST.NODES, true)) {
+            } else if ( ! Jeeel.Hash.inHash(nodeName, this.USABLE_LIST.NODES, true)) {
                 continue;
-            } else if (nodeName === 'INPUT' && ! Jeeel.Type.inArray(input.type, this.USABLE_LIST.TYPES, true)) {
+            } else if (nodeName === 'INPUT' && ! Jeeel.Hash.inHash(input.type, this.USABLE_LIST.TYPES, true)) {
                 continue;
             }
             
             // オーナーのフォームに対して送信時にplaceholder用の値を削除するトリガーをセットする
-            if (input.form && ! Jeeel.Type.inArray(input.form, forms, true)) {
+            if (input.form && ! Jeeel.Hash.inHash(input.form, forms, true)) {
                 Jeeel.Dom.Event.addEventListener(input.form, Jeeel.Dom.Event.Type.SUBMIT, this._submit, this);
                 
                 forms[forms.length] = input.form;
@@ -121,9 +121,9 @@ Jeeel.Dom.Behavior.Placeholder = {
 
         if ( ! plc) {
             return false;
-        } else if ( ! Jeeel.Type.inArray(nodeName, this.USABLE_LIST.NODES, true)) {
+        } else if ( ! Jeeel.Hash.inHash(nodeName, this.USABLE_LIST.NODES, true)) {
             return false;
-        } else if (nodeName === 'INPUT' && ! Jeeel.Type.inArray(input.type, this.USABLE_LIST.TYPES, true)) {
+        } else if (nodeName === 'INPUT' && ! Jeeel.Hash.inHash(input.type, this.USABLE_LIST.TYPES, true)) {
             return false;
         } else if ( ! Jeeel.Storage.Object.exists(input, this.STORAGE_NAME)) {
             return false;
@@ -178,6 +178,10 @@ Jeeel.Dom.Behavior.Placeholder = {
     
     _init: function () {
         delete this._init;
+        
+        if ( ! Jeeel._doc) {
+            return;
+        }
         
         var input = Jeeel._doc.createElement('input');
         

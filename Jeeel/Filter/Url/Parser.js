@@ -19,6 +19,7 @@ Jeeel.Filter.Url.Parser.create = function () {
 };
 
 Jeeel.Filter.Url.Parser.prototype = {
+    
     /**
      * URLをパースするための正規表現
      * 

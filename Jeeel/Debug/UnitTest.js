@@ -275,7 +275,7 @@ Jeeel.Debug.UnitTest.prototype = {
      * @return {Jeeel.Debug.UnitTest} 自インスタンス
      */
     assertHasKey: function (key, hash, message) {
-        return this._setAssertResult(Jeeel.Type.keyExists(key, hash), 'assertHasKey', message);
+        return this._setAssertResult(Jeeel.Hash.keyExists(key, hash), 'assertHasKey', message);
     },
     
     /**
@@ -287,7 +287,7 @@ Jeeel.Debug.UnitTest.prototype = {
      * @return {Jeeel.Debug.UnitTest} 自インスタンス
      */
     assertNotHasKey: function (key, hash, message) {
-        return this._setAssertResult( ! Jeeel.Type.keyExists(key, hash), 'assertNotHasKey', message);
+        return this._setAssertResult( ! Jeeel.Hash.keyExists(key, hash), 'assertNotHasKey', message);
     },
     
     /**

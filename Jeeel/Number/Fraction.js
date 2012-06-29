@@ -5,7 +5,7 @@
  * @class 分数を管理するクラス
  * @param {Number|String} numeric 分数化する数値もしくは数値文字列
  */
-Jeeel.Object.Fraction = function (numeric){};
+Jeeel.Number.Fraction = function (numeric) {};
 
 /**
  * コンストラクタ
@@ -14,7 +14,7 @@ Jeeel.Object.Fraction = function (numeric){};
  * @param {Integer} numerator 分子
  * @param {Integer} denominator 分母
  */
-Jeeel.Object.Fraction = function (numerator, denominator) {
+Jeeel.Number.Fraction = function (numerator, denominator) {
   
     switch (arguments.length) {
         case 1:
@@ -53,12 +53,12 @@ Jeeel.Object.Fraction = function (numerator, denominator) {
     this.denominator = +denominator;
 };
 
-Jeeel.Object.Fraction.prototype = {
+Jeeel.Number.Fraction.prototype = {
 
     /**
      * 複製を行う
      *
-     * @return {Jeeel.Object.Fraction} 複製したインスタンス
+     * @return {Jeeel.Number.Fraction} 複製したインスタンス
      */
     clone: function () {
         return new Jeeel.Object.Fraction(this.numerator, this.denominator);
@@ -67,7 +67,7 @@ Jeeel.Object.Fraction.prototype = {
     /**
      * 内部比較を行い結果を返す
      *
-     * @param {Jeeel.Object.Fraction} fraction 比較オブジェクト
+     * @param {Jeeel.Number.Fraction} fraction 比較オブジェクト
      * @return {Boolean} 判定結果
      */
     equals: function (fraction) {
@@ -78,7 +78,7 @@ Jeeel.Object.Fraction.prototype = {
     /**
      * 約分を行う
      * 
-     * @return {Jeeel.Object.Fraction} 自インスタンス
+     * @return {Jeeel.Number.Fraction} 自インスタンス
      */
     reduce: function () {
         var gcd = Jeeel.Number.getGcd(this.numerator, this.denominator);
@@ -92,8 +92,8 @@ Jeeel.Object.Fraction.prototype = {
     /**
      * 通分を行う
      * 
-     * @param {Jeeel.Object.Fraction} fraction 通分対象の分数インスタンス
-     * @return {Jeeel.Object.Fraction} 自インスタンス
+     * @param {Jeeel.Number.Fraction} fraction 通分対象の分数インスタンス
+     * @return {Jeeel.Number.Fraction} 自インスタンス
      */
     reduceCommonDenominator: function (fraction) {
         var commonNum = Jeeel.Number.getLcm(this.denominator, fraction.denominator) / this.denominator;
@@ -107,8 +107,8 @@ Jeeel.Object.Fraction.prototype = {
     /**
      * 分数を足し合わせる
      * 
-     * @param {Jeeel.Object.Fraction} fraction 足し合わせる分数インスタンス
-     * @return {Jeeel.Object.Fraction} 自インスタンス
+     * @param {Jeeel.Number.Fraction} fraction 足し合わせる分数インスタンス
+     * @return {Jeeel.Number.Fraction} 自インスタンス
      */
     add: function (fraction) {
         fraction = fraction.clone().reduceCommonDenominator(this);
@@ -123,8 +123,8 @@ Jeeel.Object.Fraction.prototype = {
     /**
      * 分数を差し引く
      * 
-     * @param {Jeeel.Object.Fraction} fraction 差し引く分数インスタンス
-     * @return {Jeeel.Object.Fraction} 自インスタンス
+     * @param {Jeeel.Number.Fraction} fraction 差し引く分数インスタンス
+     * @return {Jeeel.Number.Fraction} 自インスタンス
      */
     sub: function (fraction) {
         fraction = fraction.clone().reduceCommonDenominator(this);
@@ -139,8 +139,8 @@ Jeeel.Object.Fraction.prototype = {
     /**
      * 分数を掛け合わせる
      * 
-     * @param {Jeeel.Object.Fraction} fraction 掛け合わせる分数インスタンス
-     * @return {Jeeel.Object.Fraction} 自インスタンス
+     * @param {Jeeel.Number.Fraction} fraction 掛け合わせる分数インスタンス
+     * @return {Jeeel.Number.Fraction} 自インスタンス
      */
     mul: function (fraction) {
         this.numerator *= fraction.numerator;
@@ -152,8 +152,8 @@ Jeeel.Object.Fraction.prototype = {
     /**
      * 分数を割る
      * 
-     * @param {Jeeel.Object.Fraction} fraction 割る分数インスタンス
-     * @return {Jeeel.Object.Fraction} 自インスタンス
+     * @param {Jeeel.Number.Fraction} fraction 割る分数インスタンス
+     * @return {Jeeel.Number.Fraction} 自インスタンス
      */
     div: function (fraction) {
         this.numerator *= fraction.denominator;

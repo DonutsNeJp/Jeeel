@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+  <d0>
+    <short>日</short>
+    <full>日曜日</full>
+  </d0>
+  <d1>
+    <short>月</short>
+    <full>月曜日</full>
+  </d1>
+  <d2>
+    <short>火</short>
+    <full>火曜日</full>
+  </d2>
+  <d3>
+    <short>水</short>
+    <full>水曜日</full>
+  </d3>
+  <d4>
+    <short>木</short>
+    <full>木曜日</full>
+  </d4>
+  <d5>
+    <short>金</short>
+    <full>金曜日</full>
+  </d5>
+  <d6>
+    <short>土</short>
+    <full>土曜日</full>
+  </d6>
+</language>

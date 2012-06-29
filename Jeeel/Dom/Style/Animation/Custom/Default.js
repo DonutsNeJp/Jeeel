@@ -103,7 +103,7 @@
         name: 'backgroundPosition',
         
         get: function (value) {
-            var pos = value.split(/\s+/);
+            var pos = value.replace(/\s+/g, ' ').split(' ');
             var res = {
                 backgroundPositionX: pos[0],
                 backgroundPositionY: pos[1]
@@ -118,7 +118,7 @@
         name: 'transform',
         
         get: function (value) {
-            var trs = value.replace(/,\s+/, ',').split(/\s+/);
+            var trs = value.replace(/,\s+/g, ',').replace(/\s+/g, ' ').split(' ');
             var reg = /^([a-zA-Z\-]+)\(([^\)]+)\)$/i;
             var res = {};
             

@@ -61,6 +61,7 @@ Jeeel.Dom.Style.Animation = function (element, style, params, duration, easing, 
     this._targetStyles = filter.filter(keys);
     
     this._style = style;
+    this._element = element;
     this._hook = new this.constructor.Hook(element, style);
     this._params = styles;
     
@@ -85,6 +86,13 @@ Jeeel.Dom.Style.Animation.create = function (style, params, duration, easing, co
     return new this(style, params, duration, easing, complete, step);
 };
 
+/**
+ * アニメーション中の要素リスト
+ * 
+ * @type Element[]
+ */
+Jeeel.Dom.Style.Animation.animated = [];
+
 Jeeel.Dom.Style.Animation.prototype = {
   
     /**
@@ -94,6 +102,14 @@ Jeeel.Dom.Style.Animation.prototype = {
      * @private
      */
     _style: null,
+    
+    /**
+     * 要素
+     * 
+     * @type Element
+     * @private
+     */
+    _element: null,
     
     /**
      * アニメーションフック
@@ -444,6 +460,8 @@ Jeeel.Dom.Style.Animation.prototype = {
             this._st = new Date().getTime() - this._ct;
             
             this._frameId = this.constructor.Frame.addTask(this.step);
+            
+            this.constructor.animated.push(this._element);
         }
         
         return this;
@@ -459,6 +477,13 @@ Jeeel.Dom.Style.Animation.prototype = {
             this.constructor.Frame.removeTask(this._frameId);
             
             this._frameId = null;
+            
+            for (var i = this.constructor.animated.length; i--;) {
+                if (this.constructor.animated[i] === this._element) {
+                    this.constructor.animated.splice(i, 1);
+                    break;
+                }
+            }
         }
         
         return this;

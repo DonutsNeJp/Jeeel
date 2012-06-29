@@ -178,6 +178,11 @@ Jeeel.Dom.Document.prototype = {
      *
      * @param {String} html HTML文字列
      * @return {Node[]} 作成されたNodeリスト
+     * @example
+     * var doc = new Jeeel.Dom.Document();
+     * var html = '<div></div>ほげ<span>ぽんちょ</span>';
+     * var nodes = doc.createNodeList(html);
+     * // nodes => [HTMLDivElement, Text, HTMLSpanElement]
      */
     createNodeList: function (html) {
 
@@ -262,6 +267,11 @@ Jeeel.Dom.Document.prototype = {
      *
      * @param {String} html HTML文字列
      * @return {Element[]} 作成されたElementリスト
+     * @example
+     * var doc = new Jeeel.Dom.Document();
+     * var html = '<div></div>ほげ<span>ぽんちょ</span>';
+     * var nodes = doc.createElementList(html);
+     * // nodes => [HTMLDivElement, HTMLSpanElement]
      */
     createElementList: function (html) {
         var res = [];
@@ -608,7 +618,7 @@ if (Jeeel._doc) {
 }
 
 (function () {
-    if ( ! Jeeel.Document) {
+    if ( ! Jeeel._doc) {
         return;
     }
     

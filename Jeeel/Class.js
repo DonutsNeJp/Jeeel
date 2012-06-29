@@ -12,7 +12,34 @@ Jeeel.directory.Jeeel.Class = {
 };
 
 /**
- * @namespace クラスに関するネームスペース
+ * @staticClass クラスの継承等を行う機能を保持したスタティッククラス
+ * @example
+ * クラスの概念をJavaScriptに取り入れるためのクラス
+ * 主に継承を使いたい時に使用する
+ * 他にもインターフェースやMixinなども保持しているが使うのは稀である
+ * 
+ * 例：
+ * var A = function () {
+ *     this._test = 'A';
+ * };
+ * 
+ * A.prototype = {
+ * 
+ *     _test: '',
+ *     
+ *     getTest: function () {
+ *         return this._test;
+ *     }
+ * };
+ * 
+ * var B = function () {
+ *     this._test = 'B';
+ * };
+ * 
+ * Jeeel.Class.extend(B, A); // Bに対してAを継承させる、B: サブクラス, A: スーパークラス
+ * 
+ * var b = new B();
+ * b.getTest(); // "B"が返ってくる
  */
 Jeeel.Class = {
     
@@ -124,9 +151,20 @@ Jeeel.Class = {
         this.Abstract.prototype = null;
         
         return subClass;
+    },
+    
+    /**
+     * インターフェースを実装する
+     * 
+     * @param {Function} implementClass インターフェースを実装するクラス
+     * @param {String|Jeeel.Class.Interface|Array|Hash} implementInterface 実装インターフェース
+     * @return {Function} 実装後の自動検証クラス(implementOf, isImplementedが実装される)
+     */
+    implement: function (implementClass, implementInterface) {
+        return this.Interface.implement(implementClass, implementInterface);
     }
 };
 
-Jeeel.file.Jeeel.Class = ['Abstract', 'Mixin'];
+Jeeel.file.Jeeel.Class = ['Abstract', 'Interface', 'Mixin'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Class, Jeeel.file.Jeeel.Class);

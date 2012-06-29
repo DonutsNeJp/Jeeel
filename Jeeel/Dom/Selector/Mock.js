@@ -2,8 +2,8 @@
 /**
  * コンストラクタ
  * 
- * @class 疑似クラスを扱うクラス
- * @param {Jeeel.Dom.Selector.Node} 親ノード
+ * @class 擬似クラスと擬似要素を扱うクラス
+ * @param {Jeeel.Dom.Selector.Node} node 親ノード
  * @param {String} selector セレクタ
  */
 Jeeel.Dom.Selector.Mock = function (node, selector) {
@@ -12,54 +12,125 @@ Jeeel.Dom.Selector.Mock = function (node, selector) {
 };
 
 /**
- * @namespace 疑似クラスのロジックを保有するネームスペース
+ * @namespace 擬似クラスのロジックを保有するネームスペース
  */
 Jeeel.Dom.Selector.Mock.LOGIC = {
   
     /**
-     * 否定疑似クラスを解析するロジック(:not)
+     * 否定擬似クラスを解析するロジック(:not)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
      */
     not: function (args) {
-        var node = Jeeel.Dom.Selector.Compiler.compileNode(args);
-        
         return {
             isMatch: function (element) {
-                return ! node.isMatch(element);
-            },
-            
-            filter: function (elements) {
-                var matches = node.filter(elements);
-                var res = [];
-                
-                for (var i = 0, l = elements.length; i < l; i++) {
-                    
-                    var element = elements[i];
-                    var $continue = false;
-                    
-                    for (var j = matches.length; j--;) {
-                        if (element === matches[j]) {
-                            $continue = true;
-                            break;
-                        }
+                for (var i = this._nodes.length; i--;) {
+                    if (this._nodes[i].isMatch(element)) {
+                        return false;
                     }
-                    
-                    if ($continue) {
-                        continue;
-                    }
-                    
-                    res.puh(element);
                 }
                 
-                return res;
+                return true;
+            },
+            
+            _nodes: Jeeel.Dom.Selector.Compiler.compileNodes(args)
+        };
+    },
+    
+    /**
+     * :matches擬似クラスを解析するロジック(:matches)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    matches: function (args) {
+        return {
+            isMatch: function (element) {
+                for (var i = this._nodes.length; i--;) {
+                    if (this._nodes[i].isMatch(element)) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            },
+            
+            _nodes: Jeeel.Dom.Selector.Compiler.compileNodes(args)
+        };
+    },
+    
+    /**
+     * 言語擬似クラスを解析するロジック(:dir)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    dir: function (args) {
+        if (args) {
+            args = args.toLowerCase();
+        }
+        
+        return {
+            isMatch: (args ? function (element) {
+                while(element) {
+                    
+                    if (element.dir) {
+                        return element.dir.toLowerCase() === args;
+                    }
+                    
+                    element = element.parentNode;
+                }
+                
+                return false;
+            } : Jeeel.Function.Template.RETURN_FALSE)
+        };
+    },
+    
+    /**
+     * 言語擬似クラスを解析するロジック(:lang)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    lang: function (args) {
+      
+        if (args) {
+            args = new RegExp('^' + args.toLowerCase() + '(?:-|$)', 'i');
+        }
+        
+        return {
+            isMatch: (args ? function (element) {
+                while(element) {
+                    
+                    if (element.lang) {
+                        return !!element.lang.match(args);
+                    }
+                    
+                    element = element.parentNode;
+                }
+                
+                return false;
+            } : Jeeel.Function.Template.RETURN_FALSE)
+        };
+    },
+    
+    /**
+     * :any-link擬似クラスを解析するロジック(:any-link)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    anyLink: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.nodeName.toUpperCase() === 'A' && !!element.href;
             }
         };
     },
     
     /**
-     * :link疑似クラスを解析するロジック(:link)
+     * :link擬似クラスを解析するロジック(:link)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -67,13 +138,13 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     link: function (args) {
         return {
             isMatch: function (element) {
-                return element.nodeName.toUpperCase() === 'A';
+                return element.nodeName.toUpperCase() === 'A' && !!element.href;
             }
         };
     },
     
     /**
-     * :visited疑似クラスを解析するロジック(:visited)
+     * :visited擬似クラスを解析するロジック(:visited)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -85,51 +156,38 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * :hover疑似クラスを解析するロジック(:hover)
+     * :local-link擬似クラスを解析するロジック(:local-link)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
      */
-    hover: function (args) {
+    localLink: function (args) {
+        
+        var limitHierarchy = false;
+        
+        if (args) {
+            args = +args;
+            
+            limitHierarchy = ! isNaN(args);
+            
+            args++;
+        }
+        
         return {
-            isMatch: Jeeel.Function.Template.RETURN_FALSE
+            isMatch: (limitHierarchy ? function (element) { 
+                var baseUrl = Jeeel.String.escapeRegExp(Jeeel.UserAgent.getBaseUrl());
+                
+                return element.nodeName.toUpperCase() === 'A' && element.href.match(new RegExp('^' + baseUrl + '(?:\\/[^\\/]*){' + args + '}$'));
+            } : function (element) {
+                var baseUrl = Jeeel.String.escapeRegExp(Jeeel.UserAgent.getBaseUrl());
+                
+                return element.nodeName.toUpperCase() === 'A' && element.href.match(new RegExp('^' + baseUrl));
+            })
         };
     },
     
     /**
-     * :active疑似クラスを解析するロジック(:active)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    active: function (args) {
-        return {
-            isMatch: Jeeel.Function.Template.RETURN_FALSE
-        };
-    },
-    
-    /**
-     * :first-line疑似クラスを解析するロジック(:first-line)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    firstLine: function (args) {
-        return {};
-    },
-    
-    /**
-     * :first-letter疑似クラスを解析するロジック(:first-letter)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    firstLetter: function (args) {
-        return {};
-    },
-    
-    /**
-     * ターゲット疑似クラスを解析するロジック(:target)
+     * ターゲット擬似クラスを解析するロジック(:target)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -149,7 +207,41 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * :focus疑似クラスを解析するロジック(:focus)
+     * :scope擬似クラスを解析するロジック(:scope)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    scope: function (args) {
+        return {};
+    },
+    
+    /**
+     * :active擬似クラスを解析するロジック(:active)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    active: function (args) {
+        return {
+            isMatch: Jeeel.Function.Template.RETURN_FALSE
+        };
+    },
+    
+    /**
+     * :hover擬似クラスを解析するロジック(:hover)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    hover: function (args) {
+        return {
+            isMatch: Jeeel.Function.Template.RETURN_FALSE
+        };
+    },
+
+    /**
+     * :focus擬似クラスを解析するロジック(:focus)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -161,21 +253,194 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * 言語疑似クラスを解析するロジック(:lang)
+     * :enabled擬似クラスを解析するロジック(:enabled)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
      */
-    lang: function (args) {
+    enabled: function (args) {
         return {
             isMatch: function (element) {
-                return element.lang === args;
+                return ! element.disabled;
             }
         };
     },
     
     /**
-     * :first-child疑似クラスを解析するロジック(:first-child)
+     * :disabled擬似クラスを解析するロジック(:disabled)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    disabled: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.disabled;
+            }
+        };
+    },
+    
+    /**
+     * :checked擬似クラスを解析するロジック(:checked)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    checked: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.checked;
+            }
+        };
+    },
+    
+    /**
+     * :indeterminate擬似クラスを解析するロジック(:indeterminate)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    indeterminate: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.nodeName.toUpperCase() === 'INPUT' && element.type && element.type.toLowerCase() === 'checkbox' && element.indeterminate;
+            }
+        };
+    },
+    
+    /**
+     * :required擬似クラスを解析するロジック(:required)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    required: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.required;
+            }
+        };
+    },
+    
+    /**
+     * :optional擬似クラスを解析するロジック(:optional)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    optional: function (args) {
+        return {
+            isMatch: function (element) {
+                return 'required' in element && !element.required;
+            }
+        };
+    },
+    
+    /**
+     * :read-only擬似クラスを解析するロジック(:read-only)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    readOnly: function (args) {
+        return {
+            isMatch: function (element) {
+                
+                if (element.contentEditable === 'true') {
+                    return false;
+                }
+                
+                var e = element;
+                
+                while (e.contentEditable === 'inherit') {
+
+                    e = e.parentNode;
+                    
+                    if (e.contentEditable === 'true') {
+                        return false;
+                    }
+                }
+                
+                return element.readOnly;
+            }
+        };
+    },
+    
+    /**
+     * :read-write擬似クラスを解析するロジック(:read-write)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    readWrite: function (args) {
+        return {
+            isMatch: function (element) {
+                
+                if (element.contentEditable === 'true') {
+                    return true;
+                }
+                
+                var e = element;
+                
+                while (e.contentEditable === 'inherit') {
+
+                    e = e.parentNode;
+                    
+                    if (e.contentEditable === 'true') {
+                        return true;
+                    }
+                }
+                
+                return 'readOnly' in element && ! element.readOnly;
+            }
+        };
+    },
+    
+    /**
+     * :root擬似クラスを解析するロジック(:root)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    root: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.ownerDocument.documentElement === element;
+            },
+            
+            isOnlyMock: true
+        };
+    },
+    
+    /**
+     * :empty擬似クラスを解析するロジック(:empty)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    empty: function (args) {
+        return {
+            isMatch: function (element) {
+                
+                var type1 = Jeeel.Dom.Node.ELEMENT_NODE;
+                var type2 = Jeeel.Dom.Node.TEXT_NODE;
+                var child = element.firstChild;
+                
+                while (child) {
+                    if (child.nodeType === type1 || child.nodeType === type2) {
+                        return false;
+                    }
+                    
+                    child = child.nextSibling;
+                }
+                
+                return true;
+            }
+        };
+    },
+    
+    /**
+     * :first-child擬似クラスを解析するロジック(:first-child)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -201,7 +466,95 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * :last-child疑似クラスを解析するロジック(:last-child)
+     * :nth-child擬似クラスを解析するロジック(:nth-child)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    nthChild: function (args) {
+        var val = +args;
+        
+        var isMatch, isNth;
+        
+        if (val) {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                  
+                var p = element.previousSibling;
+                  
+                while (p) {
+                    if (p.nodeType === type) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+
+                return val === cnt;
+            };
+        } else if (args === 'odd') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                  
+                var p = element.previousSibling;
+                  
+                while (p) {
+                    if (p.nodeType === type) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+
+                return !!(cnt & 1);
+            };
+        } else if (args === 'even') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                  
+                var p = element.previousSibling;
+                  
+                while (p) {
+                    if (p.nodeType === type) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+
+                return !(cnt & 1);
+            };
+        } else {
+            isNth = this._getNth(args);
+            
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                  
+                var p = element.previousSibling;
+                  
+                while (p) {
+                    if (p.nodeType === type) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+
+                return isNth(cnt);
+            };
+        }
+        
+        return {
+            isMatch: isMatch
+        };
+    },
+    
+    /**
+     * :last-child擬似クラスを解析するロジック(:last-child)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -227,104 +580,7 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * :before疑似クラスを解析するロジック(:before)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    before: function (args) {
-        return {};
-    },
-    
-    /**
-     * :after疑似クラスを解析するロジック(:after)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    after: function (args) {
-        return {};
-    },
-    
-    /**
-     * :root疑似クラスを解析するロジック(:root)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    root: function (args) {
-        return {
-            isMatch: function (element) {
-                return element.ownerDocument.documentElement === element;
-            }
-        };
-    },
-    
-    /**
-     * :nth-child疑似クラスを解析するロジック(:nth-child)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    nthChild: function (args) {
-        var val = +args;
-        
-        var filter, isNth;
-        
-        if (val) {
-            filter = function (elements) {
-                return elements[val] && [elements[val]] || [];
-            };
-        } else if (args === 'odd') {
-            filter = function (elements) {
-                
-                var res = [];
-                
-                for (var i = 0, l = elements.length; i < l; i++) {
-                    if (i & 1) {
-                        res[res.length] = elements[i];
-                    }
-                }
-                
-                return res;
-            };
-        } else if (args === 'even') {
-            filter = function (elements) {
-                
-                var res = [];
-                
-                for (var i = 0, l = elements.length; i < l; i++) {
-                    if ( ! (i & 1)) {
-                        res[res.length] = elements[i];
-                    }
-                }
-                
-                return res;
-            };
-        } else {
-            isNth = new Function('n', 'return n % (' + args.replace(/([0-9]+)n/g, '$1*n') + ') === 0;');
-            
-            filter = function (elements) {
-                
-                var res = [];
-                
-                for (var i = 0, l = elements.length; i <l; i++) {
-                    if (isNth(i)) {
-                        res[res.length] = elements[i];
-                    }
-                }
-                
-                return res;
-            };
-        }
-        
-        return {
-            filter: filter
-        };
-    },
-    
-    /**
-     * :nth-last-child疑似クラスを解析するロジック(:nth-last-child)
+     * :nth-last-child擬似クラスを解析するロジック(:nth-last-child)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -332,218 +588,77 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     nthLastChild: function (args) {
         var val = +args;
         
-        var filter, isNth;
-        
-        if (val) {
-            filter = function (elements) {
-                return elements[elements.length - val - 1] && [elements[elements.length - val - 1]] || [];
-            };
-        } else if (args === 'odd') {
-            filter = function (elements) {
-                
-                var res = [], lidx = elements.length - 1;
-                
-                for (var i = 0, l = elements.length; i < l; i++) {
-                    if ((lidx - i) & 1) {
-                        res[res.length] = elements[i];
-                    }
-                }
-                
-                return res;
-            };
-        } else if (args === 'even') {
-            filter = function (elements) {
-                
-                var res = [], lidx = elements.length - 1;
-                
-                for (var i = 0, l = elements.length; i < l; i++) {
-                    if ( ! ((lidx - i) & 1)) {
-                        res[res.length] = elements[i];
-                    }
-                }
-                
-                return res;
-            };
-        } else {
-            isNth = new Function('n', 'return n % (' + args.replace(/([0-9]+)n/g, '$1*n') + ') === 0;');
-            
-            filter = function (elements) {
-                
-                var res = [], lidx = elements.length - 1;
-                
-                for (var i = 0, l = elements.length; i <l; i++) {
-                    if (isNth(lidx - i)) {
-                        res[res.length] = elements[i];
-                    }
-                }
-                
-                return res;
-            };
-        }
-        
-        return {
-            filter: filter
-        };
-    },
-    
-    /**
-     * :first-of-type疑似クラスを解析するロジック(:first-of-type)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    firstOfType: function (args) {
-        return {
-            isMatch: function (element) {
-                var type = Jeeel.Dom.Node.ELEMENT_NODE;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
-                
-                var p = element.previousSibling;
-                  
-                while (p) {
-                    if (p.nodeType === type && this.node.isMatch(p)) {
-                        this.isMatch = isMatch;
-                        return false;
-                    }
-                    
-                    p = p.previousSibling;
-                }
-                
-                this.isMatch = isMatch;
-                
-                return true;
-            }
-        };
-    },
-    
-    /**
-     * :last-of-type疑似クラスを解析するロジック(:last-of-type)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    lastOfType: function (args) {
-        return {
-            isMatch: function (element) {
-                var type = Jeeel.Dom.Node.ELEMENT_NODE;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
-                
-                var n = element.nextSibling;
-                  
-                while (n) {
-                    if (n.nodeType === type && this.node.isMatch(n)) {
-                        this.isMatch = isMatch;
-                        return false;
-                    }
-                    
-                    n = n.nextSibling;
-                }
-                
-                this.isMatch = isMatch;
-                
-                return true;
-            }
-        };
-    },
-    
-    /**
-     * :nth-of-type疑似クラスを解析するロジック(:nth-of-type)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    nthOfType: function (args) {
-        var val = +args;
-        
         var isMatch, isNth;
         
         if (val) {
             isMatch = function (element) {
                 var type = Jeeel.Dom.Node.ELEMENT_NODE;
                 var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
                   
-                var p = element.previousSibling;
+                var n = element.nextSibling;
                   
-                while (p) {
-                    if (p.nodeType === type && this.node.isMatch(p)) {
+                while (n) {
+                    if (n.nodeType === type) {
                         cnt++;
                     }
                     
-                    p = p.previousSibling;
+                    n = n.nextSibling;
                 }
-                
-                this.isMatch = isMatch;
-                
+
                 return val === cnt;
             };
         } else if (args === 'odd') {
             isMatch = function (element) {
                 var type = Jeeel.Dom.Node.ELEMENT_NODE;
                 var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
-                
-                var p = element.previousSibling;
                   
-                while (p) {
-                    if (p.nodeType === type && this.node.isMatch(p)) {
+                var n = element.nextSibling;
+                  
+                while (n) {
+                    if (n.nodeType === type) {
                         cnt++;
                     }
-
-                    p = p.previousSibling;
+                    
+                    n = n.nextSibling;
                 }
-                
-                this.isMatch = isMatch;
-                
+
                 return !!(cnt & 1);
             };
         } else if (args === 'even') {
             isMatch = function (element) {
                 var type = Jeeel.Dom.Node.ELEMENT_NODE;
                 var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
                   
-                var p = element.previousSibling;
+                var n = element.nextSibling;
                   
-                while (p) {
-                    if (p.nodeType === type && this.node.isMatch(p)) {
+                while (n) {
+                    if (n.nodeType === type) {
                         cnt++;
                     }
-
-                    p = p.previousSibling;
+                    
+                    n = n.nextSibling;
                 }
-                
-                this.isMatch = isMatch;
-                
+
                 return !(cnt & 1);
             };
         } else {
-            isNth = new Function('i,n', 'return (i === ' + args.replace(/([0-9]+)n/g, '$1*n') + ') || (i > ' + args.replace(/([0-9]+)n/g, '$1*n') + ' ? arguments.callee(i, n + 1) : false);');
+            isNth = this._getNth(args);
             
             isMatch = function (element) {
                 var type = Jeeel.Dom.Node.ELEMENT_NODE;
                 var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
                   
-                var p = element.previousSibling;
+                var n = element.nextSibling;
                   
-                while (p) {
-                    if (p.nodeType === type && this.node.isMatch(p)) {
+                while (n) {
+                    if (n.nodeType === type) {
                         cnt++;
                     }
                     
-                    p = p.previousSibling;
+                    n = n.nextSibling;
                 }
-                
-                this.isMatch = isMatch;
-                
-                return isNth(cnt, 0);
+
+                return isNth(cnt);
             };
         }
         
@@ -553,111 +668,7 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * :nth-last-of-type疑似クラスを解析するロジック(:nth-last-of-type)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    nthLastOfType: function (args) {
-        var val = +args;
-        
-        var isMatch, isNth;
-        
-        if (val) {
-            isMatch = function (element) {
-                var type = Jeeel.Dom.Node.ELEMENT_NODE;
-                var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
-                  
-                var n = element.nextSibling;
-                  
-                while (n) {
-                    if (n.nodeType === type && this.node.isMatch(n)) {
-                        cnt++;
-                    }
-                    
-                    n = n.nextSibling;
-                }
-                
-                this.isMatch = isMatch;
-                
-                return val === cnt;
-            };
-        } else if (args === 'odd') {
-            isMatch = function (element) {
-                var type = Jeeel.Dom.Node.ELEMENT_NODE;
-                var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
-                  
-                var n = element.nextSibling;
-                  
-                while (n) {
-                    if (n.nodeType === type && this.node.isMatch(n)) {
-                        cnt++;
-                    }
-                    
-                    n = n.nextSibling;
-                }
-                
-                this.isMatch = isMatch;
-                
-                return !!(cnt & 1);
-            };
-        } else if (args === 'even') {
-            isMatch = function (element) {
-                var type = Jeeel.Dom.Node.ELEMENT_NODE;
-                var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
-                  
-                var n = element.nextSibling;
-                  
-                while (n) {
-                    if (n.nodeType === type && this.node.isMatch(n)) {
-                        cnt++;
-                    }
-                    
-                    n = n.nextSibling;
-                }
-                
-                this.isMatch = isMatch;
-                
-                return !(cnt & 1);
-            };
-        } else {
-            isNth = new Function('i,n', 'return (i === ' + args.replace(/([0-9]+)n/g, '$1*n') + ') || (i > ' + args.replace(/([0-9]+)n/g, '$1*n') + ' ? arguments.callee(i, n + 1) : false);');
-            
-            isMatch = function (element) {
-                var type = Jeeel.Dom.Node.ELEMENT_NODE;
-                var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
-                  
-                var n = element.nextSibling;
-                  
-                while (n) {
-                    if (n.nodeType === type && this.node.isMatch(n)) {
-                        cnt++;
-                    }
-                    
-                    n = n.nextSibling;
-                }
-                
-                this.isMatch = isMatch;
-                
-                return isNth(cnt, 0);
-            };
-        }
-        
-        return {
-            isMatch: isMatch
-        };
-    },
-    
-    /**
-     * :only-child疑似クラスを解析するロジック(:only-child)
+     * :only-child擬似クラスを解析するロジック(:only-child)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -685,7 +696,287 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * :only-of-type疑似クラスを解析するロジック(:only-of-type)
+     * :first-of-type擬似クラスを解析するロジック(:first-of-type)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    firstOfType: function (args) {
+        return {
+            isMatch: function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                
+                var p = element.previousSibling;
+                
+                while (p) {
+                    if (p.nodeType === type && p.nodeName === nodeName) {
+                        return false;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+                
+                return true;
+            }
+        };
+    },
+    
+    /**
+     * :nth-of-type擬似クラスを解析するロジック(:nth-of-type)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    nthOfType: function (args) {
+        var val = +args;
+        
+        var isMatch, isNth;
+        
+        if (val) {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var p = element.previousSibling;
+                
+                while (p) {
+                    if (p.nodeType === type && p.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+                
+                return cnt === val;
+            };
+        } else if (args === 'odd') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var p = element.previousSibling;
+                
+                while (p) {
+                    if (p.nodeType === type && p.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+                
+                return !!(cnt & 1);
+            };
+        } else if (args === 'even') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var p = element.previousSibling;
+                
+                while (p) {
+                    if (p.nodeType === type && p.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+                
+                return !(cnt & 1);
+            };
+        } else {
+            isNth = this._getNth(args);
+            
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var p = element.previousSibling;
+                
+                while (p) {
+                    if (p.nodeType === type && p.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+                
+                return isNth(cnt);
+            };
+        }
+        
+        return {
+            isMatch: isMatch
+        };
+    },
+    
+    /**
+     * :last-of-type擬似クラスを解析するロジック(:last-of-type)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    lastOfType: function (args) {
+        return {
+            isMatch: function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                
+                var n = element.nextSibling;
+                
+                while (n) {
+                    if (n.nodeType === type && n.nodeName === nodeName) {
+                        return false;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                return true;
+            }
+        };
+    },
+    
+    /**
+     * :nth-last-of-type擬似クラスを解析するロジック(:nth-last-of-type)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    nthLastOfType: function (args) {
+        var val = +args;
+        
+        var isMatch, isNth;
+        
+        if (val) {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var n = element.nextSibling;
+                
+                while (n) {
+                    if (n.nodeType === type && n.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                return cnt === val;
+            };
+        } else if (args === 'odd') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var n = element.nextSibling;
+                
+                while (n) {
+                    if (n.nodeType === type && n.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                return !!(cnt & 1);
+            };
+        } else if (args === 'even') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var n = element.nextSibling;
+                
+                while (n) {
+                    if (n.nodeType === type && n.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                return !(cnt & 1);
+            };
+        } else {
+            isNth = this._getNth(args);
+            
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var n = element.nextSibling;
+                
+                while (n) {
+                    if (n.nodeType === type && n.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                return isNth(cnt);
+            };
+        }
+        
+        return {
+            isMatch: isMatch
+        };
+    },
+    
+    /**
+     * :only-of-type擬似クラスを解析するロジック(:only-of-type)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -694,21 +985,33 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
         return {
             isMatch: function (element) {
                 var type = Jeeel.Dom.Node.ELEMENT_NODE;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
                 
-                var n = element.parentNode.firstChild;
-                  
-                while (n) {
-                    if (n.nodeType === type && n !== element && this.node.isMatch(n)) {
-                        this.isMatch = isMatch;
-                        return false;
-                    }
-                    
-                    n = n.nextSibling;
+                if (element.parentNode.nodeType !== type) {
+                    return false;
                 }
                 
-                this.isMatch = isMatch;
+                var nodeName = element.nodeName;
+                var n = element.nextSibling;
+                var p = element.previousSibling;
+                
+                while (n || p) {
+                    
+                    if (n) {
+                        if (n.nodeType === type && n.nodeName === nodeName) {
+                            return false;
+                        }
+
+                        n = n.nextSibling;
+                    }
+                    
+                    if (p) {
+                        if (p.nodeType === type && p.nodeName === nodeName) {
+                            return false;
+                        }
+
+                        p = p.previousSibling;
+                    }
+                }
                 
                 return true;
             }
@@ -716,66 +1019,364 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * :empty疑似クラスを解析するロジック(:empty)
+     * :nth-match擬似クラスを解析するロジック(:nth-match)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     * @ignore 未完成
+     */
+    nthMatch: function (args) {
+        
+        var isNth, nodes;
+        
+        args = args.match(/^(odd|even|[0-9n+\-]+)\s+of\s+(.+)$/g);
+        
+        isNth = this._getNth(args[1]);
+        nodes = Jeeel.Dom.Selector.Compiler.compileNodes(args[2]);
+        
+        if ( ! (args[1] && args[2])) {
+            throw new Error('Selector compile error.');
+        }
+        
+        return {};
+    },
+    
+    /**
+     * :column擬似クラスを解析するロジック(:column)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
      */
-    empty: function (args) {
+    column: function (args) {
+        var node = Jeeel.Dom.Selector.Compiler.compileNode(args);
+        
         return {
             isMatch: function (element) {
-                return element.childNodes.length === 0;
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                return node.isMatch(element);
             }
         };
     },
     
     /**
-     * :enabled疑似クラスを解析するロジック(:enabled)
+     * :nth-column擬似クラスを解析するロジック(:nth-column)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
      */
-    enabled: function (args) {
+    nthColumn: function (args) {
+        var val = +args;
+        
+        var isMatch, isNth;
+        
+        if (val) {
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element);
+                
+                for (var i = cols.length; i--;) {
+                    if (cols[i] === val) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        } else if (args === 'odd') {
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element);
+                
+                for (var i = cols.length; i--;) {
+                    if (cols[i] & 1) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        } else if (args === 'even') {
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element);
+                
+                for (var i = cols.length; i--;) {
+                    if ( ! (cols[i] & 1)) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        } else {
+            isNth = this._getNth(args);
+            
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element);
+                
+                for (var i = cols.length; i--;) {
+                    if (isNth(cols[i])) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        }
+        
+        return {
+            isMatch: isMatch
+        };
+    },
+    
+    /**
+     * :nth-last-column擬似クラスを解析するロジック(:nth-last-column)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    nthLastColumn: function (args) {
+        var val = +args;
+        
+        var isMatch, isNth;
+        
+        if (val) {
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element, true);
+                
+                for (var i = cols.length; i--;) {
+                    if (cols[i] === val) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        } else if (args === 'odd') {
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element, true);
+                
+                for (var i = cols.length; i--;) {
+                    if (cols[i] & 1) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        } else if (args === 'even') {
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element, true);
+                
+                for (var i = cols.length; i--;) {
+                    if ( ! (cols[i] & 1)) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        } else {
+            isNth = this._getNth(args);
+            
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element, true);
+                
+                for (var i = cols.length; i--;) {
+                    if (isNth(cols[i])) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        }
+        
+        return {
+            isMatch: isMatch
+        };
+    },
+    
+   /**
+     * ::first-line擬似要素を解析するロジック(::first-line)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    firstLine: function (args) {
+        return {};
+    },
+    
+    /**
+     * ::first-letter擬似要素を解析するロジック(::first-letter)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    firstLetter: function (args) {
+        return {};
+    },
+    
+    /**
+     * ::before擬似要素を解析するロジック(::before)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    before: function (args) {
+        return {};
+    },
+    
+    /**
+     * ::after擬似要素を解析するロジック(::after)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    after: function (args) {
+        return {};
+    },
+    
+    /**
+     * カスタム擬似クラス、非表示要素に適用(:-jeeel-hidden)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    JeeelHidden: function (args) {
         return {
             isMatch: function (element) {
-                return ! element.disabled;
+                
+                if (element.nodeName.toUpperCase() === 'INPUT' && element.type === 'hidden') {
+                    return true;
+                }
+                
+                var style = Jeeel.Document.getComputedStyle(element);
+                
+                return style.display === 'none' || style.visibility === 'hidden';
             }
         };
     },
     
     /**
-     * :disabled疑似クラスを解析するロジック(:disabled)
+     * カスタム擬似クラス、表示要素に適用(:-jeeel-visible)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
      */
-    disabled: function (args) {
+    JeeelVisible: function (args) {
         return {
             isMatch: function (element) {
-                return element.disabled;
+                
+                if (element.nodeName.toUpperCase() === 'INPUT' && element.type === 'hidden') {
+                    return false;
+                }
+                
+                var style = Jeeel.Document.getComputedStyle(element);
+                
+                return style.display !== 'none' && style.visibility !== 'hidden';
             }
         };
     },
     
     /**
-     * :checked疑似クラスを解析するロジック(:checked)
+     * カスタム擬似クラス、アニメーション中の要素に適用(:-jeeel-animated)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
      */
-    checked: function (args) {
+    JeeelAnimated: function (args) {
         return {
             isMatch: function (element) {
-                return element.checked;
+                return Jeeel.Hash.inHash(element, Jeeel.Dom.Style.Animation.animated, true);
             }
         };
+    },
+    
+    /**
+     * nth系の引数部分を解析する関数を取得する
+     * 
+     * @param {String} nth 引数
+     * @return {Function} 引数解析関数
+     */
+    _getNth: function (nth) {
+        
+        if (nth === 'odd') {
+            return new Function('i',
+                'return !!(i & 1);'
+            );
+        } else if (nth === 'even') {
+            return new Function('i',
+                'return !(i & 1);'
+            );
+        } else if (nth.match(/^[0-9]+$/g)) {
+            return new Function('i',
+                'return i === ' + nth + ';'
+            );
+        }
+        
+        var minus = !!nth.match(/-[0-9]*n/g);
+        
+        return new Function('i,n,pnth', 
+            'if ( ! n) {n = 0;}var nth = ' + nth.replace(/(-?[0-9]+)n/g, '$1*n') + ';if (nth === pnth) {return false;}return (i === nth) || (' + (minus ? 'i < nth' : 'i > nth') + ' ? arguments.callee(i, n + 1, nth) : false);'
+        );
     }
 };
 
 Jeeel.Dom.Selector.Mock.prototype = {
   
     /**
-     * 疑似クラスセレクタ
+     * 擬似クラスセレクタ
      * 
      * @type String
      */
@@ -789,18 +1390,25 @@ Jeeel.Dom.Selector.Mock.prototype = {
     node: null,
     
     /**
-     * 疑似クラスの名前
+     * 擬似クラスの名前
      * 
      * @type String
      */
     name: '',
     
     /**
-     * 疑似クラスの引数
+     * 擬似クラスの引数
      * 
      * @type String
      */
     args: '',
+    
+    /**
+     * 1つの要素にしかヒットしかないかどうか
+     * 
+     * @type Boolean
+     */
+    isOnlyMock: false,
     
     /**
      * 指定した要素がセレクタと一致するかどうか返す
@@ -810,16 +1418,6 @@ Jeeel.Dom.Selector.Mock.prototype = {
      */
     isMatch: function (element) {
         return true;
-    },
-    
-    /**
-     * 指定した要素リストをフィルタリングする
-     * 
-     * @param {Element[]} elements 要素リスト
-     * @return {Element[]} フィルタリング後の要素リスト
-     */
-    filter: function (elements) {
-        return elements;
     },
     
     /**
@@ -835,15 +1433,11 @@ Jeeel.Dom.Selector.Mock.prototype = {
         if ( ! tmp) {
             return this;
         }
+        
+        for (var key in tmp) {
+            this[key] = tmp[key];
+        }
 
-        if (tmp.isMatch) {
-            this.isMatch = tmp.isMatch;
-        }
-        
-        if (tmp.filter) {
-            this.filter = tmp.filter;
-        }
-        
         return this;
     },
     

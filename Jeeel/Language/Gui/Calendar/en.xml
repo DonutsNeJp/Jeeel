@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+  <required>:label is required. Can not be omitted.</required>
+  <enum>:label is impossible to specify the value contains the.</enum>
+  <numeric-min>:label must be greater than or equal to :param:1.</numeric-min>
+  <numeric-max>:label must be less than or equal to :param:1.</numeric-max>
+  <between>:label must be less than or equal to :param:2 greater than or equal to :param:1.</between>
+  <min-length>:label must be at least :param:1 characters.</min-length>
+  <max-length>:label must be less than :param:1 characters.</max-length>
+  <length>:label must be less than or equal to :param:2 letter :param:1 or more characters</length>
+  <alnum>:label must be an alphanumeric.</alnum>
+  <alpha>:label must be contain letters.</alpha>
+  <digits>:label must be numeric.</digits>
+  <bool>:label must be a boolean value.</bool>
+  <email>:label is the e-mail address must be.</email>
+  <url>:label must be URL.</url>
+  <ip>:label must be IP.</ip>
+  <regex>The format of the :label is incorrect.</regex>
+</language>

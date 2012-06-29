@@ -44,7 +44,21 @@ Jeeel.Debug.ErrorMessage = {
      *
      * @param {Mixied} var_args 可変引数、ダンプするエラーを羅列する
      */
-    dump: function (var_args) {},
+    dump: function (var_args) {
+        var div = Jeeel.Debug.ErrorMessage._create();
+
+        var error = [];
+
+        for (var i = 0, l = arguments.length; i < l; i++) {
+            error[i] = Jeeel.String.escapeHtml(arguments[i], true);
+        }
+
+        Jeeel.Debug.ErrorMessage._setLinefeed();
+
+        div.innerHTML += error.join(' ');
+
+        Jeeel.Debug.ErrorMessage._setLinefeedTimer();
+    },
 
     /**
      * タグを全て取り除いたエラーダンプする<br />
@@ -111,7 +125,9 @@ Jeeel.Debug.ErrorMessage = {
      *
      * @return {String} 取得したエラーメッセージ
      */
-    getText: function () {},
+    getText: function () {
+        return Jeeel.String.unescapeHtml(Jeeel.Debug.ErrorMessage._create().innerHTML, true);
+    },
     
     _setLinefeed: function () {
         if (this._setLf) {
@@ -129,34 +145,5 @@ Jeeel.Debug.ErrorMessage = {
             Jeeel.Debug.ErrorMessage._setLf = true;
             Jeeel.Debug.ErrorMessage._timer = 0;
         }, 0);
-    },
-    
-    _init: function () {
-        var ef = new Jeeel.Filter.Html.Escape(true);
-        var uf = new Jeeel.Filter.Html.Unescape(true);
-        
-        this.dump = function (var_args) {
-            var div = Jeeel.Debug.ErrorMessage._create();
-
-            var error = [];
-
-            for (var i = 0, l = arguments.length; i < l; i++) {
-                error[i] = ef.filter(arguments[i]);
-            }
-            
-            Jeeel.Debug.ErrorMessage._setLinefeed();
-
-            div.innerHTML += error.join(' ');
-            
-            Jeeel.Debug.ErrorMessage._setLinefeedTimer();
-        };
-        
-        this.getText = function () {
-            return uf.filter(Jeeel.Debug.ErrorMessage._create().innerHTML);
-        };
-        
-        delete this._init;
     }
 };
-
-Jeeel.Debug.ErrorMessage._init();

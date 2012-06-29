@@ -7,7 +7,7 @@
  */
 Jeeel.Object.Technical.Trace = function (func) {
     var self = this;
-    self.args = Array.prototype.slice.call(func.arguments, 0, func.arguments.length);
+    self.args = func.arguments && Array.prototype.slice.call(func.arguments, 0, func.arguments.length) || [];
     self.name = (func[Jeeel.Debug.Debugger.INFORMATION_NAME] || {}).name || func.name;
     self.func = func;
 };

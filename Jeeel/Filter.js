@@ -78,7 +78,7 @@ Jeeel.Filter.Abstract.prototype = {
 Jeeel._Object.JeeelFilter = {
     
     getInputs: function (elm) {
-        var selector = "input, select, textarea, button";
+        var selector = "input, select, keygen, textarea, button";
         var res = [], i, l;
         
         if (elm.querySelectorAll) {
@@ -89,7 +89,7 @@ Jeeel._Object.JeeelFilter = {
             }
         } else {
             
-            var tags = ['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'];
+            var tags = ['INPUT', 'SELECT', 'KEYGEN', 'TEXTAREA', 'BUTTON'];
 
             res = Jeeel.Dom.Core.Searcher.create(elm).getElementsByTagName(tags);
         }

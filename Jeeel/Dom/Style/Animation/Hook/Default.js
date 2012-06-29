@@ -28,7 +28,7 @@
         name: 'show',
         
         get: function (key, defaultPrm, deltaPrm, endPrm) {
-            if ( ! Jeeel.Type.inArray(key, displayParts, true)) {
+            if ( ! Jeeel.Hash.inHash(key, displayParts, true)) {
                 return null;
             }
             
@@ -71,7 +71,7 @@
         name: 'hide',
         
         get: function (key, defaultPrm, deltaPrm, endPrm) {
-            if ( ! Jeeel.Type.inArray(key, displayParts, true)) {
+            if ( ! Jeeel.Hash.inHash(key, displayParts, true)) {
                 return null;
             }
             
@@ -113,7 +113,7 @@
         name: 'toggle',
         
         get: function (key, defaultPrm, deltaPrm, endPrm) {
-            if ( ! Jeeel.Type.inArray(key, displayParts, true)) {
+            if ( ! Jeeel.Hash.inHash(key, displayParts, true)) {
                 return null;
             }
             

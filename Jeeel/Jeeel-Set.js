@@ -25,7 +25,7 @@
  *
  * @name Jeeel.js(Javascript Easy Error and Exception handling Library: Japanease Eeel)
  * @author Masato Shimada
- * @version 2.0.0 RC4
+ * @version 2.0.0 RC13
  * @license <a href="http://ja.wikipedia.org/wiki/MIT_License">MIT License</a>
  * @copylight (c) 2012 Donuts, Masato Shimada
  */
@@ -35,6 +35,127 @@
     /**
      * @namespace 汎用メソッド等を提供するネームスペース
      * @name Jeeel
+     * @see Jeeel.Dom
+     * @see Jeeel.Net
+     * @see Jeeel.Session
+     * @see Jeeel.Object
+     * @see Jeeel.Debug
+     * @see Jeeel.Type
+     * @see Jeeel.UserAgent
+     * @see Jeeel.Function
+     * @see Jeeel.Timer
+     * @see Jeeel.String
+     * @see Jeeel.Number
+     * @see Jeeel.Hash
+     * @see Jeeel.Json
+     * @see Jeeel.Loader
+     * @see Jeeel.Class
+     * @see Jeeel.Template
+     * @see Jeeel.Gui
+     * @see Jeeel.Graphics
+     * @see Jeeel.Framework
+     * @example
+     * Jeeelは幾つかの大きな機能を柱に構成されている
+     * また良く使う機能はショートカットが存在しており記述量を少なくできる
+     * 
+     * グローバルショートカット一覧
+     * $ID('id'); // 指定したIDの要素を取得する。document.getElementByIdに相当
+     * $CLASS('class'); // 指定したCLASSの要素のリストを取得する。document.getElementsByClassNameに相当(但し戻り値はNodeListではなく配列になる)
+     * $TAG('tag'); // 指定したタグ名の要素リストを取得する。document.getElementsByTagNameに相当(但し戻り値はNodeListではなく配列になる)
+     * $NAME('name'); // 指定した名前の要素リストを取得する。document.getElementsByNameに相当(但し戻り値はNodeListではなく配列になる)
+     * $QUERY('#id .class'); // 指定したセレクタから要素のリストを取得する。document.querySelectorAllに相当(但し戻り値はNodeListではなく配列になる)
+     * $ELM($ID('id')); // Jeeel.Dom.Elementのインスタンスを生成する。Jeeel.Dom.Element.createと同等
+     * $ELMOP('#id .class'); // Jeeel.Dom.ElementOperatorのインスタンスを生成する。Jeeel.Dom.ElementOperator.createと同等
+     * $FORM('test-form'); // Jeeel.Net.Formのインスタンスを生成する。Jeeel.Net.Form.createと同等
+     * $AJAX('/test/'); // Jeeel.Net.Ajaxのインスタンスを生成する。Jeeel.Net.Ajax.createと同等
+     * $PRM({a, 2, b: 7}); // Jeeel.Parameterのインスタンスを生成する。Jeeel.Parameter.createと同等
+     * $BIND(Test.func, Test); // Jeeel.Functionのインスタンスを生成しthisの束縛も行う。Jeeel.Function.create + Jeeel.Function#bindと同等
+     * 
+     * createConsole(); // JSコンソールを生成する。Jeeel.Debug.Console.createと同等
+     * 
+     * Jeeel名前空間ショートカット一覧
+     * Jeeel.addLoadEvent(Test.onload, Test); // ドキュメントが全て読み込まれたときのイベントを追加する。body.onloadやwindow.onloadに相当
+     * Jeeel.errorDump(1, 4, 5); // デバッグモードが有効な場合に限り可変引数で指定した値を文字列としてダンプする
+     * Jeeel.errorHtmlDump('<p>test</p>'); // デバッグモードが有効な場合に限り可変引数で指定した値をHTMLとしてダンプする
+     * Jeeel.errorDumpConsole({a: [1, 2, 3, 4]}); // デバッグモードが有効な場合に限り可変引数で指定した値をオブジェクトとしてダンプする
+     * Jeeel.Document; // Jeeel.Dom.Documentのインスタンス
+     * Jeeel.Window; // Jeeel.Dom.Windowのインスタンス
+     * 
+     * ・DOM操作機能(Jeeel.Dom)
+     * ・通信管理機能(Jeeel.Net)
+     * ・セッション管理機能(Jeeel.Session)
+     * ・日付を初めとする特殊値の管理操作機能(Jeeel.Object)
+     * ・デバッグ機能(Jeeel.Debug)
+     * ・ユーティリティ機能
+     * 
+     * DOM操作機能(Jeeel.Dom)
+     * この機能は一部拡張機能を除き全てJeeel.Dom以下に保持されている
+     * 拡張機能とはGUIを強化するJeeel.Gui以下やcanvasやSVGを管理するグラフィックス系のJeeel.Graphics以下などがある
+     * この機能で提供するものは大よそ以下の機能になる
+     * ・イベント管理
+     * ・アニメーション
+     * ・要素の移動、削除、スタイル変化
+     * ・要素生成
+     * ・要素情報操作
+     * ・要素検索(IDやclassなどの単体からセレクタまで)
+     * ・ウィンドウ操作
+     * 
+     * 通信管理機能(Jeeel.Net)
+     * この機能は数こそ少ないが通信に関係する強力な補助ツールである
+     * デバッグに属する機能とJeeel自体を操作する特殊な機能以外は全てJeeel.Net以下に保持される
+     * この機能が提供する機能は大よそ以下の機能になる
+     * ・Ajax通信(同期・非同期を含めたXMLHttpRequestを利用した通信)
+     * ・Form要素もしくはそれに見立てた要素に対しての操作
+     * ・JSONP通信
+     * ・ビーコン
+     * 
+     * セッション管理機能(Jeeel.Session)
+     * この機能はクッキーを初めとして擬似セッションを含めたセッション管理を行う機能である
+     * 機能は全てJeeel.Session以下に属する
+     * この機能が提供する機能は大よそ以下の機能になる
+     * ・cookie管理
+     * ・window.nameを利用した擬似セッションの管理
+     * ・localStorage, sessionStorageを使用した擬似セッションの管理
+     * 
+     * 日付を初めとする特殊値の管理操作機能(Jeeel.Object)
+     * この機能は日付や色を初めてするやや扱いが面倒な値を管理する機能を保有する
+     * この機能はJeeel.Object以下に属する
+     * この機能が提供する機能は大よそ以下の機能になる
+     * ・日付の取得、改変、整形、日付移動などの日付やタイムゾーンに関する操作
+     * ・色のRGB、HSLの相互変換、色同士のブレンド、書式変換に関する操作
+     * ・幅、高さを合わせて保持したり、X座標、Y座標を合わせて保持する型に近い動作を提供する機能
+     * 
+     * デバッグ機能(Jeeel.Debug)
+     * Jeeelの代名詞とも言える機能
+     * デバッグ機能の弱いブラウザや環境に対してJSのみでデバッグ機能を提供する
+     * この機能はJeeel.Debug以下に属する
+     * この機能が提供する機能は大よそ以下の機能になる
+     * ・JSコンソール
+     * ・メッセージダンパー
+     * ・タイマー
+     * ・プロファイラ
+     * 
+     * ユーティリティ機能
+     * 上記に入らなかった機能をまとめたようなもの
+     * その中でも以下のクラスが筆頭に上がる
+     * Jeeel.Type // 型の判定に特化したクラス
+     * Jeeel.UserAgent // ブラウザ情報やURL情報などに特化したクラス
+     * Jeeel.Function // 関数のthisの固定化や遅延実行など関数実行に特化したクラス
+     * Jeeel.Timer // タイマーを使用した遅延実行や繰り返し実行に特化したクラス
+     * Jeeel.String // 文字列操作に特化したクラス、ネームスペース
+     * Jeeel.Number // 数値操作に特化したクラス、ネームスペース
+     * Jeeel.Hash // 配列・連想配列操作に特化したクラス、ネームスペース
+     * Jeeel.Json // JSONのエンコード、デコードを行うクラス
+     * Jeeel.Loader // JSやCSSの読み込み・追加などに特化したクラス
+     * Jeeel.Class // オブジェクト指向の継承などに特化したクラス
+     * Jeeel.Template // Smartyの様なテンプレートエンジンクラス
+     * 
+     * 
+     * これらの機能の他に拡張機能として以下が使用されることが多い
+     * 
+     * Jeeel.Gui // GUIのパーツを提供する
+     * Jeeel.Graphics // canvasやSVGなどのグラフィカルな機能を使いやすく提供する
+     * Jeeel.Framework // JS側で大規模なアプリを作成する手助けを行う機能の集まり
      */
     var Jeeel = {
 
@@ -51,7 +172,7 @@
          * @type String
          * @constant
          */
-        VERSION: '2.0.0 RC4',
+        VERSION: '2.0.0 RC13',
 
         /**
          * Jeeelのscriptタグに付くclass名
@@ -205,6 +326,7 @@
          *
          * @type Jeeel.Dom.Document
          * @readOnly
+         * @see Jeeel.Dom.Document
          */
         Document: null,
 
@@ -213,6 +335,7 @@
          *
          * @type Jeeel.Dom.Window
          * @readOnly
+         * @see Jeeel.Dom.Window
          */
         Window: null,
         
@@ -221,6 +344,7 @@
          * 
          * @type Jeeel.Framework.Acl
          * @readOnly
+         * @see Jeeel.Framework.Acl
          */
         Acl: null,
         
@@ -243,7 +367,9 @@
         },
 
         /**
-         * @namespace Jeeel系のサブクラス保存のための媒体
+         * Jeeel系のサブクラス保存のための媒体
+         * 
+         * @type Hash
          * @private
          */
         _Object: {
@@ -555,7 +681,7 @@ Jeeel.getFilePath = function () {
 
                 if ( ! this._debugMode && subKey === 'Debug') {
                     continue;
-                } else if ( ! this._debugMode && key === 'Technical' && Jeeel.Type.inArray(subKey, ['Information', 'Trace'], true)) {
+                } else if ( ! this._debugMode && key === 'Technical' && Jeeel.Hash.inHash(subKey, ['Information', 'Trace'], true)) {
                     continue;
                 } else if ( ! this._extendMode.Gui && subKey === 'Gui') {
                     continue;
@@ -575,7 +701,7 @@ Jeeel.getFilePath = function () {
                     continue;
                 } else if ( ! this._extendMode.Framework && subKey === 'Framework') {
                     continue;
-                } else if ( ! this._extendMode.Net && Jeeel.Type.inArray(subKey, ['Comet', 'Socket'], true)) {
+                } else if ( ! this._extendMode.Net && Jeeel.Hash.inHash(subKey, ['Comet', 'Socket'], true)) {
                     continue;
                 }
 
@@ -615,7 +741,7 @@ Jeeel.getScript = function () {
 
                 if ( ! this._debugMode && subKey === 'Debug') {
                     continue;
-                }else if ( ! this._debugMode && key === 'Technical' && Jeeel.Type.inArray(subKey, ['Information', 'Trace'], true)) {
+                } else if ( ! this._debugMode && key === 'Technical' && Jeeel.Hash.inHash(subKey, ['Information', 'Trace'], true)) {
                     continue;
                 } else if ( ! this._extendMode.Gui && subKey === 'Gui') {
                     continue;
@@ -625,7 +751,7 @@ Jeeel.getScript = function () {
                     continue;
                 } else if ( ! this._extendMode.Worker && subKey === 'Worker') {
                     continue;
-                }else if ( ! this._extendMode.Geolocation && subKey === 'Geolocation') {
+                } else if ( ! this._extendMode.Geolocation && subKey === 'Geolocation') {
                     continue;
                 } else if ( ! this._extendMode.File && subKey === 'File') {
                     continue;
@@ -635,11 +761,11 @@ Jeeel.getScript = function () {
                     continue;
                 } else if ( ! this._extendMode.Framework && subKey === 'Framework') {
                     continue;
-                } else if ( ! this._extendMode.Net && Jeeel.Type.inArray(subKey, ['Comet', 'Socket'], true)) {
+                } else if ( ! this._extendMode.Net && Jeeel.Hash.inHash(subKey, ['Comet', 'Socket'], true)) {
                     continue;
                 }
 
-                paths[paths.length] = '<script type="text/javascript" class="'+Jeeel.SCRIPT_CLASS+'" src="'+dir + subKey+'.js"></script>\n';
+                paths[paths.length] = '<script type="text/javascript" class="' + Jeeel.SCRIPT_CLASS + '" src="' + dir + subKey + '.js"></script>\n';
 
                 if (dir[subKey] && file[key][subKey]) {
                     var dirTmp = {};
@@ -793,17 +919,20 @@ Jeeel.directory.Jeeel = {
     // ユニークIDを設定する
     Jeeel.UNIQUE_ID = 'Jeeel-' + (Jeeel.VERSION + Math.random()).replace(/\D/g, '');
     Jeeel.SCRIPT_ID = Jeeel.SCRIPT_ID + '-' + Jeeel.UNIQUE_ID;
+    
+    var jeeelMatch, jeeelRegExp, src;
 
-    // ベースURLとクラス、IDの設定
+    // ベースURL・QUERYとクラス、IDの設定(Worker内の場合はURLとQUERYのみ設定)
     if (Jeeel._doc) {
-
+        
+        jeeelRegExp = /^(.*?)\/(?:Jeeel\/)?Jeeel(?:-Set(?:-Min)?)?\.js(\?.*)?$/i;
+        
         var scripts = Jeeel._doc.getElementsByTagName('script');
-        var jeeelRegExp = /^(.*)\/Jeeel\/Jeeel(?:-Set(?:-Min)?)?\.js(\?.*)?$/i,
-            jeeelMatch;
 
         for (var i = scripts.length; i--;) {
-            var script = scripts[i],
-                src = script.getAttribute('src');
+            var script = scripts[i];
+            
+            src = script.getAttribute('src');
 
             if ( ! src || ! (jeeelMatch = src.match(jeeelRegExp))) {
                 continue;
@@ -817,104 +946,116 @@ Jeeel.directory.Jeeel = {
             
             break;
         }
+    } else if (Jeeel._global && Jeeel._global.importScripts && Jeeel._global.location) {
         
-        // クエリから設定内容の取得
-        if (Jeeel.QUERY) {
-            var config = Jeeel.QUERY.split('&');
-            var full = false;
+        jeeelRegExp = /^(.*?)\/(?:Jeeel\/)?Worker\/Thread\.js(\?.*)?$/i;
+        
+        src = Jeeel._global.location.pathname + Jeeel._global.location.search;
+        
+        jeeelMatch = (src || '').match(jeeelRegExp);
 
-            for (var j = config.length; j--;) {
-                var tmp = config[j].split('=');
-                var names = Jeeel._Object.Jeeel.getInputName(tmp[0]);
+        if (jeeelMatch) {
+            Jeeel.BASE_URL = jeeelMatch[1] + '/';
+            Jeeel.QUERY = jeeelMatch[2] && jeeelMatch[2].replace(/^\?/, '') || '';
+        }
+    }
+    
+    // クエリから設定内容の取得
+    if (Jeeel.QUERY) {
+        var config = Jeeel.QUERY.split('&');
+        var full = false;
 
-                switch (names[0]) {
-                    case 'ml':
-                        Jeeel._auto = !(+tmp[1]);
-                        break;
+        for (var j = config.length; j--;) {
+            var tmp = config[j].split('=');
+            var names = Jeeel._Object.Jeeel.getInputName(tmp[0]);
 
-                    case 'cl':
-                        Jeeel._cleanMode = !!(+tmp[1]);
-                        break;
+            switch (names[0]) {
+                case 'ml':
+                    Jeeel._auto = !(+tmp[1]);
+                    break;
 
-                    case 'dbg':
-                        Jeeel._debugMode = !!(+tmp[1]);
-                        break;
+                case 'cl':
+                    Jeeel._cleanMode = !!(+tmp[1]);
+                    break;
 
-                    case 'ext':
-                        switch (names[1]) {
-                            case 'gui':
-                                Jeeel._extendMode.Gui = !!(+tmp[1]);
-                                break;
+                case 'dbg':
+                    Jeeel._debugMode = !!(+tmp[1]);
+                    break;
 
-                            case 'ws':
-                                Jeeel._extendMode.WebStorage = !!(+tmp[1]);
-                                break;
+                case 'ext':
+                    switch (names[1]) {
+                        case 'gui':
+                            Jeeel._extendMode.Gui = !!(+tmp[1]);
+                            break;
 
-                            case 'db':
-                                Jeeel._extendMode.Database = !!(+tmp[1]);
-                                break;
+                        case 'ws':
+                            Jeeel._extendMode.WebStorage = !!(+tmp[1]);
+                            break;
 
-                            case 'wk':
-                                Jeeel._extendMode.Worker = !!(+tmp[1]);
-                                break;
+                        case 'db':
+                            Jeeel._extendMode.Database = !!(+tmp[1]);
+                            break;
 
-                            case 'geo':
-                                Jeeel._extendMode.Geolocation = !!(+tmp[1]);
-                                break;
+                        case 'wk':
+                            Jeeel._extendMode.Worker = !!(+tmp[1]);
+                            break;
 
-                            case 'file':
-                                Jeeel._extendMode.File = !!(+tmp[1]);
-                                break;
+                        case 'geo':
+                            Jeeel._extendMode.Geolocation = !!(+tmp[1]);
+                            break;
 
-                            case 'md':
-                                Jeeel._extendMode.Media = !!(+tmp[1]);
-                                break;
+                        case 'file':
+                            Jeeel._extendMode.File = !!(+tmp[1]);
+                            break;
 
-                            case 'grp':
-                                Jeeel._extendMode.Graphics = !!(+tmp[1]);
-                                break;
+                        case 'md':
+                            Jeeel._extendMode.Media = !!(+tmp[1]);
+                            break;
 
-                            case 'net':
-                                Jeeel._extendMode.Net = !!(+tmp[1]);
-                                break;
-                                
-                            case 'fw':
-                                Jeeel._extendMode.Framework = !!(+tmp[1]);
-                                break;
-                        }
-                        break;
+                        case 'grp':
+                            Jeeel._extendMode.Graphics = !!(+tmp[1]);
+                            break;
 
-                    case 'full':
-                        full = !!(+tmp[1]);
-                        break;
-                }
-            }
+                        case 'net':
+                            Jeeel._extendMode.Net = !!(+tmp[1]);
+                            break;
 
-            // FULLモードの際は全て上書きする
-            if (full) {
-                Jeeel._debugMode = Jeeel._extendMode.Gui
-                                 = Jeeel._extendMode.WebStorage
-                                 = Jeeel._extendMode.Database
-                                 = Jeeel._extendMode.Worker
-                                 = Jeeel._extendMode.Geolocation
-                                 = Jeeel._extendMode.File
-                                 = Jeeel._extendMode.Media
-                                 = Jeeel._extendMode.Graphics
-                                 = Jeeel._extendMode.Net
-                                 = Jeeel._extendMode.Framework
-                                 = true;
+                        case 'fw':
+                            Jeeel._extendMode.Framework = !!(+tmp[1]);
+                            break;
+                    }
+                    break;
+
+                case 'full':
+                    full = !!(+tmp[1]);
+                    break;
             }
         }
-        
-        // 不要な物を廃棄する
-        script = scripts = jeeelMatch = jeeelRegExp = full = config = tmp = names = host = null;
+
+        // FULLモードの際は全て上書きする
+        if (full) {
+            Jeeel._debugMode = Jeeel._extendMode.Gui
+                              = Jeeel._extendMode.WebStorage
+                              = Jeeel._extendMode.Database
+                              = Jeeel._extendMode.Worker
+                              = Jeeel._extendMode.Geolocation
+                              = Jeeel._extendMode.File
+                              = Jeeel._extendMode.Media
+                              = Jeeel._extendMode.Graphics
+                              = Jeeel._extendMode.Net
+                              = Jeeel._extendMode.Framework
+                              = true;
+        }
     }
+
+    // 不要な物を廃棄する
+    script = scripts = jeeelMatch = jeeelRegExp = full = config = tmp = names = host = null;
 
     if (Jeeel._disableAuto) {
         Jeeel._auto = false;
     }
 
-    Jeeel.file.Jeeel = ['Class', 'Function', 'Type', 'Method', 'Filter', 'Hash', 'String', 'Number', 'Code', 'Loader', 'UserAgent', 'Json', 'Session', 'Dom', 'Net', 'Template', 'Timer', 'DataStructure', 'Object', 'Parameter', 'Validator', 'Storage', 'External', 'Deferred', 'Config', 'Error', 'Util'];
+    Jeeel.file.Jeeel = ['Class', 'Function', 'Type', 'String', 'Number', 'Language', 'Method', 'Hash', 'Filter', 'Parameter', 'UserAgent', 'Dom', 'Net', 'Code', 'Loader', 'Json', 'Session', 'Template', 'Timer', 'DataStructure', 'Object', 'Validator', 'Storage', 'External', 'Deferred', 'Config', 'Error', 'Util'];
 
     if (Jeeel._extendMode.Gui && Jeeel._doc) {
         Jeeel.file.Jeeel[Jeeel.file.Jeeel.length] = 'Gui';
@@ -955,18 +1096,22 @@ Jeeel.directory.Jeeel = {
     // 自動ロードを始動
     if (Jeeel._auto) {
         Jeeel._tmp = function () {
-            for (var i = 5, l = Jeeel.file.Jeeel.length; i < l; i++) {
-                Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[i]);
-            }
+            Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[10]);
+            Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[11]);
+            Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[12]);
+            
+            Jeeel._tmp = function () {
+                for (var i = 13, l = Jeeel.file.Jeeel.length; i < l; i++) {
+                    Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[i]);
+                }
 
-            delete Jeeel._tmp;
+                delete Jeeel._tmp;
+            };
         };
 
-        Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[0]);
-        Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[1]);
-        Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[2]);
-        Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[3]);
-        Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[4]);
+        for (i = 0; i <= 9; i++) {
+            Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[i]);
+        }
     }
 
     // グローバル関数・変数の設定
@@ -1064,6 +1209,7 @@ Jeeel.directory.Jeeel = {
          * 
          * @name createConsole
          * @function
+         * @see Jeeel.Debug.Console
          */
         function createConsole() {
             Jeeel.Debug.Console.create();
@@ -1082,6 +1228,8 @@ Jeeel.directory.Jeeel = {
          * @return {Element} 取得したElement
          * @name $ID
          * @function
+         * @see Jeeel.Dom.Document#getElementById
+         * @see Jeeel.Dom.Element#getElementById
          */
         function $ID(id, target) {
 
@@ -1107,6 +1255,8 @@ Jeeel.directory.Jeeel = {
          * @return {Element[]} 取得したElement配列
          * @name $CLASS
          * @function
+         * @see Jeeel.Dom.Document#getElementsByClassName
+         * @see Jeeel.Dom.Element#getElementsByClassName
          */
         function $CLASS(className, target) {
 
@@ -1132,6 +1282,8 @@ Jeeel.directory.Jeeel = {
          * @return {Element[]} 取得したElement配列
          * @name $NAME
          * @function
+         * @see Jeeel.Dom.Document#getElementsByName
+         * @see Jeeel.Dom.Element#getElementsByName
          */
         function $NAME(name, target) {
 
@@ -1157,6 +1309,8 @@ Jeeel.directory.Jeeel = {
          * @return {Element[]} 取得したElement配列
          * @name $TAG
          * @function
+         * @see Jeeel.Dom.Document#getElementsByTagName
+         * @see Jeeel.Dom.Element#getElementsByTagName
          */
         function $TAG(tagName, target) {
 
@@ -1183,6 +1337,8 @@ Jeeel.directory.Jeeel = {
          * @see Jeeel.Dom.Selector
          * @name $QUERY
          * @function
+         * @see Jeeel.Dom.Document#getElementsBySelector
+         * @see Jeeel.Dom.Element#getElementsBySelector
          */
         function $QUERY(selector, target) {
 
@@ -1208,6 +1364,7 @@ Jeeel.directory.Jeeel = {
          * @throws {Error} paramsが配列式でない場合に起こる
          * @name $PRM
          * @function
+         * @see Jeeel.Parameter
          */
         function $PRM(params) {
             return new Jeeel.Parameter(params);
@@ -1225,6 +1382,7 @@ Jeeel.directory.Jeeel = {
          * @return {Jeeel.Dom.Element} 作成したインスタンス
          * @name $ELM
          * @function
+         * @see Jeeel.Dom.Element
          */
         function $ELM(element) {
             return new Jeeel.Dom.Element(element);
@@ -1242,6 +1400,7 @@ Jeeel.directory.Jeeel = {
          * @return {Jeeel.Dom.ElementOperator} 作成したインスタンス
          * @name $ELMOP
          * @function
+         * @see Jeeel.Dom.ElementOperator
          */
         function $ELMOP(elementList) {
             return new Jeeel.Dom.ElementOperator(elementList);
@@ -1260,6 +1419,7 @@ Jeeel.directory.Jeeel = {
          * @return {Jeeel.Function} 作成したインスタンス
          * @name $BIND
          * @function
+         * @see Jeeel.Function#bind
          */
         function $BIND(func, thisArg) {
             return Jeeel.Function.create(func).bind(thisArg);
@@ -1278,6 +1438,7 @@ Jeeel.directory.Jeeel = {
          * @return {Jeeel.Net.Ajax} 作成したインスタンス
          * @name $AJAX
          * @function
+         * @see Jeeel.Net.Ajax
          */
         function $AJAX(url, method) {
             return new Jeeel.Net.Ajax(url, method);
@@ -1295,6 +1456,7 @@ Jeeel.directory.Jeeel = {
          * @return {Jeeel.Net.Form} 作成したインスタンス
          * @name $FORM
          * @function
+         * @see Jeeel.Net.Form
          */
         function $FORM(form) {
             return new Jeeel.Net.Form(form);
@@ -1317,7 +1479,34 @@ Jeeel.directory.Jeeel.Class = {
 };
 
 /**
- * @namespace クラスに関するネームスペース
+ * @staticClass クラスの継承等を行う機能を保持したスタティッククラス
+ * @example
+ * クラスの概念をJavaScriptに取り入れるためのクラス
+ * 主に継承を使いたい時に使用する
+ * 他にもインターフェースやMixinなども保持しているが使うのは稀である
+ * 
+ * 例：
+ * var A = function () {
+ *     this._test = 'A';
+ * };
+ * 
+ * A.prototype = {
+ * 
+ *     _test: '',
+ *     
+ *     getTest: function () {
+ *         return this._test;
+ *     }
+ * };
+ * 
+ * var B = function () {
+ *     this._test = 'B';
+ * };
+ * 
+ * Jeeel.Class.extend(B, A); // Bに対してAを継承させる、B: サブクラス, A: スーパークラス
+ * 
+ * var b = new B();
+ * b.getTest(); // "B"が返ってくる
  */
 Jeeel.Class = {
     
@@ -1429,12 +1618,24 @@ Jeeel.Class = {
         this.Abstract.prototype = null;
         
         return subClass;
+    },
+    
+    /**
+     * インターフェースを実装する
+     * 
+     * @param {Function} implementClass インターフェースを実装するクラス
+     * @param {String|Jeeel.Class.Interface|Array|Hash} implementInterface 実装インターフェース
+     * @return {Function} 実装後の自動検証クラス(implementOf, isImplementedが実装される)
+     */
+    implement: function (implementClass, implementInterface) {
+        return this.Interface.implement(implementClass, implementInterface);
     }
 };
 
-Jeeel.file.Jeeel.Class = ['Abstract', 'Mixin'];
+Jeeel.file.Jeeel.Class = ['Abstract', 'Interface', 'Mixin'];
 
-Jeeel._autoImports(Jeeel.directory.Jeeel.Class, Jeeel.file.Jeeel.Class);/**
+Jeeel._autoImports(Jeeel.directory.Jeeel.Class, Jeeel.file.Jeeel.Class);
+/**
  * コンストラクタ
  * 
  * @abstractClass 継承時に使用する抽象クラス
@@ -1450,11 +1651,350 @@ Jeeel.Class.Abstract.prototype = {
      * 親クラスのプロトタイプ
      * 
      * @type Object
+     * @protected
      * @readOnly
      */
     _super: null
 };
+
+/**
+ * コンストラクタ
+ * 
+ * @class インターフェースを擬似管理するクラス
+ * @param {String} name インターフェース名
+ * @param {Hash} interfaceClass インターフェース
+ */
+Jeeel.Class.Interface = function (name, interfaceClass) {
+    this._name = name;
     
+    var methods = [];
+    var constants = [];
+    var list = ['constructor', 'toString', 'valueOf'];
+    
+    if (Jeeel.Type.isArray(interfaceClass)) {
+        for (var i = interfaceClass.length; i--;) {
+            methods.push({
+                name: interfaceClass[i],
+                length: '*'
+            });
+        }
+    } else {
+        for (var key in interfaceClass) {
+            if (typeof interfaceClass[key] === 'function') {
+              
+                if (Jeeel.Hash.inHash(key, list, true)) {
+                    continue;
+                }
+                
+                methods.push({
+                    name: key,
+                    length: interfaceClass[key].length
+                });
+            } else {
+                constants.push({
+                    name: key,
+                    value: interfaceClass[key]
+                });
+            }
+        }
+    }
+    
+    this._interface = interfaceClass;
+    this._methods = methods;
+    this._constants = constants;
+};
+
+/**
+ * インスタンスの作成を行う
+ * 
+ * @param {String} name インターフェース名
+ * @param {Hash} interfaceClass インターフェース
+ * @return {Jeeel.Class.Interface} 作成したインスタンス
+ */
+Jeeel.Class.Interface.create = function (name, interfaceClass) {
+    return new this(name, interfaceClass);
+};
+
+/**
+ * インターフェースを登録する
+ * 
+ * @param {String} name インターフェース名
+ * @param {Hash} interfaceClass 登録インターフェース
+ * @return {Jeeel.Class.Interface} 登録したインターフェースインスタンス
+ */
+Jeeel.Class.Interface.register = function (name, interfaceClass) {
+    if ( ! (interfaceClass instanceof this)) {
+        interfaceClass = this.create(name, interfaceClass);
+    }
+    
+    return this._caches[interfaceClass._name] = interfaceClass;
+};
+
+/**
+ * インターフェース名からインスタンスの取得を行う
+ * 
+ * @param {String} name インターフェース名
+ * @return {Jeeel.Class.Interface} 取得したインスタンス
+ */
+Jeeel.Class.Interface.getInstance = function (name) {
+    return this._caches[name] || null;
+};
+
+Jeeel.Class.Interface.implement = function (implementClass, implementInterface) {
+    
+    if ( ! (implementInterface instanceof Jeeel.Class.Interface)) {
+        if (Jeeel.Type.isString(implementInterface)) {
+            implementInterface = Jeeel.Class.Interface.getInstance(implementInterface);
+        } else if (Jeeel.Type.isArray(implementInterface) && Jeeel.Type.isString(implementInterface[0]) && Jeeel.Type.isHash(implementInterface[1])) {
+            implementInterface = Jeeel.Class.Interface.register(implementInterface[0], implementInterface[1]);
+        } else if (Jeeel.Type.isHash(implementInterface)) {
+            implementInterface = Jeeel.Class.Interface.create((this._implementId++) + '-interface', implementInterface);
+        }
+    }
+
+    if ( ! (implementInterface instanceof Jeeel.Class.Interface)) {
+        throw new Error('implementInterface is not Jeeel.Class.Interface instance.');
+    }
+    
+    if (implementClass.prototype._autoValidateImplements) {
+        implementClass = implementClass.prototype._inherited;
+    }
+
+    if ( ! implementClass.prototype.implementOf) {
+        implementClass.prototype.implementOf = this.implementOf;
+    }
+
+    if ( ! implementClass.prototype.isImplemented) {
+        implementClass.prototype.isImplemented = this.isImplemented;
+    }
+
+    if ( ! implementClass.prototype._implements) {
+        implementClass.prototype._implements = {};
+    } else if ( ! implementClass.prototype.hasOwnProperty('_implements')) {
+        implementClass.prototype._implements = Jeeel.Hash.merge({}, implementClass.prototype._implements);
+    }
+
+    if (implementClass.prototype.constructor !== implementClass) {
+        implementClass.prototype.constructor = implementClass;
+    }
+
+    var constants = implementInterface.getConstants();
+
+    for (var i = constants.length; i--;) {
+        implementClass[constants[i].name] = constants[i].value;
+    }
+
+    implementClass.prototype._implements[implementInterface.getName()] = implementInterface;
+    
+    var newClass = new Function("this._autoValidateImplements.apply(this, arguments);");
+
+    newClass.prototype = implementClass.prototype;
+    newClass.prototype._inherited = implementClass;
+    newClass.prototype._autoValidateImplements = this._autoValidateImplements;
+    
+    for (var key in implementClass) {
+        if (implementClass.hasOwnProperty(key)) {
+            newClass[key] = implementClass[key];
+        }
+    }
+
+    return newClass;
+};
+
+/**
+ * インターフェースを正確に実装しているかどうかを調べる
+ * 
+ * @param {String|Jeeel.Class.Interface} implementInterface 
+ * @return {Boolean} 正確に実装しているかどうか
+ */
+Jeeel.Class.Interface.implementOf = function (implementInterface) {
+    if (Jeeel.Type.isString(implementInterface)) {
+        implementInterface = Jeeel.Class.Interface.getInstance(implementInterface);
+    }
+
+    if ( ! (implementInterface instanceof Jeeel.Class.Interface)) {
+        throw new Error('implementInterface is not Jeeel.Class.Interface instance.');
+    }
+
+    var interfaceName = implementInterface.getName();
+
+    var res = this._implements
+           && this._implements[interfaceName]
+           && this._implements[interfaceName].isImplemented(this);
+    
+    return !!res;
+};
+
+/**
+ * 実装したインターフェースのメソッドが全て実装されているかどうかを調べる
+ * 
+ * @return {Boolean} 正確に実装しているかどうか
+ */
+Jeeel.Class.Interface.isImplemented = function () {
+    if ( ! this._implements) {
+        return false;
+    }
+
+    for (var key in this._implements) {
+        if ( ! (this._implements[key] instanceof Jeeel.Class.Interface)) {
+            continue;
+        }
+        
+        if ( ! this._implements[key].isImplemented(this)) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+/**
+ * コンストラクタ
+ * 
+ * @class インターフェースの状況を自動検証する擬似クラス
+ * @private
+ */
+Jeeel.Class.Interface._autoValidateImplements = function () {
+  
+    this._inherited.apply(this, arguments);
+    
+    var err = true;
+    
+    if ( ! this._implements) {
+        err = 'There is no evidence that implements the interface.';
+    } else {
+        for (var key in this._implements) {
+            
+            if ( ! (this._implements[key] instanceof Jeeel.Class.Interface)) {
+                continue;
+            }
+            
+            if ((err = this._implements[key]._validateImplement(this)) !== true) {
+                break;
+            }
+        }
+    }
+    
+    if (err !== true) {
+        err = new Error(err);
+        err.name = 'ImplementError';
+        
+        throw err;
+    }
+};
+
+/**
+ * キャッシュ
+ * 
+ * @type Hash
+ * @private
+ */
+Jeeel.Class.Interface._caches = {};
+
+Jeeel.Class.Interface._implementId = 0;
+
+Jeeel.Class.Interface.prototype = {
+    
+    /**
+     * インターフェース
+     * 
+     * @type Hash
+     * @private
+     */
+    _interface: null,
+    
+    /**
+     * インターフェース名
+     * 
+     * @type String
+     * @private
+     */
+    _name: '',
+    
+    /**
+     * 実装メソッド名のリスト
+     * 
+     * @type Array
+     * @private
+     */
+    _methods: [],
+    
+    /**
+     * 定数のリスト
+     * 
+     * @type Array
+     * @private
+     */
+    _constants: [],
+    
+    /**
+     * インターフェース名を取得する
+     * 
+     * @return {String} インターフェース名
+     */
+    getName: function () {
+        return this._name;
+    },
+    
+    /**
+     * 定数リストを取得する
+     * 
+     * @return {Array} 定数リスト
+     */
+    getConstants: function () {
+        return this._constants;
+    },
+    
+    /**
+     * このインターフェースを指定したインスタンスが実装しているかどうかを調べる
+     * 
+     * @param {Object} instance 比較インスタンス
+     * @return {Boolean} 実装をしているかどうか
+     */
+    isImplemented: function (instance) {
+        return this._validateImplement(instance) === true;
+    },
+    
+    /**
+     * このインターフェースを指定したインスタンスが実装しているかどうかを調べ状態を返す
+     * 
+     * @param {Object} instance 比較インスタンス
+     * @return {Boolean|String} 実装状態
+     */
+    _validateImplement: function (instance) {
+        var i;
+        
+        for (i = this._methods.length; i--;) {
+            var method = instance[this._methods[i].name];
+            
+            if (typeof method !== 'function') {
+                return 'You need to implement the "' + this._methods[i].name + '" method.';
+            } else if (this._methods[i].length !== '*' && method.length !== this._methods[i].length) {
+                return 'Number of arguments of the "' + this._methods[i].name + '" method is different.';
+            }
+        }
+        
+        for (i = this._constants.length; i--;) {
+            var constant = this._constants[i];
+            
+            if (instance.constructor[constant.name] !== constant.value) {
+                return 'Constant "' + constant.name + '" is not implemented properly.';
+            }
+        }
+        
+        return true;
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @param {String} interfaceName インターフェース名
+     * @param {String[]} methods 実装メソッドリスト
+     * @constructor
+     */
+    constructor: Jeeel.Class.Interface
+};
+
 /**
  * コンストラクタ
  * 
@@ -1619,7 +2159,8 @@ Jeeel.Class.Mixin.prototype = {
         
         return this;
     }
-};Jeeel.directory.Jeeel.Function = {
+};
+Jeeel.directory.Jeeel.Function = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -1635,23 +2176,27 @@ Jeeel.Class.Mixin.prototype = {
 /**
  * コンストラクタ
  *
- * @class メソッドを拡張するクラス(name, length等の部分は初期化される)
- * @param {Function} target 基となるメソッド
- * @throws {Error} targetがメソッドでない場合に起こる
+ * @class 関数を拡張するクラス(name, length等の部分は初期化される)
+ * @param {Function} target 基となる関数
+ * @throws {Error} targetが関数でない場合に起こる
  * @example
+ * このクラスは関数をラッパーし幾つかの機能を追加するクラスである
+ * thisの固定や引数の固定、繰り返しや遅延実行などを使用する場合にこの機能を使う
+ * 
+ * 例：
  * var base = function (name, id) {
- * &nbsp;   return 'id: ' + id + ' name: ' + name + this;
+ *     return 'id: ' + id + ' name: ' + name + this;
  * }
  * var func = Jeeel.Function.create(base);
- * func.bind(' hello!!');
+ * func.bind(' hello!!'); // thisの束縛
  *
  * var b = func('devid', 22);
- * //b = 'id: 22 name: devid hello!!'
+ * // b = 'id: 22 name: devid hello!!'
  */
 Jeeel.Function = function (target) {
 
     if ( ! Jeeel.Type.isFunction(target)) {
-        throw new Error('targetがメソッドではありません。');
+        throw new Error('targetが関数ではありません。');
     }
 
     /**
@@ -1666,7 +2211,7 @@ Jeeel.Function = function (target) {
     }
     
     /**
-     * 対象のメソッド
+     * 対象の関数
      *
      * @type Function
      * @private
@@ -1674,7 +2219,7 @@ Jeeel.Function = function (target) {
     f._target = target;
 
     /**
-     * 変換後のメソッド
+     * 変換後の関数
      *
      * @type Function
      * @private
@@ -1693,7 +2238,7 @@ Jeeel.Function = function (target) {
 /**
  * インスタンスの作成を行う
  *
- * @param {Function} target 基となるメソッド
+ * @param {Function} target 基となる関数
  * @return {Jeeel.Function} 作成したインスタンス
  */
 Jeeel.Function.create = function (target) {
@@ -1702,10 +2247,10 @@ Jeeel.Function.create = function (target) {
 
 /**
  * 関数ネイティブ化を行う<br />
- * コンストラクタやapplyのないIEのためのメソッド
+ * コンストラクタやapplyのないIEのための関数
  * 
  * @param {Mixied} obj 親オブジェクト
- * @param {String} methodName ネイティブにしたいメソッドの名前
+ * @param {String} methodName ネイティブにしたい関数の名前
  * @param {Boolean} [useNew] インスタンス化するかどうか
  * @return {Function} ネイティブ化した関数
  */
@@ -1729,12 +2274,12 @@ Jeeel.Function.toNative = function (obj, methodName, useNew) {
 };
 
 /**
- * 単にthisをbindするメソッド<br />
+ * 単にthisをbindする関数<br />
  * メモリ消費等が少ないがエラー処理等は一切しない
  * 
- * @param {Function} target bind対象のメソッド
+ * @param {Function} target bind対象の関数
  * @param {Mixied} thisArg thisの部分にあたる値
- * @return {Function} bind後のメソッド
+ * @return {Function} bind後の関数
  */
 Jeeel.Function.simpleBind = function (target, thisArg) {
     return function () {
@@ -1745,7 +2290,7 @@ Jeeel.Function.simpleBind = function (target, thisArg) {
 Jeeel.Function.prototype = {
   
     /**
-     * 対象のメソッド
+     * 対象の関数
      *
      * @type Function
      * @private
@@ -1753,7 +2298,7 @@ Jeeel.Function.prototype = {
     _target: null,
     
     /**
-     * 変換後のメソッド
+     * 変換後の関数
      *
      * @type Function
      * @private
@@ -1761,7 +2306,7 @@ Jeeel.Function.prototype = {
     _cnvTarget: null,
     
     /**
-     * メソッドないのthisの部分を定義する<br />
+     * 関数内のthisの部分を定義する<br />
      * 一度しか意味がない
      *
      * @param {Mixied} thisArg thisの部分にあたる値
@@ -1778,8 +2323,8 @@ Jeeel.Function.prototype = {
     },
 
     /**
-     * メソッドの遅延実行を定義する<br />
-     * メソッドの戻り値はタイムアウトIDに変更される
+     * 関数の遅延実行を定義する<br />
+     * 関数の戻り値はタイムアウトIDに変更される
      *
      * @param {Integer} delayTime 遅延時間(ミリ秒)
      * @return {Jeeel.Function} 自インスタンス
@@ -1803,9 +2348,9 @@ Jeeel.Function.prototype = {
     },
 
     /**
-     * メソッドを複数回実行する<br />
-     * メソッドの戻り値はJeeel.Timerのインスタンスになる<br />
-     * メソッド内部のthisはこのメソッド前にbindしていない限りJeeel.Timerのインスタンスになる
+     * 関数を複数回実行する<br />
+     * 関数の戻り値はJeeel.Timerのインスタンスになる<br />
+     * 関数内部のthisはこの関数前にbindしていない限りJeeel.Timerのインスタンスになる
      *
      * @param {Integer} interval 実行間隔(ミリ秒)
      * @param {Integer} count 実行回数
@@ -1827,38 +2372,36 @@ Jeeel.Function.prototype = {
     },
 
     /**
-     * 複数のメソッドを結合する<br />
-     * 現在のメソッドが最初に実行される<br />
-     * メソッドの戻り値は複数のメソッドの戻り値のリストになる
+     * 複数の関数を結合する<br />
+     * 現在の関数が最初に実行される<br />
+     * 関数の戻り値は複数の関数の戻り値のリストになる
      *
-     * @param {Mixied} var_args 結合するメソッドを順に渡す
+     * @param {Function} var_args 結合する関数を順に渡す
      * @return {Jeeel.Function} 自インスタンス
-     * @throws {Error} 引数にメソッド以外を渡した場合に起こる
+     * @throws {Error} 引数に関数以外を渡した場合に起こる
      * @example
-     * <pre>
      * var f1 = function (n) {
-     * &nbsp;   return a + 1;
+     *     return a + 1;
      * };
      * var f2 = function (n) {
-     * &nbsp;   return a + 2;
+     *     return a + 2;
      * };
      * var f3 = function (n) {
-     * &nbsp;   return a + 3;
+     *     return a + 3;
      * };
      * var sf = Jeeel.Function.create(f1);
      * sf.join(f2, f3);
      *
      * var res = sf(2);
      *
-     * //res = [3, 4, 5]
-     * </pre>
+     * // res = [3, 4, 5]
      */
     join: function (var_args) {
         var funcs = Array.prototype.slice.call(arguments, 0, arguments.length);
 
         for (var i = 0, l = funcs.length; i < l; i++) {
             if ( ! Jeeel.Type.isFunction(funcs[i])) {
-                throw new Error('引数にメソッド以外が含まれています。');
+                throw new Error('引数に関数以外が含まれています。');
             }
         }
 
@@ -1882,23 +2425,22 @@ Jeeel.Function.prototype = {
     },
 
     /**
-     * 複数のメソッドを切り替えて実行する機能を付加する<br />
-     * 現在のメソッドを起点として、引数に指定したメソッドを呼び出す毎に切り替えて実行する<br />
+     * 複数の関数を切り替えて実行する機能を付加する<br />
+     * 現在の関数を起点として、引数に指定した関数を呼び出す毎に切り替えて実行する<br />
      * 最後まで実行したら自動的に最初に戻る
      *
-     * @param {Mixied} var_args 順次実行するメソッドを順に渡す
+     * @param {Function} var_args 順次実行する関数を順に渡す
      * @return {Jeeel.Function} 自インスタンス
-     * @throws {Error} 引数にメソッド以外を渡した場合に起こる
+     * @throws {Error} 引数に関数以外を渡した場合に起こる
      * @example
-     * <pre>
      * var f1 = function (n) {
-     * &nbsp;   return a + 1;
+     *     return n + 1;
      * };
      * var f2 = function (n) {
-     * &nbsp;   return a + 2;
+     *     return n + 2;
      * };
      * var f3 = function (n) {
-     * &nbsp;   return a + 3;
+     *     return n + 3;
      * };
      * var sf = Jeeel.Function.create(f1);
      * sf.iterate(f2, f3);
@@ -1906,18 +2448,17 @@ Jeeel.Function.prototype = {
      * var res = [];
      *
      * for (var i = 0; i &lt; 3; i++) {
-     * &nbsp;   res[i] = sf(i);
+     *     res[i] = sf(i);
      * }
      *
-     * //res = [1, 3, 5]
-     * </pre>
+     * // res = [1, 3, 5]
      */
     iterate: function (var_args) {
         var funcs = Array.prototype.slice.call(arguments, 0, arguments.length);
 
         for (var i = 0, l = funcs.length; i < l; i++) {
             if ( ! Jeeel.Type.isFunction(funcs[i])) {
-                throw new Error('引数にメソッド以外が含まれています。');
+                throw new Error('引数に関数以外が含まれています。');
             }
         }
 
@@ -1948,16 +2489,14 @@ Jeeel.Function.prototype = {
      * @param {Mixied} var_args 定義づけるパラメータを左から順に渡す
      * @return {Jeeel.Function} 自インスタンス
      * @example
-     * <pre>
      * var f = function (a, b, c) {
-     * &nbsp;   return a + b + c;
+     *     return a + b + c;
      * };
      * var sf = Jeeel.Function.create(f);
      * sf.curry('Hello! ', 'World ');
      *
      * var res = sf('Jhon!!');
-     * //res = 'Hello! World Jhon!!'
-     * </pre>
+     * // res = 'Hello! World Jhon!!'
      */
     curry: function (var_args) {
         var slice = Array.prototype.slice;
@@ -1978,7 +2517,7 @@ Jeeel.Function.prototype = {
     },
 
     /**
-     * メソッドの変更を元に戻す
+     * 関数の変更を元に戻す
      * 
      * @return {Jeeel.Function} 自インスタンス
      */
@@ -1989,16 +2528,16 @@ Jeeel.Function.prototype = {
     },
 
     /**
-     * ベースとなったメソッドを取得する
+     * ベースとなった関数を取得する
      *
-     * @return {Function} ベースになったメソッド
+     * @return {Function} ベースになった関数
      */
     getBaseMethod: function () {
         return this._target;
     }
 };
 
-Jeeel.file.Jeeel.Function = ['Template'];
+Jeeel.file.Jeeel.Function = ['Template', 'Callback'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Function, Jeeel.file.Jeeel.Function);
 
@@ -2128,6 +2667,100 @@ Jeeel.Function.Template = {
         throw value;
     }
 };
+
+/**
+ * コンストラクタ
+ * 
+ * @class コールバックを管理するクラス
+ * @param {String} methodName メソッド名
+ * @param {Object} [obj] オブジェクト(省略時はグローバルオブジェクト)
+ */
+Jeeel.Function.Callback = function (methodName, obj) {
+    this._method = methodName;
+    this._obj = (obj || obj === 0 ? obj : Jeeel._global);
+    
+    if ( ! Jeeel.Type.isFunction(this._obj[this._method])) {
+        throw new Error('"' + this._method + '" is not a method of "' + this._obj.toString() + '".');
+    }
+};
+
+/**
+ * インスタンスの作成を行う
+ * 
+ * @param {String} methodName メソッド名
+ * @param {Object} [obj] オブジェクト(省略時はグローバルオブジェクト)
+ * @return {Jeeel.Function.Callback} 作成したインスタンス
+ */
+Jeeel.Function.Callback.create = function (methodName, obj) {
+    return new this(methodName, obj);
+};
+
+Jeeel.Function.Callback.prototype = {
+    
+    /**
+     * オブジェクト
+     * 
+     * @type Object
+     * @private
+     */
+    _obj: null,
+    
+    /**
+     * メソッド名
+     * 
+     * @type String
+     * @private
+     */
+    _method: '',
+    
+    /**
+     * オブジェクトを取得する
+     * 
+     * @return {Object} オブジェクト
+     */
+    getMethodOwner: function () {
+        return this._obj;
+    },
+    
+    /**
+     * メソッド名を取得する
+     * 
+     * @return {String} メソッド名
+     */
+    getMethodName: function () {
+        return this._method;
+    },
+    
+    /**
+     * メソッドを取得する
+     * 
+     * @return {Function} メソッド
+     */
+    getMethod: function () {
+        return this._obj[this._method];
+    },
+    
+    /**
+     * メソッドをコールする
+     * 
+     * @param {Mixied} var_args 可変引数、メソッドに引き渡す引数を指定する
+     * @return {Mixied} 戻り値
+     */
+    call: function (var_args) {
+        return this.apply(arguments);
+    },
+    
+    /**
+     * メソッドを引数に配列を渡してコールする
+     * 
+     * @param {Array} [args] メソッドに引き渡す引数のリストを指定する
+     * @return {Mixied} 戻り値
+     */
+    apply: function (args) {
+        return this._obj[this._method].apply(this._obj, args || []);
+    }
+};
+
 Jeeel.directory.Jeeel.Type = {
 
     /**
@@ -2143,6 +2776,26 @@ Jeeel.directory.Jeeel.Type = {
 
 /**
  * @staticClass 型に関する関数や定数を保持するスタティッククラス
+ * @example
+ * このクラスは型を判定する機能に特化したクラスである
+ * JavaScriptでは型があるにも関わらず正確な判別方法がデフォで無いため
+ * 正確な型判定をする必要がある際に利用する
+ * 
+ * 例：
+ * Jeeel.Type.isInteger(12); // true、数値で且整数なのでtrueになる
+ * Jeeel.Type.isInteger(12.5); // false、数値だか整数ではないのでfalseになる
+ * Jeeel.Type.isInteger(new Number(11)); // true、typeofではobject判定だが整数なのでtrueになる
+ * Jeeel.Type.isString('22'); // true、文字列なのでtrueになる
+ * Jeeel.Type.isString(22); // false、数値なのでfalseになる
+ * Jeeel.Type.isString(new String('22')); // true、typeofではobject判定だが文字列なのでtrueになる
+ * 
+ * 上記のように正確に判定する事が可能である
+ * 他にも良く使用するメソッドとして以下が挙げられる
+ * 
+ * Jeeel.Type.isArray([]); // 配列かどうかを判定する
+ * Jeeel.Type.isSet(null); // null, undefined以外かどうかを判定する(undefinedは a === undefined では判定出来ない)
+ * Jeeel.Type.isPrimitive(5); // 基本型かどうかを判定する(真偽値、数値、文字列値、null、undefinedが対象となる)
+ * Jeeel.Type.isHash({}); // 添え字を使用する事が出来るかどうかを判定する(基本型と関数以外全て)
  */
 Jeeel.Type = {
 
@@ -2958,30 +3611,6 @@ Jeeel.Type = {
     },
 
     /**
-     * 指定した値が配列式型の中に存在するかどうかを返す
-     *
-     * @param {Mixied} val 判定値
-     * @param {Hash} array 配列式型
-     * @param {Boolean} [strict] 厳密に型のチェックをするかどうか
-     * @return {Boolean} 判定結果
-     * @throws {Error} arrayが配列式でない場合に起こる
-     */
-    inArray: function (val, array, strict) {
-        var check = false;
-        
-        Jeeel.Hash.forEach(array,
-            function (elm) {
-                if (( ! strict && val == elm) || (strict && val === elm)) {
-                    check = true;
-                    return Jeeel.Hash.FOR_EACH_EXIT;
-                }
-            }
-        );
-
-        return check;
-    },
-
-    /**
      * 変数が配列式型で更に空であるかどうかを返す
      *
      * @param {Mixied} val 判定値
@@ -3002,24 +3631,16 @@ Jeeel.Type = {
         );
 
         return check;
-    },
-
-    /**
-     * 指定したキーが配列式型に存在するかどうかを返す
-     *
-     * @param {String|Integer} key 判定値
-     * @param {Hash} array 配列式型
-     * @return {Boolean} 判定結果
-     * @throws {TypeError} arrayが配列式でない場合に起こる
-     */
-    keyExists: function (key, array) {
-        return key in array;
     }
 };
 
 if (Jeeel._global && Jeeel._global.Array && Jeeel._global.Array.isArray) {
   
     /**
+     * 配列型かどうかを返す
+     *
+     * @param {Mixied} val 判定値
+     * @return {Boolean} 判定結果
      * @ignore
      */
     Jeeel.Type.isArray = function (val) {
@@ -3319,7 +3940,7 @@ Jeeel.Type.ObjectKeys = {
      * @type String[]
      * @constant
      */
-    ELEMENT: ['name', 'id', 'className', 'tagName', 'nodeName', 'nodeType', 'firstChild', 'lastChild', 'nextSibling', 'previousSibling', 'parentNode', 'children', 'childNodes', 'hasChildNodes', 'style', 'appendChild', 'removeChild', 'replaceChild', 'insertBefore', 'setAttribute', 'getAttribute', 'removeAttribute', 'blur', 'focus', 'cloneNode', 'tabIndex', 'innerHTML', 'onabort', 'onbeforecopy', 'onbeforecut', 'onbeforepaste', 'onbeforeunload', 'onblur', 'onchange', 'onclick', 'oncontextmenu', 'oncopy', 'oncut', 'ondblclick', 'ondrag', 'ondragend', 'ondragenter', 'ondragleave', 'ondragover', 'ondragstart', 'ondrop', 'onerror', 'onfocus', 'onhashchange', 'oninput', 'oninvalid', 'onkeydown', 'onkeypress', 'onkeyup', 'onload', 'onmessage', 'onmousedown', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup', 'onmousewheel', 'onoffline', 'ononline', 'onpaste', 'onpopstate', 'onreset', 'onresize', 'onscroll', 'onsearch', 'onselect', 'onselectstart', 'onstorage', 'onsubmit', 'onunload'],
+    ELEMENT: ['name', 'id', 'className', 'tagName', 'nodeName', 'nodeType', 'firstChild', 'lastChild', 'nextSibling', 'previousSibling', 'parentNode', 'children', 'childNodes', 'hasChildNodes', 'getElementsByClassName', 'getElementsByTagName', 'querySelectorAll', 'querySelector', 'style', 'appendChild', 'removeChild', 'replaceChild', 'insertBefore', 'setAttribute', 'getAttribute', 'removeAttribute', 'blur', 'focus', 'cloneNode', 'tabIndex', 'innerHTML', 'onabort', 'onbeforecopy', 'onbeforecut', 'onbeforepaste', 'onbeforeunload', 'onblur', 'onchange', 'onclick', 'oncontextmenu', 'oncopy', 'oncut', 'ondblclick', 'ondrag', 'ondragend', 'ondragenter', 'ondragleave', 'ondragover', 'ondragstart', 'ondrop', 'onerror', 'onfocus', 'onhashchange', 'oninput', 'oninvalid', 'onkeydown', 'onkeypress', 'onkeyup', 'onload', 'onmessage', 'onmousedown', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup', 'onmousewheel', 'onoffline', 'ononline', 'onpaste', 'onpopstate', 'onreset', 'onresize', 'onscroll', 'onsearch', 'onselect', 'onselectstart', 'onstorage', 'onsubmit', 'onunload'],
 
     /**
      * Attribute型のキーリスト
@@ -3359,7 +3980,7 @@ Jeeel.Type.ObjectKeys = {
      * @type String[]
      * @constant
      */
-    DOCUMENT: ['nodeType', 'getElementById', 'getElementsByName', 'getElementsByTagName', 'documentElement', 'body', 'childNodes', 'write', 'writeln', 'open', 'close', 'cookie', 'createElement', 'createTextNode', 'createDocumentFragment', 'createComment', 'createAttribute'],
+    DOCUMENT: ['nodeType', 'getElementById', 'getElementsByClassName', 'querySelectorAll', 'querySelector', 'getElementsByName', 'getElementsByTagName', 'documentElement', 'body', 'childNodes', 'write', 'writeln', 'open', 'close', 'cookie', 'createElement', 'createTextNode', 'createDocumentFragment', 'createComment', 'createAttribute'],
 
     /**
      * Window型のキーリスト
@@ -3409,6 +4030,2696 @@ Jeeel.Type.ObjectKeys = {
      */
     STORAGE: ['length', 'key', 'getItem', 'setItem', 'removeItem', 'clear']
 };
+Jeeel.directory.Jeeel.String = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel + 'String/';
+    }
+};
+
+/**
+ * コンストラクタ
+ * 
+ * @class 文字列の複雑な処理をするクラス
+ * @param {String} [string] 基となる文字列
+ * @example
+ * 文字列に対して複雑な処理を行うことが出来るクラス
+ * sprintfを使用したりキャメルケース、スネークケース等の変換からHTMLとして文字列を埋め込んだ際の幅や高さの取得まで幅広い文字列操作を行うことが出来る
+ * インスタンス化して使用する事も可能だがインスタンス化する必要があることは殆ど無い
+ * 
+ * 例：
+ * var str = '  test-case-sort  ';
+ * str = Jeeel.String.trim(str); // 前後の余分は空白等を取り除く
+ * str = Jeeel.String.toCamelCase(str); // スネークケース、ハイフネーションをキャメルケースに変換する
+ * str = Jeeel.String.padLeft(str, 15, '*'); // 左側を15文字になるまで*で埋める
+ * 
+ * // str => '***testCaseSort'
+ * 
+ * 他にも以下のような機能が良く使われる
+ * 
+ * Jeeel.String.escapeRegExp('$hoge'): // 正規表現で使用するメタ文字をエスケープする
+ * Jeeel.String.escapeHtml('<p>tag</p>'); // HTMLで使用する特殊文字(<, >, "など)をエスケープする
+ * Jeeel.String.stripTags('<p>test</p>'); // HTMLタグを全て取り除く
+ * Jeeel.String.toSnakeCase('test-hyphen'); // キャメルケース、ハイフネーションをスネークケースに変換する
+ * Jeeel.String.toHyphenation('test_snake'); // キャメルケース、スネークケースをハイフネーションに変換する
+ * Jeeel.String.toTitleCase('test case'); // 単語の頭文字を全て大文字に変換する
+ * Jeeel.String.sprintf('%02d:%02d', 1, 22); // C言語でお馴染みのsprintf関数を再現したものである
+ * Jeeel.String.Hash.md5('678'); // 指定された文字列のMD5を取得する
+ * Jeeel.String.Hash.Base64.encode('654'); // 指定された文字列に対してBASE64エンコードを行う
+ * Jeeel.String.Hash.Base64.decode('NjU0'); // 指定されたBASE64に対してデコードを行い元の文字列に戻す
+ */
+Jeeel.String = function (string) {
+    
+    if ( ! Jeeel.Type.isSet(string)) {
+        string = '';
+    }
+    
+    this._str = ('' + string).replace(/\r\n/g, '\n');
+};
+
+/**
+ * インスタンスの作成を行う
+ * 
+ * @param {String} [string] 基となる文字列
+ * @return {Jeeel.String} 作成したインスタンス
+ */
+Jeeel.String.create = function (string) {
+    return new this(string);
+};
+
+/**
+ * バイナリコードよりインスタンスの作成を行う<br />
+ * 多バイトには対応していない
+ *
+ * @param {String|String[]} binary 連結したバイナリコードまたはバイナリコード配列
+ * @return {Jeeel.String} 作成したインスタンス
+ * @throws {Error} binaryがバイナリコード・バイナリコード配列で無い場合に発生する
+ */
+Jeeel.String.fromBinary = function (binary) {
+    var tmp = [];
+    var i, l = binary.length;
+
+    if (Jeeel.Type.isString(binary)) {
+        for (i = 0; i < l; i += 2) {
+            tmp[tmp.length] = '0x' + binary.slice(i, i + 2);
+        }
+    } else if (Jeeel.Type.isArray(binary)) {
+        for (i = 0; i < l; i++) {
+            tmp[i] = '0x' + binary[i];
+        }
+    } else {
+        throw new Error('binaryはバイナリコードまたはバイナリコード配列でなければなりません。');
+    }
+
+    return new this(String.fromCharCode.apply(null, tmp));
+};
+
+/**
+ * 正規表現のメタ文字をエスケープする
+ * 
+ * @param {String} string 対象文字列
+ * @return {String} エスケープ後の文字列
+ */
+Jeeel.String.escapeRegExp = function (string) {
+    var reg = /([\/()\[\]{}|*+-.,\^$?\\])/g;
+    
+    return ('' + string).replace(reg, '\\$1');
+};
+
+/**
+ * HTML内で使用できない文字を特殊文字にエスケープする
+ * 
+ * @param {String} html 対象文字列
+ * @param {Boolean} [replaceSpaceAndLineFeed] 改行とスペースを置き換えるかどうか(デフォルトは置き換えない)
+ * @return {String} エスケープ後の文字列
+ */
+Jeeel.String.escapeHtml = function (html, replaceSpaceAndLineFeed) {
+    html = '' + html;
+
+    html = html.replace(/&/g, '&amp;')
+               .replace(/"/g, '&quot;')
+               .replace(/</g, '&lt;')
+               .replace(/>/g, '&gt;');
+
+    if (replaceSpaceAndLineFeed) {
+
+        // IEではスペースが入らない改行後に文字が入らないとその改行を無視するのでスペースを挿入
+        if (Jeeel.UserAgent.isInternetExplorer()) {
+            html = html.replace(/ /g, '&nbsp;')
+                       .replace(/\r\n/g, '\n')
+                       .replace(/\n\n/g, '<br />&nbsp;<br />')
+                       .replace(/\n/g, '<br />');
+        } else {
+            html = html.replace(/ /g, '&nbsp;')
+                       .replace(/\n/g, '<br />');
+        }
+    }
+
+    return html;
+};
+
+/**
+ * HTML内の特殊文字にを元に戻す(但し対象はHTML内でテキストとして存在出来ない文字列のみである)
+ * 
+ * @param {String} txt 対象文字列
+ * @param {Boolean} [replaceNbspAndBr] brタグとスペース特殊文字を置き換えるかどうか(デフォルトは置き換えない)
+ * @return {String} エスケープ後の文字列
+ */
+Jeeel.String.unescapeHtml = function (txt, replaceNbspAndBr) {
+    txt = '' + txt;
+
+    txt = txt.replace(/&amp;|&#38;|&#x26;/g, '&')
+             .replace(/&quot;|&#34;|&#x22;/g, '"')
+             .replace(/&lt;|&#60;|&#x3C;/g, '<')
+             .replace(/&gt;|&#62;|&#x3E;/g, '>');
+
+    if (replaceNbspAndBr) {
+        txt = txt.replace(/&nbsp;|&#160;|&#xA0;/g, ' ')
+                 .replace(/<br *(\/)?>/g, '\n');
+    }
+
+    return txt;
+};
+
+/**
+ * HTML文字列からタグ文字を全て取り除く
+ *
+ * @param {String} html HTML文字列
+ * @return {String} タグを取り除いた文字列
+ */
+Jeeel.String.stripTags = function (html) {
+
+//    return html.replace(/<\w+(\s+("[^"]*"|'[^']*'|[^>])+)?>|<\/\w+>/gi, '');
+
+    var nodes = {childNodes: Jeeel.Document.createNodeList(html)};
+
+    var res = [];
+    var txt = Jeeel.Dom.Node.TEXT_NODE;
+
+    function _search(target) {
+        if (target.nodeType === txt) {
+            res[res.length] = target.data;
+        }
+
+        for (var i = 0, l = target.childNodes.length; i < l; i++) {
+            _search(target.childNodes[i]);
+        }
+    }
+
+    _search(nodes);
+
+    return res.join('');
+};
+
+/**
+ * 文字列の前後から空白を取り除く
+ *
+ * @param {String} str 対象の文字列(文字列以外を入れた場合は文字列に変換された後に値を返す)
+ * @return {String} 空白を取り除いた後の値
+ */
+Jeeel.String.trim = function (str) {
+    if ( ! str) {
+        return '';
+    }
+    
+    str = str.toString();
+    
+    if (str.trim) {
+        return str.trim();
+    }
+
+    var trimLeft  = /^\s+/;
+    var trimRight = /\s\s*$/;
+
+    return str.replace(trimLeft, '').replace(trimRight, '');
+};
+
+/**
+ * 文字列を反転させる
+ *
+ * @param {String} str 対象の文字列
+ * @return {String} 反転させた後の値
+ */
+Jeeel.String.reverse = function (str) {
+    return ('' + str).split('').reverse().join('');
+};
+
+/**
+ * 指定した文字列を指定した長さになるまで左側を空白もしくは指定文字列で埋める<br />
+ * 但し、必要とされる埋める文字数がpadStrの長さで均等に分割出来ない場合割り切れる一番長い数まで行い終了する
+ * 
+ * @param {String} str 対象文字列
+ * @param {Integer} length 処理後の文字列の長さ
+ * @param {String} [padStr] 空白以外を使用したい時に指定
+ * @return {String} 処理後の文字列
+ */
+Jeeel.String.padLeft = function (str, length, padStr) {
+    str = '' + str;
+    padStr = '' + (padStr || ' ');
+    
+    var padLength = padStr.length;
+
+    while ((str.length + padLength) <= length) {
+        str = padStr + str;
+    }
+    
+    return str;
+};
+
+/**
+ * 指定した文字列を指定した長さになるまで右側を空白もしくは指定文字列で埋める<br />
+ * 但し、必要とされる埋める文字数がpadStrの長さで均等に分割出来ない場合割り切れる一番長い数まで行い終了する
+ * 
+ * @param {String} str 対象文字列
+ * @param {Integer} length 処理後の文字列の長さ
+ * @param {String} [padStr] 空白以外を使用したい時に指定
+ * @return {String} 処理後の文字列
+ */
+Jeeel.String.padRight = function (str, length, padStr) {
+    str = '' + str;
+    padStr = '' + (padStr || ' ');
+    
+    var padLength = padStr.length;
+
+    while ((str.length + padLength) <= length) {
+        str += padStr;
+    }
+    
+    return str;
+};
+
+/**
+ * 対象文字列をキャメルケースに変更する(パスカルケースではない)<br />
+ * 変換対象はパスカルケース、ハイフネーションまたはスネークケースが対象となる
+ * 
+ * @param {String} str 対象文字列
+ * @return {String} 変換後の文字列
+ */
+Jeeel.String.toCamelCase = function (str) {
+    str = ('' + str).replace(/(?:-|_)([a-z])/g, function (str, p){return p.toUpperCase();});
+    return str.replace(/^[A-Z]/, function (chr) {return chr.toLowerCase();});
+};
+
+/**
+ * 対象文字列をパスカルケースに変更する<br />
+ * 変換対象はハイフネーションまたはスネークケースが対象となる
+ * 
+ * @param {String} str 対象文字列
+ * @return {String} 変換後の文字列
+ */
+Jeeel.String.toPascalCase = function (str) {
+    return ('' + str).replace(/(?:^|-|_)([a-z])/g, function (str, p){return p.toUpperCase();});
+};
+
+/**
+ * 対象文字列をスネークケースに変更する<br />
+ * 変換対象はハイフネーションまたはキャメルケースが対象となる
+ * 
+ * @param {String} str 対象文字列
+ * @return {String} 変換後の文字列
+ */
+Jeeel.String.toSnakeCase = function (str) {
+    return ('' + str).replace(/([A-Z])/g, '_$1').replace(/-/g, '_').toLowerCase();
+};
+
+/**
+ * 対象文字列をハイフネーションに変更する<br />
+ * 変換対象はスネークケースまたはキャメルケースが対象となる
+ * 
+ * @param {String} str 対象文字列
+ * @return {String} 変換後の文字列
+ */
+Jeeel.String.toHyphenation = function (str) {
+    return ('' + str).replace(/([A-Z])/g, '-$1').replace(/_/g, '-').toLowerCase();
+};
+
+/**
+ * 対象文字列の単語の先頭をだけを大文字にする
+ * 
+ * @param {String} str 対象文字列
+ * @return {String} 変換後の文字列
+ */
+Jeeel.String.toTitleCase = function (str) {
+    return ('' + str).toLowerCase().replace(/(^|\b)([a-z])/g, function (str, p1, p2){return p1 + p2.toUpperCase();});
+};
+
+/**
+ * 全角文字を半角文字に変換する<br />
+ * 対象となる文字は英数字、スペース、記号となる
+ * 
+ * @param {String} str 対象文字列
+ * @return {String} 変換後の文字列
+ */
+Jeeel.String.toHalfWidth = function (str) {
+    return ('' + str).replace(/[！＃-＆（-／０-９：-＠Ａ-Ｚ［-｀ａ-ｚ｛-～　]+/g, function (chars) {
+
+        var res = [];
+
+        for (var i = chars.length; i--;) {
+            var code = chars[i].charCodeAt(0);
+
+            // 全角スペースは特殊なので個別に変換
+            if (code === 12288) {
+                code = 32;
+            } else {
+                code -= 65248;
+            }
+
+            res[i] = code;
+        }
+
+        return String.fromCharCode.apply(null, res);
+    });
+};
+
+/**
+ * 半角文字を全角文字に変換する<br />
+ * 対象となる文字は英数字、スペース、記号となる
+ * 
+ * @param {String} str 対象文字列
+ * @return {String} 変換後の文字列
+ */
+Jeeel.String.toFullWidth = function (str) {
+    return ('' + str).replace(/[!#-&(-/0-9:-@A-Z\[-`a-z{-~ ]+/g, function (chars) {
+
+        var res = [];
+
+        for (var i = chars.length; i--;) {
+            var code = chars[i].charCodeAt(0);
+
+            // 半角スペースは特殊なので個別に変換
+            if (code === 32) {
+                code = 12288;
+            } else {
+                code += 65248;
+            }
+
+            res[i] = code;
+        }
+
+        return String.fromCharCode.apply(null, res);
+    });
+};
+
+/**
+ * 文字列の指定箇所に指定文字列を挿入する
+ *
+ * @param {String} str 対象の文字列(文字列以外を入れた場合は文字列に変換された後に値を返す)
+ * @param {Integer} index 挿入箇所のインデックス(マイナスのインデックスの場合は先頭に、インデックスをオーバーしたら末尾に挿入文字列が付けられる)
+ * @param {String} insertStr 挿入文字列
+ * @return {String} 挿入後の文字列
+ */
+Jeeel.String.insert = function (str, index, insertStr) {
+    if ( ! str) {
+        return insertStr;
+    }
+    
+    str = '' + str;
+    
+    var leftStr = str.substring(0, index);
+    var rightStr = str.substring(index, str.length);
+
+    return leftStr + insertStr + rightStr;
+};
+
+/**
+ * Jeeel.String.insertの複数版
+ *
+ * @param {String} str 対象の文字列(文字列以外を入れた場合は文字列に変換された後に値を返す)
+ * @param {Integer[]} indexArr 挿入箇所のインデックス配列(マイナスのインデックスの場合は先頭に、インデックスをオーバーしたら末尾に挿入文字列が付けられる)<br />
+ *                              もしもこの配列内のインデックスの並びが昇順ではない場合、insertStrArrの配列のインデックスとずれるので注意
+ * @param {String|String[]} insertStrArr 挿入文字列もしくは挿入文字列配列(配列にした場合はインデックスの配列と数が一致しなければならない)
+ * @return {String} 挿入後の文字列
+ * @throws {Error} insertStrArrが配列でindexArrとinsertStrArrの配列の要素数が一致しない場合に起こる
+ */
+Jeeel.String.multiInsert = function (str, indexArr, insertStrArr) {
+    if ( ! Jeeel.Type.isArray(indexArr)) {
+        indexArr = [indexArr];
+    }
+    
+    str = '' + str;
+    
+    var res = [];
+    var insertStrIsArray = Jeeel.Type.isArray(insertStrArr);
+    var insertStr;
+    
+    if (insertStrIsArray && indexArr.length != insertStrArr.length) {
+        throw new Error('インデックスの配列と挿入文字の配列の数が違います。');
+    }
+    
+    indexArr.sort(function (a, b) {return a - b});
+
+    indexArr.unshift(0);
+    
+    if (insertStrIsArray) {
+        insertStrArr.unshift('');
+    }
+    
+    for (var i = 1, l = indexArr.length; i < l; i++) {
+        if (insertStrIsArray) {
+            insertStr = insertStrArr[i];
+        } else {
+            insertStr = insertStrArr;
+        }
+        
+        res[res.length] = str.substring(indexArr[i - 1], indexArr[i]);
+        res[res.length] = insertStr;
+    }
+    
+    res[res.length] = str.substring(indexArr[l - 1], str.length);
+    
+    return res.join('');
+};
+
+/**
+ * テキストのサイズを取得する
+ * 
+ * @param {String} text サイズを知りたいテキスト
+ * @param {Hash} [styleList] スタイルのキーと値のリスト
+ * @return {Jeeel.Object.Size} ピクセル単位のテキストのサイズ
+ */
+Jeeel.String.getTextSize = function (text, styleList) {
+    var span;
+    
+    if (this.getTextWidth._span) {
+        span = this.getTextWidth._span;
+    } else {
+        span = Jeeel.Document.createElement('span');
+        span.style.cssText = 'display: inline; position: absolute; top: 0px; margin: 0; white-space: nowrap; border: none; visibility: hidden;';
+        
+        Jeeel.Document.appendToBody(span);
+        
+        span = new Jeeel.Dom.Element(span);
+        
+        this.getTextWidth._span = span;
+    }
+    
+    if ( ! styleList) {
+        styleList = {};
+    }
+    
+    delete styleList.visibility;
+    delete styleList.position;
+    
+    span.setStyleList(styleList);
+    
+    if (text.charAt(text.length - 1) === '\n') {
+        text += ' ';
+    }
+    
+    span.setText(text);
+    
+    return span.getSize();
+};
+
+/**
+ * テキストの幅を取得する
+ * 
+ * @param {String} text 幅を知りたいテキスト
+ * @param {Hash} [styleList] スタイルのキーと値のリスト
+ * @return {Integer} ピクセル単位のテキストの幅
+ */
+Jeeel.String.getTextWidth = function (text, styleList) {
+    return this.getTextSize(text, styleList).width;
+};
+
+/**
+ * テキストの高さを取得する
+ * 
+ * @param {String} text 高さを知りたいテキスト
+ * @param {Hash} [styleList] スタイルのキーと値のリスト
+ * @return {Integer} ピクセル単位のテキストの高さ
+ */
+Jeeel.String.getTextHeight = function (text, styleList) {
+    return this.getTextSize(text, styleList).height;
+};
+
+Jeeel.String.prototype = {
+  
+    /**
+     * 元の文字列
+     * 
+     * @type String
+     * @private
+     */
+    _str: '',
+    
+    /**
+     * 行数
+     * 
+     * @type Integer
+     * @private
+     */
+    _lineCount: null,
+    
+    /**
+     * 改行部分のインデックス配列
+     * 
+     * @type Integer[]
+     * @private
+     */
+    _lineIndex: null,
+    
+    /**
+     * 内部文字列を取得する
+     * 
+     * @return {String} 文字列
+     */
+    getString: function () {
+        return this._str;
+    },
+    
+    /**
+     * 文字列の行数を取得する
+     * 
+     * @return {Integer} 行数
+     */
+    getLineCount: function () {
+        if (this._lineCount) {
+            return this._lineCount;
+        }
+        
+        return this._lineCount = this._str.length - this._str.replace(/\n/g, '').length + 1;
+    },
+    
+    /**
+     * 指定した行の文字列を得る
+     *
+     * @param {Integer} [line] 行インデックス(範囲以外の数や文字を入れると全ての文字列が返ってくる)
+     * @return {String} 指定行の文字列
+     */
+    getLine: function (line) {
+      
+        this._createLineIndex();
+
+        var first = (line <= 0 ? 0 : this._lineIndex[line-1] + 1);
+        var last  = this._lineIndex[line];
+        
+        return this._str.slice(first, last);
+    },
+    
+    /**
+     * 文字列のサイズを取得する
+     * 
+     * @param {Hash} [styleList] スタイルのキーと値のリスト
+     * @return {Jeeel.Object.Size} ピクセル単位のテキストのサイズ
+     */
+    getTextSize: function (styleList) {
+        return this.constructor.getTextSize(this._str, styleList);
+    },
+    
+    /**
+     * 文字列の幅を取得する
+     * 
+     * @param {Hash} [styleList] スタイルのキーと値のリスト
+     * @return {Integer} ピクセル単位のテキストの幅
+     */
+    getTextWidth: function (styleList) {
+        return this.constructor.getTextWidth(this._str, styleList);
+    },
+    
+    /**
+     * 文字列の高さを取得する
+     * 
+     * @param {Hash} [styleList] スタイルのキーと値のリスト
+     * @return {Integer} ピクセル単位のテキストの高さ
+     */
+    getTextHeight: function (styleList) {
+        return this.constructor.getTextHeight(this._str, styleList);
+    },
+    
+    /**
+     * 指定した文字列が最初に見つかった行インデックスとその行でのインデックスを取得する
+     *
+     * @param {String} search 検索文字列
+     * @return {Jeeel.Object.Technical.LineIndex} 行数とその行でのインデックスを保持する構造体
+     */
+    lineIndexOf: function (search) {
+        this._createLineIndex();
+        
+        var idx = this._str.indexOf(search);
+
+        var line = 0;
+        var tmp  = 0;
+
+        for (var i = 0, l = this._lineIndex.length; i < l; i++) {
+            if (tmp < idx && idx < this._lineIndex[i]) {
+                line += i;
+                idx  -= tmp + 1;
+                break;
+            }
+
+            tmp = this._lineIndex[i];
+        }
+
+        return new Jeeel.Object.Technical.LineIndex({line: line, index: idx});
+    },
+    
+    /**
+     * Bsse64エンコードを行う
+     * 
+     * @return {Jeeel.String} 自インスタンス
+     */
+    encodeBase64: function () {
+        this._str = this.toBase64();
+        
+        return this._reset();
+    },
+    
+    /**
+     * Bsse64デコードを行う
+     * 
+     * @return {Jeeel.String} 自インスタンス
+     */
+    decodeBase64: function () {
+        this._str = this.constructor.Hash.Base64.decode(this._str);
+        
+        return this._reset();
+    },
+    
+    /**
+     * MD5エンコードを行う
+     * 
+     * @return {Jeeel.String} 自インスタンス
+     */
+    encodeMd5: function () {
+        this._str = this.toMd5();
+        
+        return this._reset();
+    },
+    
+    /**
+     * Jsonエンコードを行う
+     * 
+     * @return {Jeeel.String} 自インスタンス
+     */
+    encodeJson: function () {
+        this._str = Jeeel.Json.encode(this._str);
+        
+        return this._reset();
+    },
+    
+    /**
+     * Html文字列にあたる部分をエスケープする
+     * 
+     * @param {Boolean} [replaceSpaceAndLineFeed] 改行とスペースを置き換えるかどうか(デフォルトは置き換えない)
+     * @return {Jeeel.String} 自インスタンス
+     */
+    escapeHtml: function (replaceSpaceAndLineFeed) {
+        this._str = this.constructor.escapeHtml(this._str, replaceSpaceAndLineFeed);
+        
+        return this._reset();
+    },
+    
+    /**
+     * エスケープされたHtml文字列を元に戻す
+     * 
+     * @param {Boolean} [replaceNbspAndBr] brタグとスペース特殊文字を置き換えるかどうか(デフォルトは置き換えない)
+     * @return {Jeeel.String} 自インスタンス
+     */
+    unescapeHtml: function (replaceNbspAndBr) {
+        this._str = this.constructor.unescapeHtml(this._str, replaceNbspAndBr);
+        
+        return this._reset();
+    },
+    
+    /**
+     * RegExpに使用するメタ文字をエスケープする
+     * 
+     * @return {Jeeel.String} 自インスタンス
+     */
+    escapeRegExp: function () {
+        this._str = this.constructor.escapeRegExp(this._str);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列からHTMLタグ文字を全て取り除く
+     *
+     * @return {Jeeel.String} 自インスタンス
+     */
+    stripTags: function () {
+        this._str = this.constructor.stripTags(this._str);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列の前後から空白を取り除く
+     *
+     * @return {Jeeel.String} 自インスタンス
+     */
+    trim: function () {
+        this._str = this.constructor.trim(this._str);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列を反転させる
+     *
+     * @return {Jeeel.String} 自インスタンス
+     */
+    reverse: function () {
+        this._str = this.constructor.reverse(this._str);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列を指定した長さになるまで左側を空白もしくは指定文字列で埋める<br />
+     * 但し、必要とされる埋める文字数がpadStrの長さで均等に分割出来ない場合割り切れる一番長い数まで行い終了する
+     * 
+     * @param {Integer} length 処理後の文字列の長さ
+     * @param {String} [padStr] 空白以外を使用したい時に指定
+     * @return {Jeeel.String} 自インスタンス
+     */
+    padLeft: function (length, padStr) {
+        this._str = this.constructor.padLeft(this._str, length, padStr);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列を指定した長さになるまで右側を空白もしくは指定文字列で埋める<br />
+     * 但し、必要とされる埋める文字数がpadStrの長さで均等に分割出来ない場合割り切れる一番長い数まで行い終了する
+     * 
+     * @param {Integer} length 処理後の文字列の長さ
+     * @param {String} [padStr] 空白以外を使用したい時に指定
+     * @return {String} 処理後の文字列
+     */
+    padRight: function (length, padStr) {
+        this._str = this.constructor.padRight(this._str, length, padStr);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列をキャメルケースに変更する
+     * 
+     * @return {Jeeel.String} 自インスタンス
+     */
+    camelCase: function () {
+        this._str = this.constructor.toCamelCase(this._str);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列をパスカルケースに変更する
+     * 
+     * @return {Jeeel.String} 自インスタンス
+     */
+    pascalCase: function () {
+        this._str = this.constructor.toPascalCase(this._str);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列をスネークケースに変更する
+     * 
+     * @return {Jeeel.String} 自インスタンス
+     */
+    snakeCase: function () {
+        this._str = this.constructor.toSnakeCase(this._str);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列をハイフネーションに変更する
+     * 
+     * @return {Jeeel.String} 自インスタンス
+     */
+    hyphenation: function () {
+        this._str = this.constructor.toHyphenation(this._str);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列をタイトルケースに変更する
+     * 
+     * @return {Jeeel.String} 自インスタンス
+     */
+    titleCase: function () {
+        this._str = this.constructor.toTitleCase(this._str);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列に対して指定箇所に文字列を挿入する
+     * 
+     * @param {Integer} index 挿入箇所のインデックス(マイナスのインデックスの場合は先頭に、インデックスをオーバーしたら末尾に挿入文字列が付けられる)
+     * @param {String} insertStr 挿入文字列
+     * @return {Jeeel.String} 自インスタンス
+     */
+    insert: function (index, insertStr) {
+        this._str = this.constructor.insert(this._str, index, insertStr);
+        
+        return this._reset();
+    },
+    
+    /**
+     * 文字列に対して指定箇所に文字列を挿入する
+     * 
+     * @param {Integer[]} indexArr 挿入箇所のインデックス配列(マイナスのインデックスの場合は先頭に、インデックスをオーバーしたら末尾に挿入文字列が付けられる)<br />
+     *                              もしもこの配列内のインデックスの並びが昇順ではない場合、insertStrArrの配列のインデックスとずれるので注意
+     * @param {String|String[]} insertStrArr 挿入文字列もしくは挿入文字列配列(配列にした場合はインデックスの配列と数が一致しなければならない)
+     * @return {Jeeel.String} 自インスタンス
+     */
+    multiInsert: function (indexArr, insertStrArr) {
+        this._str = this.constructor.multiInsert(this._str, indexArr, insertStrArr);
+        
+        return this._reset();
+    },
+    
+    /**
+     * Query形式の文字列を連想配列に変換する
+     * 
+     * @return {Hash} 変換後の連想配列
+     */
+    toQuery: function () {
+        return Jeeel.Filter.Url.QueryParameter.create().filter(this._str);
+    },
+    
+    /**
+     * Json形式の文字列を変換する
+     * 
+     * @return {Mixied} 変換後の値
+     */
+    parseJson: function () {
+        return Jeeel.Json.decode(this._str);
+    },
+    
+    /**
+     * Base64文字列に変換する
+     * 
+     * @return {String} Base64文字列
+     */
+    toBase64: function () {
+        return this.constructor.Hash.Base64.encode(this._str);
+    },
+    
+    /**
+     * MD5文字列に変換する
+     * 
+     * @return {String} MD5文字列
+     */
+    toMd5: function () {
+        return this.constructor.Hash.md5(this._str);
+    },
+    
+    /**
+     * 文字単位バイナリコードに変換して返す
+     *
+     * @param {String} [prefix] 16進数を示す接頭辞(デフォルトはなし)
+     * @return {String} バイナリコード
+     */
+    toBinary: function (prefix) {
+        return this.toBinaryArray(prefix).join('');
+    },
+
+    /**
+     * 文字単位バイナリコード配列に変換して返す
+     *
+     * @param {String} [prefix] 16進数を示す接頭辞(デフォルトはなし)
+     * @return {String[]} バイナリコード配列
+     */
+    toBinaryArray: function (prefix) {
+        if ( ! Jeeel.Type.isString(prefix)) {
+            prefix = '';
+        }
+
+        var res = [];
+
+        for (var i = 0, l = this._str.length; i < l; i++) {
+            var tmp = this._str.charCodeAt(i);
+            tmp = tmp.toString(16);
+
+            if (tmp.length & 1) {
+                tmp = '0' + tmp;
+            }
+
+            res[i] = prefix + tmp;
+        }
+
+        return res;
+    },
+    
+    /**
+     * インスタンスを文字列に変換する
+     * 
+     * @return {String} 文字列
+     */
+    toString: function () {
+        return this._str;
+    },
+    
+    /**
+     * インスタンスを文字列に変換する
+     * 
+     * @return {String} 文字列
+     */
+    valueOf: function () {
+        return this._str;
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @param {String} [str] 基となる文字列
+     * @constructor
+     */
+    constructor: Jeeel.String,
+    
+    _createLineIndex: function () {
+        if (this._lineIndex) {
+            return;
+        }
+        
+        this._lineIndex = [];
+        
+        var tmp = 0;
+
+        while (1) {
+            tmp = this._str.indexOf('\n', tmp);
+
+            if (tmp < 0) {
+                break;
+            }
+
+            this._lineIndex[this._lineIndex.length] = tmp;
+            tmp++;
+        }
+    },
+    
+    _reset: function () {
+        this._lineCount = null;
+        this._lineIndex = null;
+        
+        return this;
+    }
+};
+
+Jeeel._Object.JeeelString = {
+
+};
+
+Jeeel.file.Jeeel.String = ['Sprintf', 'Hash'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.String, Jeeel.file.Jeeel.String);
+/**
+ * sprintfのJS版<br />
+ * 書式: %[フラグ][フィールド幅].[精度][型指定子]<br />
+ * フラグ: -, +, 空白, 0, #<br />
+ * 型指定子: b, c, d, e, E, u, f, g, G, o, s, x, X<br />
+ * 正規表現を使用するのっでIEでの多用はお勧めしない
+ *
+ * @param {String} format フォーマット
+ * @param {Mixied} var_args フォーマットに対して割り当てる値
+ */
+Jeeel.String.sprintf = function (format, var_args) {
+    format = '' + format;
+  
+    var ch, res = [];
+    var plCnt = 0;
+    var len = format.length;
+    var args = Array.prototype.slice.call(arguments, 1, arguments.length);
+    var JeeelString = Jeeel._Object.JeeelString;
+    var tmp = {
+        length: 1
+    };
+    
+    for (var i = 0; i < len; i++) {
+        ch = format.charAt(i);
+        
+        // %が出るまで数値を進めて%が出たらプレースホルダ―毎変換する
+        switch (ch) {
+            case '%':
+                if (format.charAt(i + 1) === '%') {
+                    res[res.length] = '%';
+                    i++;
+                } else {
+                    res[res.length] = JeeelString.convertPlaceholder(format.slice(i, len), args[plCnt++], tmp);
+                    
+                    i += tmp.length - 1;
+                }
+                break;
+                
+            default:
+                res[res.length] = ch;
+                break;
+        }
+    }
+    
+    return res.join('');
+};
+
+/**
+ * @ignore
+ */
+Jeeel._Object.JeeelString.PLACEHOLDER_REGS = /%([+\-# 0]*)?([1-9][0-9]*)?(?:\.(|[0-9]*))?([^0-9]|$)/;
+
+/**
+ * @ignore
+ */
+Jeeel._Object.JeeelString.PLACEHOLDERS = {
+    
+    /**
+     * 二進数に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @return {String} 変換後の値
+     */
+    b: function (op, value) {
+        return this.cnvRadix(op, value, 2);
+    },
+    
+    /**
+     * 文字に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @return {String} 変換後の値
+     */
+    c: function (op, value) {
+        return String.fromCharCode(+value);
+    }, 
+    
+    /**
+     * 整数に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @return {String} 変換後の値
+     */
+    d: function (op, value) {
+        return this.cnvInt(op, value);
+    }, 
+    
+    /**
+     * 指数表記に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @return {String} 変換後の値
+     */
+    e: function (op, value) {
+        return this.cnvExponential(op, value);
+    }, 
+    
+    /**
+     * 指数表記の大文字に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @return {String} 変換後の値
+     */
+    E: function (op, value) {
+        return this.cnvExponential(op, value, true);
+    }, 
+    
+    /**
+     * 符号なし整数に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @return {String} 変換後の値
+     */
+    u: function (op, value) {
+        return this.cnvInt(op, value, true);
+    },
+    
+    /**
+     * 数値に変換(double)<br />
+     * 実際には
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @return {String} 変換後の値
+     */
+    f: function (op, value) {
+        return this.cnvFloat(op, value);
+    },
+    
+    /**
+     * 数値に変換(float)
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @return {String} 変換後の値
+     */
+    F: function (op, value) {
+        return this.cnvFloat(op, value);
+    },
+    
+    /**
+     * 有効桁数から指数表記もしくは数値に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @return {String} 変換後の値
+     */
+    g: function (op, value) {
+        
+        var valid = false;
+        
+        if (op.accur === null || op.accur >= (+value).toString().length) {
+            op.accur = null;
+            valid = true;
+        }
+
+        return valid ? this.cnvFloat(op, value) : this.cnvExponential(op, value);
+    },
+    
+    /**
+     * 有効桁数から指数表記もしくは数値の大文字に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @return {String} 変換後の値
+     */
+    G: function (op, value) {
+      
+        var valid = false;
+        
+        if (op.accur === null || op.accur >= (+value).toString().length) {
+            op.accur = null;
+            valid = true;
+        }
+        
+        return valid ? this.cnvFloat(op, value) : this.cnvExponential(op, value, true);
+    },
+    
+    /**
+     * 八進数に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @return {String} 変換後の値
+     */
+    o: function (op, value) {
+        return this.cnvRadix(op, value, 8);
+    },
+    
+    /**
+     * 文字列に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @return {String} 変換後の値
+     */
+    s: function (op, value) {
+        value = '' + value;
+        var width = (+op.width || 0) - value.length;
+        
+        if (width <= 0) {
+            return value;
+        }
+        
+        var pad = op.pad;
+        
+        if (op.right) {
+            value += Array(width + 1).join(pad);
+        } else {
+            value = Array(width + 1).join(pad) + value;
+        }
+        
+        return value;
+    },
+    
+    /**
+     * 十六進数に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @return {String} 変換後の値
+     */
+    x: function (op, value) {
+        return this.cnvRadix(op, value, 16);
+    },
+    
+    /**
+     * 十六進数大文字に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @return {String} 変換後の値
+     */
+    X: function (op, value) {
+        return this.cnvRadix(op, value, 16, true);
+    },
+    
+    /**
+     * N進数に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @param {Integer} radix 何進数に変換するか
+     * @param {Boolean} [toUpper] 大文字にするかどうか
+     * @return {String} 変換後の値
+     */
+    cnvRadix: function (op, value, radix, toUpper) {
+        value = +value;
+        
+        var isPlus = value >= 0;
+      
+        value = Math.floor(isPlus && value || -value).toString(radix);
+        
+        var prf = ! isPlus && '-' || '';
+        
+        if (op.accur !== null) {
+            value = prf = '';
+        }
+        
+        if (toUpper) {
+            value = value.toUpperCase();
+        }
+        
+        if (value && op.sp) {
+            switch (radix) {
+                case 8:
+                    prf = prf + '0';
+                    break;
+                    
+                case 16:
+                    prf = prf + '0x';
+                    break;
+            }
+        }
+        
+        var width = (+op.width || 0) - value.length - prf.length;
+        
+        if (width <= 0) {
+            return prf + value;
+        }
+        
+        var pad = op.pad;
+        
+        if (op.right) {
+            value += Array(width + 1).join(pad);
+        } else {
+            value = Array(width + 1).join(pad) + value;
+        }
+
+        return prf + value;
+    },
+    
+    /**
+     * 整数に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @param {Boolean} [unsigned] 符号を付けないかどうか
+     * @return {String} 変換後の値
+     */
+    cnvInt: function (op, value, unsigned) {
+        value = unsigned ? Math.abs(+value) : +value;
+        
+        var isPlus = value >= 0;
+        
+        value = Math.floor(isPlus && value || -value).toString(10);
+
+        var prf = isPlus && op.plus && '+' || ! isPlus && '-' || '';
+        
+        var width = (+op.width || 0) - value.length - prf.length;
+        
+        if (width <= 0) {
+            return prf + value;
+        }
+        
+        var pad = op.pad;
+        
+        if (op.right) {
+            value += Array(width + 1).join(pad);
+        } else {
+            value = Array(width + 1).join(pad) + value;
+        }
+        
+        return prf + value;
+    },
+    
+    /**
+     * 数値に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @return {String} 変換後の値
+     */
+    cnvFloat: function (op, value) {
+        value = +value;
+        
+        var isPlus = value >= 0;
+        var accur = op.accur;
+        
+        if (accur !== null) {
+            value = (isPlus && value || -value).toFixed(accur);
+        } else {
+            value = (isPlus && value || -value).toString(10);
+        }
+
+        var prf = isPlus && op.plus && '+' || ! isPlus && '-' || '';
+        
+        var width = (+op.width || 0) - value.length - prf.length;
+        
+        if (width <= 0) {
+            return prf + value;
+        }
+        
+        var pad = op.pad;
+        
+        if (op.right) {
+            value += Array(width + 1).join(pad);
+        } else {
+            value = Array(width + 1).join(pad) + value;
+        }
+        
+        return prf + value;
+    },
+    
+    /**
+     * 指数に変換
+     * 
+     * @param {Hash} op オプション
+     * @param {Mixied} value 値
+     * @param {Boolean} [toUpper] 大文字にするかどうか
+     * @return {String} 変換後の値
+     */
+    cnvExponential: function (op, value, toUpper) {
+        value = +value;
+        
+        var isPlus = value >= 0;
+        var accur = op.accur;
+        
+        if (accur !== null) {
+            value = (isPlus && value || -value).toExponential(accur);
+        } else {
+            value = (isPlus && value || -value).toExponential();
+        }
+        
+        var prf = isPlus && op.plus && '+' || ! isPlus && '-' || '';
+        
+        var width = (+op.width || 0) - value.length - prf.length;
+        
+        if (width <= 0) {
+            return prf + value;
+        }
+        
+        var pad = op.pad;
+        
+        if (op.right) {
+            value += Array(width + 1).join(pad);
+        } else {
+            value = Array(width + 1).join(pad) + value;
+        }
+        
+        if (toUpper) {
+            value = value.toUpperCase();
+        }
+        
+        return prf + value;
+    }
+};
+
+/**
+ * @ignore
+ */
+Jeeel._Object.JeeelString.convertPlaceholder = function (placeholder, value, res) {
+  
+    placeholder = placeholder.match(this.PLACEHOLDER_REGS);
+    
+    res.length = placeholder[0].length;
+
+    var plPrms = {};
+    
+    // プレースホルダ―の型指定子が一致しなかったら丸ごと消す
+    if ( ! this.PLACEHOLDERS[placeholder[4]]) {
+        return '';
+    }
+    
+    var flg = placeholder[1] && placeholder[1].split('');
+    
+    plPrms.width = placeholder[2] || 0;
+    plPrms.accur = (placeholder[3] || placeholder[3] === '') ? +placeholder[3] : null;
+    
+    if (flg) {
+        
+        for (var i = flg.length; i--;) {
+            
+            switch (flg[i]) {
+                case '-':
+                    plPrms.right = true;
+                    break;
+                    
+                case '+':
+                    plPrms.plus = true;
+                    break;
+                    
+                case '#':
+                    plPrms.sp = true;
+                    break;
+                    
+                case ' ':
+                case '0':
+                    if ( ! plPrms.pad) {
+                        plPrms.pad = flg[i];
+                    }
+                    break;
+            }
+        }
+    }
+    
+    // パディング文字がなかった場合は空白をデフォ値にする
+    if ( ! plPrms.pad) {
+        plPrms.pad = ' ';
+    }
+    
+    return this.PLACEHOLDERS[placeholder[4]](plPrms, value);
+};
+Jeeel.directory.Jeeel.String.Hash = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel.String + 'Hash/';
+    }
+};
+
+/**
+ * @namespace Hash関数関連のネームスペース
+ */
+Jeeel.String.Hash = {
+
+};
+
+/**
+ * @private
+ */
+Jeeel._Object.JeeelStringHash = {
+    
+};
+
+Jeeel.file.Jeeel.String.Hash = ['Base64', 'Md5'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.String.Hash, Jeeel.file.Jeeel.String.Hash);
+Jeeel.directory.Jeeel.String.Hash.Base64 = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel.String.Hash + 'Base64/';
+    }
+};
+
+/**
+ * @namespace Base64関連のモジュール
+ */
+Jeeel.String.Hash.Base64 = {
+    
+    /**
+     * エンコード文字列
+     *
+     * @type String
+     * @constant
+     */
+    ENCODE_CHARS: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
+    
+    /**
+     * デコード配列
+     * 
+     * @type Integer[]
+     * @constant
+     */
+    DECODE_CHARS: [
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63,
+        52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1,
+        -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
+        15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1,
+        -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1
+    ]
+};
+
+Jeeel.file.Jeeel.String.Hash.Base64 = ['Encode', 'Decode'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.String.Hash.Base64, Jeeel.file.Jeeel.String.Hash.Base64);
+
+/**
+ * 指定した文字列に対してbsse64エンコードを行う
+ * 
+ * @param {String} str エンコード対象文字列
+ * @return {String} bsse64文字列
+ */
+Jeeel.String.Hash.Base64.encode = function (str) {
+    
+    str = '' + str;
+    
+    var out, i, len;
+    var c1, c2, c3;
+
+    len = str.length;
+    i = 0;
+    out = [];
+    
+    while(i < len) {
+        c1 = str.charCodeAt(i++) & 0xff;
+        
+        if (i == len) {
+            out[out.length] = this.ENCODE_CHARS.charAt(c1 >> 2);
+            out[out.length] = this.ENCODE_CHARS.charAt((c1 & 0x3) << 4);
+            out[out.length] = "==";
+            break;
+        }
+        
+        c2 = str.charCodeAt(i++);
+        
+        if (i == len) {
+            out[out.length] = this.ENCODE_CHARS.charAt(c1 >> 2);
+            out[out.length] = this.ENCODE_CHARS.charAt(((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4));
+            out[out.length] = this.ENCODE_CHARS.charAt((c2 & 0xF) << 2);
+            out[out.length] = "=";
+            break;
+        }
+        
+        c3 = str.charCodeAt(i++);
+        
+        out[out.length] = this.ENCODE_CHARS.charAt(c1 >> 2);
+        out[out.length] = this.ENCODE_CHARS.charAt(((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4));
+        out[out.length] = this.ENCODE_CHARS.charAt(((c2 & 0xF) << 2) | ((c3 & 0xC0) >>6));
+        out[out.length] = this.ENCODE_CHARS.charAt(c3 & 0x3F);
+    }
+    
+    return out.join('');
+};
+
+/**
+ * bsse64エンコードされた文字列を復元する
+ * 
+ * @param {String} str base64文字列
+ * @return {String} 復元した文字列
+ */
+Jeeel.String.Hash.Base64.decode = function (str) {
+    str = '' + str;
+    
+    var c1, c2, c3, c4;
+    var i, len, out;
+
+    len = str.length;
+    i = 0;
+    out = [];
+    
+    while(i < len) {
+        // c1
+        do {
+            c1 = this.DECODE_CHARS[str.charCodeAt(i++) & 0XFF];
+        } while(i < len && c1 == -1);
+        
+        if (c1 == -1) {
+            break;
+        }
+
+        // c2
+        do {
+            c2 = this.DECODE_CHARS[str.charCodeAt(i++) & 0XFF];
+        } while(i < len && c2 == -1);
+        
+        if (c2 == -1) {
+            break;
+        }
+
+        out[out.length] = String.fromCharCode((c1 << 2) | ((c2 & 0x30) >> 4));
+
+        // c3
+        do {
+            c3 = str.charCodeAt(i++) & 0XFF;
+            
+            if (c3 == 61) {
+                return out.join('');
+            }
+            
+            c3 = this.DECODE_CHARS[c3];
+        } while(i < len && c3 == -1);
+        
+        if (c3 == -1) {
+            break;
+        }
+
+        out[out.length] = String.fromCharCode(((c2 & 0XF) << 4) | ((c3 & 0x3C) >> 2));
+
+        // c4
+        do {
+            c4 = str.charCodeAt(i++) & 0XFF;
+            
+            if (c4 == 61) {
+                return out.join('');
+            }
+            
+            c4 = this.DECODE_CHARS[c4];
+        } while(i < len && c4 == -1);
+        
+        if (c4 == -1) {
+            break;
+        }
+        
+        out[out.length] = String.fromCharCode(((c3 & 0x03) << 6) | c4);
+    }
+    
+    return out.join('');
+};
+
+/**
+ * 文字列をMD5に変換する
+ * 
+ * @param {String} data 対象の文字列
+ * @return {String} MD5文字列
+ */
+Jeeel.String.Hash.md5 = function (data) {
+    return Jeeel._Object.JeeelStringHash.Md5.hexHash('' + data);
+};
+
+/**
+ * @private
+ */
+Jeeel._Object.JeeelStringHash.Md5 = {
+  
+    /**
+     * 16進数に使用する文字列
+     * 
+     * @type String
+     * @constant
+     */
+    HEX_TEXT: "0123456789abcdef",
+    
+    /**
+     * 16進数に使用する文字列
+     * 
+     * @type Integer[]
+     * @constant
+     */
+    T: [],
+
+    round: [],
+    
+    pack: function (n32) {
+        return String.fromCharCode(n32 & 0xFF) 
+             + String.fromCharCode((n32 >>> 8) & 0xFF) 
+             + String.fromCharCode((n32 >>> 16) & 0xFF) 
+             + String.fromCharCode((n32 >>> 24) & 0xFF);
+    },
+
+    unpack: function (s4) {
+        return (s4.charCodeAt(0))
+             | (s4.charCodeAt(1) <<  8) 
+             | (s4.charCodeAt(2) << 16) 
+             | (s4.charCodeAt(3) << 24);
+    },
+
+    number: function (n) {
+        while (n < 0) {
+            n += 4294967296;
+        }
+        
+        while (n > 4294967295) {
+            n -= 4294967296;
+        }
+        
+        return n;
+    },
+
+    applyRound: function (x, s, f, abcd, r) {
+        var a, b, c, d;
+        var kk, ss, ii;
+        var t, u;
+
+        a = abcd[0];
+        b = abcd[1];
+        c = abcd[2];
+        d = abcd[3];
+        kk = r[0];
+        ss = r[1];
+        ii = r[2];
+
+        u = f(s[b], s[c], s[d]);
+        t = s[a] + u + x[kk] + this.T[ii];
+        t = this.number(t);
+        t = ((t<<ss) | (t>>>(32-ss)));
+        t += s[b];
+        s[a] = this.number(t);
+    },
+    
+    hash: function (data) {
+        this.init();
+        
+        var abcd, x, state, s;
+        var len, index, padLen, f, r;
+        var i, j, k;
+        var tmp;
+
+        state = [0X67452301, 0XEFCDAB89, 0X98BADCFE, 0X10325476];
+        
+        len = data.length;
+        index = len & 0x3f;
+        
+        padLen = (index < 56) ? (56 - index) : (120 - index);
+        
+        if (padLen > 0) {
+            data += "\x80";
+            
+            for (i = 0; i < padLen - 1; i++) {
+                data += "\x00";
+            }
+        }
+        
+        data += this.pack(len * 8);
+        data += this.pack(0);
+        len  += padLen + 8;
+        
+        abcd = [0, 1, 2, 3];
+        x    = [];
+        s    = [];
+
+        for (k = 0; k < len; k += 64) {
+            for (i = 0, j = k; i < 16; i++, j += 4) {
+                x[i] = (data.charCodeAt(j))
+                     | (data.charCodeAt(j + 1) <<  8) 
+                     | (data.charCodeAt(j + 2) << 16) 
+                     | (data.charCodeAt(j + 3) << 24);
+            }
+            
+            for (i = 0; i < 4; i++) {
+                s[i] = state[i];
+            }
+            
+            for (i = 0; i < 4; i++) {
+                f = this.round[i][0];
+                r = this.round[i][1];
+                
+                for (j = 0; j < 16; j++) {
+                    this.applyRound(x, s, f, abcd, r[j]);
+                    
+                    tmp = abcd[0];
+                    abcd[0] = abcd[3];
+                    abcd[3] = abcd[2];
+                    abcd[2] = abcd[1];
+                    abcd[1] = tmp;
+                }
+            }
+
+            for (i = 0; i < 4; i++) {
+              state[i] += s[i];
+              state[i] = this.number(state[i]);
+            }
+        }
+
+        return this.pack(state[0]) 
+             + this.pack(state[1]) 
+             + this.pack(state[2]) 
+             + this.pack(state[3]);
+    },
+    
+    hexHash: function (data) {
+        var i, out, c;
+        var bit128;
+
+        bit128 = this.hash(data);
+        out = [];
+        
+        for (i = 0; i < 16; i++) {
+            c = bit128.charCodeAt(i);
+            
+            out[out.length] = this.HEX_TEXT.charAt((c>>4) & 0xF);
+            out[out.length] = this.HEX_TEXT.charAt(c & 0xF);
+        }
+        
+        return out.join('');
+    },
+    
+    init: function () {
+        if (this.init.ignore) {
+            return;
+        }
+        
+        this.init.ignore = true;
+        
+        var merge = {
+            T: [
+                0X00000000, 0XD76AA478, 0XE8C7B756, 0X242070DB,
+                0XC1BDCEEE, 0XF57C0FAF, 0X4787C62A, 0XA8304613,
+                0XFD469501, 0X698098D8, 0X8B44F7AF, 0XFFFF5BB1,
+                0X895CD7BE, 0X6B901122, 0XFD987193, 0XA679438E,
+                0X49B40821, 0XF61E2562, 0XC040B340, 0X265E5A51,
+                0XE9B6C7AA, 0XD62F105D, 0X02441453, 0XD8A1E681,
+                0XE7D3FBC8, 0X21E1CDE6, 0XC33707D6, 0XF4D50D87,
+                0X455A14ED, 0XA9E3E905, 0XFCEFA3F8, 0X676F02D9,
+                0X8D2A4C8A, 0XFFFA3942, 0X8771F681, 0X6D9D6122,
+                0XFDE5380C, 0XA4BEEA44, 0X4BDECFA9, 0XF6BB4B60,
+                0XBEBFBC70, 0X289B7EC6, 0XEAA127FA, 0XD4EF3085,
+                0X04881D05, 0XD9D4D039, 0XE6DB99E5, 0X1FA27CF8,
+                0XC4AC5665, 0XF4292244, 0X432AFF97, 0XAB9423A7,
+                0XFC93A039, 0X655B59C3, 0X8F0CCC92, 0XFFEFF47D,
+                0X85845DD1, 0X6FA87E4F, 0XFE2CE6E0, 0XA3014314,
+                0X4E0811A1, 0XF7537E82, 0XBD3AF235, 0X2AD7D2BB,
+                0XEB86D391
+            ],
+
+            round1: [
+                [ 0, 7, 1], [ 1,12, 2],
+                [ 2,17, 3], [ 3,22, 4],
+                [ 4, 7, 5], [ 5,12, 6],
+                [ 6,17, 7], [ 7,22, 8],
+                [ 8, 7, 9], [ 9,12,10],
+                [10,17,11], [11,22,12],
+                [12, 7,13], [13,12,14],
+                [14,17,15], [15,22,16]
+            ],
+
+            round2: [
+                [ 1, 5,17], [ 6, 9,18],
+                [11,14,19], [ 0,20,20],
+                [ 5, 5,21], [10, 9,22],
+                [15,14,23], [ 4,20,24],
+                [ 9, 5,25], [14, 9,26],
+                [ 3,14,27], [ 8,20,28],
+                [13, 5,29], [ 2, 9,30],
+                [ 7,14,31], [12,20,32]
+            ],
+
+            round3: [
+                [ 5, 4,33], [ 8,11,34],
+                [11,16,35], [14,23,36],
+                [ 1, 4,37], [ 4,11,38],
+                [ 7,16,39], [10,23,40],
+                [13, 4,41], [ 0,11,42],
+                [ 3,16,43], [ 6,23,44],
+                [ 9, 4,45], [12,11,46],
+                [15,16,47], [ 2,23,48]
+            ],
+
+            round4: [
+                [ 0, 6,49], [ 7,10,50],
+                [14,15,51], [ 5,21,52],
+                [12, 6,53], [ 3,10,54],
+                [10,15,55], [ 1,21,56],
+                [ 8, 6,57], [15,10,58],
+                [ 6,15,59], [13,21,60],
+                [ 4, 6,61], [11,10,62],
+                [ 2,15,63], [ 9,21,64]
+            ],
+
+            /**
+             * @ignore
+             */
+            F: function (x, y, z) {return (x & y) | (~x & z);},
+            
+            /**
+             * @ignore
+             */
+            G: function (x, y, z) {return (x & z) | (y & ~z);},
+            
+            /**
+             * @ignore
+             */
+            H: function (x, y, z) {return x ^ y ^ z;},
+            
+            /**
+             * @ignore
+             */
+            I: function (x, y, z) {return y ^ (x | ~z);}
+        };
+    
+        this.T = merge.T;
+        this.round = [
+            [merge.F, merge.round1],
+            [merge.G, merge.round2],
+            [merge.H, merge.round3],
+            [merge.I, merge.round4]
+        ];
+    }
+};
+Jeeel.directory.Jeeel.Number = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel + 'Number/';
+    }
+};
+
+/**
+ * コンストラクタ
+ * 
+ * @class 数値の複雑な処理をするクラス
+ * @param {Number} [number] 基となる数値
+ * @example
+ * 数値に対して複雑な処理を行うクラス
+ * 3桁区切りのフォーマット化や数値を指定範囲に収めたり、ランダムな整数を得たり平均や最小公倍数等を取得することが出来る
+ * 
+ * 例：
+ * Jeeel.Number.format(12548752, ',', '\'); // "\12,548,752"を取得する、主に金額を表示する際に使用する
+ * Jeeel.Number.limit(12, 0, 10); // 1つめの引数の数値が2つめと3つめの間に収まるように切り捨てる、この場合は10が返ってくる
+ * Jeeel.Number.random(1, 10); // 1～10の間の整数を取得する
+ * Jeeel.Number.getAvg(1, 5, 6); // 1, 5, 6を足し合わせて平均を取得する(戻り値4)
+ */
+Jeeel.Number = function (number) {
+    
+    if ( ! Jeeel.Type.isSet(number)) {
+        number = 0;
+    }
+    
+    this._num = +number;
+};
+
+/**
+ * インスタンスの作成を行う
+ * 
+ * @param {Number} [number] 基となる数値
+ * @return {Jeeel.Number} 作成したインスタンス
+ */
+Jeeel.Number.create = function (number) {
+    return new this(number);
+};
+
+/**
+ * 数字を千単位でグループ化してフォーマットする
+ * 
+ * @param {Number} number 対象の数値
+ * @param {String} [separator] 千単位を区切る文字列(デフォルトは , )
+ * @param {String} [prefix] 接頭辞
+ * @param {String} [suffix] 接尾辞
+ * @return {String} 変換後の値
+ */
+Jeeel.Number.format = function (number, separator, prefix, suffix) {
+    var str = (+number || 0).toString();
+    var dpi = str.indexOf('.');
+    var moi = str.indexOf('-') + 1;
+    
+    if (dpi < 0) {
+        dpi = str.length;
+    }
+    
+    var indexArr = [];
+
+    for (var i = dpi - 3; i > moi; i -= 3) {
+        indexArr[indexArr.length] = i;
+    }
+
+    return (prefix || '') + Jeeel.String.multiInsert(str, indexArr, separator || ',') + (suffix || '');
+};
+
+/**
+ * 数値を指定範囲内に収める
+ * 
+ * @param {Number} number 対象の数値
+ * @param {Number} min 最小値
+ * @param {Number} max 最大値
+ * @return {Number} 収めた後の数値
+ */
+Jeeel.Number.limit = function (number, min, max) {
+    if (number < min) {
+        number = min;
+    }
+    
+    if (number > max) {
+        number = max;
+    }
+    
+    return number;
+};
+
+/**
+ * 指定した整数の範囲以内の値をランダムで返す
+ * 
+ * @param {Integer} min 最小値(負数も可)
+ * @param {Integer} max 最大値(負数も可)
+ * @return {Integer} ランダム整数値(min &lt;= random &lt;= max)
+ */
+Jeeel.Number.random = function (min, max) {
+    var r = max - min + 1;
+    
+    return Math.floor(min + Math.random() * r);
+};
+
+/**
+ * 数値を百分率にして返す
+ * 
+ * @param {Number} number 対象の数値
+ * @return {String} 百分率表記の文字列(後ろに%が付く)
+ */
+Jeeel.Number.percentage = function (number) {
+    return number * 100 + '%';
+};
+
+/**
+ * 指定した角度をラジアンに変換する
+ * 
+ * @param {Number} deg 角度
+ * @return {Number} ラジアン
+ */
+Jeeel.Number.degreeToRadian = function (deg) {
+    return deg / 180 * Math.PI;
+};
+
+/**
+ * 指定したラジアンを角度に変換する
+ * 
+ * @param {Number} rad ラジアン
+ * @return {Number} 角度
+ */
+Jeeel.Number.radianToDegree = function (rad) {
+    return rad / Math.PI * 180;
+};
+
+/**
+ * 合計値を求める
+ * 
+ * @param {Number} var_args 合計値を求める際に数を可変で引き渡す
+ */
+Jeeel.Number.getSum = function (var_args) {
+    var i, sum = 0;
+    
+    for (i = arguments.length; i--;) {
+        sum += arguments[i];
+    }
+    
+    return sum;
+};
+
+/**
+ * 平均値を求める
+ * 
+ * @param {Number} var_args 平均値を求める際に数を可変で引き渡す
+ */
+Jeeel.Number.getAvg = function (var_args) {
+    return this.getSum.apply(this, arguments) / arguments.length;
+};
+
+/**
+ * 最大公約数を求める
+ * 
+ * @param {Integer} base 最大公約数を求める際の数
+ * @param {Integer} var_args 可変引数、2つ以上の数を指定する場合に渡す
+ * @return {Integer} 最大公約数(正)
+ */
+Jeeel.Number.getGcd = function (base, var_args) {
+    var i, j, l, r;
+    
+    for (i = 0, l = arguments.length - 1; i < l; i++) {
+        j = i + 1;
+        r = arguments[i] % arguments[j];
+
+        arguments[j] = r === 0 ? arguments[j] : arguments.callee(arguments[j], r < 0 ? -r : r);
+    }
+    
+    return arguments[l];
+};
+
+/**
+ * 最小公倍数を求める
+ * 
+ * @param {Integer} base 最小公倍数を求める際の数
+ * @param {Integer} var_args 可変引数、2つ以上の数を指定する場合に渡す
+ * @return {Integer} 最小公倍数(正)
+ */
+Jeeel.Number.getLcm = function (base, var_args) {
+    var i, j, l;
+    
+    for (i = 0, l = arguments.length - 1; i < l; i++) {
+        j = i + 1;
+        
+        arguments[j] = arguments[i] * arguments[j] / this.getGcd(arguments[i], arguments[j]);
+    }
+
+    return arguments[l] < 0 ? -arguments[l] : arguments[l];
+};
+
+Jeeel.Number.prototype = {
+  
+    /**
+     * 元の数値
+     * 
+     * @type Number
+     * @private
+     */
+    _num: 0,
+    
+    /**
+     * 数値を絶対値にする
+     * 
+     * @return {Jeeel.Number} 自インスタンス
+     */
+    abs: function () {
+        this._num =  (this._num > 0 ? this._num : -this._num);
+        
+        return this;
+    },
+    
+    /**
+     * 数値を切り上げる
+     * 
+     * @return {Jeeel.Number} 自インスタンス
+     */
+    ceil: function () {
+        this._num = Math.ceil(this._num);
+        
+        return this;
+    },
+    
+    /**
+     * 数値を切り下げる
+     * 
+     * @return {Jeeel.Number} 自インスタンス
+     */
+    floor: function () {
+        this._num = Math.floor(this._num);
+        
+        return this;
+    },
+    
+    /**
+     * 数値を四捨五入する
+     * 
+     * @return {Jeeel.Number} 自インスタンス
+     */
+    round: function () {
+        this._num = Math.round(this._num);
+        
+        return this;
+    },
+    
+    /**
+     * 数値を指定範囲に収める
+     * 
+     * @return {Jeeel.Number} 自インスタンス
+     */
+    limit: function (min, max) {
+        this._num = this.constructor.limit(this._num, min, max);
+        
+        return this;
+    },
+    
+    /**
+     * 数値を千単位でグループ化してフォーマットする
+     * 
+     * @param {String} [separator] 千単位を区切る文字列(デフォルトは , )
+     * @param {String} [prefix] 接頭辞
+     * @param {String} [suffix] 接尾辞
+     * @return {String} フォーマット後の文字列
+     */
+    toFormatted: function (separator, prefix, suffix) {
+        return this.constructor.format(this._num, separator, prefix, suffix);
+    },
+    
+    /**
+     * 数値を百分率表記に変換する
+     * 
+     * @return {String} 百分率表記の文字列
+     */
+    toPercentage: function () {
+        return this.constructor.percentage(this._num);
+    },
+    
+    /**
+     * インスタンスを文字列に変換する
+     * 
+     * @param {Integer} [radix] 進数を指定する場合に指定
+     * @return {String} 文字列
+     */
+    toString: function (radix) {
+        return (radix ? this._num.toString(radix) : this._num.toString());
+    },
+    
+    /**
+     * インスタンスを数値に変換する
+     * 
+     * @return {Number} 数値
+     */
+    valueOf: function () {
+        return this._num;
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @param {Number} [number] 基となる数値
+     * @constructor
+     */
+    constructor: Jeeel.Number
+};
+
+Jeeel.file.Jeeel.Number = ['Fraction'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Number, Jeeel.file.Jeeel.Number);
+
+/**
+ * コンストラクタ
+ * 
+ * @class 分数を管理するクラス
+ * @param {Number|String} numeric 分数化する数値もしくは数値文字列
+ */
+Jeeel.Number.Fraction = function (numeric) {};
+
+/**
+ * コンストラクタ
+ * 
+ * @class 分数を管理するクラス
+ * @param {Integer} numerator 分子
+ * @param {Integer} denominator 分母
+ */
+Jeeel.Number.Fraction = function (numerator, denominator) {
+  
+    switch (arguments.length) {
+        case 1:
+            var numeric = Jeeel.String.trim('' + arguments[0]);
+
+            var pidx = numeric.lastIndexOf('.');
+            denominator = 1;
+
+            if (pidx + 1) {
+                denominator = Math.pow(10, numeric.length - pidx - 1);
+            }
+
+            numerator = +(numeric.replace('.', ''));
+            break;
+
+        case 2:
+            break;
+
+        default:
+            throw new Error('引数の数が違います。');
+            break;
+    }
+    
+    /**
+     * 分子
+     * 
+     * @type Integer
+     */
+    this.numerator = +numerator;
+    
+    /**
+     * 分母
+     * 
+     * @type Integer
+     */
+    this.denominator = +denominator;
+};
+
+Jeeel.Number.Fraction.prototype = {
+
+    /**
+     * 複製を行う
+     *
+     * @return {Jeeel.Number.Fraction} 複製したインスタンス
+     */
+    clone: function () {
+        return new Jeeel.Object.Fraction(this.numerator, this.denominator);
+    },
+
+    /**
+     * 内部比較を行い結果を返す
+     *
+     * @param {Jeeel.Number.Fraction} fraction 比較オブジェクト
+     * @return {Boolean} 判定結果
+     */
+    equals: function (fraction) {
+        return this.numerator === fraction.numerator
+            && this.denominator === fraction.denominator;
+    },
+    
+    /**
+     * 約分を行う
+     * 
+     * @return {Jeeel.Number.Fraction} 自インスタンス
+     */
+    reduce: function () {
+        var gcd = Jeeel.Number.getGcd(this.numerator, this.denominator);
+        
+        this.numerator /= gcd;
+        this.denominator /= gcd;
+        
+        return this;
+    },
+    
+    /**
+     * 通分を行う
+     * 
+     * @param {Jeeel.Number.Fraction} fraction 通分対象の分数インスタンス
+     * @return {Jeeel.Number.Fraction} 自インスタンス
+     */
+    reduceCommonDenominator: function (fraction) {
+        var commonNum = Jeeel.Number.getLcm(this.denominator, fraction.denominator) / this.denominator;
+        
+        this.numerator *= commonNum;
+        this.denominator *= commonNum;
+        
+        return this;
+    },
+    
+    /**
+     * 分数を足し合わせる
+     * 
+     * @param {Jeeel.Number.Fraction} fraction 足し合わせる分数インスタンス
+     * @return {Jeeel.Number.Fraction} 自インスタンス
+     */
+    add: function (fraction) {
+        fraction = fraction.clone().reduceCommonDenominator(this);
+        
+        this.reduceCommonDenominator(fraction);
+        
+        this.numerator += fraction.numerator;
+        
+        return this;
+    },
+    
+    /**
+     * 分数を差し引く
+     * 
+     * @param {Jeeel.Number.Fraction} fraction 差し引く分数インスタンス
+     * @return {Jeeel.Number.Fraction} 自インスタンス
+     */
+    sub: function (fraction) {
+        fraction = fraction.clone().reduceCommonDenominator(this);
+        
+        this.reduceCommonDenominator(fraction);
+        
+        this.numerator -= fraction.numerator;
+        
+        return this;
+    },
+    
+    /**
+     * 分数を掛け合わせる
+     * 
+     * @param {Jeeel.Number.Fraction} fraction 掛け合わせる分数インスタンス
+     * @return {Jeeel.Number.Fraction} 自インスタンス
+     */
+    mul: function (fraction) {
+        this.numerator *= fraction.numerator;
+        this.denominator *= fraction.denominator;
+        
+        return this;
+    },
+    
+    /**
+     * 分数を割る
+     * 
+     * @param {Jeeel.Number.Fraction} fraction 割る分数インスタンス
+     * @return {Jeeel.Number.Fraction} 自インスタンス
+     */
+    div: function (fraction) {
+        this.numerator *= fraction.denominator;
+        this.denominator *= fraction.numerator;
+        
+        return this;
+    },
+
+    /**
+     * 文字列に変換する
+     *
+     * @return {String} 文字列に変換した自インスタンス
+     */
+    toString: function () {
+        return this.numerator + ' / ' + this.denominator;
+    },
+    
+    /**
+     * 数値に変換する
+     * 
+     * @return {Number} 数値に変換した自インスタンス
+     */
+    valueOf: function () {
+        return this.numerator / this.denominator;
+    }
+};
+Jeeel.directory.Jeeel.Language = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel + 'Language/';
+    }
+};
+
+/**
+ * @staticClass 言語関連を管理するスタティッククラス
+ */
+Jeeel.Language = {
+    
+    /**
+     * ユニークID
+     * 
+     * @type String
+     * @private
+     */
+    _uid: Jeeel.UNIQUE_ID,
+    
+    /**
+     * ロケール
+     * 
+     * @type String
+     * @private
+     */
+    _locale: 'en',
+    
+    /**
+     * 初期ロケール
+     * 
+     * @type String
+     * @private
+     */
+    _defaultLocale: 'en',
+    
+    /**
+     * サポートしているロケール
+     * 
+     * @type String[]
+     * @private
+     */
+    _supportLocales: [
+        'en',
+        'ja'
+    ],
+    
+    /**
+     * ランゲージ格納ディレクトリ
+     * 
+     * @type String[]
+     * @private
+     */
+    _languageDirectories: [
+        Jeeel.BASE_URL + 'Jeeel/Language/'
+    ],
+    
+    /**
+     * 読み込み済みのランゲージ要素
+     * 
+     * @type Hash
+     * @private
+     */
+    _languages: {},
+    
+    /**
+     * 読み込み済みのパスリスト
+     * 
+     * @type String[]
+     * @private
+     */
+    _loadedPaths: [],
+    
+    /**
+     * このクラスがサポートするロケール一覧を取得する
+     * 
+     * @return {String[]} ロケール一覧
+     */
+    getSupportLocales: function () {
+        return this._supportLocales;
+    },
+    
+    /**
+     * デフォルトのロケールを取得する
+     * 
+     * @return {String} ロケール
+     */
+    getDefaultLocale: function () {
+        return this._defaultLocale;
+    },
+    
+    /**
+     * 現在のロケールを取得する
+     * 
+     * @return {String} ロケール
+     */
+    getLocale: function () {
+        return this._locale;
+    },
+    
+    /**
+     * 現在のロケールを設定する(サポート外の値を指定すると初期ロケールに戻される)
+     * 
+     * @param {String} locale ロケール
+     * @return {Jeeel.Language} 自クラス
+     */
+    setLocale: function (locale) {
+        if ( ! Jeeel.Hash.inHash(locale, this._supportLocales, true)) {
+            locale = this._defaultLocale;
+        }
+        
+        this._locale = locale;
+        
+        return this._reloadLanguage();
+    },
+    
+    /**
+     * 言語設定を読み込む
+     * 
+     * @param {String} path 言語パス
+     * @param {Function} [callback] 言語設定読み込み完了時のコールバック
+     * @return {Jeeel.Language} 自クラス
+     */
+    loadLanguage: function (path, callback) {
+        path = ('' + path);
+        
+        var urlPath = path.replace('.', '/');
+        var idx = this._languageDirectories.length - 1;
+        
+        var url = this._languageDirectories[idx--] + urlPath + '/' + this._locale + '.xml';
+        var ajax = Jeeel.Net.Ajax.create(url, 'GET');
+        
+        var retry = function () {
+            if (Jeeel.UNIQUE_ID !== this._uid) {
+                return;
+            }
+            
+            if (idx >= 0) {
+                url = this._languageDirectories[idx--] + urlPath + '/' + this._locale + '.xml';
+                
+                ajax.setUrl(url);
+                ajax.execute();
+            }
+        };
+        
+        ajax.setSuccessMethod(function (response) {
+            if (Jeeel.UNIQUE_ID !== this._uid) {
+                return;
+            }
+            
+            var xml = new Jeeel.Dom.Xml(response.responseXML || response.responseText);
+            var names = path.split('.');
+            var hash = this._languages;
+            
+            if ( ! hash[this._locale]) {
+                hash[this._locale] = {};
+            }
+
+            hash = hash[this._locale];
+
+            for (var i = 0, l = names.length - 1; i < l; i++) {
+                if ( ! Jeeel.Type.isHash(hash[names[i]])) {
+                    hash[names[i]] = {};
+                }
+
+                hash = hash[names[i]];
+            }
+            
+            hash[names[l]] = xml.toHash().language;
+            
+            if ( ! Jeeel.Hash.inHash(path, this._loadedPaths, true)) {
+                this._loadedPaths.push(path);
+            }
+            
+            callback && callback();
+            
+        }, this).setFailureMethod(retry, this).setExceptionMethod(retry, this);
+
+        ajax.execute();
+        
+        return this;
+    },
+    
+    /**
+     * 言語設定が存在するかどうかを返す
+     * 
+     * @param {String} path 言語パス
+     * @return {Boolean} 存在するかどうか
+     */
+    hasLanguage: function (path) {
+        var names = ('' + path).split('.');
+        
+        var hash = this._languages;
+        
+        if ( ! hash[this._locale]) {
+            return false;
+        }
+        
+        hash = hash[this._locale];
+        
+        for (var i = 0, l = names.length; i < l; i++) {
+            if ( ! Jeeel.Type.isHash(hash[names[i]])) {
+                return false;
+            }
+            
+            hash = hash[names[i]];
+        }
+        
+        return true;
+    },
+    
+    /**
+     * 言語設定を取得する
+     * 
+     * @param {String} path 言語パス
+     * @return {Hash} 言語設定
+     */
+    getLanguage: function (path) {
+        var names = ('' + path).split('.');
+        
+        var hash = this._languages;
+        
+        if ( ! hash[this._locale]) {
+            return null;
+        }
+        
+        hash = hash[this._locale];
+        
+        for (var i = 0, l = names.length; i < l; i++) {
+            if ( ! Jeeel.Type.isHash(hash[names[i]])) {
+                return null;
+            }
+            
+            hash = hash[names[i]];
+        }
+        
+        return hash;
+    },
+    
+    /**
+     * ロケールが変わった後に再読み込みを行う
+     * 
+     * @return {Jeeel.Language} 自クラス
+     * @private
+     */
+    _reloadLanguage: function () {
+        
+        for (var i = this._loadedPaths.length; i--;) {
+            var path = this._loadedPaths[i];
+            
+            if ( ! this.hasLanguage(path)) {
+                this.loadLanguage(path);
+            }
+        }
+        
+        return this;
+    }
+};
 /**
  * @namespace 汎用的なメソッドを保持するネームスペース
  */
@@ -3445,6 +6756,1581 @@ Jeeel.Method = {
         newClass.prototype = value;
 
         return new newClass();
+    }
+};
+/**
+ * コンストラクタ
+ * 
+ * @class 配列もしくは連想配列について複雑な処理をするクラス<br />
+ *         そのままの連想配列やJeeel.Parameterよりも高速に連想配列にアクセス出来るが、初期化にかなりのロスを伴う
+ * @param {Hash} [hash] 基となるHash
+ * @example
+ * 配列・連想配列に対して様々な処理を行うクラス
+ * インスタンス化すると連想配列を配列の様に扱い高速アクセスや配列に備わっているメソッドを使用できるようにする
+ * 
+ * 例：
+ * var hash = Jeeel.Hash.create({a: 55, b: 777});
+ * hash.getValues(); // 値のリストを取得する、[55, 777]
+ * hash.getKeys(); // キーのリストを取得する、['a', 'b']
+ * hash.search(777); // 内部の値を検索してヒットしたらキーを返しヒットしなかったらnullを返す
+ * 
+ * 他にも以下のようなメソッドが良く使用される
+ * 
+ * Jeeel.Hash.merge({a: 55, b: 888}, {b: 66, c: 45}); // 2つ配列、連想配列を混合して新しく連想配列を生成する
+ * Jeeel.Hash.forEach(function (val, key) {  // 配列・連想配列に対してその要素に順次アクセスを行う
+ *     console.log(key + ': ' + val);
+ * }, {a: 1, b: 2, c: 3});
+ */
+Jeeel.Hash = function (hash) {
+    this._init(hash);
+};
+
+/**
+ * インスタンスの作成を行う
+ * 
+ * @param {Hash} [hash] 基となるHash
+ * @return {Jeeel.Hash} 作成したインスタンス
+ */
+Jeeel.Hash.create = function (hash) {
+    return new this(hash);
+};
+
+/**
+ * Jeeel.Hash.forEachを途中で終了するための定数
+ *
+ * @type Object
+ * @constant
+ */
+Jeeel.Hash.FOR_EACH_EXIT = {
+    exit: true
+};
+
+/**
+ * 指定したキーが配列式型に存在するかどうかを返す
+ *
+ * @param {String|Integer} key 判定値
+ * @param {Hash} hash 配列式型
+ * @return {Boolean} 判定結果
+ * @throws {TypeError} arrayが配列式でない場合に起こる
+ */
+Jeeel.Hash.keyExists = function (key, hash) {
+    return key in hash;
+};
+
+/**
+ * 指定した値が配列式型の中に存在するかどうかを返す
+ *
+ * @param {Mixied} val 判定値
+ * @param {Hash} hash 配列式型
+ * @param {Boolean} [strict] 厳密に型のチェックをするかどうか
+ * @return {Boolean} 判定結果
+ * @throws {Error} arrayが配列式でない場合に起こる
+ */
+Jeeel.Hash.inHash = function (val, hash, strict) {
+    var check = false;
+
+    Jeeel.Hash.forEach(hash,
+        function (elm) {
+            if (( ! strict && val == elm) || (strict && val === elm)) {
+                check = true;
+                return Jeeel.Hash.FOR_EACH_EXIT;
+            }
+        }
+    );
+
+    return check;
+};
+
+/**
+ * 指定したHashから配列の長さを返す
+ *
+ * @param {Hash} hash 配列・連想配列
+ * @return {Integer} キーの数
+ * @throws {Error} hashが配列式でない場合に起こる
+ */
+Jeeel.Hash.getCount = function (hash) {
+    if ( ! Jeeel.Type.isHash(hash)) {
+        throw new Error('hashが配列・連想配列ではありません');
+    }
+
+    if (Jeeel.Type.hasLength(hash)) {
+        return hash.length;
+    }
+
+    var count = 0;
+
+    for (var key in hash) {
+        count++;
+    }
+
+    return count;
+};
+
+/**
+ * 指定したHashからキーのリストを取得する
+ *
+ * @param {Hash} hash 配列・連想配列(キーを保持する全てを許可する)
+ * @param {Mixied} [value] キーの取得条件値
+ * @param {Boolean} [strict] 厳密な検索を行うかどうか
+ * @return {String[]} キーのリスト
+ * @throws {Error} hashが配列式でない場合に起こる
+ */
+Jeeel.Hash.getKeys = function (hash, value, strict) {
+
+    if (Jeeel.Type.isEmpty(hash)) {
+        throw new Error('hashが配列・連想配列ではありません');
+    }
+    
+    var valSet = Jeeel.Type.isSet(value);
+    var res = [];
+
+    if (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash) || Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash)) {
+        for (var i = 0, l = hash.length; i < l; i++) {
+            
+            if (valSet) {
+                if (strict && value !== hash[i]) {
+                    continue;
+                } else if ( ! strict && value != hash[i]) {
+                    continue;
+                }
+            }
+
+            res[res.length] = '' + i;
+        }
+    } else {
+        for (var key in hash) {
+
+            if (valSet) {
+                if (strict && value !== hash[key]) {
+                    continue;
+                } else if ( ! strict && value != hash[key]) {
+                    continue;
+                }
+            }
+
+            res[res.length] = key;
+        }
+    }
+
+    return res;
+};
+
+/**
+ * 指定したHashの値を全て返す
+ *
+ * @param {Hash} hash 配列・連想配列
+ * @return {Array} 値のリスト
+ * @throws {Error} hashが配列式でない場合に起こる
+ */
+Jeeel.Hash.getValues = function (hash) {
+
+    if ( ! Jeeel.Type.isHash(hash)) {
+        throw new Error('hashが配列・連想配列ではありません');
+    }
+    
+    var res;
+
+    if (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash)) {
+        return Array.prototype.slice.call(hash, 0, hash.length);
+    } else if (Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash)) {
+        res = [];
+        
+        for (var i = hash.length; i--;) {
+            res[i] = hash[i];
+        }
+        
+        return res;
+    }
+
+    res = [];
+
+    for (var key in hash) {
+        res[res.length] = hash[key];
+    }
+
+    return res;
+};
+
+/**
+ * 指定したHashのキーと値のペアを全て返す<br />
+ * 配列等に関しても全て返す
+ *
+ * @param {Hash} hash 配列・連想配列
+ * @param {Boolean} [sort] ソートするかどうか
+ * @param {Boolean} [enableChainKey] プロトタイプチェーンのキーを全て参照するかどうか(__proto__が定義されていないブラウザには意味がない)
+ * @return {Jeeel.Object.Item[]} キーと値のリスト(valueはセキュリティ系のエラーの場合、値ではなくエラーオブジェクトを代入する)
+ * @throws {Error} hashが配列式でない場合に起こる
+ */
+Jeeel.Hash.getPairs = function (hash, sort, enableChainKey) {
+    
+    if (Jeeel.Type.isEmpty(hash)) {
+        throw new Error('hashが配列・連想配列ではありません');
+    }
+
+    var type = Jeeel.Type.getType(hash);
+    var list = Jeeel.Type.getKeys(type);
+    var ownConstructor = hash.constructor && (Object.prototype.hasOwnProperty && ! Object.prototype.hasOwnProperty.call(hash, 'constructor') || hash.constructor !== Object);
+    var retryWhere = !!( ! enableChainKey && (hash.__proto__ || Object.getPrototypeOf || ownConstructor) && Object.prototype.hasOwnProperty);
+    var pair = [], key;
+
+    for (key in hash) {
+
+        if (retryWhere && ! Object.prototype.hasOwnProperty.call(hash, key)) {
+            continue;
+        }
+
+        var val;
+
+        try {
+            val = hash[key];
+        } catch (e) {
+            val = e;
+        }
+
+        pair[pair.length] = new Jeeel.Object.Item(key, val);
+
+        var searchKey = Jeeel.Hash.search(key, list, true);
+
+        if ( ! Jeeel.Type.isEmpty(searchKey)) {
+            list.splice(searchKey, 1);
+        }
+    }
+    
+    for (var i = 0, l = list.length; i < l; i++) {
+        key = list[i];
+        
+        if (key !== '__proto__' && retryWhere && ! Object.prototype.hasOwnProperty.call(hash, key)) {
+            continue;
+        }
+        
+        if ( ! (key in hash)) {
+            continue;
+        }
+        
+        try {
+            pair[pair.length] = new Jeeel.Object.Item(key, hash[key]);
+        } catch (e) {
+            pair[pair.length] = new Jeeel.Object.Item(key, e);
+        }
+    }
+    
+    if (retryWhere &&  ! ('__proto__' in hash)) {
+        if (Object.getPrototypeOf) {
+            pair[pair.length] = new Jeeel.Object.Item('__proto__', Object.getPrototypeOf(hash));
+        } else if (ownConstructor && Object.prototype.hasOwnProperty && ! Object.prototype.hasOwnProperty.call(hash, 'constructor')) {
+            pair[pair.length] = new Jeeel.Object.Item('__proto__', hash.constructor.prototype);
+        } else if (ownConstructor && hash.constructor !== Object) {
+            pair[pair.length] = new Jeeel.Object.Item('__proto__', hash._super || Object.prototype);
+        }
+    }
+    
+    if (sort) {
+        pair.sort(function (a, b) {
+            if (a.key > b.key) {
+                return 1;
+            } else if (a.key < b.key) {
+                return -1;
+            }
+            
+            return 0;
+        });
+    }
+
+    return pair;
+};
+
+/**
+ * 配列・連想配列をマージする
+ *
+ * @param {Hash} hash1 配列・連想配列
+ * @param {Hash} hash2 配列・連想配列
+ * @return {Hash} mergeした後の連想配列
+ * @throws {Error} hashが配列式でない場合に起こる
+ */
+Jeeel.Hash.merge = function (hash1, hash2) {
+    if ( ! Jeeel.Type.isHash(hash1) || ! Jeeel.Type.isHash(hash2)) {
+        throw new Error('hash1・hash2が配列・連想配列ではありません');
+    }
+
+    var res = {};
+
+    var digit, count = 0;
+
+    Jeeel.Hash.forEach(hash1,
+        function (val, key) {
+
+            digit = +key;
+
+            if (Jeeel.Type.isInteger(digit) && digit > count) {
+                count = digit;
+            }
+
+            res[key] = val;
+        }
+    );
+
+    Jeeel.Hash.forEach(hash2,
+        function (val, key) {
+
+            if (Jeeel.Type.isInteger(+key)) {
+                res[++count] = val;
+            } else {
+                res[key] = val;
+            }
+        }
+    );
+   
+    return res;
+};
+
+/**
+ * 指定した値をHash内で検索し、見つかった場合は対応するキーを返す
+ *
+ * @param {Mixied} value 検索する値
+ * @param {Hash} hash 配列・連想配列
+ * @param {Boolean} [strict] 厳密な検索を行うかどうか
+ * @return {String} 見つかった値の対応するキー(見つからなかった場合はnull)
+ * @throws {Error} hashが配列式でない場合に起こる
+ */
+Jeeel.Hash.search = function (value, hash, strict) {
+    if ( ! Jeeel.Type.isHash(hash)) {
+        throw new Error('hashが配列・連想配列ではありません');
+    }
+    
+    var _key = null;
+
+    Jeeel.Hash.forEach(hash,
+        function (val, key) {
+            if (strict && value === val) {
+                _key = key;
+                return Jeeel.Hash.FOR_EACH_EXIT;
+            } else if ( ! strict && value == val) {
+                _key = key;
+                return Jeeel.Hash.FOR_EACH_EXIT;
+            }
+        }
+    );
+
+    return _key;
+};
+
+/**
+ * Hash形式のオブジェクトを配列に修正して返す
+ *
+ * @param {Hash} hash 配列・連想配列
+ * @return {Array} 配列に修正したHashの値リスト(hashのキーが数字の部分を優先し、その後ろからキーが文字列のものを入れていく)
+ * @throws {Error} hashが配列式でない場合に起こる
+ */
+Jeeel.Hash.toArray = function (hash) {
+    if ( ! Jeeel.Type.isHash(hash)) {
+        throw new Error('hashが配列・連想配列ではありません');
+    }
+
+    if (Jeeel.Type.isArray(hash)) {
+        return Jeeel.Method.clone(hash);
+    }
+    else if (Jeeel.Type.isArguments(hash)) {
+        return (hash.length === 1 ? [hash[0]] : Array.apply(null, hash));
+    }
+    else if (Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash)) {
+        var arr = [];
+
+        for (var i = hash.length; i--;) {
+            arr[i] = hash[i];
+        }
+
+        return arr;
+    }
+
+    var key, num, nums = [];
+    var res = [];
+    var max = -1;
+    
+    for (key in hash) {
+        num = +key;
+        
+        if (Jeeel.Type.isInteger(num)) {
+            nums[nums.length] = num;
+            
+            res[num] = hash[num];
+            
+            if (max < num) {
+                max = num;
+            }
+        }
+    }
+
+    for (key in hash) {
+        if ( ! Jeeel.Type.isInteger(+key)) {
+            res[++max] = hash[key];
+        }
+    }
+
+    return res;
+};
+
+/**
+ * 配列・連想配列に対して各要素にアクセスするメソッド<br />
+ * 配列の場合は初期化していない要素にはアクセスしない
+ * 
+ * @param {Hash} hash 配列・連想配列
+ * @param {Function} callback void callBack(Mixied value, String key, Hash hash)<br />
+ *                             引数は左から要素,キー,配列となる(戻り値に指定定数を返すとbreakする)
+ * @param {Mixied} [thisArg] コールバックメソッド中のthisに変わるオブジェクト(初期値はhashになる)
+ * @throws {Error} hashが配列式でない場合に起こる
+ * @see Jeeel.Hash.FOR_EACH_EXIT
+ */
+Jeeel.Hash.forEach = function (hash, callback, thisArg) {
+    if ( ! Jeeel.Type.isHash(hash)) {
+        throw new Error('hashが配列・連想配列ではありません');
+    }
+    
+    if ( ! Jeeel.Type.isSet(thisArg)) {
+        thisArg = hash;
+    }
+
+    var tmp, length;
+    var exit = Jeeel.Hash.FOR_EACH_EXIT;
+
+    if (Jeeel.Type.hasLength(hash)) {
+        length = hash.length;
+
+        for (var i = 0; i < length; i++) {
+
+            if (i in hash) {
+
+                tmp = callback.call(thisArg, hash[i], i, hash);
+
+                if (tmp === exit) {
+                    break;
+                }
+            }
+        }
+    } else {
+        for (var key in hash) {
+            
+            tmp = callback.call(thisArg, hash[key], key, hash);
+
+            if (tmp === exit) {
+                break;
+            }
+        }
+    }
+};
+
+Jeeel.Hash.prototype = {
+
+    /**
+     * 基のHash
+     *
+     * @type Hash
+     */
+    _hash: null,
+
+    /**
+     * Hashのキーリスト
+     *
+     * @type String[]
+     */
+    _keys: [],
+
+    /**
+     * Hashの値リスト
+     *
+     * @type Array
+     */
+    _vals: [],
+
+    /**
+     * Hashの値を全て数値に変更したリスト
+     *
+     * @type Number[]
+     */
+    _nums: null,
+
+    /**
+     * Hashの要素数
+     *
+     * @type Integer
+     */
+    _length: 0,
+    
+    /**
+     * Hash内のキーの内最大の数値
+     * 
+     * @type Integer
+     */
+    _lastIndex: -1,
+    
+    /**
+     * Hashの値を取得する
+     * 
+     * @param {String} key キー
+     * @param {Mixied} [defaultValue] デフォルト値
+     * @return {Mixied} 取得した値
+     */
+    get: function (key, defaultValue) {
+        return (key in this._hash ? this._hash[key] : defaultValue);
+    },
+    
+    /**
+     * Hashに値を設定する
+     * 
+     * @param {String} key キー
+     * @param {Mixed} val 保存する値
+     * @return {Jeeel.Hash} 自インスタンス
+     */
+    set: function (key, val) {
+        var c = ! (key in this._hash);
+        
+        this._hash[key] = val;
+        
+        if (c) {
+            this._keys[this._length] = key;
+            this._vals[this._length] = val;
+            this._length++;
+            
+            this._nums = null;
+            
+            this._resetLastIndex(key, true);
+        }
+
+        return this;
+    },
+    
+    /**
+     * Hashの値を削除する
+     * 
+     * @param {String} key キー
+     * @return {Jeeel.Hash} 自インスタンス
+     */
+    unset: function (key) {
+        if (key in this._hash) {
+            delete this._hash[key];
+            var index, i;
+            
+            for (i = 0; i < this._length; i++) {
+                if (this._keys[i] == key) {
+                    index = i;
+                    break;
+                }
+            }
+            
+            this._keys.splice(index, 1);
+            this._vals.splice(index, 1);
+            
+            this._length--;
+            
+            this._nums = null;
+            
+            this._resetLastIndex(key);
+        }
+
+        return this;
+    },
+    
+    /**
+     * 指定したキーに対応するインデックスを取得する
+     * 
+     * @param {String} key キー
+     * @return {Integer} インデックス
+     */
+    getIndex: function (key) {
+        var index = -1;
+        
+        for (var i = 0; i < this._length; i++) {
+            if (this._keys[i] == key) {
+                index = i;
+                break;
+            }
+        }
+        
+        return index;
+    },
+    
+    /**
+     * 指定したインデックスに対応するキーを取得する
+     * 
+     * @param {Integer} index インデックス
+     * @return {String} キー
+     */
+    getKey: function (index) {
+        return this._keys[index];
+    },
+    
+    /**
+     * 指定したインデックスに対応する値を取得する
+     * 
+     * @param {Integer} index インデックス
+     * @return {Mixied} 取得した値
+     */
+    getValue: function (index) {
+        return this._vals[index];
+    },
+
+    /**
+     * Hashの要素数を返す
+     *
+     * @return {Integer} 要素数
+     */
+    getLength: function () {
+        return this._length;
+    },
+
+    /**
+     * 最初の値を取得する
+     *
+     * @return {Mixied} 取得した値
+     */
+    getFirst: function () {
+        return this._vals[0];
+    },
+
+    /**
+     * 最後の値を取得する
+     *
+     * @return {Mixied} 取得した値
+     */
+    getLast: function () {
+        return this._vals[this._length - 1];
+    },
+
+    /**
+     * 基のHashを返す
+     *
+     * @return {Hash} 基のHash
+     */
+    getHash: function () {
+        return this._hash;
+    },
+
+    /**
+     * Hashのキーのリストを作成して取得する
+     *
+     * @return {String[]} キーのリスト
+     */
+    getKeys: function () {
+        return this._keys;
+    },
+
+    /**
+     * Hashの値のリストを作成して取得する
+     *
+     * @return {Array} 値のリスト
+     */
+    getValues: function () {
+        return this._vals;
+    },
+    
+    /**
+     * Hash内の値を全て数値と見立てて最大値を得る
+     *
+     * @return {Number} 最大値
+     */
+    getMax: function () {
+        return Math.max.apply(null, this._getNums());
+    },
+
+    /**
+     * Hash内の値を全て数値と見立てて最小値を得る
+     *
+     * @return {Number} 最小値
+     */
+    getMin: function () {
+        return Math.min.apply(null, this._getNums());
+    },
+
+    /**
+     * Hash内の値を全て数値と見立てて合計値を得る
+     *
+     * @return {Number} 合計値
+     */
+    getSum: function () {
+        var nums = this._getNums();
+        var sum  = 0;
+
+        for (var i = nums.length; i--;) {
+            sum += nums[i];
+        }
+
+        return sum;
+    },
+
+    /**
+     * Hash内の値を全て数値と見立てて平均値を得る
+     *
+     * @return {Number} 平均値
+     */
+    getAvg: function () {
+        return this.getSum() / this._length;
+    },
+
+    /**
+     * 指定された関数を実行し、それらに合格した要素からなる新しいインスタンスを作成する
+     *
+     * @param {Function} callback Boolean callback(Mixied val, String key, Hash hash)
+     * @param {Mixied} [thisArg] callback内でthisに相当する値
+     * @return {Jeeel.Hash} 作成したインスタンス
+     */
+    filter: function (callback, thisArg) {
+        var res = {};
+        
+        if ( ! Jeeel.Type.isSet(thisArg)) {
+            thisArg = this;
+        }
+
+        for (var i = 0; i < this._length; i++) {
+            if (callback.call(thisArg, this._vals[i], this._keys[i], this._hash)) {
+                res[this._keys[i]] = this._vals[i];
+            }
+        }
+
+        return this.constructor.create(res);
+    },
+
+    /**
+     * 指定された関数を実行し、それらの戻り値から新しいインスタンスを作成する
+     *
+     * @param {Function} callback Mixied callback(Mixied val, String key, Hash hash)
+     * @param {Mixied} [thisArg] callback内でthisに相当する値
+     * @return {Jeeel.Hash} 作成したインスタンス
+     */
+    map: function (callback, thisArg) {
+        var res = {};
+        
+        if ( ! Jeeel.Type.isSet(thisArg)) {
+            thisArg = this;
+        }
+
+        for (var i = 0; i < this._length; i++) {
+            res[this._keys[i]] = callback.call(thisArg, this._vals[i], this._keys[i], this._hash);
+        }
+
+        return this.constructor.create(res);
+    },
+
+    /**
+     * 前の戻り値とHashの値を先頭から1つ引数に取り、<br />
+     * 最終的にひとつの値を結果として得る<br />
+     * 始めの時の戻り値には初期値もしくは先頭の値が来る(先頭の値の場合は引数に二番目の値が来る)
+     * 
+     * @param {Function} callback Mixied callback(Mixied tmp, Mixied val, String key, Hash hash)
+     * @param {Mixied} [initVal] 初期値(指定しない場合は最初の値を使う)
+     * @return {Mixied} 戻り値
+     */
+    reduce: function (callback, initVal) {
+        if ( ! Jeeel.Type.isSet(initVal) && this._length <= 0) {
+            throw new Error('空のHashに対して初期値未指定でReduceメソッドは使えません。');
+        }
+
+        var val;
+        var min = 0;
+
+        if (Jeeel.Type.isSet(initVal)) {
+            val = initVal;
+        } else {
+            val = this._vals[0];
+            min++;
+        }
+
+        for (var i = min; i < this._length; i++) {
+            val = callback(val, this._vals[i], this._keys[i], this._hash);
+        }
+
+        return val;
+    },
+
+    /**
+     * 前の戻り値とHashの値を後尾から1つ引数に取り、<br />
+     * 最終的にひとつの値を結果として得る<br />
+     * 始めの時の戻り値には初期値もしくは先頭の値が来る(先頭の値の場合は引数に二番目の値が来る)
+     *
+     * @param {Function} callback Mixied reduce(Mixied tmp, Mixied val, String key, Hash hash)
+     * @param {Mixied} [initVal] 初期値(指定しない場合は最初の値を使う)
+     * @return {Mixied} 戻り値
+     */
+    reduceRight: function (callback, initVal) {
+        if ( ! Jeeel.Type.isSet(initVal) && this._length <= 0) {
+            throw new Error('空のHashに対して初期値未指定でReduceRightメソッドは使えません。');
+        }
+
+        var val;
+        var max = this._length - 1;
+
+        if (Jeeel.Type.isSet(initVal)) {
+            val = initVal;
+        } else {
+            val = this._vals[max];
+            max--;
+        }
+
+        for (var i = max; i >= 0; i--) {
+            val = callback(val, this._vals[i], this._keys[i], this._hash);
+        }
+
+        return val;
+    },
+
+    /**
+     * 指定された関数を実行し、全ての要素がそれを合格するかどうかを返す
+     *
+     * @param {Function} callback Boolean callback(Mixied val, String key, Hash hash)
+     * @param {Mixied} [thisArg] callback内でthisに相当する値
+     * @return {Boolean} 全ての要素が合格したかどうか
+     */
+    every: function (callback, thisArg) {
+        if ( ! Jeeel.Type.isSet(thisArg)) {
+            thisArg = this;
+        }
+        
+        for (var i = 0; i < this._length; i++) {
+            if ( ! callback.call(thisArg, this._vals[i], this._keys[i], this._hash)) {
+                return false;
+            }
+        }
+
+        return true;
+    },
+
+    /**
+     * 指定された関数を実行し、それに合格する要素があるかどうかを返す
+     *
+     * @param {Function} callback Boolean callback(Mixied val, String key, Hash hash)
+     * @param {Mixied} [thisArg] callback内でthisに相当する値
+     * @return {Boolean} 合格する要素があるかどうか
+     */
+    some: function (callback, thisArg) {
+        if ( ! Jeeel.Type.isSet(thisArg)) {
+            thisArg = this;
+        }
+        
+        for (var i = 0; i < this._length; i++) {
+            if (callback.call(thisArg, this._vals[i], this._keys[i], this._hash)) {
+                return true;
+            }
+        }
+
+        return false;
+    },
+
+    /**
+     * 指定された関数を各要素に一度ずつ実行する
+     *
+     * @param {Function} callback void callback(Mixied val, String key, Hash hash)
+     * @param {Mixied} [thisArg] callback内でthisに相当する値
+     * @return {Jeeel.Hash} 自インスタンス
+     */
+    forEach: function (callback, thisArg) {
+        if ( ! Jeeel.Type.isSet(thisArg)) {
+            thisArg = this;
+        }
+        
+        for (var i = 0; i < this._length; i++) {
+            callback.call(thisArg, this._vals[i], this._keys[i], this._hash);
+        }
+
+        return this;
+    },
+    
+    /**
+     * Hash内の要素が配列もしくはJeeel.Hashインスタンスだった場合は押しつぶして、1次元に変換して新しいインスタンスとして作成する<br />
+     * その際キーは失われる
+     *
+     * @return {Jeeel.Hash} 作成したインスタンス
+     */
+    flatten: function () {
+        var res = [];
+        
+        var _flatten = function (arr) {
+            for (var i = 0, l = arr.length; i < l; i++) {
+                
+                if (Jeeel.Type.isArray(arr[i])) {
+                    _flatten(arr[i]);
+                    continue;
+                } else if (arr[i] instanceof this.constructor) {
+                    _flatten(arr[i].getValues());
+                    continue;
+                }
+                
+                res[res.length] = arr[i];
+            }
+        };
+        
+        _flatten(this._vals);
+        
+        return new this.constructor(res);
+    },
+    
+    /**
+     * 指定したキー同士の値を交換する
+     * 
+     * @param {String} keyLeft キー1
+     * @param {String} keyRight キー2
+     * @return {Jeeel.Hash} 自インスタンス
+     */
+    swap: function (keyLeft, keyRight) {
+        var left, right, both = 0;
+        
+        for (var i = 0; i < this._length; i++) {
+            if (this._keys[i] == keyLeft) {
+                left  = i;
+                both++;
+            } else if (this._keys[i] == keyRight) {
+                right = i;
+                both++;
+            }
+            
+            if (both === 2) {
+                break;
+            }
+        }
+        
+        return this.swapValue(left, right);
+    },
+
+    /**
+     * 指定したインデックス同士の値を交換する
+     * 
+     * @param {Integer} left インデックス1
+     * @param {Integer} right インデックス2
+     * @return {Jeeel.Hash} 自インスタンス
+     */
+    swapValue: function (left, right) {
+        if ( ! (0 <= left && left < this._length)) {
+            return this;
+        }
+        else if ( ! (0 <= right && right < this._length)) {
+            return this;
+        }
+        else if (left === right) {
+            return this;
+        }
+        
+        var key = this._keys[left];
+        var val = this._vals[left];
+
+        this._keys[left] = this._keys[right];
+        this._vals[left] = this._vals[right];
+
+        this._keys[right] = key;
+        this._vals[right] = val;
+
+        return this;
+    },
+    
+    /**
+     * Hash内から最後の要素を取り除き、<br />
+     * その値を返す
+     *
+     * @return {Mixied} 取りだした値
+     */
+    pop: function () {
+        if ( ! this._length) {
+            return undefined;
+        }
+        
+        this._length--;
+
+        var key = this._keys.pop();
+        var val = this._vals.pop();
+
+        delete this._hash[key];
+
+        this._nums = null;
+        
+        this._resetLastIndex(key);
+
+        return val;
+    },
+
+    /**
+     * 引数で受け取った値をHashの最後に挿入する
+     *
+     * @param {Mixied} var_args 挿入値の可変引数
+     * @return {Integer} 挿入後の要素数
+     */
+    push: function (var_args) {
+        var len = arguments.length;
+        
+        if ( ! len) {
+            return this._length;
+        }
+        
+        var max = this._lastIndex + 1;
+
+        for (var i = 0; i < len; i++) {
+            this._hash[max] = arguments[i];
+            this._vals[this._length] = arguments[i];
+            this._keys[this._length] = '' + max;
+
+            max++;
+            this._length++;
+        }
+
+        this._nums = null;
+        this._lastIndex = max - 1;
+
+        return this._length;
+    },
+
+    /**
+     * Hash内の先頭の要素を取り除き、<br />
+     * その値を返す
+     *
+     * @return {Mixied} 取りだした値
+     */
+    shift: function () {
+        if ( ! this._length) {
+            return undefined;
+        }
+        
+        this._length--;
+
+        var key = this._keys.shift();
+        var val = this._vals.shift();
+
+        delete this._hash[key];
+
+        this._nums = null;
+        
+        this._resetLastIndex(key);
+
+        return val;
+    },
+
+    /**
+     * 引数で受け取った値をHashの先頭に挿入する
+     *
+     * @param {Mixied} var_args 挿入値の可変引数
+     * @return {Integer} 挿入後の要素数
+     */
+    unshift: function (var_args) {
+        var len = arguments.length;
+        
+        if ( ! len) {
+            return this._length;
+        }
+        
+        var li, i, keys = [], vals = [], repKeys = {};
+        
+        if (this._lastIndex >= 0) {
+            for (i = this._lastIndex; i >= 0; i--) {
+                if (i in this._hash) {
+                    this._hash[i + len] = this._hash[i];
+                    
+                    repKeys[i] = '' + (i + len);
+                    
+                    if ( ! li) {
+                        li = i + len;
+                    }
+                }
+            }
+        } else {
+            li = len - 1;
+        }
+        
+        for (i = 0; i < len; i++) {
+            this._hash[i] = arguments[i];
+            vals[i] = arguments[i];
+            keys[i] = '' + i;
+        }
+
+        for (i = 0; i < this._length; i++) {
+            vals[len + i] = this._vals[i];
+            keys[len + i] = repKeys[this._keys[i]] || this._keys[i];
+        }
+        
+        this._keys = keys;
+        this._vals = vals;
+
+        this._nums = null;
+        
+        if (li) {
+            this._lastIndex = li;
+        }
+
+        return this._length += len;
+    },
+    
+    /**
+     * Hashの一部を取り出して新たにインスタンスを作成する
+     * 
+     * @param {Integer} [start] どこから取り出すかを示すインデックス<br />
+     *                           負の数を指定した場合Hashの終わりからのオフセットを示す<br />
+     *                           省略時は0
+     * @param {Integer} [end] どこまで取りだすかを示すインデックス(この数値は含まない)<br />
+     *                         負の数を指定した場合Hashの終わりからのオフセットを示す<br />
+     *                         省略時はHashの最後まで
+     * @return {Jeeel.Hash} 作成したインスタンス
+     */
+    slice: function (start, end) {
+        if ( ! Jeeel.Type.isInteger(start)) {
+            start = 0;
+        } else if (start < 0) {
+            start = start + this._length;
+            
+            if (start < 0) {
+                start = 0;
+            }
+        }
+        
+        if ( ! Jeeel.Type.isSet(end) || end > this._length) {
+            end = this._length;
+        } else if (end < 0) {
+            end = end + this._length + 1;
+        }
+        
+        return this._copy(start, end - 1);
+    },
+
+    /**
+     * Hash内の古い要素を取り除き、代わりに新しい要素を挿入する
+     * 
+     * @param {Integer} index 配列を変化させ始めるインデックス
+     * @param {Integer} [count] 配列から取り除く要素の数(省略はindex以降全ての要素)
+     * @param {Mixied} var_args 追加要素の可変引数
+     * @return {Array} 古い要素の配列
+     */
+    splice: function (index, count, var_args) {
+        if ( ! Jeeel.Type.isInteger(index)) {
+            return [];
+        }
+        
+        if ( ! Jeeel.Type.isInteger(count)) {
+            count = this._length;
+        }
+        
+        var i, idx, ai = 2, li = -1;
+        var len = index + count;
+        var res = [], keys = [], vals = [];
+        
+        for (i = 0; i < index; i++) {
+            keys[i] = this._keys[i];
+            vals[i] = this._vals[i];
+            
+            idx = +keys[i];
+            
+            if (Jeeel.Type.isInteger(idx) && li < idx) {
+                li = idx;
+            }
+        }
+        
+        for (i = index; i < len; i++) {
+            res[res.length] = this._vals[i];
+            
+            if (ai in arguments) {
+                keys[i] = this._keys[i];
+                vals[i] = arguments[ai];
+                
+                idx = +keys[i];
+
+                if (Jeeel.Type.isInteger(idx) && li < idx) {
+                    li = idx;
+                }
+                
+                this._hash[keys[i]] = vals[i];
+                
+                ai++;
+            } else {
+                delete this._hash[this._keys[i]];
+            }
+        }
+        
+        for (i = len; i < this._length; i++) {
+            keys[keys.length] = this._keys[i];
+            vals[vals.length] = this._vals[i];
+            
+            idx = +keys[i];
+            
+            if (Jeeel.Type.isInteger(idx) && li < idx) {
+                li = idx;
+            }
+        }
+        
+        this._keys = keys;
+        this._vals = vals;
+        
+        this._length = this._vals.length;
+        
+        this._nums = null;
+        
+        this._lastIndex = li;
+        
+        return res;
+    },
+
+    /**
+     * 配列をソートする<br />
+     * ソートアルゴリズムはクイックソート
+     * 
+     * @param {Function} [compareFunction] 比較関数(大きい数値の場合はaを優先、小さい数値の場合はbを優先、0は同値とする)<br />
+     *                                      Integer compareFunction(Mixied a, Mixied b)
+     * @return {Jeeel.Hash} 自インスタンス
+     */
+    sort: function (compareFunction) {
+        if ( ! compareFunction ) {
+          
+            /**
+             * @ignore
+             */
+            compareFunction = function (a, b) {
+                a = '' + a;
+                b = '' + b;
+                
+                return a > b ? 1 : (a < b ? -1 : 0);
+            };
+        }
+        
+        /**
+         * @ignore
+         */
+        var middle = function (h, t) {
+            return h + ((t - h) >>> 1);
+        };
+
+        var stack = [0, this._length - 1];
+        
+        while(stack.length) {
+            var tail = stack.pop();
+            var head = stack.pop();
+            var pivot = this._vals[middle(head, tail)];
+            var i = head - 1;
+            var j = tail + 1;
+            
+            while (1) {
+                while (i < tail && compareFunction(this._vals[++i], pivot) < 0);
+                while (j > head && compareFunction(this._vals[--j], pivot) > 0);
+                
+                if (i >= j) break;
+                
+                this.swapValue(i, j);
+            }
+            
+            if (head < i - 1) {stack.push(head);stack.push(i - 1);}
+            if (j + 1 < tail) {stack.push(j + 1);stack.push(tail);}
+        }
+        
+        return this;
+    },
+
+    /**
+     * Hash内の要素をシャッフルする
+     *
+     * @return {Jeeel.Hash} 自インスタンス
+     */
+    shuffle: function () {
+        var i = this._length;
+
+        while(i) {
+            var j = Math.floor(Math.random() * i);
+
+            i--;
+
+            if (i == j) {
+                continue;
+            }
+
+            this.swapValue(i, j);
+        }
+        
+        this._nums = null;
+
+        return this;
+    },
+
+    /**
+     * Hash内の並びを逆転させる
+     *
+     * @return {Jeeel.Hash} 自インスタンス
+     */
+    reverse: function () {
+
+        this._keys.reverse();
+        this._vals.reverse();
+        this._nums = null;
+
+        return this;
+    },
+
+    /**
+     * Hashに他のインスタンス・配列や値を結合し新しいインスタンスとして返す<br />
+     * その際キーは失われる
+     * 
+     * @param {Mixied} var_args 接続値の可変引数
+     * @return {Jeeel.Hash} 作成したインスタンス
+     */
+    concat: function (var_args) {
+        var i, j, res = [];
+
+        for (i = 0; i < this._length; i++) {
+            res[i] = this._vals[i];
+        }
+
+        var len = arguments.length;
+        var idx = this._length;
+        var arg;
+        
+        for (i = 0; i < len; i++) {
+            arg = arguments[i];
+            
+            if (arg instanceof this.constructor) {
+                for (j = 0; j < arg._length; j++) {
+                    res[idx++] = arg._vals[j];
+                }
+            }
+            else if (Jeeel.Type.isArray(arg)) {
+                for (j = 0; j < arg.length; j++) {
+                    res[idx++] = arg[j];
+                }
+            } 
+            else {
+                res[idx++] = arg;
+            }
+        }
+
+        return new this.constructor(res);
+    },
+
+    /**
+     * Hash内の要素を全て繋げて文字列にする
+     *
+     * @param {String} [separator] 連結時の区切り文字列
+     * @return {String} 連結文字列
+     */
+    join: function (separator) {
+        if ( ! Jeeel.Type.isSet(separator)) {
+            separator = ',';
+        }
+
+        return this._vals.join(separator);
+    },
+    
+    /**
+     * 指定した値をHash内で検索し、見つかった場合は対応するキーを返す
+     *
+     * @param {Mixied} searchValue 検索する値
+     * @param {Boolean} [strict] 厳密な検索を行うかどうか
+     * @return {String} 見つかった値に対応するキー(見つからなかった場合はnull)
+     */
+    search: function (searchValue, strict) {
+        var len = this._length;
+        
+        for (var from = 0; from < len; from++) {
+            if (strict && this._vals[from] === searchValue) {
+                return this._keys[from];
+            } else if ( ! strict && this._vals[from] == searchValue) {
+                return this._keys[from];
+            }
+        }
+
+        return null;
+    },
+
+    /**
+     * 指定した値をHash内で検索し、見つかった場合は対応するインデックスを返す
+     *
+     * @param {Mixied} searchValue 検索する値
+     * @param {Integer} [fromIndex] 検索を始める初期インデックス
+     * @return {Integer} 見つかった値に対応するインデックス(見つからなかった場合は-1)
+     */
+    indexOf: function (searchValue, fromIndex) {
+        var len = this._length;
+
+        var from = Number(fromIndex) || 0;
+
+        from = (from < 0 ? Math.ceil(from) : Math.floor(from));
+
+        if (from < 0) {
+            from += len;
+        }
+
+        for (; from < len; from++) {
+            if (from in this._vals && this._vals[from] === searchValue) {
+                return from;
+            }
+        }
+
+        return -1;
+    },
+    
+    /**
+     * 指定した値をHash内で後ろから検索し、見つかった場合は対応するインデックスを返す
+     *
+     * @param {Mixied} searchValue 検索する値
+     * @param {Integer} [fromIndex] 検索を始める初期インデックス
+     * @return {Integer} 見つかった値に対応するインデックス(見つからなかった場合は-1)
+     */
+    lastIndexOf: function (searchValue, fromIndex) {
+        var len = this.length;
+
+        var from = Number(fromIndex);
+        
+        if (isNaN(from)) {
+            from = len - 1;
+        }
+        else {
+            from = (from < 0 ? Math.ceil(from) : Math.floor(from));
+
+            if (from < 0) {
+                from += len;
+            }
+            else if (from >= len) {
+                from = len - 1;
+            }
+        }
+
+        for (; from > -1; from--) {
+            if (from in this._vals && this._vals[from] === searchValue) {
+                return from;
+            }
+        }
+        
+        return -1;
+    },
+
+    /**
+     * HashをGetパラメータ文字列に変換する(先頭に?はつかない)
+     *
+     * @return {String} Getパラメータ文字列
+     */
+    toQueryString: function () {
+        return Jeeel.Filter.Url.QueryString.create().filter(this._hash);
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @param {Hash} [hash] 基となるHash
+     * @constructor
+     */
+    constructor: Jeeel.Hash,
+    
+    /**
+     * 初期化を行う
+     * 
+     * @param {Hash} [hash] 基となるHash
+     */
+    _init: function (hash) {
+        if ( ! Jeeel.Type.isHash(hash)) {
+            hash = {};
+        } else if (hash instanceof this.constructor) {
+            hash = hash.getHash();
+        } else if (hash instanceof Jeeel.Parameter) {
+            hash = hash.getAll();
+        }
+        
+        var keys = [], vals = [];
+        
+        if ('length' in hash && (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash) || Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash))) {
+            for (var i = 0, l = hash.length; i < l; i++) {
+                keys[i] = '' + i;
+                vals[i] = hash[i];
+            }
+            
+            this._lastIndex = l - 1;
+        } else {
+            var max = -1;
+            
+            for (var key in hash) {
+                keys[keys.length] = key;
+                vals[vals.length] = hash[key];
+                
+                key = +key;
+                
+                if (Jeeel.Type.isInteger(key) && max < key) {
+                    max = key;
+                }
+            }
+            
+            this._lastIndex = max;
+        }
+
+        this._hash = hash;
+        this._keys = keys;
+        this._vals = vals;
+        this._length = vals.length;
+    },
+    
+    _copy: function (from, to) {
+        var res = new this.constructor();
+        var max = -1;
+        
+        for (var i = from; i <= to; i++) {
+            var key = this._keys[i];
+            
+            res._keys[res._keys.length] = key;
+            res._vals[res._vals.length] = this._vals[i];
+            res._hash[key] = this._vals[i];
+            
+            key = +key;
+
+            if (Jeeel.Type.isInteger(key) && max < key) {
+                max = key;
+            }
+        }
+        
+        res._lastIndex = max;
+        res._length = res._keys.length;
+        
+        return res;
+    },
+    
+    /**
+     * 
+     */
+    _resetLastIndex: function (key, set) {
+        
+        if ( ! Jeeel.Type.isSet(key)) {
+            key = -1;
+            
+            for (var i = 0; i < this._length; i++) {
+                var tmp = +this._keys[i];
+                
+                if (Jeeel.Type.isInteger(tmp) && key < tmp) {
+                    key = tmp;
+                }
+            }
+            
+            this._lastIndex = key;
+            
+            return;
+        }
+        
+        key = +key;
+
+        if (set && this._lastIndex < key) {
+            this._lastIndex = key;
+        } else if (this._lastIndex == key) {
+            for (var i = key; i >= 0; i--) {
+                if (i in this._hash) {
+                    this._lastIndex = i;
+                    return;
+                }
+            }
+
+            this._lastIndex = -1;
+        }
+    },
+
+    /**
+     * Hash内の物を全て数値だと仮定してキャストして取得する
+     * 
+     * @return {Number[]} 数値配列
+     */
+    _getNums: function () {
+        if (this._nums) {
+            return this._nums;
+        }
+
+        var nums = [];
+
+        for (var i = 0; i < this._length; i++) {
+            nums[i] = +this._vals[i];
+        }
+        
+        this._nums = nums;
+
+        return nums;
     }
 };
 Jeeel.directory.Jeeel.Filter = {
@@ -3527,7 +8413,7 @@ Jeeel.Filter.Abstract.prototype = {
 Jeeel._Object.JeeelFilter = {
     
     getInputs: function (elm) {
-        var selector = "input, select, textarea, button";
+        var selector = "input, select, keygen, textarea, button";
         var res = [], i, l;
         
         if (elm.querySelectorAll) {
@@ -3538,7 +8424,7 @@ Jeeel._Object.JeeelFilter = {
             }
         } else {
             
-            var tags = ['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'];
+            var tags = ['INPUT', 'SELECT', 'KEYGEN', 'TEXTAREA', 'BUTTON'];
 
             res = Jeeel.Dom.Core.Searcher.create(elm).getElementsByTagName(tags);
         }
@@ -3654,7 +8540,7 @@ Jeeel.Filter.Each.prototype = {
         Jeeel.Hash.forEach(params,
             function (val, key) {
 
-                if ( ! this._keys || Jeeel.Type.inArray(key, this._keys)) {
+                if ( ! this._keys || Jeeel.Hash.inHash(key, this._keys)) {
                     result[key] = filter.filter(val);
                 }
                 else {
@@ -4358,7 +9244,7 @@ Jeeel.Filter.Hash.Key.prototype = {
                 Jeeel.Hash.forEach(row,
                     function (val, key) {
                         if (key === this._key) {
-                            allow = Jeeel.Type.inArray(val, this._allowList);
+                            allow = Jeeel.Hash.inHash(val, this._allowList);
                            return Jeeel.Hash.FOR_EACH_EXIT;
                         }
                     }, this
@@ -4958,7 +9844,7 @@ Jeeel.Filter.Hash.DeleteKey.prototype = {
         Jeeel.Hash.forEach(vals,
             function (val, key) {
 
-                if ( ! Jeeel.Type.inArray(key, this._deleteKeys)) {
+                if ( ! Jeeel.Hash.inHash(key, this._deleteKeys)) {
                     res[key] = val;
                 }
             }, this
@@ -4989,7 +9875,7 @@ Jeeel.Filter.String = {
 
 };
 
-Jeeel.file.Jeeel.Filter.String = ['Split', 'Replace', 'RegularExpressionEscape'];
+Jeeel.file.Jeeel.Filter.String = ['Split', 'Replace'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Filter.String, Jeeel.file.Jeeel.Filter.String);
 
@@ -5119,45 +10005,6 @@ Jeeel.Filter.String.Replace.prototype = {
 };
 
 Jeeel.Class.extend(Jeeel.Filter.String.Replace, Jeeel.Filter.Abstract);
-
-/**
- * コンストラクタ
- *
- * @class 正規表現に使用するメタ文字をエスケープするフィルター
- * @augments Jeeel.Filter.Abstract
- */
-Jeeel.Filter.String.RegularExpressionEscape = function () {
-    Jeeel.Filter.Abstract.call(this);
-};
-
-/**
- * インスタンスの作成
- *
- * @return {Jeeel.Filter.String.RegularExpressionEscape} 作成したインスタンス
- */
-Jeeel.Filter.String.RegularExpressionEscape.create = function () {
-    return new this();
-};
-
-Jeeel.Filter.String.RegularExpressionEscape.prototype = {
-  
-    /**
-     * エスケープ対象の正規表現
-     * 
-     * @type RegExp
-     * @private
-     */
-    _reg: /([\/()\[\]{}|*+-.,\^$?\\])/g,
-    
-    /**
-     * @private
-     */
-    _filter: function (val) {
-        return ('' + val).replace(this._reg, '\\$1');
-    }
-};
-
-Jeeel.Class.extend(Jeeel.Filter.String.RegularExpressionEscape, Jeeel.Filter.Abstract);
 Jeeel.directory.Jeeel.Filter.Url = {
 
     /**
@@ -5475,6 +10322,7 @@ Jeeel.Filter.Url.Parser.create = function () {
 };
 
 Jeeel.Filter.Url.Parser.prototype = {
+    
     /**
      * URLをパースするための正規表現
      * 
@@ -5537,123 +10385,9 @@ Jeeel.Filter.Html = {
 
 };
 
-Jeeel.file.Jeeel.Filter.Html = ['Escape', 'Unescape', 'Form', 'FormValue', 'Hidden', 'HiddenString'];
+Jeeel.file.Jeeel.Filter.Html = ['Form', 'FormValue', 'Hidden', 'HiddenString'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Filter.Html, Jeeel.file.Jeeel.Filter.Html);
-
-/**
- * コンストラクタ
- *
- * @class HTML内で使用できない文字を特殊文字にエスケープするフィルター
- * @augments Jeeel.Filter.Abstract
- * @param {Boolean} [replaceSpaceAndLineFeed] 改行とスペースを置き換えるかどうか(デフォルトは置き換えない)
- */
-Jeeel.Filter.Html.Escape = function (replaceSpaceAndLineFeed) {
-    Jeeel.Filter.Abstract.call(this);
-    
-    this._replaceSpaceAndLineFeed = !!replaceSpaceAndLineFeed;
-};
-
-/**
- * インスタンスの作成を行う
- *
- * @param {Boolean} [replaceSpaceAndLineFeed] 改行とスペースを置き換えるかどうか(デフォルトは置き換えない)
- * @return {Jeeel.Filter.Html.Escape} 作成したインスタンス
- */
-Jeeel.Filter.Html.Escape.create = function (replaceSpaceAndLineFeed) {
-    return new this(replaceSpaceAndLineFeed);
-};
-
-Jeeel.Filter.Html.Escape.prototype = {
-  
-    /**
-     * 改行とスペースを置き換えるかどうか
-     * 
-     * @type Boolean
-     * @private
-     */
-    _replaceSpaceAndLineFeed: false,
-    
-    _filter: function (val) {
-        val = '' + val;
-
-        val = val.replace(/&/g, '&amp;')
-                 .replace(/"/g, '&quot;')
-                 .replace(/</g, '&lt;')
-                 .replace(/>/g, '&gt;');
-
-        if (this._replaceSpaceAndLineFeed) {
-          
-            // IEではスペースが入らない改行後に文字が入らないとその改行を無視するのでスペースを挿入
-            if (Jeeel.UserAgent.isInternetExplorer()) {
-                val = val.replace(/ /g, '&nbsp;')
-                         .replace(/\r\n/g, '\n')
-                         .replace(/\n\n/g, '<br />&nbsp;<br />')
-                         .replace(/\n/g, '<br />');
-            } else {
-                val = val.replace(/ /g, '&nbsp;')
-                         .replace(/\n/g, '<br />');
-            }
-        }
-
-        return val;
-    }
-};
-
-Jeeel.Class.extend(Jeeel.Filter.Html.Escape, Jeeel.Filter.Abstract);
-
-/**
- * コンストラクタ
- *
- * @class HTML内の特殊文字にを元に戻すフィルター(全てを全て置き換える訳ではない)
- * @augments Jeeel.Filter.Abstract
- * @param {Boolean} [replaceSpaceAndLineFeed] 改行とスペースを置き換えるかどうか(デフォルトは置き換えない)
- */
-Jeeel.Filter.Html.Unescape = function (replaceSpaceAndLineFeed) {
-
-    Jeeel.Filter.Abstract.call(this);
-    
-    this._replaceSpaceAndLineFeed = !!replaceSpaceAndLineFeed;
-};
-
-/**
- * インスタンスの作成を行う
- *
- * @param {Boolean} [replaceSpaceAndLineFeed] 改行とスペースを置き換えるかどうか(デフォルトは置き換えない)
- * @return {Jeeel.Filter.Html.Unescape} 作成したインスタンス
- */
-Jeeel.Filter.Html.Unescape.create = function (replaceSpaceAndLineFeed) {
-    return new this(replaceSpaceAndLineFeed);
-};
-
-Jeeel.Filter.Html.Unescape.prototype = {
-
-    /**
-     * 改行とスペースを置き換えるかどうか
-     * 
-     * @type Boolean
-     * @private
-     */
-    _replaceSpaceAndLineFeed: false,
-  
-    _filter: function (val) {
-        val = '' + val;
-
-        val = val.replace(/&amp;|&#38;|&#x26;/g, '&')
-                 .replace(/&quot;|&#34;|&#x22;/g, '"')
-                 .replace(/&lt;|&#60;|&#x3C;/g, '<')
-                 .replace(/&gt;|&#62;|&#x3E;/g, '>');
-
-        if (this._replaceSpaceAndLineFeed) {
-            val = val.replace(/&nbsp;|&#160;|&#xA0;/g, ' ')
-                     .replace(/<br *(\/)?>/g, '\n');
-        }
-
-        return val;
-    }
-};
-
-Jeeel.Class.extend(Jeeel.Filter.Html.Unescape, Jeeel.Filter.Abstract);
 
 /**
  * コンストラクタ
@@ -5691,7 +10425,9 @@ Jeeel.Filter.Html.Form.create = function (useDefaultValue, unknownName, overwrit
 };
 
 Jeeel.Filter.Html.Form.prototype = {
-  
+    
+    _radioToArray: false,
+    
     _useDefaultValue: false,
     
     _unknownName: '',
@@ -5699,6 +10435,18 @@ Jeeel.Filter.Html.Form.prototype = {
     _overwrittenName: null,
     
     _avoidValues: [],
+    
+    /**
+     * 正確なリストを有効にするかどうかを設定する
+     * 
+     * @param {Boolean} [enable] 有効かどうか
+     * @return {Jeeel.Filter.Html.Form} 自インスタンス
+     */
+    enableAccurateList: function (enable) {
+        this._radioToArray = !!enable;
+        
+        return this;
+    },
     
     /**
      * @private
@@ -5789,8 +10537,10 @@ Jeeel.Filter.Html.Form.prototype = {
     },
     
     _setParams: function (res, name, element) {
-
-        if (element.tagName.toUpperCase() === 'INPUT') {
+        
+        var tagName = element.tagName.toUpperCase();
+        
+        if ( ! this._radioToArray && tagName === 'INPUT') {
             if (element.type.toLowerCase() === 'radio' && ! this._getProp(element, 'checked')) {
                 return;
             }
@@ -5806,7 +10556,7 @@ Jeeel.Filter.Html.Form.prototype = {
 
             key = names[i] || this._getMaxCount(res);
 
-            if (i < l -1) {
+            if (i < l - 1) {
                 if (Jeeel.Type.isElement(res[key])) {
                     this._avoidValues[this._avoidValues.length] = new Jeeel.Object.Item(this._repairName(names.slice(0, i + 1)), res[key]);
                     
@@ -5817,11 +10567,25 @@ Jeeel.Filter.Html.Form.prototype = {
             }
         }
         
-        if (key in res) {
+        if (key in res && ! Jeeel.Type.isArray(res[key])) {
             this._avoidValues = this._avoidValues.concat(this._repairValue(res[key]));
         }
         
-        res[key] = element;
+        if (this._radioToArray && tagName === 'INPUT' && element.type.toLowerCase() === 'radio') {
+            if ( ! res[key]) {
+                res[key] = [];
+                res[key]._checkRadio = null;
+                res[key].valueOf = this._getRadio;
+            }
+            
+            if (this._getProp(element, 'checked')) {
+                res[key]._checkRadio = element;
+            }
+            
+            res[key].push(element);
+        } else {
+            res[key] = element;
+        }
     },
     
     _getMaxCount: function (res) {
@@ -5837,6 +10601,10 @@ Jeeel.Filter.Html.Form.prototype = {
         }
 
         return (cnt === null ? 0 : cnt + 1);
+    },
+    
+    _getRadio: function () {
+        return this._checkRadio;
     }
 };
 
@@ -5987,7 +10755,7 @@ Jeeel.Filter.Html.FormValue.prototype = {
                         res = [];
 
                         for (i = 0, l = ops.length; i < l; i++) {
-                            if (ops[i].getAttribute('selected')) {
+                            if (ops[i].getAttribute('selected') !== null) {
                                 res[res.length] = ops[i].getAttribute(propName);
                             }
                         }
@@ -5995,8 +10763,8 @@ Jeeel.Filter.Html.FormValue.prototype = {
                         return res;
                     }
                     
-                    for (i = 0, l = ops.length; i < l; i++) {
-                        if (ops[i].getAttribute('selected')) {
+                    for (i = ops.length; i--;) {
+                        if (ops[i].getAttribute('selected') !== null) {
                             return ops[i].getAttribute(propName);
                         }
                     }
@@ -6110,7 +10878,9 @@ Jeeel.Filter.Html.Hidden = function (key) {
 
     Jeeel.Filter.Abstract.call(this);
     
-    this._key = key || null;
+    if (key || key === 0) {
+        this._key = key;
+    }
 };
 
 /**
@@ -6130,7 +10900,7 @@ Jeeel.Filter.Html.Hidden.prototype = {
     
     _filter: function (vals) {
 
-        if (this._key) {
+        if (this._key || this._key === 0) {
             return this._makeHiddenString(this._key, vals);
         }
 
@@ -6139,7 +10909,7 @@ Jeeel.Filter.Html.Hidden.prototype = {
 
     _filterEach: function (vals) {
 
-        if (this._key) {
+        if (this._key || this._key === 0) {
             return this._scanArray(this._key, vals);
         }
         
@@ -6217,7 +10987,9 @@ Jeeel.Class.extend(Jeeel.Filter.Html.Hidden, Jeeel.Filter.Abstract);
 Jeeel.Filter.Html.HiddenString = function (key) {
     Jeeel.Filter.Abstract.call(this);
     
-    this._key = key || null;
+    if (key || key === 0) {
+        this._key = key;
+    }
 };
 
 /**
@@ -6233,12 +11005,11 @@ Jeeel.Filter.Html.HiddenString.create = function (key) {
 Jeeel.Filter.Html.HiddenString.prototype = {
     _key: null,
     
-    _mFilter: Jeeel.Filter.Chain.create().add(new Jeeel.Filter.Url.Escape())
-                                       .add(new Jeeel.Filter.Html.Escape()),
+    _mFilter: new Jeeel.Filter.Url.Escape(),
   
     _filter: function (vals) {
 
-        if (this._key) {
+        if (this._key || this._key === 0) {
             return this._makeHiddenString(this._key, vals);
         }
         
@@ -6247,7 +11018,7 @@ Jeeel.Filter.Html.HiddenString.prototype = {
 
     _filterEach: function (vals) {
 
-        if (this._key) {
+        if (this._key || this._key === 0) {
             return this._scanArray(this._key, vals);
         }
 
@@ -6303,1531 +11074,13 @@ Jeeel.Filter.Html.HiddenString.prototype = {
 
     _makeHiddenString: function (key, val) {
         val = this._mFilter.filter(val);
+        val = Jeeel.String.escapeHtml(val);
         return '<input type="hidden" name="' + key + '" value="' + val + '" />';
     }
 };
 
 Jeeel.Class.extend(Jeeel.Filter.Html.HiddenString, Jeeel.Filter.Abstract);
-
-if (Jeeel._auto) {
-    Jeeel._tmp();
-}/**
- * コンストラクタ
- * 
- * @class 配列もしくは連想配列について複雑な処理をするクラス<br />
- *         そのままの連想配列やJeeel.Parameterよりも高速に連想配列にアクセス出来るが、初期化にかなりのロスを伴う
- * @param {Hash} [hash] 基となるHash
- */
-Jeeel.Hash = function (hash) {
-    this._init(hash);
-};
-
-/**
- * インスタンスの作成を行う
- * 
- * @param {Hash} [hash] 基となるHash
- * @return {Jeeel.Hash} 作成したインスタンス
- */
-Jeeel.Hash.create = function (hash) {
-    return new this(hash);
-};
-
-/**
- * Jeeel.Hash.forEachを途中で終了するための定数
- *
- * @type Object
- * @constant
- */
-Jeeel.Hash.FOR_EACH_EXIT = {
-    exit: true
-};
-
-/**
- * 指定したHashから配列の長さを返す
- *
- * @param {Hash} hash 配列・連想配列
- * @return {Integer} キーの数
- * @throws {Error} hashが配列式でない場合に起こる
- */
-Jeeel.Hash.getCount = function (hash) {
-    if ( ! Jeeel.Type.isHash(hash)) {
-        throw new Error('hashが配列・連想配列ではありません');
-    }
-
-    if (Jeeel.Type.hasLength(hash)) {
-        return hash.length;
-    }
-
-    var count = 0;
-
-    for (var key in hash) {
-        count++;
-    }
-
-    return count;
-};
-
-/**
- * 指定したHashからキーのリストを取得する
- *
- * @param {Hash} hash 配列・連想配列(キーを保持する全てを許可する)
- * @param {Mixied} [value] キーの取得条件値
- * @param {Boolean} [strict] 厳密な検索を行うかどうか
- * @return {String[]} キーのリスト
- * @throws {Error} hashが配列式でない場合に起こる
- */
-Jeeel.Hash.getKeys = function (hash, value, strict) {
-
-    if (Jeeel.Type.isEmpty(hash)) {
-        throw new Error('hashが配列・連想配列ではありません');
-    }
-    
-    var valSet = Jeeel.Type.isSet(value);
-    var res = [];
-
-    if (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash) || Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash)) {
-        for (var i = 0, l = hash.length; i < l; i++) {
-            
-            if (valSet) {
-                if (strict && value !== hash[i]) {
-                    continue;
-                } else if ( ! strict && value != hash[i]) {
-                    continue;
-                }
-            }
-
-            res[res.length] = '' + i;
-        }
-    } else {
-        for (var key in hash) {
-
-            if (valSet) {
-                if (strict && value !== hash[key]) {
-                    continue;
-                } else if ( ! strict && value != hash[key]) {
-                    continue;
-                }
-            }
-
-            res[res.length] = key;
-        }
-    }
-
-    return res;
-};
-
-/**
- * 指定したHashの値を全て返す
- *
- * @param {Hash} hash 配列・連想配列
- * @return {Array} 値のリスト
- * @throws {Error} hashが配列式でない場合に起こる
- */
-Jeeel.Hash.getValues = function (hash) {
-
-    if ( ! Jeeel.Type.isHash(hash)) {
-        throw new Error('hashが配列・連想配列ではありません');
-    }
-    
-    var res;
-
-    if (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash)) {
-        return Array.prototype.slice.call(hash, 0, hash.length);
-    } else if (Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash)) {
-        res = [];
-        
-        for (var i = hash.length; i--;) {
-            res[i] = hash[i];
-        }
-        
-        return res;
-    }
-
-    res = [];
-
-    for (var key in hash) {
-        res[res.length] = hash[key];
-    }
-
-    return res;
-};
-
-/**
- * 指定したHashのキーと値のペアを全て返す<br />
- * 配列等に関しても全て返す
- *
- * @param {Hash} hash 配列・連想配列
- * @param {Boolean} [sort] ソートするかどうか
- * @param {Boolean} [enableChainKey] プロトタイプチェーンのキーを全て参照するかどうか(__proto__が定義されていないブラウザには意味がない)
- * @return {Jeeel.Object.Item[]} キーと値のリスト(valueはセキュリティ系のエラーの場合、値ではなくエラーオブジェクトを代入する)
- * @throws {Error} hashが配列式でない場合に起こる
- */
-Jeeel.Hash.getPairs = function (hash, sort, enableChainKey) {
-    
-    if (Jeeel.Type.isEmpty(hash)) {
-        throw new Error('hashが配列・連想配列ではありません');
-    }
-
-    var type = Jeeel.Type.getType(hash);
-    var list = Jeeel.Type.getKeys(type);
-    var retryWhere = !!( ! enableChainKey && (hash.__proto__ || Object.getPrototypeOf) && hash.hasOwnProperty);
-    var pair = [], key;
-
-    for (key in hash) {
-
-        if (retryWhere && ! hash.hasOwnProperty(key)) {
-            continue;
-        }
-
-        var val;
-
-        try {
-            val = hash[key];
-        } catch (e) {
-            val = e;
-        }
-
-        pair[pair.length] = new Jeeel.Object.Item(key, val);
-
-        var searchKey = Jeeel.Hash.search(key, list, true);
-
-        if ( ! Jeeel.Type.isEmpty(searchKey)) {
-            list.splice(searchKey, 1);
-        }
-    }
-    
-    for (var i = 0, l = list.length; i < l; i++) {
-        key = list[i];
-        
-        if (key !== '__proto__' && retryWhere && ! hash.hasOwnProperty(key)) {
-            continue;
-        }
-        
-        if ( ! (key in hash)) {
-            continue;
-        }
-        
-        try {
-            pair[pair.length] = new Jeeel.Object.Item(key, hash[key]);
-        } catch (e) {
-            pair[pair.length] = new Jeeel.Object.Item(key, e);
-        }
-    }
-    
-    if ( ! ('__proto__' in hash) && Object.getPrototypeOf) {
-        pair[pair.length] = new Jeeel.Object.Item('__proto__', Object.getPrototypeOf(hash));
-    }
-    
-    if (sort) {
-        pair.sort(function (a, b) {
-            if (a.key > b.key) {
-                return 1;
-            } else if(a.key < b.key) {
-                return -1;
-            }
-            
-            return 0;
-        });
-    }
-
-    return pair;
-};
-
-/**
- * 配列・連想配列をマージする
- *
- * @param {Hash} hash1 配列・連想配列
- * @param {Hash} hash2 配列・連想配列
- * @return {Hash} mergeした後の連想配列
- * @throws {Error} hashが配列式でない場合に起こる
- */
-Jeeel.Hash.merge = function (hash1, hash2) {
-    if ( ! Jeeel.Type.isHash(hash1) || ! Jeeel.Type.isHash(hash2)) {
-        throw new Error('hash1・hash2が配列・連想配列ではありません');
-    }
-
-    var res = {};
-
-    var digit, count = 0;
-
-    Jeeel.Hash.forEach(hash1,
-        function (val, key) {
-
-            digit = +key;
-
-            if (Jeeel.Type.isInteger(digit) && digit > count) {
-                count = digit;
-            }
-
-            res[key] = val;
-        }
-    );
-
-    Jeeel.Hash.forEach(hash2,
-        function (val, key) {
-
-            if (Jeeel.Type.isInteger(+key)) {
-                res[++count] = val;
-            } else {
-                res[key] = val;
-            }
-        }
-    );
-   
-    return res;
-};
-
-/**
- * 指定した値をHash内で検索し、見つかった場合は対応するキーを返す
- *
- * @param {Mixied} value 検索する値
- * @param {Hash} hash 配列・連想配列
- * @param {Boolean} [strict] 厳密な検索を行うかどうか
- * @return {String} 見つかった値の対応するキー(見つからなかった場合はnull)
- * @throws {Error} hashが配列式でない場合に起こる
- */
-Jeeel.Hash.search = function (value, hash, strict) {
-    if ( ! Jeeel.Type.isHash(hash)) {
-        throw new Error('hashが配列・連想配列ではありません');
-    }
-    
-    var _key = null;
-
-    Jeeel.Hash.forEach(hash,
-        function (val, key) {
-            if (strict && value === val) {
-                _key = key;
-                return Jeeel.Hash.FOR_EACH_EXIT;
-            } else if ( ! strict && value == val) {
-                _key = key;
-                return Jeeel.Hash.FOR_EACH_EXIT;
-            }
-        }
-    );
-
-    return _key;
-};
-
-/**
- * Hash形式のオブジェクトを配列に修正して返す
- *
- * @param {Hash} hash 配列・連想配列
- * @return {Array} 配列に修正したHashの値リスト(hashのキーが数字の部分を優先し、その後ろからキーが文字列のものを入れていく)
- * @throws {Error} hashが配列式でない場合に起こる
- */
-Jeeel.Hash.toArray = function (hash) {
-    if ( ! Jeeel.Type.isHash(hash)) {
-        throw new Error('hashが配列・連想配列ではありません');
-    }
-
-    if (Jeeel.Type.isArray(hash)) {
-        return Jeeel.Method.clone(hash);
-    }
-    else if (Jeeel.Type.isArguments(hash)) {
-        return (hash.length === 1 ? [hash[0]] : Array.apply(null, hash));
-    }
-    else if (Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash)) {
-        var arr = [];
-
-        for (var i = hash.length; i--;) {
-            arr[i] = hash[i];
-        }
-
-        return arr;
-    }
-
-    var key, num, nums = [];
-    var res = [];
-    var max = -1;
-    
-    for (key in hash) {
-        num = +key;
-        
-        if (Jeeel.Type.isInteger(num)) {
-            nums[nums.length] = num;
-            
-            res[num] = hash[num];
-            
-            if (max < num) {
-                max = num;
-            }
-        }
-    }
-
-    for (key in hash) {
-        if ( ! Jeeel.Type.isInteger(+key)) {
-            res[++max] = hash[key];
-        }
-    }
-
-    return res;
-};
-
-/**
- * 配列・連想配列に対して各要素にアクセスするメソッド<br />
- * 配列の場合は初期化していない要素にはアクセスしない
- * 
- * @param {Hash} hash 配列・連想配列
- * @param {Function} callback void callBack(Mixied value, String key, Hash hash)<br />
- *                             引数は左から要素,キー,配列となる(戻り値に指定定数を返すとbreakする)
- * @param {Mixied} [thisArg] コールバックメソッド中のthisに変わるオブジェクト(初期値はhashになる)
- * @throws {Error} hashが配列式でない場合に起こる
- * @see Jeeel.Hash.FOR_EACH_EXIT
- */
-Jeeel.Hash.forEach = function (hash, callback, thisArg) {
-    if ( ! Jeeel.Type.isHash(hash)) {
-        throw new Error('hashが配列・連想配列ではありません');
-    }
-    
-    if ( ! Jeeel.Type.isSet(thisArg)) {
-        thisArg = hash;
-    }
-
-    var tmp, length;
-    var exit = Jeeel.Hash.FOR_EACH_EXIT;
-
-    if (Jeeel.Type.hasLength(hash)) {
-        length = hash.length;
-
-        for (var i = 0; i < length; i++) {
-
-            if (i in hash) {
-
-                tmp = callback.call(thisArg, hash[i], i, hash);
-
-                if (tmp === exit) {
-                    break;
-                }
-            }
-        }
-    } else {
-        for (var key in hash) {
-            
-            tmp = callback.call(thisArg, hash[key], key, hash);
-
-            if (tmp === exit) {
-                break;
-            }
-        }
-    }
-};
-
-Jeeel.Hash.prototype = {
-
-    /**
-     * 基のHash
-     *
-     * @type Hash
-     */
-    _hash: null,
-
-    /**
-     * Hashのキーリスト
-     *
-     * @type String[]
-     */
-    _keys: [],
-
-    /**
-     * Hashの値リスト
-     *
-     * @type Array
-     */
-    _vals: [],
-
-    /**
-     * Hashの値を全て数値に変更したリスト
-     *
-     * @type Number[]
-     */
-    _nums: null,
-
-    /**
-     * Hashの要素数
-     *
-     * @type Integer
-     */
-    _length: 0,
-    
-    /**
-     * Hash内のキーの内最大の数値
-     * 
-     * @type Integer
-     */
-    _lastIndex: -1,
-    
-    /**
-     * Hashの値を取得する
-     * 
-     * @param {String} key キー
-     * @param {Mixied} [defaultValue] デフォルト値
-     * @return {Mixied} 取得した値
-     */
-    get: function (key, defaultValue) {
-        return (key in this._hash ? this._hash[key] : defaultValue);
-    },
-    
-    /**
-     * Hashに値を設定する
-     * 
-     * @param {String} key キー
-     * @param {Mixed} val 保存する値
-     * @return {Jeeel.Hash} 自インスタンス
-     */
-    set: function (key, val) {
-        var c = ! (key in this._hash);
-        
-        this._hash[key] = val;
-        
-        if (c) {
-            this._keys[this._length] = key;
-            this._vals[this._length] = val;
-            this._length++;
-            
-            this._nums = null;
-            
-            this._resetLastIndex(key, true);
-        }
-
-        return this;
-    },
-    
-    /**
-     * Hashの値を削除する
-     * 
-     * @param {String} key キー
-     * @return {Jeeel.Hash} 自インスタンス
-     */
-    unset: function (key) {
-        if (key in this._hash) {
-            delete this._hash[key];
-            var index, i;
-            
-            for (i = 0; i < this._length; i++) {
-                if (this._keys[i] == key) {
-                    index = i;
-                    break;
-                }
-            }
-            
-            this._keys.splice(index, 1);
-            this._vals.splice(index, 1);
-            
-            this._length--;
-            
-            this._nums = null;
-            
-            this._resetLastIndex(key);
-        }
-
-        return this;
-    },
-    
-    /**
-     * 指定したキーに対応するインデックスを取得する
-     * 
-     * @param {String} key キー
-     * @return {Integer} インデックス
-     */
-    getIndex: function (key) {
-        var index = -1;
-        
-        for (var i = 0; i < this._length; i++) {
-            if (this._keys[i] == key) {
-                index = i;
-                break;
-            }
-        }
-        
-        return index;
-    },
-    
-    /**
-     * 指定したインデックスに対応するキーを取得する
-     * 
-     * @param {Integer} index インデックス
-     * @return {String} キー
-     */
-    getKey: function (index) {
-        return this._keys[index];
-    },
-    
-    /**
-     * 指定したインデックスに対応する値を取得する
-     * 
-     * @param {Integer} index インデックス
-     * @return {Mixied} 取得した値
-     */
-    getValue: function (index) {
-        return this._vals[index];
-    },
-
-    /**
-     * Hashの要素数を返す
-     *
-     * @return {Integer} 要素数
-     */
-    getLength: function () {
-        return this._length;
-    },
-
-    /**
-     * 最初の値を取得する
-     *
-     * @return {Mixied} 取得した値
-     */
-    getFirst: function () {
-        return this._vals[0];
-    },
-
-    /**
-     * 最後の値を取得する
-     *
-     * @return {Mixied} 取得した値
-     */
-    getLast: function () {
-        return this._vals[this._length - 1];
-    },
-
-    /**
-     * 基のHashを返す
-     *
-     * @return {Hash} 基のHash
-     */
-    getHash: function () {
-        return this._hash;
-    },
-
-    /**
-     * Hashのキーのリストを作成して取得する
-     *
-     * @return {String[]} キーのリスト
-     */
-    getKeys: function () {
-        return this._keys;
-    },
-
-    /**
-     * Hashの値のリストを作成して取得する
-     *
-     * @return {Array} 値のリスト
-     */
-    getValues: function () {
-        return this._vals;
-    },
-    
-    /**
-     * Hash内の値を全て数値と見立てて最大値を得る
-     *
-     * @return {Number} 最大値
-     */
-    getMax: function () {
-        return Math.max.apply(null, this._getNums());
-    },
-
-    /**
-     * Hash内の値を全て数値と見立てて最小値を得る
-     *
-     * @return {Number} 最小値
-     */
-    getMin: function () {
-        return Math.min.apply(null, this._getNums());
-    },
-
-    /**
-     * Hash内の値を全て数値と見立てて合計値を得る
-     *
-     * @return {Number} 合計値
-     */
-    getSum: function () {
-        var nums = this._getNums();
-        var sum  = 0;
-
-        for (var i = nums.length; i--;) {
-            sum += nums[i];
-        }
-
-        return sum;
-    },
-
-    /**
-     * Hash内の値を全て数値と見立てて平均値を得る
-     *
-     * @return {Number} 平均値
-     */
-    getAvg: function () {
-        return this.getSum() / this._length;
-    },
-
-    /**
-     * 指定された関数を実行し、それらに合格した要素からなる新しいインスタンスを作成する
-     *
-     * @param {Function} callback Boolean callback(Mixied val, String key, Hash hash)
-     * @param {Mixied} [thisArg] callback内でthisに相当する値
-     * @return {Jeeel.Hash} 作成したインスタンス
-     */
-    filter: function (callback, thisArg) {
-        var res = {};
-        
-        if ( ! Jeeel.Type.isSet(thisArg)) {
-            thisArg = this;
-        }
-
-        for (var i = 0; i < this._length; i++) {
-            if (callback.call(thisArg, this._vals[i], this._keys[i], this._hash)) {
-                res[this._keys[i]] = this._vals[i];
-            }
-        }
-
-        return this.constructor.create(res);
-    },
-
-    /**
-     * 指定された関数を実行し、それらの戻り値から新しいインスタンスを作成する
-     *
-     * @param {Function} callback Mixied callback(Mixied val, String key, Hash hash)
-     * @param {Mixied} [thisArg] callback内でthisに相当する値
-     * @return {Jeeel.Hash} 作成したインスタンス
-     */
-    map: function (callback, thisArg) {
-        var res = {};
-        
-        if ( ! Jeeel.Type.isSet(thisArg)) {
-            thisArg = this;
-        }
-
-        for (var i = 0; i < this._length; i++) {
-            res[this._keys[i]] = callback.call(thisArg, this._vals[i], this._keys[i], this._hash);
-        }
-
-        return this.constructor.create(res);
-    },
-
-    /**
-     * 前の戻り値とHashの値を先頭から1つ引数に取り、<br />
-     * 最終的にひとつの値を結果として得る<br />
-     * 始めの時の戻り値には初期値もしくは先頭の値が来る(先頭の値の場合は引数に二番目の値が来る)
-     * 
-     * @param {Function} callback Mixied callback(Mixied tmp, Mixied val, String key, Hash hash)
-     * @param {Mixied} [initVal] 初期値(指定しない場合は最初の値を使う)
-     * @return {Mixied} 戻り値
-     */
-    reduce: function (callback, initVal) {
-        if ( ! Jeeel.Type.isSet(initVal) && this._length <= 0) {
-            throw new Error('空のHashに対して初期値未指定でReduceメソッドは使えません。');
-        }
-
-        var val;
-        var min = 0;
-
-        if (Jeeel.Type.isSet(initVal)) {
-            val = initVal;
-        } else {
-            val = this._vals[0];
-            min++;
-        }
-
-        for (var i = min; i < this._length; i++) {
-            val = callback(val, this._vals[i], this._keys[i], this._hash);
-        }
-
-        return val;
-    },
-
-    /**
-     * 前の戻り値とHashの値を後尾から1つ引数に取り、<br />
-     * 最終的にひとつの値を結果として得る<br />
-     * 始めの時の戻り値には初期値もしくは先頭の値が来る(先頭の値の場合は引数に二番目の値が来る)
-     *
-     * @param {Function} callback Mixied reduce(Mixied tmp, Mixied val, String key, Hash hash)
-     * @param {Mixied} [initVal] 初期値(指定しない場合は最初の値を使う)
-     * @return {Mixied} 戻り値
-     */
-    reduceRight: function (callback, initVal) {
-        if ( ! Jeeel.Type.isSet(initVal) && this._length <= 0) {
-            throw new Error('空のHashに対して初期値未指定でReduceRightメソッドは使えません。');
-        }
-
-        var val;
-        var max = this._length - 1;
-
-        if (Jeeel.Type.isSet(initVal)) {
-            val = initVal;
-        } else {
-            val = this._vals[max];
-            max--;
-        }
-
-        for (var i = max; i >= 0; i--) {
-            val = callback(val, this._vals[i], this._keys[i], this._hash);
-        }
-
-        return val;
-    },
-
-    /**
-     * 指定された関数を実行し、全ての要素がそれを合格するかどうかを返す
-     *
-     * @param {Function} callback Boolean callback(Mixied val, String key, Hash hash)
-     * @param {Mixied} [thisArg] callback内でthisに相当する値
-     * @return {Boolean} 全ての要素が合格したかどうか
-     */
-    every: function (callback, thisArg) {
-        if ( ! Jeeel.Type.isSet(thisArg)) {
-            thisArg = this;
-        }
-        
-        for (var i = 0; i < this._length; i++) {
-            if ( ! callback.call(thisArg, this._vals[i], this._keys[i], this._hash)) {
-                return false;
-            }
-        }
-
-        return true;
-    },
-
-    /**
-     * 指定された関数を実行し、それに合格する要素があるかどうかを返す
-     *
-     * @param {Function} callback Boolean callback(Mixied val, String key, Hash hash)
-     * @param {Mixied} [thisArg] callback内でthisに相当する値
-     * @return {Boolean} 合格する要素があるかどうか
-     */
-    some: function (callback, thisArg) {
-        if ( ! Jeeel.Type.isSet(thisArg)) {
-            thisArg = this;
-        }
-        
-        for (var i = 0; i < this._length; i++) {
-            if (callback.call(thisArg, this._vals[i], this._keys[i], this._hash)) {
-                return true;
-            }
-        }
-
-        return false;
-    },
-
-    /**
-     * 指定された関数を各要素に一度ずつ実行する
-     *
-     * @param {Function} callback void callback(Mixied val, String key, Hash hash)
-     * @param {Mixied} [thisArg] callback内でthisに相当する値
-     * @return {Jeeel.Hash} 自インスタンス
-     */
-    forEach: function (callback, thisArg) {
-        if ( ! Jeeel.Type.isSet(thisArg)) {
-            thisArg = this;
-        }
-        
-        for (var i = 0; i < this._length; i++) {
-            callback.call(thisArg, this._vals[i], this._keys[i], this._hash);
-        }
-
-        return this;
-    },
-    
-    /**
-     * Hash内の要素が配列もしくはJeeel.Hashインスタンスだった場合は押しつぶして、1次元に変換して新しいインスタンスとして作成する<br />
-     * その際キーは失われる
-     *
-     * @return {Jeeel.Hash} 作成したインスタンス
-     */
-    flatten: function () {
-        var res = [];
-        
-        var _flatten = function (arr) {
-            for (var i = 0, l = arr.length; i < l; i++) {
-                
-                if (Jeeel.Type.isArray(arr[i])) {
-                    _flatten(arr[i]);
-                    continue;
-                } else if(arr[i] instanceof this.constructor) {
-                    _flatten(arr[i].getValues());
-                    continue;
-                }
-                
-                res[res.length] = arr[i];
-            }
-        };
-        
-        _flatten(this._vals);
-        
-        return new this.constructor(res);
-    },
-    
-    /**
-     * 指定したキー同士の値を交換する
-     * 
-     * @param {String} keyLeft キー1
-     * @param {String} keyRight キー2
-     * @return {Jeeel.Hash} 自インスタンス
-     */
-    swap: function (keyLeft, keyRight) {
-        var left, right, both = 0;
-        
-        for (var i = 0; i < this._length; i++) {
-            if (this._keys[i] == keyLeft) {
-                left  = i;
-                both++;
-            } else if (this._keys[i] == keyRight) {
-                right = i;
-                both++;
-            }
-            
-            if (both === 2) {
-                break;
-            }
-        }
-        
-        return this.swapValue(left, right);
-    },
-
-    /**
-     * 指定したインデックス同士の値を交換する
-     * 
-     * @param {Integer} left インデックス1
-     * @param {Integer} right インデックス2
-     * @return {Jeeel.Hash} 自インスタンス
-     */
-    swapValue: function (left, right) {
-        if ( ! (0 <= left && left < this._length)) {
-            return this;
-        }
-        else if ( ! (0 <= right && right < this._length)) {
-            return this;
-        }
-        else if (left === right) {
-            return this;
-        }
-        
-        var key = this._keys[left];
-        var val = this._vals[left];
-
-        this._keys[left] = this._keys[right];
-        this._vals[left] = this._vals[right];
-
-        this._keys[right] = key;
-        this._vals[right] = val;
-
-        return this;
-    },
-    
-    /**
-     * Hash内から最後の要素を取り除き、<br />
-     * その値を返す
-     *
-     * @return {Mixied} 取りだした値
-     */
-    pop: function () {
-        if ( ! this._length) {
-            return undefined;
-        }
-        
-        this._length--;
-
-        var key = this._keys.pop();
-        var val = this._vals.pop();
-
-        delete this._hash[key];
-
-        this._nums = null;
-        
-        this._resetLastIndex(key);
-
-        return val;
-    },
-
-    /**
-     * 引数で受け取った値をHashの最後に挿入する
-     *
-     * @param {Mixied} var_args 挿入値の可変引数
-     * @return {Integer} 挿入後の要素数
-     */
-    push: function (var_args) {
-        var len = arguments.length;
-        
-        if ( ! len) {
-            return this._length;
-        }
-        
-        var max = this._lastIndex + 1;
-
-        for (var i = 0; i < len; i++) {
-            this._hash[max] = arguments[i];
-            this._vals[this._length] = arguments[i];
-            this._keys[this._length] = '' + max;
-
-            max++;
-            this._length++;
-        }
-
-        this._nums = null;
-        this._lastIndex = max - 1;
-
-        return this._length;
-    },
-
-    /**
-     * Hash内の先頭の要素を取り除き、<br />
-     * その値を返す
-     *
-     * @return {Mixied} 取りだした値
-     */
-    shift: function () {
-        if ( ! this._length) {
-            return undefined;
-        }
-        
-        this._length--;
-
-        var key = this._keys.shift();
-        var val = this._vals.shift();
-
-        delete this._hash[key];
-
-        this._nums = null;
-        
-        this._resetLastIndex(key);
-
-        return val;
-    },
-
-    /**
-     * 引数で受け取った値をHashの先頭に挿入する
-     *
-     * @param {Mixied} var_args 挿入値の可変引数
-     * @return {Integer} 挿入後の要素数
-     */
-    unshift: function (var_args) {
-        var len = arguments.length;
-        
-        if ( ! len) {
-            return this._length;
-        }
-        
-        var li, i, keys = [], vals = [], repKeys = {};
-        
-        if (this._lastIndex >= 0) {
-            for (i = this._lastIndex; i >= 0; i--) {
-                if (i in this._hash) {
-                    this._hash[i + len] = this._hash[i];
-                    
-                    repKeys[i] = '' + (i + len);
-                    
-                    if ( ! li) {
-                        li = i + len;
-                    }
-                }
-            }
-        } else {
-            li = len - 1;
-        }
-        
-        for (i = 0; i < len; i++) {
-            this._hash[i] = arguments[i];
-            vals[i] = arguments[i];
-            keys[i] = '' + i;
-        }
-
-        for (i = 0; i < this._length; i++) {
-            vals[len + i] = this._vals[i];
-            keys[len + i] = repKeys[this._keys[i]] || this._keys[i];
-        }
-        
-        this._keys = keys;
-        this._vals = vals;
-
-        this._nums = null;
-        
-        if (li) {
-            this._lastIndex = li;
-        }
-
-        return this._length += len;
-    },
-    
-    /**
-     * Hashの一部を取り出して新たにインスタンスを作成する
-     * 
-     * @param {Integer} [start] どこから取り出すかを示すインデックス<br />
-     *                           負の数を指定した場合Hashの終わりからのオフセットを示す<br />
-     *                           省略時は0
-     * @param {Integer} [end] どこまで取りだすかを示すインデックス(この数値は含まない)<br />
-     *                         負の数を指定した場合Hashの終わりからのオフセットを示す<br />
-     *                         省略時はHashの最後まで
-     * @return {Jeeel.Hash} 作成したインスタンス
-     */
-    slice: function (start, end) {
-        if ( ! Jeeel.Type.isInteger(start)) {
-            start = 0;
-        } else if (start < 0) {
-            start = start + this._length;
-            
-            if (start < 0) {
-                start = 0;
-            }
-        }
-        
-        if ( ! Jeeel.Type.isSet(end) || end > this._length) {
-            end = this._length;
-        } else if (end < 0) {
-            end = end + this._length + 1;
-        }
-        
-        return this._copy(start, end - 1);
-    },
-
-    /**
-     * Hash内の古い要素を取り除き、代わりに新しい要素を挿入する
-     * 
-     * @param {Integer} index 配列を変化させ始めるインデックス
-     * @param {Integer} [count] 配列から取り除く要素の数(省略はindex以降全ての要素)
-     * @param {Mixied} var_args 追加要素の可変引数
-     * @return {Array} 古い要素の配列
-     */
-    splice: function (index, count, var_args) {
-        if ( ! Jeeel.Type.isInteger(index)) {
-            return [];
-        }
-        
-        if ( ! Jeeel.Type.isInteger(count)) {
-            count = this._length;
-        }
-        
-        var i, idx, ai = 2, li = -1;
-        var len = index + count;
-        var res = [], keys = [], vals = [];
-        
-        for (i = 0; i < index; i++) {
-            keys[i] = this._keys[i];
-            vals[i] = this._vals[i];
-            
-            idx = +keys[i];
-            
-            if (Jeeel.Type.isInteger(idx) && li < idx) {
-                li = idx;
-            }
-        }
-        
-        for (i = index; i < len; i++) {
-            res[res.length] = this._vals[i];
-            
-            if (ai in arguments) {
-                keys[i] = this._keys[i];
-                vals[i] = arguments[ai];
-                
-                idx = +keys[i];
-
-                if (Jeeel.Type.isInteger(idx) && li < idx) {
-                    li = idx;
-                }
-                
-                this._hash[keys[i]] = vals[i];
-                
-                ai++;
-            } else {
-                delete this._hash[this._keys[i]];
-            }
-        }
-        
-        for (i = len; i < this._length; i++) {
-            keys[keys.length] = this._keys[i];
-            vals[vals.length] = this._vals[i];
-            
-            idx = +keys[i];
-            
-            if (Jeeel.Type.isInteger(idx) && li < idx) {
-                li = idx;
-            }
-        }
-        
-        this._keys = keys;
-        this._vals = vals;
-        
-        this._length = this._vals.length;
-        
-        this._nums = null;
-        
-        this._lastIndex = li;
-        
-        return res;
-    },
-
-    /**
-     * 配列をソートする<br />
-     * ソートアルゴリズムはクイックソート
-     * 
-     * @param {Function} [compareFunction] 比較関数(大きい数値の場合はaを優先、小さい数値の場合はbを優先、0は同値とする)<br />
-     *                                      Integer compareFunction(Mixied a, Mixied b)
-     * @return {Jeeel.Hash} 自インスタンス
-     */
-    sort: function (compareFunction) {
-        if ( ! compareFunction ) {
-          
-            /**
-             * @ignore
-             */
-            compareFunction = function (a, b) {
-                a = '' + a;
-                b = '' + b;
-                
-                return a > b ? 1 : (a < b ? -1 : 0);
-            };
-        }
-        
-        /**
-         * @ignore
-         */
-        var middle = function (h, t) {
-            return h + ((t - h) >>> 1);
-        };
-
-        var stack = [0, this._length - 1];
-        
-        while(stack.length) {
-            var tail = stack.pop();
-            var head = stack.pop();
-            var pivot = this._vals[middle(head, tail)];
-            var i = head - 1;
-            var j = tail + 1;
-            
-            while (1) {
-                while (i < tail && compareFunction(this._vals[++i], pivot) < 0);
-                while (j > head && compareFunction(this._vals[--j], pivot) > 0);
-                
-                if (i >= j) break;
-                
-                this.swapValue(i, j);
-            }
-            
-            if (head < i - 1) {stack.push(head);stack.push(i - 1);}
-            if (j + 1 < tail) {stack.push(j + 1);stack.push(tail);}
-        }
-        
-        return this;
-    },
-
-    /**
-     * Hash内の要素をシャッフルする
-     *
-     * @return {Jeeel.Hash} 自インスタンス
-     */
-    shuffle: function () {
-        var i = this._length;
-
-        while(i) {
-            var j = Math.floor(Math.random() * i);
-
-            i--;
-
-            if (i == j) {
-                continue;
-            }
-
-            this.swapValue(i, j);
-        }
-        
-        this._nums = null;
-
-        return this;
-    },
-
-    /**
-     * Hash内の並びを逆転させる
-     *
-     * @return {Jeeel.Hash} 自インスタンス
-     */
-    reverse: function () {
-
-        this._keys.reverse();
-        this._vals.reverse();
-        this._nums = null;
-
-        return this;
-    },
-
-    /**
-     * Hashに他のインスタンス・配列や値を結合し新しいインスタンスとして返す<br />
-     * その際キーは失われる
-     * 
-     * @param {Mixied} var_args 接続値の可変引数
-     * @return {Jeeel.Hash} 作成したインスタンス
-     */
-    concat: function (var_args) {
-        var i, j, res = [];
-
-        for (i = 0; i < this._length; i++) {
-            res[i] = this._vals[i];
-        }
-
-        var len = arguments.length;
-        var idx = this._length;
-        var arg;
-        
-        for (i = 0; i < len; i++) {
-            arg = arguments[i];
-            
-            if (arg instanceof this.constructor) {
-                for (j = 0; j < arg._length; j++) {
-                    res[idx++] = arg._vals[j];
-                }
-            }
-            else if (Jeeel.Type.isArray(arg)) {
-                for (j = 0; j < arg.length; j++) {
-                    res[idx++] = arg[j];
-                }
-            } 
-            else {
-                res[idx++] = arg;
-            }
-        }
-
-        return new this.constructor(res);
-    },
-
-    /**
-     * Hash内の要素を全て繋げて文字列にする
-     *
-     * @param {String} [separator] 連結時の区切り文字列
-     * @return {String} 連結文字列
-     */
-    join: function (separator) {
-        if ( ! Jeeel.Type.isSet(separator)) {
-            separator = ',';
-        }
-
-        return this._vals.join(separator);
-    },
-    
-    /**
-     * 指定した値をHash内で検索し、見つかった場合は対応するキーを返す
-     *
-     * @param {Mixied} searchValue 検索する値
-     * @param {Boolean} [strict] 厳密な検索を行うかどうか
-     * @return {String} 見つかった値に対応するキー(見つからなかった場合はnull)
-     */
-    search: function (searchValue, strict) {
-        var len = this._length;
-        
-        for (var from = 0; from < len; from++) {
-            if (strict && this._vals[from] === searchValue) {
-                return this._keys[from];
-            } else if ( ! strict && this._vals[from] == searchValue) {
-                return this._keys[from];
-            }
-        }
-
-        return null;
-    },
-
-    /**
-     * 指定した値をHash内で検索し、見つかった場合は対応するインデックスを返す
-     *
-     * @param {Mixied} searchValue 検索する値
-     * @param {Integer} [fromIndex] 検索を始める初期インデックス
-     * @return {Integer} 見つかった値に対応するインデックス(見つからなかった場合は-1)
-     */
-    indexOf: function (searchValue, fromIndex) {
-        var len = this._length;
-
-        var from = Number(fromIndex) || 0;
-
-        from = (from < 0 ? Math.ceil(from) : Math.floor(from));
-
-        if (from < 0) {
-            from += len;
-        }
-
-        for (; from < len; from++) {
-            if (from in this._vals && this._vals[from] === searchValue) {
-                return from;
-            }
-        }
-
-        return -1;
-    },
-    
-    /**
-     * 指定した値をHash内で後ろから検索し、見つかった場合は対応するインデックスを返す
-     *
-     * @param {Mixied} searchValue 検索する値
-     * @param {Integer} [fromIndex] 検索を始める初期インデックス
-     * @return {Integer} 見つかった値に対応するインデックス(見つからなかった場合は-1)
-     */
-    lastIndexOf: function (searchValue, fromIndex) {
-        var len = this.length;
-
-        var from = Number(fromIndex);
-        
-        if (isNaN(from)) {
-            from = len - 1;
-        }
-        else {
-            from = (from < 0 ? Math.ceil(from) : Math.floor(from));
-
-            if (from < 0) {
-                from += len;
-            }
-            else if (from >= len) {
-                from = len - 1;
-            }
-        }
-
-        for (; from > -1; from--) {
-            if (from in this._vals && this._vals[from] === searchValue) {
-                return from;
-            }
-        }
-        
-        return -1;
-    },
-
-    /**
-     * HashをGetパラメータ文字列に変換する(先頭に?はつかない)
-     *
-     * @return {String} Getパラメータ文字列
-     */
-    toQueryString: function () {
-        return Jeeel.Filter.Url.QueryString.create().filter(this._hash);
-    },
-    
-    /**
-     * コンストラクタ
-     * 
-     * @param {Hash} [hash] 基となるHash
-     * @constructor
-     */
-    constructor: Jeeel.Hash,
-    
-    /**
-     * 初期化を行う
-     * 
-     * @param {Hash} [hash] 基となるHash
-     */
-    _init: function (hash) {
-        if ( ! Jeeel.Type.isHash(hash)) {
-            hash = {};
-        } else if (hash instanceof this.constructor) {
-            hash = hash.getHash();
-        } else if (hash instanceof Jeeel.Parameter) {
-            hash = hash.getAll();
-        }
-        
-        var keys = [], vals = [];
-        
-        if ('length' in hash && (Jeeel.Type.isArray(hash) || Jeeel.Type.isArguments(hash) || Jeeel.Type.isHtmlCollection(hash) || Jeeel.Type.isNodeList(hash))) {
-            for (var i = 0, l = hash.length; i < l; i++) {
-                keys[i] = '' + i;
-                vals[i] = hash[i];
-            }
-            
-            this._lastIndex = l - 1;
-        } else {
-            var max = -1;
-            
-            for (var key in hash) {
-                keys[keys.length] = key;
-                vals[vals.length] = hash[key];
-                
-                key = +key;
-                
-                if (Jeeel.Type.isInteger(key) && max < key) {
-                    max = key;
-                }
-            }
-            
-            this._lastIndex = max;
-        }
-
-        this._hash = hash;
-        this._keys = keys;
-        this._vals = vals;
-        this._length = vals.length;
-    },
-    
-    _copy: function (from, to) {
-        var res = new this.constructor();
-        var max = -1;
-        
-        for (var i = from; i <= to; i++) {
-            var key = this._keys[i];
-            
-            res._keys[res._keys.length] = key;
-            res._vals[res._vals.length] = this._vals[i];
-            res._hash[key] = this._vals[i];
-            
-            key = +key;
-
-            if (Jeeel.Type.isInteger(key) && max < key) {
-                max = key;
-            }
-        }
-        
-        res._lastIndex = max;
-        res._length = res._keys.length;
-        
-        return res;
-    },
-    
-    /**
-     * 
-     */
-    _resetLastIndex: function (key, set) {
-        
-        if ( ! Jeeel.Type.isSet(key)) {
-            key = -1;
-            
-            for (var i = 0; i < this._length; i++) {
-                var tmp = +this._keys[i];
-                
-                if (Jeeel.Type.isInteger(tmp) && key < tmp) {
-                    key = tmp;
-                }
-            }
-            
-            this._lastIndex = key;
-            
-            return;
-        }
-        
-        key = +key;
-
-        if (set && this._lastIndex < key) {
-            this._lastIndex = key;
-        } else if (this._lastIndex == key) {
-            for (var i = key; i >= 0; i--) {
-                if (i in this._hash) {
-                    this._lastIndex = i;
-                    return;
-                }
-            }
-
-            this._lastIndex = -1;
-        }
-    },
-
-    /**
-     * Hash内の物を全て数値だと仮定してキャストして取得する
-     * 
-     * @return {Number[]} 数値配列
-     */
-    _getNums: function () {
-        if (this._nums) {
-            return this._nums;
-        }
-
-        var nums = [];
-
-        for (var i = 0; i < this._length; i++) {
-            nums[i] = +this._vals[i];
-        }
-        
-        this._nums = nums;
-
-        return nums;
-    }
-};
-Jeeel.directory.Jeeel.String = {
+Jeeel.directory.Jeeel.Parameter = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -7836,1950 +11089,1463 @@ Jeeel.directory.Jeeel.String = {
      * @private
      */
     toString: function () {
-        return Jeeel.directory.Jeeel + 'String/';
+        return Jeeel.directory.Jeeel + 'Parameter/';
     }
 };
 
 /**
  * コンストラクタ
  * 
- * @class 文字列の複雑な処理をするクラス
- * @param {String} [string] 基となる文字列
+ * @class 配列・連想配列に対して操作を行うクラス
+ * @implements Jeeel.Parameter.Filter.Interface, Jeeel.Parameter.Validator.Interface
+ * @param {Hash} [params] 入力パラメータ
+ * @throws {Error} paramsを指定してかつが配列式でない場合に起こる
  */
-Jeeel.String = function (string) {
-    
-    if ( ! Jeeel.Type.isSet(string)) {
-        string = '';
-    }
-    
-    this._str = ('' + string).replace(/\r\n/g, '\n');
-};
+Jeeel.Parameter = function (params) {
 
-/**
- * インスタンスの作成を行う
- * 
- * @param {String} [string] 基となる文字列
- * @return {Jeeel.String} 作成したインスタンス
- */
-Jeeel.String.create = function (string) {
-    return new this(string);
-};
-
-/**
- * バイナリコードよりインスタンスの作成を行う<br />
- * 多バイトには対応していない
- *
- * @param {String|String[]} binary 連結したバイナリコードまたはバイナリコード配列
- * @return {Jeeel.String} 作成したインスタンス
- * @throws {Error} binaryがバイナリコード・バイナリコード配列で無い場合に発生する
- */
-Jeeel.String.fromBinary = function (binary) {
-    var tmp = [];
-    var i, l = binary.length;
-
-    if (Jeeel.Type.isString(binary)) {
-        for (i = 0; i < l; i += 2) {
-            tmp[tmp.length] = '0x' + binary.slice(i, i + 2);
-        }
-    } else if (Jeeel.Type.isArray(binary)) {
-        for (i = 0; i < l; i++) {
-            tmp[i] = '0x' + binary[i];
-        }
-    } else {
-        throw new Error('binaryはバイナリコードまたはバイナリコード配列でなければなりません。');
+    if ( ! params) {
+        params = {};
+    } else if ( ! Jeeel.Type.isHash(params)) {
+        throw new Error('paramsには配列式が使えなければなりません。');
     }
 
-    return new this(String.fromCharCode.apply(null, tmp));
-};
-
-/**
- * HTML文字列からタグ文字を全て取り除く
- *
- * @param {String} html HTML文字列
- * @return {String} タグを取り除いた文字列
- */
-Jeeel.String.stripTags = function (html) {
-
-//    return html.replace(/<\w+(\s+("[^"]*"|'[^']*'|[^>])+)?>|<\/\w+>/gi, '');
-
-    var nodes = {childNodes: Jeeel.Document.createNodeList(html)};
-
-    var res = [];
-    var txt = Jeeel.Dom.Node.TEXT_NODE;
-
-    function _search(target) {
-        if (target.nodeType === txt) {
-            res[res.length] = target.data;
-        }
-
-        for (var i = 0, l = target.childNodes.length; i < l; i++) {
-            _search(target.childNodes[i]);
-        }
-    }
-
-    _search(nodes);
-
-    return res.join('');
-};
-
-/**
- * 文字列の前後から空白を取り除く
- *
- * @param {String} str 対象の文字列(文字列以外を入れた場合は文字列に変換された後に値を返す)
- * @return {String} 空白を取り除いた後の値
- */
-Jeeel.String.trim = function (str) {
-    if ( ! str) {
-        return '';
-    }
+    this._params = params;
+    this._errors = {};
+    this._fieldList = new this.constructor.FieldList();
+    this._validators = this.constructor._validators.concat();
+    this._filters = this.constructor._filters.concat();
     
-    str = str.toString();
-    
-    if (str.trim) {
-        return str.trim();
-    }
-
-    var trimLeft  = /^\s+/;
-    var trimRight = /\s\s*$/;
-
-    return str.replace(trimLeft, '').replace(trimRight, '');
-};
-
-/**
- * 対象文字列をキャメルケースに変更する(パスカルケースではない)<br />
- * 変換対象はハイフネーションまたはスネークケースが対象となる
- * 
- * @param {String} str 対象文字列
- * @return {String} 変換後の文字列
- */
-Jeeel.String.toCamelCase = function (str) {
-    return ('' + str).replace(/(?:-|_)([a-z])/g, function (str, p){return p.toUpperCase();});
-};
-
-/**
- * 対象文字列をスネークケースに変更する<br />
- * 変換対象はハイフネーションまたはキャメルケースが対象となる
- * 
- * @param {String} str 対象文字列
- * @return {String} 変換後の文字列
- */
-Jeeel.String.toSnakeCase = function (str) {
-    return ('' + str).replace(/([A-Z])/g, '_$1').replace(/-/g, '_').toLowerCase();
-};
-
-/**
- * 対象文字列をハイフネーションに変更する<br />
- * 変換対象はスネークケースまたはキャメルケースが対象となる
- * 
- * @param {String} str 対象文字列
- * @return {String} 変換後の文字列
- */
-Jeeel.String.toHyphenation = function (str) {
-    return ('' + str).replace(/([A-Z])/g, '-$1').replace(/_/g, '-').toLowerCase();
-};
-
-/**
- * 対象文字列の単語の先頭をだけを大文字にする
- * 
- * @param {String} str 対象文字列
- * @return {String} 変換後の文字列
- */
-Jeeel.String.toTitleCase = function (str) {
-    return ('' + str).toLowerCase().replace(/(^|\s)([a-z])/g, function (str, p1, p2){return p1 + p2.toUpperCase();});
-};
-
-/**
- * 文字列の指定箇所に指定文字列を挿入する
- *
- * @param {String} str 対象の文字列(文字列以外を入れた場合は文字列に変換された後に値を返す)
- * @param {Integer} index 挿入箇所のインデックス(マイナスのインデックスの場合は先頭に、インデックスをオーバーしたら末尾に挿入文字列が付けられる)
- * @param {String} insertStr 挿入文字列
- * @return {String} 挿入後の文字列
- */
-Jeeel.String.insert = function (str, index, insertStr) {
-    if ( ! str) {
-        return insertStr;
-    }
-    
-    str = '' + str;
-    
-    var leftStr = str.substring(0, index);
-    var rightStr = str.substring(index, str.length);
-
-    return leftStr + insertStr + rightStr;
-};
-
-/**
- * Jeeel.String.insertの複数版
- *
- * @param {String} str 対象の文字列(文字列以外を入れた場合は文字列に変換された後に値を返す)
- * @param {Integer[]} indexArr 挿入箇所のインデックス配列(マイナスのインデックスの場合は先頭に、インデックスをオーバーしたら末尾に挿入文字列が付けられる)<br />
- *                              もしもこの配列内のインデックスの並びが昇順ではない場合、insertStrArrの配列のインデックスとずれるので注意
- * @param {String|String[]} insertStrArr 挿入文字列もしくは挿入文字列配列(配列にした場合はインデックスの配列と数が一致しなければならない)
- * @return {String} 挿入後の文字列
- * @throws {Error} insertStrArrが配列でindexArrとinsertStrArrの配列の要素数が一致しない場合に起こる
- */
-Jeeel.String.multiInsert = function (str, indexArr, insertStrArr) {
-    if ( ! Jeeel.Type.isArray(indexArr)) {
-        indexArr = [indexArr];
-    }
-    
-    str = '' + str;
-    
-    var res = [];
-    var insertStrIsArray = Jeeel.Type.isArray(insertStrArr);
-    var insertStr;
-    
-    if (insertStrIsArray && indexArr.length != insertStrArr.length) {
-        throw new Error('インデックスの配列と挿入文字の配列の数が違います。');
-    }
-    
-    indexArr.sort(function (a, b) {return a - b});
-
-    indexArr.unshift(0);
-    
-    if (insertStrIsArray) {
-        insertStrArr.unshift('');
-    }
-    
-    for (var i = 1, l = indexArr.length; i < l; i++) {
-        if (insertStrIsArray) {
-            insertStr = insertStrArr[i];
-        } else {
-            insertStr = insertStrArr;
-        }
+    if ( ! Jeeel.Parameter._lock && ! Jeeel.Language.hasLanguage('Parameter.Validator')) {
+        Jeeel.Parameter._lock = true;
         
-        res[res.length] = str.substring(indexArr[i - 1], indexArr[i]);
-        res[res.length] = insertStr;
+        Jeeel.Language.loadLanguage('Parameter.Validator', function () {
+            Jeeel.Parameter._lock = false;
+        });
     }
-    
-    res[res.length] = str.substring(indexArr[l - 1], str.length);
-    
-    return res.join('');
 };
 
 /**
- * テキストのサイズを取得する
- * 
- * @param {String} text サイズを知りたいテキスト
- * @param {Hash} [styleList] スタイルのキーと値のリスト
- * @return {Jeeel.Object.Size} ピクセル単位のテキストのサイズ
+ * インスタンスの作成
+ *
+ * @param {Hash} [params] 入力パラメータ
+ * @return {Jeeel.Parameter} 作成したインスタンス
+ * @throws {Error} paramsを指定してかつが配列式でない場合に起こる
  */
-Jeeel.String.getTextSize = function (text, styleList) {
-    var span;
-    
-    if (this.getTextWidth._span) {
-        span = this.getTextWidth._span;
-    } else {
-        span = Jeeel.Document.createElement('span');
-        span.style.cssText = 'display: inline; position: absolute; top: 0px; margin: 0; white-space: nowrap; border: none; visibility: hidden;';
-        
-        Jeeel.Document.appendToBody(span);
-        
-        span = new Jeeel.Dom.Element(span);
-        
-        this.getTextWidth._span = span;
-    }
-    
-    if ( ! styleList) {
-        styleList = {};
-    }
-    
-    delete styleList.visibility;
-    delete styleList.position;
-    
-    span.setStyleList(styleList);
-    
-    if (text.charAt(text.length - 1) === '\n') {
-        text += ' ';
-    }
-    
-    span.setText(text);
-    
-    return span.getSize();
+Jeeel.Parameter.create = function (params) {
+    return new this(params);
+};
+
+Jeeel.Parameter._validators = [];
+Jeeel.Parameter._filters = [];
+Jeeel.Parameter._activeParameter = null;
+Jeeel.Parameter._activeField = null;
+
+/**
+ * 初期で使用するバリデータを追加する
+ * 
+ * @param {Jeeel.Parameter.Validator.Interface} validator
+ */
+Jeeel.Parameter.addDefaultValidator = function (validator) {
+    this._validators.push(validator);
 };
 
 /**
- * テキストの幅を取得する
+ * 初期で使用するフィルタを追加する
  * 
- * @param {String} text 幅を知りたいテキスト
- * @param {Hash} [styleList] スタイルのキーと値のリスト
- * @return {Integer} ピクセル単位のテキストの幅
+ * @param {Jeeel.Parameter.Filter.Interface} filter
  */
-Jeeel.String.getTextWidth = function (text, styleList) {
-    return this.getTextSize(text, styleList).width;
+Jeeel.Parameter.addDefaultFilter = function (filter) {
+    this._filters.push(filter);
 };
 
 /**
- * テキストの高さを取得する
+ * 現在処理中のパラメータを取得する
  * 
- * @param {String} text 高さを知りたいテキスト
- * @param {Hash} [styleList] スタイルのキーと値のリスト
- * @return {Integer} ピクセル単位のテキストの高さ
+ * @return {Jeeel.Parameter} パラメータ
  */
-Jeeel.String.getTextHeight = function (text, styleList) {
-    return this.getTextSize(text, styleList).height;
+Jeeel.Parameter.getActiveParameter = function () {
+    return this._activeParameter;
 };
 
-Jeeel.String.prototype = {
-  
+/**
+ * 現在処理中のフィールドを取得する
+ * 
+ * @return {Jeeel.Parameter.Field} フィールド
+ */
+Jeeel.Parameter.getActiveField = function () {
+    return this._activeField;
+};
+
+/**
+ * 現在処理中のパラメータを設定する
+ * 
+ * @param {Jeeel.Parameter} parameter パラメータ
+ */
+Jeeel.Parameter._setActiveParameter = function (parameter) {
+    this._activeParameter = parameter || null;
+};
+
+/**
+ * 現在処理中のフィールドを設定する
+ * 
+ * @param {Jeeel.Parameter.Field} field フィールド
+ */
+Jeeel.Parameter._setActiveField = function (field) {
+    this._activeField = field || null;
+};
+
+Jeeel.Parameter.prototype = {
+
     /**
-     * 元の文字列
-     * 
-     * @type String
-     * @private
-     */
-    _str: '',
-    
-    /**
-     * 行数
-     * 
-     * @type Integer
-     * @private
-     */
-    _lineCount: null,
-    
-    /**
-     * 改行部分のインデックス配列
-     * 
-     * @type Integer[]
-     * @private
-     */
-    _lineIndex: null,
-    
-    /**
-     * 内部文字列を取得する
-     * 
-     * @return {String} 文字列
-     */
-    getString: function () {
-        return this._str;
-    },
-    
-    /**
-     * 文字列の行数を取得する
-     * 
-     * @return {Integer} 行数
-     */
-    getLineCount: function () {
-        if (this._lineCount) {
-            return this._lineCount;
-        }
-        
-        return this._lineCount = this._str.length - this._str.replace(/\n/g, '').length + 1;
-    },
-    
-    /**
-     * 指定した行の文字列を得る
+     * パラメータ
      *
-     * @param {Integer} [line] 行インデックス(範囲以外の数や文字を入れると全ての文字列が返ってくる)
-     * @return {String} 指定行の文字列
+     * @type Hash
+     * @private
      */
-    getLine: function (line) {
-      
-        this._createLineIndex();
+    _params: {},
+    
+    /**
+     * フィールドリスト
+     * 
+     * @type Jeeel.Parameter.FieldList
+     * @private
+     */
+    _fieldList: null,
+    
+    /**
+     * バリデータリスト
+     * 
+     * @type Jeeel.Parameter.Validator.Abstract[]
+     * @private
+     */
+    _validators: [],
+    
+    /**
+     * フィルタリスト
+     * 
+     * @type Jeeel.Parameter.Filter.Abstract[]
+     * @private
+     */
+    _filters: [],
 
-        var first = (line <= 0 ? 0 : this._lineIndex[line-1] + 1);
-        var last  = this._lineIndex[line];
-        
-        return this._str.slice(first, last);
-    },
-    
     /**
-     * 文字列のサイズを取得する
-     * 
-     * @param {Hash} [styleList] スタイルのキーと値のリスト
-     * @return {Jeeel.Object.Size} ピクセル単位のテキストのサイズ
-     */
-    getTextSize: function (styleList) {
-        return this.constructor.getTextSize(this._str, styleList);
-    },
-    
-    /**
-     * 文字列の幅を取得する
-     * 
-     * @param {Hash} [styleList] スタイルのキーと値のリスト
-     * @return {Integer} ピクセル単位のテキストの幅
-     */
-    getTextWidth: function (styleList) {
-        return this.constructor.getTextWidth(this._str, styleList);
-    },
-    
-    /**
-     * 文字列の高さを取得する
-     * 
-     * @param {Hash} [styleList] スタイルのキーと値のリスト
-     * @return {Integer} ピクセル単位のテキストの高さ
-     */
-    getTextHeight: function (styleList) {
-        return this.constructor.getTextHeight(this._str, styleList);
-    },
-    
-    /**
-     * 指定した文字列が最初に見つかった行インデックスとその行でのインデックスを取得する
+     * エラー
      *
-     * @param {String} search 検索文字列
-     * @return {Jeeel.Object.Technical.LineIndex} 行数とその行でのインデックスを保持する構造体
+     * @type Hash
+     * @private
      */
-    lineIndexOf: function (search) {
-        this._createLineIndex();
+    _errors: {},
+    
+    /**
+     * バリデート済みかどうか
+     * 
+     * @type Boolean
+     * @private
+     */
+    _validated: true,
+
+    /**
+     * ストレージ
+     *
+     * @type Jeeel.Storage.Abstract
+     * @private
+     */
+    _storage: null,
+    
+    /**
+     * バリデータを追加する
+     * 
+     * @param {Jeeel.Parameter.Validator.Abstract} validator バリデータ
+     * @return {Jeeel.Parameter} 自インスタンス
+     */
+    addValidator: function (validator) {
+        this._validators.push(validator);
         
-        var idx = this._str.indexOf(search);
-
-        var line = 0;
-        var tmp  = 0;
-
-        for (var i = 0, l = this._lineIndex.length; i < l; i++) {
-            if (tmp < idx && idx < this._lineIndex[i]) {
-                line += i;
-                idx  -= tmp + 1;
-                break;
+        return this;
+    },
+    
+    /**
+     * フィルタを追加する
+     * 
+     * @param {Jeeel.Parameter.Filter.Abstract} filter フィルタ
+     * @return {Jeeel.Parameter} 自インスタンス
+     */
+    addFilter: function (filter) {
+        this._filters.push(filter);
+        
+        return this;
+    },
+    
+    /**
+     * フィルタメソッドが呼べるかどうかを返す
+     * 
+     * @param {String} name フィルタ名
+     * @return {Boolean} フィルタメソッドが呼べるかどうか
+     */
+    hasFiltration: function (name) {
+        var fname = '_filter' + Jeeel.String.toPascalCase(name);
+        
+        if (this[fname] && typeof this[fname] === 'function') {
+            return true;
+        }
+        
+        for (var i = this._filters.length; i--;) {
+            if (this._filters[i].hasFiltration(name)) {
+                return true;
             }
+        }
+        
+        return false;
+    },
+    
+    /**
+     * フィルタメソッドが取得する
+     * 
+     * @param {String} name フィルタ名
+     * @return {Jeeel.Function.Callback} コールバック
+     */
+    getFiltration: function (name) {
+        var fname = '_filter' + Jeeel.String.toPascalCase(name);
+        
+        if (this[fname] && typeof this[fname] === 'function') {
+            return new Jeeel.Function.Callback(fname, this);
+        }
+        
+        for (var i = this._filters.length; i--;) {
+            if (this._filters[i].hasFiltration(name)) {
+                return this._filters[i].getFiltration(name);
+            }
+        }
+        
+        return null;
+    },
+    
+    /**
+     * バリデートメソッドが呼べるかどうかを返す
+     * 
+     * @param {String} name バリデート名
+     * @return {Boolean} バリデートメソッドが呼べるかどうか
+     */
+    hasValidation: function (name) {
+        var vname = '_validate' + Jeeel.String.toPascalCase(name);
+        
+        if (this[vname] && typeof this[vname] === 'function') {
+            return true;
+        }
+        
+        for (var i = this._validators.length; i--;) {
+            if (this._validators[i].hasValidation(name)) {
+                return true;
+            }
+        }
+        
+        return false;
+    },
+    
+    /**
+     * バリデートメソッドを取得する
+     * 
+     * @param {String} name バリデート名
+     * @return {Jeeel.Function.Callback} コールバック
+     */
+    getValidation: function (name) {
+        var vname = '_validate' + Jeeel.String.toPascalCase(name);
+        
+        if (this[vname] && typeof this[vname] === 'function') {
+            return new Jeeel.Function.Callback(vname, this);
+        }
+        
+        for (var i = this._validators.length; i--;) {
+            if (this._validators[i].hasValidation(name)) {
+                return this._validators[i].getValidation(name);
+            }
+        }
+        
+        return null;
+    },
+    
+    /**
+     * 指定したキーの値を取得する
+     *
+     * @param {String} key キー
+     * @param {Mixied} [defaultValue] デフォルト値
+     * @return {Mixied} 取得値
+     */
+    get: function (key, defaultValue) {
+        return (key in this._params) ? this._params[key] : defaultValue;
+    },
 
-            tmp = this._lineIndex[i];
+    /**
+     * Hashの最初の値を取得する
+     *
+     * @param {Mixied} [defaultValue] デフォルト値
+     * @return {Mixied} 取得値
+     * @deprecated 今後削除される予定
+     */
+    getOne: function (defaultValue) {
+        var result;
+
+        Jeeel.Hash.forEach(this._params,
+            function (val) {
+
+                result = val;
+
+                return Jeeel.Hash.FOR_EACH_EXIT;
+            }
+        );
+
+        if (Jeeel.Type.isEmpty(result)) {
+            return defaultValue;
         }
 
-        return new Jeeel.Object.Technical.LineIndex({line: line, index: idx});
-    },
-    
-    /**
-     * Bsse64エンコードを行う
-     * 
-     * @return {Jeeel.String} 自インスタンス
-     */
-    encodeBase64: function () {
-        this._str = this.toBase64();
-        
-        return this._reset();
-    },
-    
-    /**
-     * Bsse64デコードを行う
-     * 
-     * @return {Jeeel.String} 自インスタンス
-     */
-    decodeBase64: function () {
-        this._str = this.constructor.Hash.Base64.decode(this._str);
-        
-        return this._reset();
-    },
-    
-    /**
-     * MD5エンコードを行う
-     * 
-     * @return {Jeeel.String} 自インスタンス
-     */
-    encodeMd5: function () {
-        this._str = this.toMd5();
-        
-        return this._reset();
-    },
-    
-    /**
-     * Jsonエンコードを行う
-     * 
-     * @return {Jeeel.String} 自インスタンス
-     */
-    encodeJson: function () {
-        this._str = Jeeel.Json.encode(this._str);
-        
-        return this._reset();
-    },
-    
-    /**
-     * Html文字列にあたる部分をエスケープする
-     * 
-     * @param {Boolean} [replaceSpaceAndLineFeed] 改行とスペースを置き換えるかどうか(デフォルトは置き換えない)
-     * @return {Jeeel.String} 自インスタンス
-     */
-    escapeHtml: function (replaceSpaceAndLineFeed) {
-        this._str = Jeeel.Filter.Html.Escape.create(replaceSpaceAndLineFeed).filter(this._str);
-        
-        return this._reset();
-    },
-    
-    /**
-     * エスケープされたHtml文字列を元に戻す
-     * 
-     * @param {Boolean} [replaceSpaceAndLineFeed] 改行とスペースを置き換えるかどうか(デフォルトは置き換えない)
-     * @return {Jeeel.String} 自インスタンス
-     */
-    unescapeHtml: function (replaceSpaceAndLineFeed) {
-        this._str = Jeeel.Filter.Html.Unescape.create(replaceSpaceAndLineFeed).filter(this._str);
-        
-        return this._reset();
-    },
-    
-    /**
-     * RegExpに使用するメタ文字をエスケープする
-     * 
-     * @return {Jeeel.String} 自インスタンス
-     */
-    escapeRegExp: function () {
-        this._str = Jeeel.Filter.String.RegularExpressionEscape.create().filter(this._str);
-        
-        return this._reset();
-    },
-    
-    /**
-     * 文字列からHTMLタグ文字を全て取り除く
-     *
-     * @return {Jeeel.String} 自インスタンス
-     */
-    stripTags: function () {
-        this._str = this.constructor.stripTags(this._str);
-        
-        return this._reset();
-    },
-    
-    /**
-     * 文字列の前後から空白を取り除く
-     *
-     * @return {Jeeel.String} 自インスタンス
-     */
-    trim: function () {
-        this._str = this.constructor.trim(this._str);
-        
-        return this._reset();
-    },
-    
-    /**
-     * 文字列をキャメルケースに変更する
-     * 
-     * @return {Jeeel.String} 自インスタンス
-     */
-    camelCase: function () {
-        this._str = this.constructor.toCamelCase(this._str);
-        
-        return this._reset();
-    },
-    
-    /**
-     * 文字列をスネークケースに変更する
-     * 
-     * @return {Jeeel.String} 自インスタンス
-     */
-    snakeCase: function () {
-        this._str = this.constructor.toSnakeCase(this._str);
-        
-        return this._reset();
-    },
-    
-    /**
-     * 文字列をハイフネーションに変更する
-     * 
-     * @return {Jeeel.String} 自インスタンス
-     */
-    hyphenation: function () {
-        this._str = this.constructor.toHyphenation(this._str);
-        
-        return this._reset();
-    },
-    
-    /**
-     * 文字列をタイトルケースに変更する
-     * 
-     * @return {Jeeel.String} 自インスタンス
-     */
-    titleCase: function () {
-        this._str = this.constructor.toTitleCase(this._str);
-        
-        return this._reset();
-    },
-    
-    /**
-     * 文字列に対して指定箇所に文字列を挿入する
-     * 
-     * @param {Integer} index 挿入箇所のインデックス(マイナスのインデックスの場合は先頭に、インデックスをオーバーしたら末尾に挿入文字列が付けられる)
-     * @param {String} insertStr 挿入文字列
-     * @return {Jeeel.String} 自インスタンス
-     */
-    insert: function (index, insertStr) {
-        this._str = this.constructor.insert(this._str, index, insertStr);
-        
-        return this._reset();
-    },
-    
-    /**
-     * 文字列に対して指定箇所に文字列を挿入する
-     * 
-     * @param {Integer[]} indexArr 挿入箇所のインデックス配列(マイナスのインデックスの場合は先頭に、インデックスをオーバーしたら末尾に挿入文字列が付けられる)<br />
-     *                              もしもこの配列内のインデックスの並びが昇順ではない場合、insertStrArrの配列のインデックスとずれるので注意
-     * @param {String|String[]} insertStrArr 挿入文字列もしくは挿入文字列配列(配列にした場合はインデックスの配列と数が一致しなければならない)
-     * @return {Jeeel.String} 自インスタンス
-     */
-    multiInsert: function (indexArr, insertStrArr) {
-        this._str = this.constructor.multiInsert(this._str, indexArr, insertStrArr);
-        
-        return this._reset();
-    },
-    
-    /**
-     * Query形式の文字列を連想配列に変換する
-     * 
-     * @return {Hash} 変換後の連想配列
-     */
-    toQueryParameters: function () {
-        return Jeeel.Filter.Url.QueryParameter.create().filter(this._str);
-    },
-    
-    /**
-     * Json形式の文字列を変換する
-     * 
-     * @return {Mixied} 変換後の値
-     */
-    parseJson: function () {
-        return Jeeel.Json.decode(this._str);
-    },
-    
-    /**
-     * Base64文字列に変換する
-     * 
-     * @return {String} Base64文字列
-     */
-    toBase64: function () {
-        return this.constructor.Hash.Base64.encode(this._str);
-    },
-    
-    /**
-     * MD5文字列に変換する
-     * 
-     * @return {String} MD5文字列
-     */
-    toMd5: function () {
-        return this.constructor.Hash.md5(this._str);
-    },
-    
-    /**
-     * 文字単位バイナリコードに変換して返す
-     *
-     * @param {String} [prefix] 16進数を示す接頭辞(デフォルトはなし)
-     * @return {String} バイナリコード
-     */
-    toBinary: function (prefix) {
-        return this.toBinaryArray(prefix).join('');
+        return result;
     },
 
     /**
-     * 文字単位バイナリコード配列に変換して返す
+     * 全ての値を返す
      *
-     * @param {String} [prefix] 16進数を示す接頭辞(デフォルトはなし)
-     * @return {String[]} バイナリコード配列
+     * @return {Hash} 取得値
      */
-    toBinaryArray: function (prefix) {
-        if ( ! Jeeel.Type.isString(prefix)) {
-            prefix = '';
+    getAll: function () {
+        return this._params;
+    },
+
+    /**
+     * 現インスタンスの配列に値を保存する
+     *
+     * @param {String} key 保存する値を示すキー
+     * @param {Mixed} val 保存する値
+     * @return {Jeeel.Parameter} 自インスタンス
+     */
+    set: function (key, val) {
+        this._params[key] = val;
+
+        return this;
+    },
+
+    /**
+     * 全ての値を上書きする
+     *
+     * @param {Hash} params 上書きする値リスト
+     * @return {Jeeel.Parameter} 自インスタンス
+     * @throws {Error} paramsが配列式でない場合に起こる
+     */
+    setAll: function (params) {
+        if ( ! Jeeel.Type.isHash(params)) {
+           throw new Error('paramsには配列式が使えなければなりません。');
         }
+        
+        var self = this;
 
+        Jeeel.Hash.forEach(params,
+            function (val, key) {
+                self._params[key] = val;
+            }
+        );
+
+        return this;
+    },
+
+    /**
+     * 現在保持している内部値のキーのリストを作成して取得する
+     * 
+     * @return {String[]} キーのリスト
+     */
+    getKeys: function () {
+        return Jeeel.Hash.getKeys(this._params);
+    },
+
+    /**
+     * 現在保持している内部値のリストを作成して取得する
+     *
+     * @return {Array} キーのリスト
+     */
+    getValues: function () {
+        return Jeeel.Hash.getValues(this._params);
+    },
+    
+    /**
+     * 指定したキーの値を破棄する
+     *
+     * @param {String} key キー
+     * @return {Jeeel.Parameter} 自インスタンス
+     */
+    unset: function (key) {
+        delete this._params[key];
+
+        return this;
+    },
+    
+    /**
+     * 現在の内部の値を全て破棄する
+     * 
+     * @return {Jeeel.Parameter} 自インスタンス
+     */
+    clear: function () {
+        this._params = {};
+        
+        return this;
+    },
+
+    /**
+     * 指定したキーの値を保持しているかどうかを返す
+     *
+     * @param {String} key キー
+     * @return {Boolean} 値を保持していたらtrueそれ以外はfalseを返す
+     */
+    has: function (key) {
+        return key in this._params;
+    },
+    
+    /**
+     * フィールドを全て取得する
+     * 
+     * @return {Jeeel.Parameter.Field[]} フィールドのリスト
+     */
+    getFields: function () {
+        var fields = this._fieldList.getFieldAll();
+        
         var res = [];
-
-        for (var i = 0, l = this._str.length; i < l; i++) {
-            var tmp = this._str.charCodeAt(i);
-            tmp = tmp.toString(16);
-
-            if (tmp.length & 1) {
-                tmp = '0' + tmp;
-            }
-
-            res[i] = prefix + tmp;
+        
+        for (var name in fields) {
+            res.push(fields[name]);
         }
-
+        
         return res;
     },
     
     /**
-     * インスタンスを文字列に変換する
+     * フィールドを追加する
      * 
-     * @return {String} 文字列
+     * @param {String} name フィールド名
+     * @param {String} label ラベル
+     * @param {Array|String} [validationRules] バリデートルール
+     * @param {Array|String} [filtrationRules] フィルタールール
+     * @return {Jeeel.Parameter} 自インスタンス
      */
-    toString: function () {
-        return this._str;
-    },
-    
-    /**
-     * インスタンスを文字列に変換する
-     * 
-     * @return {String} 文字列
-     */
-    valueOf: function () {
-        return this._str;
-    },
-    
-    /**
-     * コンストラクタ
-     * 
-     * @param {String} [str] 基となる文字列
-     * @constructor
-     */
-    constructor: Jeeel.String,
-    
-    _createLineIndex: function () {
-        if (this._lineIndex) {
-            return;
+    addField: function (name, label, validationRules, filtrationRules) {
+        
+        if ( ! (name && label)) {
+            throw new Error('name and label is required.');
         }
         
-        this._lineIndex = [];
+        var vRules = [];
+        var fRules = [];
+        var i, l, pos, key, rule, args,
+            validateRule, filterRule;
         
-        var tmp = 0;
-
-        while (1) {
-            tmp = this._str.indexOf('\n', tmp);
-
-            if (tmp < 0) {
-                break;
+        // バリデートルールの解析
+        if (validationRules && Jeeel.Type.isHash(validationRules)) {
+            
+            for (key in validationRules) {
+                
+                validateRule = validationRules[key];
+                
+                if ( ! Jeeel.Type.isDigit(key)) {
+                    rule = key;
+                    args = Jeeel.Type.isArray(validateRule) && validateRule || [validateRule];
+                } else if (Jeeel.Type.isArray(validateRule)) {
+                    rule = validateRule[0];
+                    args = Jeeel.Type.isArray(validateRule[1]) && validateRule[1] || [validateRule[1]];
+                } else {
+                    rule = Jeeel.String.trim(validateRule);
+                    args = [];
+                }
+                
+                vRules.push([rule, args]);
             }
-
-            this._lineIndex[this._lineIndex.length] = tmp;
-            tmp++;
+        } else if (validationRules) {
+            validationRules = validationRules.split('|');
+            
+            for (i = 0, l = validationRules.length; i < l; i++) {
+                
+                validateRule = Jeeel.String.trim(validationRules[i]);
+                
+                pos = validateRule.indexOf('[');
+                
+                if (pos >= 0) {
+                    rule = validateRule.substr(0, pos);
+                    args = validateRule.substr(pos + 1, validateRule.lastIndexOf(']') - pos - 1).split(',');
+                } else {
+                    rule = validateRule;
+                    args = [];
+                }
+                
+                vRules.push([rule, args]);
+            }
         }
-    },
-    
-    _reset: function () {
-        this._lineCount = null;
-        this._lineIndex = null;
+        
+        // フィルタルールの解析
+        if (filtrationRules && Jeeel.Type.isHash(filtrationRules)) {
+            
+            for (key in filtrationRules) {
+                
+                filterRule = filtrationRules[key];
+
+                if ( ! Jeeel.Type.isDigit(key)) {
+                    rule = key;
+                    args = Jeeel.Type.isArray(filterRule) && filterRule || [filterRule];
+                } else if (Jeeel.Type.isArray(filterRule)) {
+                    rule = filterRule[0];
+                    args = Jeeel.Type.isArray(filterRule[1]) && filterRule[1] || [filterRule[1]];
+                } else {
+                    rule = Jeeel.String.trim(filterRule);
+                    args = [];
+                }
+                
+                fRules.push([rule, args]);
+            }
+        } else if (filtrationRules) {
+            filtrationRules = filtrationRules.split('|');
+            
+            for (i = 0, l = filtrationRules.length; i < l; i++) {
+                filterRule = Jeeel.String.trim(filtrationRules[i]);
+
+                pos = filterRule.indexOf('[');
+                
+                if (pos >= 0) {
+                    rule = filterRule.substr(0, pos);
+                    args = filterRule.substr(pos + 1, filterRule.lastIndexOf(']') - pos - 1).split(',');
+                } else {
+                    rule = filterRule;
+                    args = [];
+                }
+                
+                fRules.push([rule, args]);
+            }
+        }
+        
+        var field = new this.constructor.Field(this, name, label, vRules, fRules);
+        
+        this._validated = false;
+        this._fieldList.addField(field);
         
         return this;
-    }
-};
-
-Jeeel._Object.JeeelString = {
-
-};
-
-Jeeel.file.Jeeel.String = ['Sprintf', 'Hash'];
-
-Jeeel._autoImports(Jeeel.directory.Jeeel.String, Jeeel.file.Jeeel.String);
-/**
- * sprintfのJS版<br />
- * 書式: %[フラグ][フィールド幅].[精度][型指定子]<br />
- * フラグ: -, +, 空白, 0, #<br />
- * 型指定子: b, c, d, e, E, u, f, g, G, o, s, x, X<br />
- * 正規表現を使用するのっでIEでの多用はお勧めしない
- *
- * @param {String} format フォーマット
- * @param {Mixied} var_args フォーマットに対して割り当てる値
- */
-Jeeel.String.sprintf = function (format, var_args) {
-    format = '' + format;
-  
-    var ch, res = [];
-    var plCnt = 0;
-    var len = format.length;
-    var args = Array.prototype.slice.call(arguments, 1, arguments.length);
-    var JeeelString = Jeeel._Object.JeeelString;
-    var tmp = {
-        length: 1
-    };
+    },
     
-    for (var i = 0; i < len; i++) {
-        ch = format.charAt(i);
+    /**
+     * フィールドを削除する
+     * 
+     * @param {String} name フィールド名
+     * @return {Jeeel.Parameter} 自インスタンス
+     */
+    removeField: function (name) {
+        this._fieldList.removeField(name);
         
-        // %が出るまで数値を進めて%が出たらプレースホルダ―毎変換する
-        switch (ch) {
-            case '%':
-                if (format.charAt(i + 1) === '%') {
-                    res[res.length] = '%';
-                    i++;
-                } else {
-                    res[res.length] = JeeelString.convertPlaceholder(format.slice(i, len), args[plCnt++], tmp);
-                    
-                    i += tmp.length - 1;
-                }
-                break;
+        return this;
+    },
+    
+    /**
+     * 指定した名前のフィールドを保持しているかどうかを返す
+     * 
+     * @param {String} name フィールド名
+     * @return {Boolean} フィールドを保持しているかどうか
+     */
+    hasField: function (name) {
+        return this._fieldList.hasField(name);
+    },
+    
+    /**
+     * 設定した全てのフィルタ・検証を行う
+     * 
+     * @return {Jeeel.Net.Abstract} 自インスタンス
+     */
+    validate: function () {
+        this.constructor._setActiveParameter(this);
+        
+        var values = this._params;
+        var fields = this._fieldList.toHash();
+        
+        this._validated = true;
+        this._errors = {};
+        
+        for (var key in fields) {
+            
+            var field = fields[key];
+
+            this.constructor._setActiveField(field);
+            
+            var value = Jeeel.Type.isSet(values[key]) ? values[key] : null;
+            var fRules = field.getFilterRules();
+            var vRules = field.getValidateRules();
+            
+            value = this._filter(field, value, fRules);
+            
+            if (value === Jeeel.Parameter.Filter.IGNORED_VALUE) {
+                field.setValue(value);
                 
-            default:
-                res[res.length] = ch;
-                break;
+                continue;
+            }
+            
+            var isValid = this._validate(field, value, vRules);
+            
+            if (isValid) {
+                field.setValue(value);
+            } else {
+                field.setValue(null);
+            }
         }
-    }
-    
-    return res.join('');
-};
-
-/**
- * @ignore
- */
-Jeeel._Object.JeeelString.PLACEHOLDER_REGS = /%([+\-# 0]*)?([1-9][0-9]*)?(?:\.(|[0-9]*))?([^0-9]|$)/;
-
-/**
- * @ignore
- */
-Jeeel._Object.JeeelString.PLACEHOLDERS = {
-    
-    /**
-     * 二進数に変換
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @return {String} 変換後の値
-     */
-    b: function (op, value) {
-        return this.cnvRadix(op, value, 2);
-    },
-    
-    /**
-     * 文字に変換
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @return {String} 変換後の値
-     */
-    c: function (op, value) {
-        return String.fromCharCode(+value);
-    }, 
-    
-    /**
-     * 整数に変換
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @return {String} 変換後の値
-     */
-    d: function (op, value) {
-        return this.cnvInt(op, value);
-    }, 
-    
-    /**
-     * 指数表記に変換
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @return {String} 変換後の値
-     */
-    e: function (op, value) {
-        return this.cnvExponential(op, value);
-    }, 
-    
-    /**
-     * 指数表記の大文字に変換
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @return {String} 変換後の値
-     */
-    E: function (op, value) {
-        return this.cnvExponential(op, value, true);
-    }, 
-    
-    /**
-     * 符号なし整数に変換
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @return {String} 変換後の値
-     */
-    u: function (op, value) {
-        return this.cnvInt(op, value, true);
-    },
-    
-    /**
-     * 数値に変換(double)<br />
-     * 実際には
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @return {String} 変換後の値
-     */
-    f: function (op, value) {
-        return this.cnvFloat(op, value);
-    },
-    
-    /**
-     * 数値に変換(float)
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @return {String} 変換後の値
-     */
-    F: function (op, value) {
-        return this.cnvFloat(op, value);
-    },
-    
-    /**
-     * 有効桁数から指数表記もしくは数値に変換
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @return {String} 変換後の値
-     */
-    g: function (op, value) {
         
-        var valid = false;
+        this.constructor._setActiveParameter();
+        this.constructor._setActiveField();
         
-        if (op.accur === null || op.accur >= (+value).toString().length) {
-            op.accur = null;
-            valid = true;
+        return this;
+    },
+    
+    /**
+     * バリーデータを全て通過したかどうかを返す
+     *
+     * @return {Boolean} 通過ならばtrueそれ以外はfalseを返す
+     */
+    isValid: function () {
+        return this._validated && Jeeel.Type.isEmptyHash(this._errors);
+    },
+    
+    /**
+     * フィルタ・検証後の値を全て取得する
+     * 
+     * @return {Hash} 取得値
+     */
+    getValidatedValues: function () {
+        var res = {};
+        var fields = this._fieldList.toHash();
+        
+        for (var key in fields) {
+            var field = fields[key];
+            
+            var value = field.getValue();
+            
+            if (value !== Jeeel.Parameter.Filter.IGNORED_VALUE) {
+                res[key] = value;
+            }
+        }
+        
+        return res;
+    },
+
+    /**
+     * パラメータにフィルターを掛けた値を新しくインスタンスとして返す
+     *
+     * @param {Jeeel.Filter.Abstract} filter Jeeel.Filter.Abstractを継承したクラスのフィルター
+     * @param {String|String[]} keys 指定キーの要素のみを対象とする
+     * @return {Jeeel.Parameter} フィルターを掛けた新しいインスタンス
+     */
+    filter: function (filter, keys) {
+        var value;
+
+        if (keys) {
+            value = this.filterEach(filter, keys).getAll();
+        }
+        else {
+            value = filter.filter(this.getAll());
         }
 
-        return valid ? this.cnvFloat(op, value) : this.cnvExponential(op, value);
+        if ( ! Jeeel.Type.isHash(value)) {
+            value = [value];
+        }
+
+        return Jeeel.Parameter.create(value);
+    },
+
+    /**
+     * フィルターを配列の各要素にそれぞれ掛けていく
+     *
+     * @param {Jeeel.Filter.Abstract} innerFilter 内部フィルター
+     * @param {String[]} [keys] 操作許可キーリスト(初期値は全て)
+     * @return {Jeeel.Parameter} フィルターを掛けた新しいインスタンス
+     */
+    filterEach: function (innerFilter, keys) {
+        var filter = Jeeel.Filter.Each.create(innerFilter, keys);
+
+        return this.filter(filter);
+    },
+
+    /**
+     * 現インスタンスの内部値を文字列として結合し返す
+     *
+     * @param {String} [separator] 連結時の区切り文字列
+     * @param {String[]} [keys] 連結するキーのリスト
+     * @return {String} 結合後の値
+     */
+    join: function (separator, keys) {
+        return this.filter(Jeeel.Filter.Join.create(separator, keys)).getOne('');
+    },
+
+    /**
+     * エラーを全て返す
+     *
+     * @return {Hash} エラーのリスト
+     */
+    getErrors: function () {
+        return this._errors;
     },
     
     /**
-     * 有効桁数から指数表記もしくは数値の大文字に変換
+     * 指定したフィールドのエラーを取得する
      * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @return {String} 変換後の値
+     * @param {String} name フィールド名
+     * @return {Jeeel.Parameter.Validator.Error|Mixed} エラー
      */
-    G: function (op, value) {
-      
-        var valid = false;
+    getError: function(name) {
+        return Jeeel.Type.isSet(this._errors[name]) ? this._errors[name] : null;
+    },
+    
+    /**
+     * 全てのエラーを文字列として取得する
+     * 
+     * @return {String[]|Array} エラーリスト
+     */
+    getErrorMessages: function () {
+        var err, res = {};
         
-        if (op.accur === null || op.accur >= (+value).toString().length) {
-            op.accur = null;
-            valid = true;
+        for (var name in this._errors) {
+            err = this._errors[name];
+            
+            if (err instanceof this.constructor.Validator.Error) {
+                res[name] = err.getMessage();
+            } else {
+                res[name] = err;
+            }
         }
         
-        return valid ? this.cnvFloat(op, value) : this.cnvExponential(op, value, true);
+        return res;
     },
     
     /**
-     * 八進数に変換
+     * 指定したフィールドのエラーを文字列として取得する
      * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @return {String} 変換後の値
+     * @return {String|Mixed} エラー
      */
-    o: function (op, value) {
-        return this.cnvRadix(op, value, 8);
-    },
-    
-    /**
-     * 文字列に変換
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @return {String} 変換後の値
-     */
-    s: function (op, value) {
-        value = '' + value;
-        var width = (+op.width || 0) - value.length;
-        
-        if (width <= 0) {
-            return value;
+    getErrorMessage: function (name) {
+        var err = this._errors[name] || '';
+
+        if (err instanceof this.constructor.Validator.Error) {
+            err = err.getMessage();
         }
         
-        var pad = op.pad;
+        return err;
+    },
+
+    /**
+     * エラーをセットする
+     *
+     * @param {String} key エラーのキー
+     * @param {Jeeel.Parameter.Validator.Error|Mixed} val エラーの内容
+     * @return {Jeeel.Parameter} 自インスタンス
+     */
+    setError: function (key, val) {
+        this._errors[key] = val;
+
+        return this;
+    },
+    
+    /**
+     * エラーを削除する
+     * 
+     * @param {String} key エラーのキー
+     * @return {Jeeel.Parameter} 自インスタンス
+     */
+    removeError: function (key) {
+        delete this._errors[key];
         
-        if (op.right) {
-            value += Array(width + 1).join(pad);
+        return this;
+    },
+
+    /**
+     * keyで指定された値をとりだし、Jeeel.Parameterのインスタンスとして返す<br />
+     * 取り出した値が配列ではなかった場合、かわりにdefaultが使われる<br />
+     * defaultが配列ではなかった場合、[default]が使われる<br />
+     * defaultが指定されなかった（またはnullだった)場合、[]が使われる
+     *
+     * @param {String} key 取りだす要素のキー
+     * @param {Mixed} [defaultValue] デフォルト値
+     * @return {Jeeel.Parameter} 取りだした要素を含んだインスタンス
+     */
+    getElement: function (key, defaultValue) {
+        var val = this.get(key, null);
+
+        if (val === null) {
+            val = [];
+        }
+
+        if ( ! Jeeel.Type.isHash(val) && Jeeel.Type.isSet(defaultValue)) {
+
+            if ( ! Jeeel.Type.isHash(defaultValue)) {
+                defaultValue = [defaultValue];
+            }
+
+            val = defaultValue;
+        }
+
+        return Jeeel.Parameter.create(val);
+    },
+
+    /**
+     * keysで指定された部分集合をJeeel.Parameterのインスタンスとして返す。<br />
+     * defaultは、キーが存在しなかった場合のデフォルト値として使われる。<br />
+     * defaultが配列array(x => y, ...) だった場合、キーxのデフォルトにyが適用される。<br />
+     * defaultが配列で、キー '*' => z を持つ場合、すべてのキーのデフォルトにzが適用される。<br />
+     * defaultが配列で、キー a => v を持ち、aが配列だった場合、<br />
+     *     aで指定された全てのキーのデフォルトに、vが適用される<br />
+     * '*' => z と 'x' => y が指定された場合、yが優先される<br />
+     * defaultが配列ではなかった場合、すべてのキーに対して、defaultが適用される。<br />
+     * defaultが指定されない場合、部分集合に含まれない。
+     *
+     * @param {String|String[]} keys 部分集合を表す複数のキー
+     * @param {Mixed} [defaultValue] キーが存在しなかった場合のデフォルト値
+     * @return {Jeeel.Parameter} 部分集合を持ったインスタンス
+     */
+    getSubset: function (keys, defaultValue) {
+        return this.filter(Jeeel.Filter.Subset.create(keys, defaultValue));
+    },
+
+    /**
+     * 現インスタンス内部の値をシリアライズして返す<br />
+     * その際指定したキーの値のみをシリアライズ出来、<br />
+     * かつその内部の部分配列をシリアライズ出来る
+     *
+     * @param {String} [key] 指定キー
+     * @param {String|String[]} [subset] 部分配列を指定するキーリスト
+     * @return {String} Json化した内部値
+     */
+    serialize: function (key, subset) {
+        var params = (key ? this.getElement(key) : this);
+        params = (subset ? params.getSubset(subset) : params);
+
+        return Jeeel.Json.encode(params.getAll());
+    },
+
+    /**
+     * Jeeel.Storage.Abstractを継承したストレージをセットする
+     *
+     * @param {Jeeel.Storage.Abstract} storage ストレージ
+     * @return {Jeeel.Parameter} 自インスタンス
+     */
+    setStorage: function (storage) {
+        this._storage = storage;
+
+        return this;
+    },
+
+    /**
+     * ストレージを取得する
+     *
+     * @return {Jeeel.Storage.Abstract} 取得したストレージ
+     * @throws {Error} ストレージがセットされていない場合に投げられる
+     */
+    getStorage: function () {
+        if ( ! this._storage) {
+            throw new Error('ストレージがセットされていません。');
+        }
+
+        return this._storage;
+    },
+
+
+    /**
+     * ストレージにパラメータを保存する
+     *
+     * @param {Jeeel.Storage.Abstract} [storage] 任意のストレージを使う場合に指定
+     * @return {Jeeel.Parameter} 自インスタンス
+     * @throws {Error} ストレージを指定せず、ストレージがセットされていない場合に投げられる
+     */
+    save: function (storage) {
+        if ( ! storage) {
+            storage = this.getStorage();
+        }
+
+        storage.save(this.getAll());
+
+        return this;
+    },
+
+    /**
+     * ストレージからパラメータを読み込む
+     *
+     * @param {Jeeel.Storage.Abstract} [storage] 任意のストレージを使う場合に指定
+     * @return {Jeeel.Parameter} 自インスタンス
+     * @throws {Error} ストレージを指定せず、ストレージがセットされていない場合に投げられる
+     */
+    load: function (storage) {
+        if ( ! storage) {
+            storage = this.getStorage();
+        }
+
+        this.setAll(storage.load());
+
+        return this;
+    },
+
+    /**
+     * 内部の保持値をGetパラメータ用の値に変更して返す<br />
+     * Getパラメータの先頭に?はつかない
+     *
+     * @return {String} Getパラメータを示す文字列
+     */
+    toQueryString: function () {
+        return Jeeel.Filter.Url.QueryString.create().filter(this._params);
+    },
+
+    /**
+     * 内部要素にforeachをかける<br />
+     * 詳しくはJeeel.Hash.forEach参照
+     *
+     * @param {Function} eachMethod コールバックメソッド
+     * @param {Mixied} [thisArg] thisに相当する値
+     * @return {Jeeel.Parameter} 自インスタンス
+     * @see Jeeel.Hash.forEach
+     */
+    each: function (eachMethod, thisArg) {
+        Jeeel.Hash.forEach(this._params, eachMethod, thisArg);
+        
+        return this;
+    },
+    
+    /**
+     * インスタンスの複製を行う
+     * 
+     * @return {Jeeel.Parameter} 複製したインスタンス
+     */
+    clone: function () {
+        var prms;
+        
+        if (Jeeel.Type.isArray(this._params)) {
+            prms = this._params.concat();
         } else {
-            value = Array(width + 1).join(pad) + value;
+            prms = {};
+            
+            for (var key in this._params) {
+                prms[key] = this._params[key];
+            }
+        }
+        
+        var instance = new this.constructor(prms);
+        
+        return instance;
+    },
+    
+    _filter: function (field, value, rules) {
+        
+        for (var key in rules) {
+            var rule = rules[key];
+            var callback = this.getFiltration(rule[0]);
+            
+            if (callback) {
+                var args = rule[1];
+                args.unshift(value);
+                value = callback.apply(args);
+                
+                if (value === Jeeel.Parameter.Filter.IGNORED_VALUE) {
+                    return value;
+                }
+            }
         }
         
         return value;
     },
     
-    /**
-     * 十六進数に変換
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @return {String} 変換後の値
-     */
-    x: function (op, value) {
-        return this.cnvRadix(op, value, 16);
-    },
-    
-    /**
-     * 十六進数大文字に変換
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @return {String} 変換後の値
-     */
-    X: function (op, value) {
-        return this.cnvRadix(op, value, 16, true);
-    },
-    
-    /**
-     * N進数に変換
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @param {Integer} radix 何進数に変換するか
-     * @param {Boolean} [toUpper] 大文字にするかどうか
-     * @return {String} 変換後の値
-     */
-    cnvRadix: function (op, value, radix, toUpper) {
-        value = +value;
+    _validate: function(field, value, rules) {
         
-        var isPlus = value >= 0;
-      
-        value = Math.floor(isPlus && value || -value).toString(radix);
+        var isValid = true;
         
-        var prf = ! isPlus && '-' || '';
-        
-        if (op.accur !== null) {
-            value = prf = '';
-        }
-        
-        if (toUpper) {
-            value = value.toUpperCase();
-        }
-        
-        if (value && op.sp) {
-            switch (radix) {
-                case 8:
-                    prf = prf + '0';
-                    break;
-                    
-                case 16:
-                    prf = prf + '0x';
-                    break;
-            }
-        }
-        
-        var width = (+op.width || 0) - value.length - prf.length;
-        
-        if (width <= 0) {
-            return prf + value;
-        }
-        
-        var pad = op.pad;
-        
-        if (op.right) {
-            value += Array(width + 1).join(pad);
-        } else {
-            value = Array(width + 1).join(pad) + value;
-        }
-
-        return prf + value;
-    },
-    
-    /**
-     * 整数に変換
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @param {Boolean} [unsigned] 符号を付けないかどうか
-     * @return {String} 変換後の値
-     */
-    cnvInt: function (op, value, unsigned) {
-        value = unsigned ? Math.abs(+value) : +value;
-        
-        var isPlus = value >= 0;
-        
-        value = Math.floor(isPlus && value || -value).toString(10);
-
-        var prf = isPlus && op.plus && '+' || ! isPlus && '-' || '';
-        
-        var width = (+op.width || 0) - value.length - prf.length;
-        
-        if (width <= 0) {
-            return prf + value;
-        }
-        
-        var pad = op.pad;
-        
-        if (op.right) {
-            value += Array(width + 1).join(pad);
-        } else {
-            value = Array(width + 1).join(pad) + value;
-        }
-        
-        return prf + value;
-    },
-    
-    /**
-     * 数値に変換
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @return {String} 変換後の値
-     */
-    cnvFloat: function (op, value) {
-        value = +value;
-        
-        var isPlus = value >= 0;
-        var accur = op.accur;
-        
-        if (accur !== null) {
-            value = (isPlus && value || -value).toFixed(accur);
-        } else {
-            value = (isPlus && value || -value).toString(10);
-        }
-
-        var prf = isPlus && op.plus && '+' || ! isPlus && '-' || '';
-        
-        var width = (+op.width || 0) - value.length - prf.length;
-        
-        if (width <= 0) {
-            return prf + value;
-        }
-        
-        var pad = op.pad;
-        
-        if (op.right) {
-            value += Array(width + 1).join(pad);
-        } else {
-            value = Array(width + 1).join(pad) + value;
-        }
-        
-        return prf + value;
-    },
-    
-    /**
-     * 指数に変換
-     * 
-     * @param {Hash} op オプション
-     * @param {Mixied} value 値
-     * @param {Boolean} [toUpper] 大文字にするかどうか
-     * @return {String} 変換後の値
-     */
-    cnvExponential: function (op, value, toUpper) {
-        value = +value;
-        
-        var isPlus = value >= 0;
-        var accur = op.accur;
-        
-        if (accur !== null) {
-            value = (isPlus && value || -value).toExponential(accur);
-        } else {
-            value = (isPlus && value || -value).toExponential();
-        }
-        
-        var prf = isPlus && op.plus && '+' || ! isPlus && '-' || '';
-        
-        var width = (+op.width || 0) - value.length - prf.length;
-        
-        if (width <= 0) {
-            return prf + value;
-        }
-        
-        var pad = op.pad;
-        
-        if (op.right) {
-            value += Array(width + 1).join(pad);
-        } else {
-            value = Array(width + 1).join(pad) + value;
-        }
-        
-        if (toUpper) {
-            value = value.toUpperCase();
-        }
-        
-        return prf + value;
-    }
-};
-
-/**
- * @ignore
- */
-Jeeel._Object.JeeelString.convertPlaceholder = function (placeholder, value, res) {
-  
-    placeholder = placeholder.match(this.PLACEHOLDER_REGS);
-    
-    res.length = placeholder[0].length;
-
-    var plPrms = {};
-    
-    // プレースホルダ―の型指定子が一致しなかったら丸ごと消す
-    if ( ! this.PLACEHOLDERS[placeholder[4]]) {
-        return '';
-    }
-    
-    var flg = placeholder[1] && placeholder[1].split('');
-    
-    plPrms.width = placeholder[2] || 0;
-    plPrms.accur = (placeholder[3] || placeholder[3] === '') ? +placeholder[3] : null;
-    
-    if (flg) {
-        
-        for (var i = flg.length; i--;) {
+        for (var key in rules) {
+            var rule = rules[key];
+            var callback = this.getValidation(rule[0]);
             
-            switch (flg[i]) {
-                case '-':
-                    plPrms.right = true;
-                    break;
-                    
-                case '+':
-                    plPrms.plus = true;
-                    break;
-                    
-                case '#':
-                    plPrms.sp = true;
-                    break;
-                    
-                case ' ':
-                case '0':
-                    if ( ! plPrms.pad) {
-                        plPrms.pad = flg[i];
-                    }
-                    break;
-            }
-        }
-    }
-    
-    // パディング文字がなかった場合は空白をデフォ値にする
-    if ( ! plPrms.pad) {
-        plPrms.pad = ' ';
-    }
-    
-    return this.PLACEHOLDERS[placeholder[4]](plPrms, value);
-};
-Jeeel.directory.Jeeel.String.Hash = {
-
-    /**
-     * 自身を文字列参照された場合の変換
-     *
-     * @return {String} 自身のディレクトリ
-     * @private
-     */
-    toString: function () {
-        return Jeeel.directory.Jeeel.String + 'Hash/';
-    }
-};
-
-/**
- * @namespace Hash関数関連のネームスペース
- */
-Jeeel.String.Hash = {
-
-};
-
-/**
- * @ignore
- */
-Jeeel._Object.JeeelStringHash = {
-    
-};
-
-Jeeel.file.Jeeel.String.Hash = ['Base64', 'Md5'];
-
-Jeeel._autoImports(Jeeel.directory.Jeeel.String.Hash, Jeeel.file.Jeeel.String.Hash);
-Jeeel.directory.Jeeel.String.Hash.Base64 = {
-
-    /**
-     * 自身を文字列参照された場合の変換
-     *
-     * @return {String} 自身のディレクトリ
-     * @private
-     */
-    toString: function () {
-        return Jeeel.directory.Jeeel.String.Hash + 'Base64/';
-    }
-};
-
-/**
- * @namespace Base64関連のモジュール
- */
-Jeeel.String.Hash.Base64 = {
-    
-    /**
-     * エンコード文字列
-     *
-     * @type String
-     * @constant
-     */
-    ENCODE_CHARS: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
-    
-    /**
-     * デコード配列
-     * 
-     * @type Integer[]
-     * @constant
-     */
-    DECODE_CHARS: [
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63,
-        52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1,
-        -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
-        15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1,
-        -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1
-    ]
-};
-
-Jeeel.file.Jeeel.String.Hash.Base64 = ['Encode', 'Decode'];
-
-Jeeel._autoImports(Jeeel.directory.Jeeel.String.Hash.Base64, Jeeel.file.Jeeel.String.Hash.Base64);
-
-/**
- * 指定した文字列に対してbsse64エンコードを行う
- * 
- * @param {String} str エンコード対象文字列
- * @return {String} bsse64文字列
- */
-Jeeel.String.Hash.Base64.encode = function (str) {
-    
-    str = '' + str;
-    
-    var out, i, len;
-    var c1, c2, c3;
-
-    len = str.length;
-    i = 0;
-    out = [];
-    
-    while(i < len) {
-        c1 = str.charCodeAt(i++) & 0xff;
-        
-        if (i == len) {
-            out[out.length] = this.ENCODE_CHARS.charAt(c1 >> 2);
-            out[out.length] = this.ENCODE_CHARS.charAt((c1 & 0x3) << 4);
-            out[out.length] = "==";
-            break;
-        }
-        
-        c2 = str.charCodeAt(i++);
-        
-        if (i == len) {
-            out[out.length] = this.ENCODE_CHARS.charAt(c1 >> 2);
-            out[out.length] = this.ENCODE_CHARS.charAt(((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4));
-            out[out.length] = this.ENCODE_CHARS.charAt((c2 & 0xF) << 2);
-            out[out.length] = "=";
-            break;
-        }
-        
-        c3 = str.charCodeAt(i++);
-        
-        out[out.length] = this.ENCODE_CHARS.charAt(c1 >> 2);
-        out[out.length] = this.ENCODE_CHARS.charAt(((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4));
-        out[out.length] = this.ENCODE_CHARS.charAt(((c2 & 0xF) << 2) | ((c3 & 0xC0) >>6));
-        out[out.length] = this.ENCODE_CHARS.charAt(c3 & 0x3F);
-    }
-    
-    return out.join('');
-};
-
-/**
- * bsse64エンコードされた文字列を復元する
- * 
- * @param {String} str base64文字列
- * @return {String} 復元した文字列
- */
-Jeeel.String.Hash.Base64.decode = function (str) {
-    str = '' + str;
-    
-    var c1, c2, c3, c4;
-    var i, len, out;
-
-    len = str.length;
-    i = 0;
-    out = [];
-    
-    while(i < len) {
-        /* c1 */
-        do {
-            c1 = this.DECODE_CHARS[str.charCodeAt(i++) & 0XFF];
-        } while(i < len && c1 == -1);
-        
-        if (c1 == -1) {
-            break;
-        }
-
-        /* c2 */
-        do {
-            c2 = this.DECODE_CHARS[str.charCodeAt(i++) & 0XFF];
-        } while(i < len && c2 == -1);
-        
-        if (c2 == -1) {
-            break;
-        }
-
-        out[out.length] = String.fromCharCode((c1 << 2) | ((c2 & 0x30) >> 4));
-
-        /* c3 */
-        do {
-            c3 = str.charCodeAt(i++) & 0XFF;
-            
-            if (c3 == 61) {
-                return out.join('');
-            }
-            
-            c3 = this.DECODE_CHARS[c3];
-        } while(i < len && c3 == -1);
-        
-        if (c3 == -1) {
-            break;
-        }
-
-        out[out.length] = String.fromCharCode(((c2 & 0XF) << 4) | ((c3 & 0x3C) >> 2));
-
-        /* c4 */
-        do {
-            c4 = str.charCodeAt(i++) & 0XFF;
-            
-            if (c4 == 61) {
-                return out.join('');
-            }
-            
-            c4 = this.DECODE_CHARS[c4];
-        } while(i < len && c4 == -1);
-        
-        if (c4 == -1) {
-            break;
-        }
-        
-        out[out.length] = String.fromCharCode(((c3 & 0x03) << 6) | c4);
-    }
-    
-    return out.join('');
-};
-
-/**
- * 文字列をMD5に変換する
- * 
- * @param {String} data 対象の文字列
- * @return {String} MD5文字列
- */
-Jeeel.String.Hash.md5 = function (data) {
-    return Jeeel._Object.JeeelStringHash.Md5.hexHash('' + data);
-};
-
-/**
- * @ignore
- */
-Jeeel._Object.JeeelStringHash.Md5 = {
-  
-    /**
-     * 16進数に使用する文字列
-     * 
-     * @type String
-     * @constant
-     */
-    HEX_TEXT: "0123456789abcdef",
-    
-    /**
-     * 16進数に使用する文字列
-     * 
-     * @type Integer[]
-     * @constant
-     */
-    T: [],
-
-    round: [],
-    
-    pack: function (n32) {
-        return String.fromCharCode(n32 & 0xFF) 
-             + String.fromCharCode((n32 >>> 8) & 0xFF) 
-             + String.fromCharCode((n32 >>> 16) & 0xFF) 
-             + String.fromCharCode((n32 >>> 24) & 0xFF);
-    },
-
-    unpack: function (s4) {
-        return (s4.charCodeAt(0))
-             | (s4.charCodeAt(1) <<  8) 
-             | (s4.charCodeAt(2) << 16) 
-             | (s4.charCodeAt(3) << 24);
-    },
-
-    number: function (n) {
-        while (n < 0) {
-            n += 4294967296;
-        }
-        
-        while (n > 4294967295) {
-            n -= 4294967296;
-        }
-        
-        return n;
-    },
-
-    applyRound: function (x, s, f, abcd, r) {
-        var a, b, c, d;
-        var kk, ss, ii;
-        var t, u;
-
-        a = abcd[0];
-        b = abcd[1];
-        c = abcd[2];
-        d = abcd[3];
-        kk = r[0];
-        ss = r[1];
-        ii = r[2];
-
-        u = f(s[b], s[c], s[d]);
-        t = s[a] + u + x[kk] + this.T[ii];
-        t = this.number(t);
-        t = ((t<<ss) | (t>>>(32-ss)));
-        t += s[b];
-        s[a] = this.number(t);
-    },
-    
-    hash: function (data) {
-        this.init();
-        
-        var abcd, x, state, s;
-        var len, index, padLen, f, r;
-        var i, j, k;
-        var tmp;
-
-        state = [0X67452301, 0XEFCDAB89, 0X98BADCFE, 0X10325476];
-        
-        len = data.length;
-        index = len & 0x3f;
-        
-        padLen = (index < 56) ? (56 - index) : (120 - index);
-        
-        if (padLen > 0) {
-            data += "\x80";
-            
-            for (i = 0; i < padLen - 1; i++) {
-                data += "\x00";
-            }
-        }
-        
-        data += this.pack(len * 8);
-        data += this.pack(0);
-        len  += padLen + 8;
-        
-        abcd = [0, 1, 2, 3];
-        x    = [];
-        s    = [];
-
-        for (k = 0; k < len; k += 64) {
-            for (i = 0, j = k; i < 16; i++, j += 4) {
-                x[i] = (data.charCodeAt(j))
-                     | (data.charCodeAt(j + 1) <<  8) 
-                     | (data.charCodeAt(j + 2) << 16) 
-                     | (data.charCodeAt(j + 3) << 24);
-            }
-            
-            for (i = 0; i < 4; i++) {
-                s[i] = state[i];
-            }
-            
-            for (i = 0; i < 4; i++) {
-                f = this.round[i][0];
-                r = this.round[i][1];
+            if (callback) {
+                var args = rule[1].concat();
+                args.unshift(value);
                 
-                for (j = 0; j < 16; j++) {
-                    this.applyRound(x, s, f, abcd, r[j]);
+                var isFieldValid = callback.apply(args);
+                
+                if (isFieldValid !== true) {
                     
-                    tmp = abcd[0];
-                    abcd[0] = abcd[3];
-                    abcd[3] = abcd[2];
-                    abcd[2] = abcd[1];
-                    abcd[1] = tmp;
+                    var fieldName = field.getName();
+                    
+                    if ( ! this._errors[fieldName]) {
+                        this._errors[fieldName] = new this.constructor.Validator.Error(field, value, callback.getMethodName(), rule[1]);
+                        
+                        if (isFieldValid !== false) {
+                            this._errors[fieldName].setMessage(isFieldValid);
+                        }
+                    }
+                    
+                    isValid = false;
                 }
             }
-
-            for (i = 0; i < 4; i++) {
-              state[i] += s[i];
-              state[i] = this.number(state[i]);
-            }
         }
-
-        return this.pack(state[0]) 
-             + this.pack(state[1]) 
-             + this.pack(state[2]) 
-             + this.pack(state[3]);
+        
+        return isValid;
     },
-    
-    hexHash: function (data) {
-        var i, out, c;
-        var bit128;
 
-        bit128 = this.hash(data);
-        out = [];
-        
-        for (i = 0; i < 16; i++) {
-            c = bit128.charCodeAt(i);
-            
-            out[out.length] = this.HEX_TEXT.charAt((c>>4) & 0xF);
-            out[out.length] = this.HEX_TEXT.charAt(c & 0xF);
-        }
-        
-        return out.join('');
-    },
-    
-    init: function () {
-        if (this.init.ignore) {
-            return;
-        }
-        
-        this.init.ignore = true;
-        
-        var merge = {
-            T: [
-                0X00000000, 0XD76AA478, 0XE8C7B756, 0X242070DB,
-                0XC1BDCEEE, 0XF57C0FAF, 0X4787C62A, 0XA8304613,
-                0XFD469501, 0X698098D8, 0X8B44F7AF, 0XFFFF5BB1,
-                0X895CD7BE, 0X6B901122, 0XFD987193, 0XA679438E,
-                0X49B40821, 0XF61E2562, 0XC040B340, 0X265E5A51,
-                0XE9B6C7AA, 0XD62F105D, 0X02441453, 0XD8A1E681,
-                0XE7D3FBC8, 0X21E1CDE6, 0XC33707D6, 0XF4D50D87,
-                0X455A14ED, 0XA9E3E905, 0XFCEFA3F8, 0X676F02D9,
-                0X8D2A4C8A, 0XFFFA3942, 0X8771F681, 0X6D9D6122,
-                0XFDE5380C, 0XA4BEEA44, 0X4BDECFA9, 0XF6BB4B60,
-                0XBEBFBC70, 0X289B7EC6, 0XEAA127FA, 0XD4EF3085,
-                0X04881D05, 0XD9D4D039, 0XE6DB99E5, 0X1FA27CF8,
-                0XC4AC5665, 0XF4292244, 0X432AFF97, 0XAB9423A7,
-                0XFC93A039, 0X655B59C3, 0X8F0CCC92, 0XFFEFF47D,
-                0X85845DD1, 0X6FA87E4F, 0XFE2CE6E0, 0XA3014314,
-                0X4E0811A1, 0XF7537E82, 0XBD3AF235, 0X2AD7D2BB,
-                0XEB86D391
-            ],
+    /**
+     * コンストラクタ
+     * 
+     * @param {Hash} [params] 入力パラメータ
+     * @constructor
+     */
+    constructor: Jeeel.Parameter
+};
 
-            round1: [
-                [ 0, 7, 1], [ 1,12, 2],
-                [ 2,17, 3], [ 3,22, 4],
-                [ 4, 7, 5], [ 5,12, 6],
-                [ 6,17, 7], [ 7,22, 8],
-                [ 8, 7, 9], [ 9,12,10],
-                [10,17,11], [11,22,12],
-                [12, 7,13], [13,12,14],
-                [14,17,15], [15,22,16]
-            ],
+Jeeel.file.Jeeel.Parameter = ['Field', 'FieldList', 'Filter', 'Validator'];
 
-            round2: [
-                [ 1, 5,17], [ 6, 9,18],
-                [11,14,19], [ 0,20,20],
-                [ 5, 5,21], [10, 9,22],
-                [15,14,23], [ 4,20,24],
-                [ 9, 5,25], [14, 9,26],
-                [ 3,14,27], [ 8,20,28],
-                [13, 5,29], [ 2, 9,30],
-                [ 7,14,31], [12,20,32]
-            ],
+Jeeel._autoImports(Jeeel.directory.Jeeel.Parameter, Jeeel.file.Jeeel.Parameter);
 
-            round3: [
-                [ 5, 4,33], [ 8,11,34],
-                [11,16,35], [14,23,36],
-                [ 1, 4,37], [ 4,11,38],
-                [ 7,16,39], [10,23,40],
-                [13, 4,41], [ 0,11,42],
-                [ 3,16,43], [ 6,23,44],
-                [ 9, 4,45], [12,11,46],
-                [15,16,47], [ 2,23,48]
-            ],
-
-            round4: [
-                [ 0, 6,49], [ 7,10,50],
-                [14,15,51], [ 5,21,52],
-                [12, 6,53], [ 3,10,54],
-                [10,15,55], [ 1,21,56],
-                [ 8, 6,57], [15,10,58],
-                [ 6,15,59], [13,21,60],
-                [ 4, 6,61], [11,10,62],
-                [ 2,15,63], [ 9,21,64]
-            ],
-
-            /**
-             * @ignore
-             */
-            F: function (x, y, z) {return (x & y) | (~x & z);},
-            
-            /**
-             * @ignore
-             */
-            G: function (x, y, z) {return (x & z) | (y & ~z);},
-            
-            /**
-             * @ignore
-             */
-            H: function (x, y, z) {return x ^ y ^ z;},
-            
-            /**
-             * @ignore
-             */
-            I: function (x, y, z) {return y ^ (x | ~z);}
-        };
-    
-        this.T = merge.T;
-        this.round = [
-            [merge.F, merge.round1],
-            [merge.G, merge.round2],
-            [merge.H, merge.round3],
-            [merge.I, merge.round4]
-        ];
-    }
-};/**
+/**
  * コンストラクタ
  * 
- * @class 数値の複雑な処理をするクラス
- * @param {Number} [number] 基となる数値
+ * @class フィールドを扱うクラス
+ * @param {Jeeel.Parameter} parameter パラメータ
+ * @param {String} name フィールド名
+ * @param {String} [label] ラベル
+ * @param {Array} [validateRules] バリデートルール
+ * @param {Array} [filterRules] フィルタルール
  */
-Jeeel.Number = function (number) {
-    
-    if ( ! Jeeel.Type.isSet(number)) {
-        number = 0;
-    }
-    
-    this._num = +number;
+Jeeel.Parameter.Field = function (parameter, name, label, validateRules, filterRules) {
+    this._parameter = parameter;
+    this._name = name;
+    this._label = label || '';
+    this._validateRules = validateRules || [];
+    this._filterRules = filterRules || [];
 };
 
-/**
- * インスタンスの作成を行う
- * 
- * @param {Number} [number] 基となる数値
- * @return {Jeeel.Number} 作成したインスタンス
- */
-Jeeel.Number.create = function (number) {
-    return new this(number);
-};
-
-/**
- * 数字を千単位でグループ化してフォーマットする
- * 
- * @param {Number} number 対象の数値
- * @param {String} [separator] 千単位を区切る文字列(デフォルトは , )
- * @param {String} [prefix] 接頭辞
- * @param {String} [suffix] 接尾辞
- * @return {String} 変換後の値
- */
-Jeeel.Number.format = function (number, separator, prefix, suffix) {
-    var str = (+number || 0).toString();
-    var dpi = str.indexOf('.');
-    var moi = str.indexOf('-') + 1;
+Jeeel.Parameter.Field.prototype = {
     
-    if (dpi < 0) {
-        dpi = str.length;
-    }
+    _parameter: null,
+    _name: '',
+    _label: '',
+    _value: null,
+    _validateRules: [],
+    _filterRules: [],
     
-    var indexArr = [];
-
-    for (var i = dpi - 3; i > moi; i -= 3) {
-        indexArr[indexArr.length] = i;
-    }
-
-    return (prefix || '') + Jeeel.String.multiInsert(str, indexArr, separator || ',') + (suffix || '');
-};
-
-/**
- * 数値を指定範囲内に収める
- * 
- * @param {Number} number 対象の数値
- * @param {Number} min 最小値
- * @param {Number} max 最大値
- * @return {Number} 収めた後の数値
- */
-Jeeel.Number.limit = function (number, min, max) {
-    if (number < min) {
-        number = min;
-    }
-    
-    if (number > max) {
-        number = max;
-    }
-    
-    return number;
-};
-
-/**
- * 指定した整数の範囲以内の値をランダムで返す
- * 
- * @param {Integer} min 最小値(負数も可)
- * @param {Integer} max 最大値(負数も可)
- * @return {Integer} ランダム整数値(min &lt;= random &lt;= max)
- */
-Jeeel.Number.random = function (min, max) {
-    var r = max - min + 1;
-    
-    return Math.floor(min + Math.random() * r);
-};
-
-/**
- * 数値を百分率にして返す
- * 
- * @param {Number} number 対象の数値
- * @return {String} 百分率表記の文字列(後ろに%が付く)
- */
-Jeeel.Number.percentage = function (number) {
-    return number * 100 + '%';
-};
-
-/**
- * 指定した角度をラジアンに変換する
- * 
- * @param {Number} deg 角度
- * @return {Number} ラジアン
- */
-Jeeel.Number.degreeToRadian = function (deg) {
-    return deg / 180 * Math.PI;
-};
-
-/**
- * 指定したラジアンを角度に変換する
- * 
- * @param {Number} rad ラジアン
- * @return {Number} 角度
- */
-Jeeel.Number.radianToDegree = function (rad) {
-    return rad / Math.PI * 180;
-};
-
-/**
- * 合計値を求める
- * 
- * @param {Number} var_args 合計値を求める際に数を可変で引き渡す
- */
-Jeeel.Number.getSum = function (var_args) {
-    var i, sum = 0;
-    
-    for (i = arguments.length; i--;) {
-        sum += arguments[i];
-    }
-    
-    return sum;
-};
-
-/**
- * 平均値を求める
- * 
- * @param {Number} var_args 平均値を求める際に数を可変で引き渡す
- */
-Jeeel.Number.getAvg = function (var_args) {
-    return this.getSum.apply(this, arguments) / arguments.length;
-};
-
-/**
- * 最大公約数を求める
- * 
- * @param {Integer} base 最大公約数を求める際の数
- * @param {Integer} var_args 可変引数、2つ以上の数を指定する場合に渡す
- * @return {Integer} 最大公約数(正)
- */
-Jeeel.Number.getGcd = function (base, var_args) {
-    var i, j, l, r;
-    
-    for (i = 0, l = arguments.length - 1; i < l; i++) {
-        j = i + 1;
-        r = arguments[i] % arguments[j];
-
-        arguments[j] = r === 0 ? arguments[j] : arguments.callee(arguments[j], r < 0 ? -r : r);
-    }
-    
-    return arguments[l];
-};
-
-/**
- * 最小公倍数を求める
- * 
- * @param {Integer} base 最小公倍数を求める際の数
- * @param {Integer} var_args 可変引数、2つ以上の数を指定する場合に渡す
- * @return {Integer} 最小公倍数(正)
- */
-Jeeel.Number.getLcm = function (base, var_args) {
-    var i, j, l;
-    
-    for (i = 0, l = arguments.length - 1; i < l; i++) {
-        j = i + 1;
-        
-        arguments[j] = arguments[i] * arguments[j] / this.getGcd(arguments[i], arguments[j]);
-    }
-
-    return arguments[l] < 0 ? -arguments[l] : arguments[l];
-};
-
-Jeeel.Number.prototype = {
-  
     /**
-     * 元の数値
+     * パラメータを取得する
      * 
-     * @type Number
+     * @return {Jeeel.Parameter} パラメータ
+     */
+    getParameter: function () {
+        return this._parameter;
+    },
+
+    /**
+     * フィールド名を取得する
+     * 
+     * @return {String} フィールド名
+     */
+    getName: function () {
+        return this._name;
+    },
+    
+    /**
+     * フィールドのラベルを取得する
+     * 
+     * @return {String} ラベル値
+     */
+    getLabel: function () {
+        return this._label;
+    },
+    
+    /**
+     * フィールドの値を取得する
+     * 
+     * @return {Mixed} フィールド値
+     */
+    getValue: function () {
+        return this._value;
+    },
+    
+    /**
+     * フィールドの値を設定する
+     * 
+     * @param {Mixed} value フィールド値
+     * @return {Jeeel.Parameter.Field} 自インスタンス
+     */
+    setValue: function (value) {
+        this._value = value;
+        
+        return this;
+    },
+    
+    /**
+     * バリデートルールのリストを取得する
+     * 
+     * @return {Array} バリデートルールリスト
+     */
+    getValidateRules: function () {
+        return this._validateRules;
+    },
+    
+    /**
+     * フィルタのルールのリストを取得する
+     * 
+     * @return {Array} フィルタルールリスト
+     */
+    getFilterRules: function () {
+        return this._filterRules;
+    }
+};
+
+/**
+ * コンストラクタ
+ * 
+ * @class フィールドを管理するクラス
+ */
+Jeeel.Parameter.FieldList = function () {
+    this._fields = {};
+};
+
+Jeeel.Parameter.FieldList.prototype = {
+    
+    /**
+     * フィールドリスト
+     * 
+     * @type Hash
      * @private
      */
-    _num: 0,
+    _fields: {},
     
     /**
-     * 数値を絶対値にする
+     * フィールドを追加する
      * 
-     * @return {Jeeel.Number} 自インスタンス
+     * @param {Jeeel.Parameter.Field} field 追加フィールド
+     * @return {Jeeel.Parameter.FieldList} 自インスタンス
      */
-    abs: function () {
-        this._num =  (this._num > 0 ? this._num : -this._num);
+    addField: function (field) {
+        this._fields[field.getName()] = field;
         
         return this;
     },
     
     /**
-     * 数値を切り上げる
+     * フィールドを取得する
      * 
-     * @return {Jeeel.Number} 自インスタンス
+     * @param {String} name フィールド名
+     * @return {Jeeel.Parameter.Field} フィールド
      */
-    ceil: function () {
-        this._num = Math.ceil(this._num);
+    getField: function (name) {
+        return this.hasField(name) ? this._fields[name] : null;
+    },
+    
+    /**
+     * フィールドを削除する
+     * 
+     * @param {String} name フィールド名
+     * @return {Jeeel.Parameter.FieldList} 自インスタンス
+     */
+    removeField: function (name) {
+        delete this._fields[name];
         
         return this;
     },
-    
+
     /**
-     * 数値を切り下げる
+     * フィールドを全て取得する
      * 
-     * @return {Jeeel.Number} 自インスタンス
+     * @return {Hash} フィールドリスト
      */
-    floor: function () {
-        this._num = Math.floor(this._num);
+    getFieldAll: function () {
+        return this._fields;
+    },
+
+    /**
+     * フィールドを保持しているかどうかを取得する
+     * 
+     * @param {String} name フィールド名
+     * @return {Boolean} 保持しているかどうか
+     */
+    hasField: function (name) {
+        if (name === '*') {
+            for (var key in this._fields) {
+                return true;
+            }
+            
+            return false;
+        }
         
-        return this;
+        return !!this._fields[name];
     },
     
     /**
-     * 数値を四捨五入する
+     * ハッシュに変換する
      * 
-     * @return {Jeeel.Number} 自インスタンス
+     * @return {Hash} 変換後のハッシュ
      */
-    round: function () {
-        this._num = Math.round(this._num);
+    toHash: function () {
+        var res = {};
         
-        return this;
-    },
-    
-    /**
-     * 数値を指定範囲に収める
-     * 
-     * @return {Jeeel.Number} 自インスタンス
-     */
-    limit: function (min, max) {
-        this._num = this.constructor.limit(this._num, min, max);
+        for (var key in this._fields) {
+            res[key] = this._fields[key];
+        }
         
-        return this;
-    },
+        return res;
+    }
+};
+Jeeel.directory.Jeeel.Parameter.Filter = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel.Parameter + 'Filter/';
+    }
+};
+
+/**
+ * @namespace フィルタクラスのためのネームスペース
+ */
+Jeeel.Parameter.Filter = {
     
     /**
-     * 数値を千単位でグループ化してフォーマットする
+     * DBに対して入れるべきでない事を示す定数<br />
+     * この定数をフィルタが返したら検証済みの値のリストにそのフィールドは含んではならない
      * 
-     * @param {String} [separator] 千単位を区切る文字列(デフォルトは , )
-     * @param {String} [prefix] 接頭辞
-     * @param {String} [suffix] 接尾辞
-     * @return {String} フォーマット後の文字列
+     * @type String
+     * @constant
      */
-    toFormatted: function (separator, prefix, suffix) {
-        return this.constructor.format(this._num, separator, prefix, suffix);
-    },
+    IGNORED_VALUE: '@pbs-form-filter-ignored-value@',
     
     /**
-     * 数値を百分率表記に変換する
+     * インターフェース
      * 
-     * @return {String} 百分率表記の文字列
+     * @interface フィルタークラスを作る際のインターフェース
      */
-    toPercentage: function () {
-        return this.constructor.percentage(this._num);
-    },
-    
-    /**
-     * インスタンスを文字列に変換する
-     * 
-     * @param {Integer} [radix] 進数を指定する場合に指定
-     * @return {String} 文字列
-     */
-    toString: function (radix) {
-        return (radix ? this._num.toString(radix) : this._num.toString());
-    },
-    
-    /**
-     * インスタンスを数値に変換する
-     * 
-     * @return {Number} 数値
-     */
-    valueOf: function () {
-        return this._num;
+    Interface: {
+        /**
+         * フィルタメソッドが呼べるかどうかを返す
+         * 
+         * @param {String} name フィルタ名
+         * @return {Boolean} フィルタメソッドが呼べるかどうか
+         */
+        hasFiltration: function (name) {},
+        
+        /**
+         * フィルタメソッドが取得する
+         * 
+         * @param {String} name フィルタ名
+         * @return {Jeeel.Function.Callback} コールバック
+         */
+        getFiltration: function (name) {}
     },
     
     /**
      * コンストラクタ
      * 
-     * @param {Number} [number] 基となる数値
-     * @constructor
+     * @abstractClass フィルタークラスを作る際の抽象クラス
+     * @implements Jeeel.Parameter.Filter.Interface
      */
-    constructor: Jeeel.Number
+    Abstract: function () {}
 };
 
-Jeeel.directory.Jeeel.Code = {
+Jeeel.Parameter.Filter.Interface = Jeeel.Class.Interface.register('Jeeel.Parameter.Filter.Interface', Jeeel.Parameter.Filter.Interface);
+
+Jeeel.Parameter.Filter.Abstract.prototype = {
+    
+    /**
+     * フィルタを行う
+     * 
+     * @param {String} name フィルタ名
+     * @param {Mixed} value フィルタ対象
+     * @param {Array} [args] 引数リスト
+     * @return {Boolean} フィルタ結果
+     */
+    filter: function(name, value, args) {
+        
+        args = args || [];
+        
+        args.unshift(value);
+        
+        name = "filter" + Jeeel.String.toPascalCase(name);
+        
+        return this[name].apply(this, args);
+    },
+    
+    /**
+     * フィルタメソッドが呼べるかどうかを返す
+     * 
+     * @param {String} name フィルタ名
+     * @return {Boolean} フィルタメソッドが呼べるかどうか
+     */
+    hasFiltration: function (name) {
+        name = "filter" + Jeeel.String.toPascalCase(name);
+        
+        return !!(this[name] && typeof this[name] === 'function');
+    },
+    
+    /**
+     * フィルタメソッドが取得する
+     * 
+     * @param {String} name フィルタ名
+     * @return {Jeeel.Function.Callback} コールバック
+     */
+    getFiltration: function (name) {
+        name = "filter" + Jeeel.String.toPascalCase(name);
+        
+        return this[name] && typeof this[name] === 'function' && new Jeeel.Function.Callback(name, this) || null;
+    }
+};
+
+Jeeel.Parameter.Filter.Abstract = Jeeel.Class.implement(Jeeel.Parameter.Filter.Abstract, Jeeel.Parameter.Filter.Interface);
+
+Jeeel.file.Jeeel.Parameter.Filter = ['Base'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Parameter.Filter, Jeeel.file.Jeeel.Parameter.Filter);
+
+/**
+ * コンストラクタ
+ * 
+ * @class 基本となるフィルタクラス
+ * @augments Jeeel.Parameter.Filter.Abstract
+ */
+Jeeel.Parameter.Filter.Base = function () {
+    Jeeel.Parameter.Filter.Abstract.call(this);
+};
+
+Jeeel.Parameter.Filter.Base.prototype = {
+    
+    /**
+     * 値が無かったら無視する
+     * 
+     * @param {Mixed} value フィルタ値
+     * @return int フィルタ後の値
+     */
+    filterOption: function (value) {
+        return ! Jeeel.Type.isEmpty(value) ? value : Jeeel.Parameter.Filter.IGNORED_VALUE;
+    },
+    
+    /**
+     * 値が指定されていなかった場合に代わりに代替値を返す
+     * 
+     * @param {Mixed} value 対象値
+     * @param {Mixed} defaultValue デフォルト値
+     * @return {Mixed} 処理後の値
+     */
+    filterDefault: function (value, defaultValue) {
+        return ! Jeeel.Type.isEmpty(value) ? value : defaultValue;
+    },
+    
+    /**
+     * floatにキャストする
+     * 
+     * @param {Mixed} value キャスト値
+     * @return {Number} キャスト後の値
+     */
+    filterFloat: function (value) {
+        if (value === Jeeel.Parameter.Filter.IGNORED_VALUE) {
+            return value;
+        }
+        
+        return +value;
+    },
+    
+    /**
+     * intにキャストする
+     * 
+     * @param {Mixed} value キャスト値
+     * @return {Integer} キャスト後の値
+     */
+    filterInt: function (value) {
+        if (value === Jeeel.Parameter.Filter.IGNORED_VALUE) {
+            return value;
+        }
+        
+        return Math.floor(+value);
+    },
+    
+    /**
+     * Stringにキャストする
+     * 
+     * @param {Mixed} value キャスト値
+     * @return {String} キャスト後の値
+     */
+    filterString: function (value) {
+        if (value === Jeeel.Parameter.Filter.IGNORED_VALUE) {
+            return value;
+        } else if ( ! value && value !== 0) {
+            return '';
+        }
+        
+        return (value.toString ? value.toString() : '' + value);
+    },
+    
+    /**
+     * Arrayにキャストする
+     * 
+     * @param {Mixed} value キャスト値
+     * @return {Array} キャスト後の値
+     */
+    filterArray: function (value) {
+        if (value === Jeeel.Parameter.Filter.IGNORED_VALUE) {
+            return value;
+        }
+        
+        return Jeeel.Type.isArray(value) ? value : [value];
+    },
+    
+    /**
+     * Booleanにキャストする
+     * 
+     * @param {Mixed} value キャスト値
+     * @return {Boolean} キャスト後の値
+     */
+    filterBool: function (value) {
+        if (value === Jeeel.Parameter.Filter.IGNORED_VALUE) {
+            return value;
+        }
+        
+        return !!value;
+    },
+    
+    /**
+     * 前後の空白等を取り除く
+     * 
+     * @param {String} value 対象値
+     * @return {String} 処理後の値
+     */
+    filterTrim: function (value) {
+        if (Jeeel.Type.isEmpty(value) || value === Jeeel.Parameter.Filter.IGNORED_VALUE) {
+            return value;
+        }
+        
+        return Jeeel.String.trim(value);
+    },
+    
+    /**
+     * 全角英数字とスペース・記号を半角にする
+     * 
+     * @param {String} value 対象値
+     * @return {String} 処理後の値
+     */
+    filterHalfWidth: function (value) {
+        if (Jeeel.Type.isEmpty(value) || value === Jeeel.Parameter.Filter.IGNORED_VALUE) {
+            return value;
+        }
+        
+        return Jeeel.String.toHalfWidth(value);
+    },
+    
+    /**
+     * 半角英数字とスペース・記号を全角にする
+     * 
+     * @param {String} value 対象値
+     * @return {String} 処理後の値
+     */
+    filterFullWidth: function (value) {
+        if (Jeeel.Type.isEmpty(value) || value === Jeeel.Parameter.Filter.IGNORED_VALUE) {
+            return value;
+        }
+        
+        return Jeeel.String.toFullWidth(value);
+    }
+};
+
+Jeeel.Class.extend(Jeeel.Parameter.Filter.Base, Jeeel.Parameter.Filter.Abstract);
+
+Jeeel.Parameter.addDefaultFilter(new Jeeel.Parameter.Filter.Base());
+
+Jeeel.directory.Jeeel.Parameter.Validator = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -9788,1506 +12554,533 @@ Jeeel.directory.Jeeel.Code = {
      * @private
      */
     toString: function () {
-        return Jeeel.directory.Jeeel + 'Code/';
+        return Jeeel.directory.Jeeel.Parameter + 'Validator/';
     }
 };
 
 /**
- * @namespace コード関連のネームスペース
+ * @namespace バリデータクラスのためのネームスペース
  */
-Jeeel.Code = {
-
-};
-
-Jeeel.file.Jeeel.Code = ['CharCode', 'CharEncoding', 'HtmlCode'];
-
-Jeeel._autoImports(Jeeel.directory.Jeeel.Code, Jeeel.file.Jeeel.Code);
-
-/**
- * @namespace 文字コードに関する列挙体
- */
-Jeeel.Code.CharCode = {
-
-    /**
-     * 空文字
-     *
-     * @type Integer
-     * @constant
-     */
-    Null: 0x00,
-
-    /**
-     * ヘッダ開始
-     *
-     * @type Integer
-     * @constant
-     */
-    StartOfHeading: 0x01,
-
-    /**
-     * テキスト開始
-     *
-     * @type Integer
-     * @constant
-     */
-    StartOfText: 0x02,
-
-    /**
-     * テキスト終了
-     *
-     * @type Integer
-     * @constant
-     */
-    EndOfText: 0x03,
-
-    /**
-     * 伝送終了
-     *
-     * @type Integer
-     * @constant
-     */
-    EndOfTransmission: 0x04,
-
-    /**
-     * 問い合わせ
-     *
-     * @type Integer
-     * @constant
-     */
-    Enquiry: 0x05,
+Jeeel.Parameter.Validator = {
     
     /**
-     * 肯定応答
-     *
-     * @type Integer
-     * @constant
-     */
-    Acknowledge: 0x06,
-
-    /**
-     * ベル
-     *
-     * @type Integer
-     * @constant
-     */
-    Bell: 0x07,
-
-    /**
-     * 1文字後退
-     *
-     * @type Integer
-     * @constant
-     */
-    BackSpace: 0x08,
-
-    /**
-     * 水平タブ
-     *
-     * @type Integer
-     * @constant
-     */
-    HorizontalTabulation: 0x09,
-    
-    /**
-     * 改行
-     *
-     * @type Integer
-     * @constant
-     */
-    LineFeed: 0x0A,
-
-    /**
-     * 垂直タブ
-     *
-     * @type Integer
-     * @constant
-     */
-    VerticalTabulation: 0x0B,
-    
-    /**
-     * 改ページ
-     *
-     * @type Integer
-     * @constant
-     */
-    FormFeed: 0x0C,
-
-    /**
-     * 復帰
-     *
-     * @type Integer
-     * @constant
-     */
-    CarriageReturn: 0x0D,
-    
-    /**
-     * シフトアウト
-     *
-     * @type Integer
-     * @constant
-     */
-    ShiftOut: 0x0E,
-
-    /**
-     * シフトイン
-     *
-     * @type Integer
-     * @constant
-     */
-    ShiftIn: 0x0F,
-    
-    /**
-     * データリンク拡張
-     *
-     * @type Integer
-     * @constant
-     */
-    DataLinkEscape: 0x10,
-
-    /**
-     * 装置制御1(XON)
-     *
-     * @type Integer
-     * @constant
-     */
-    DeviceControl1: 0x11,
-
-    /**
-     * 装置制御2
-     *
-     * @type Integer
-     * @constant
-     */
-    DeviceControl2: 0x12,
-
-    /**
-     * 装置制御3(XOFF)
-     *
-     * @type Integer
-     * @constant
-     */
-    DeviceControl3: 0x13,
-    
-    /**
-     * 装置制御4
-     *
-     * @type Integer
-     * @constant
-     */
-    DeviceControl4: 0x14,
-
-    /**
-     * 否定応答
-     *
-     * @type Integer
-     * @constant
-     */
-    NegativeAcKnowledge: 0x15,
-
-    /**
-     * 同期信号
-     *
-     * @type Integer
-     * @constant
-     */
-    SynchronousIdle: 0x16,
-
-    /**
-     * ブロック転送終了
-     *
-     * @type Integer
-     * @constant
-     */
-    EndOfTransmissionBlock: 0x17,
-
-    /**
-     * 取り消し
-     *
-     * @type Integer
-     * @constant
-     */
-    Cancel: 0x18,
-
-    /**
-     * メディア終了
-     *
-     * @type Integer
-     * @constant
-     */
-    EndOfMedium: 0x19,
-    
-    /**
-     * 置換(EOF)
-     *
-     * @type Integer
-     * @constant
-     */
-    SubstituteCharacter: 0x1A,
-
-    /**
-     * エスケープ
-     *
-     * @type Integer
-     * @constant
-     */
-    Escape: 0x1B,
-
-    /**
-     * ファイル区切り
-     *
-     * @type Integer
-     * @constant
-     */
-    FileSeparator: 0x1C,
-
-    /**
-     * グループ区切り
-     *
-     * @type Integer
-     * @constant
-     */
-    GroupSeparator: 0x1D,
-
-    /**
-     * レコード区切り
-     *
-     * @type Integer
-     * @constant
-     */
-    RecordSeparator: 0x1E,
-
-    /**
-     * ユニット区切り
-     *
-     * @type Integer
-     * @constant
-     */
-    UnitSeparator: 0x1F,
-
-    /**
-     * 空白
-     *
-     * @type Integer
-     * @constant
-     */
-    Space: 0x20,
-
-    /**
-     * !
-     *
-     * @type Integer
-     * @constant
-     */
-    ExclamationMark: 0x21,
-
-    /**
-     * "
-     *
-     * @type Integer
-     * @constant
-     */
-    DoubleQuote: 0x22,
-
-    /**
-     * #
-     *
-     * @type Integer
-     * @constant
-     */
-    Sharp: 0x23,
-
-    /**
-     * $
-     *
-     * @type Integer
-     * @constant
-     */
-    DollarMark: 0x24,
-
-    /**
-     * %
-     *
-     * @type Integer
-     * @constant
-     */
-    PercentSign: 0x25,
-
-    /**
-     * &amp;
-     *
-     * @type Integer
-     * @constant
-     */
-    Ampersand: 0x26,
-
-    /**
-     * '
-     *
-     * @type Integer
-     * @constant
-     */
-    SingleQuote: 0x27,
-
-    /**
-     * (
-     *
-     * @type Integer
-     * @constant
-     */
-    LeftParenthesis: 0x28,
-
-    /**
-     * )
-     *
-     * @type Integer
-     * @constant
-     */
-    RightParenthesis: 0x29,
-
-    /**
-     * &lowast;
-     *
-     * @type Integer
-     * @constant
-     */
-    MultiplicationSign: 0x2A,
-
-    /**
-     * +
-     *
-     * @type Integer
-     * @constant
-     */
-    AdditionSign: 0x2B,
-
-    /**
-     * ,
-     *
-     * @type Integer
-     * @constant
-     */
-    Comma: 0x2C,
-
-    /**
-     * -
-     *
-     * @type Integer
-     * @constant
-     */
-    SubtractionSign: 0x2D,
-
-    /**
-     * .
-     *
-     * @type Integer
-     * @constant
-     */
-    Period: 0x2E,
-    
-    /**
-     * /
-     *
-     * @type Integer
-     * @constant
-     */
-    DivisionSign: 0x2F,
-
-    /**
-     * 0
-     *
-     * @type Integer
-     * @constant
-     */
-    0: 0x30,
-
-    /**
-     * 1
-     *
-     * @type Integer
-     * @constant
-     */
-    1: 0x31,
-
-    /**
-     * 2
-     *
-     * @type Integer
-     * @constant
-     */
-    2: 0x32,
-
-    /**
-     * 3
-     *
-     * @type Integer
-     * @constant
-     */
-    3: 0x33,
-
-    /**
-     * 4
-     *
-     * @type Integer
-     * @constant
-     */
-    4: 0x34,
-
-    /**
-     * 5
-     *
-     * @type Integer
-     * @constant
-     */
-    5: 0x35,
-
-    /**
-     * 6
-     *
-     * @type Integer
-     * @constant
-     */
-    6: 0x36,
-
-    /**
-     * 7
-     *
-     * @type Integer
-     * @constant
-     */
-    7: 0x37,
-
-    /**
-     * 8
-     *
-     * @type Integer
-     * @constant
-     */
-    8: 0x38,
-
-    /**
-     * 9
-     *
-     * @type Integer
-     * @constant
-     */
-    9: 0x39,
-
-    /**
-     * :
-     *
-     * @type Integer
-     * @constant
-     */
-    Colon: 0x3A,
-
-    /**
-     * ;
-     *
-     * @type Integer
-     * @constant
-     */
-    Semicolon: 0x3B,
-
-    /**
-     * &lt;
-     *
-     * @type Integer
-     * @constant
-     */
-    LessThan: 0x3C,
-
-    /**
-     * =
-     *
-     * @type Integer
-     * @constant
-     */
-    EqualsSign: 0x3D,
-
-    /**
-     * &gt;
-     *
-     * @type Integer
-     * @constant
-     */
-    GreaterThan: 0x3E,
-
-    /**
-     * ?
-     *
-     * @type Integer
-     * @constant
-     */
-    QuestionMark: 0x3F,
-
-    /**
-     * &#64;
-     *
-     * @type Integer
-     * @constant
-     */
-    Atmark: 0x40,
-
-    /**
-     * A
-     *
-     * @type Integer
-     * @constant
-     */
-    A: 0x41,
-
-    /**
-     * B
-     *
-     * @type Integer
-     * @constant
-     */
-    B: 0x42,
-
-    /**
-     * C
-     *
-     * @type Integer
-     * @constant
-     */
-    C: 0x43,
-
-    /**
-     * D
-     *
-     * @type Integer
-     * @constant
-     */
-    D: 0x44,
-
-    /**
-     * E
-     *
-     * @type Integer
-     * @constant
-     */
-    E: 0x45,
-
-    /**
-     * F
-     *
-     * @type Integer
-     * @constant
-     */
-    F: 0x46,
-
-    /**
-     * G
-     *
-     * @type Integer
-     * @constant
-     */
-    G: 0x47,
-
-    /**
-     * H
-     *
-     * @type Integer
-     * @constant
-     */
-    H: 0x48,
-
-    /**
-     * I
-     *
-     * @type Integer
-     * @constant
-     */
-    I: 0x49,
-
-    /**
-     * J
-     *
-     * @type Integer
-     * @constant
-     */
-    J: 0x4A,
-
-    /**
-     * K
-     *
-     * @type Integer
-     * @constant
-     */
-    K: 0x4B,
-
-    /**
-     * L
-     *
-     * @type Integer
-     * @constant
-     */
-    L: 0x4C,
-
-    /**
-     * M
-     *
-     * @type Integer
-     * @constant
-     */
-    M: 0x4D,
-
-    /**
-     * N
-     *
-     * @type Integer
-     * @constant
-     */
-    N: 0x4E,
-
-    /**
-     * O
-     *
-     * @type Integer
-     * @constant
-     */
-    O: 0x4F,
-
-    /**
-     * P
-     *
-     * @type Integer
-     * @constant
-     */
-    P: 0x50,
-
-    /**
-     * Q
-     *
-     * @type Integer
-     * @constant
-     */
-    Q: 0x51,
-
-    /**
-     * R
-     *
-     * @type Integer
-     * @constant
-     */
-    R: 0x52,
-
-    /**
-     * S
-     *
-     * @type Integer
-     * @constant
-     */
-    S: 0x53,
-
-    /**
-     * T
-     *
-     * @type Integer
-     * @constant
-     */
-    T: 0x54,
-
-    /**
-     * U
-     *
-     * @type Integer
-     * @constant
-     */
-    U: 0x55,
-
-    /**
-     * V
-     *
-     * @type Integer
-     * @constant
-     */
-    V: 0x56,
-
-    /**
-     * W
-     *
-     * @type Integer
-     * @constant
-     */
-    W: 0x57,
-
-    /**
-     * X
-     *
-     * @type Integer
-     * @constant
-     */
-    X: 0x58,
-
-    /**
-     * Y
-     *
-     * @type Integer
-     * @constant
-     */
-    Y: 0x59,
-
-    /**
-     * Z
-     *
-     * @type Integer
-     * @constant
-     */
-    Z: 0x5A,
-
-    /**
-     * [
-     *
-     * @type Integer
-     * @constant
-     */
-    LeftBracket: 0x5B,
-
-    /**
-     * \
-     *
-     * @type Integer
-     * @constant
-     */
-    YenMark: 0x5C,
-
-    /**
-     * ]
-     *
-     * @type Integer
-     * @constant
-     */
-    RightBracket: 0x5D,
-
-    /**
-     * ^
-     *
-     * @type Integer
-     * @constant
-     */
-    Caret: 0x5E,
-
-    /**
-     * _
-     *
-     * @type Integer
-     * @constant
-     */
-    Underscore: 0x5F,
-
-    /**
-     * `
-     *
-     * @type Integer
-     * @constant
-     */
-    BackQuote: 0x60,
-
-    /**
-     * a
-     *
-     * @type Integer
-     * @constant
-     */
-    a: 0x61,
-
-    /**
-     * b
-     *
-     * @type Integer
-     * @constant
-     */
-    b: 0x62,
-
-    /**
-     * c
-     *
-     * @type Integer
-     * @constant
-     */
-    c: 0x63,
-
-    /**
-     * d
-     *
-     * @type Integer
-     * @constant
-     */
-    d: 0x64,
-
-    /**
-     * e
-     *
-     * @type Integer
-     * @constant
-     */
-    e: 0x65,
-
-    /**
-     * f
-     *
-     * @type Integer
-     * @constant
-     */
-    f: 0x66,
-
-    /**
-     * g
-     *
-     * @type Integer
-     * @constant
-     */
-    g: 0x67,
-
-    /**
-     * h
-     *
-     * @type Integer
-     * @constant
-     */
-    h: 0x68,
-
-    /**
-     * i
-     *
-     * @type Integer
-     * @constant
-     */
-    i: 0x69,
-
-    /**
-     * j
-     *
-     * @type Integer
-     * @constant
-     */
-    j: 0x6A,
-
-    /**
-     * k
-     *
-     * @type Integer
-     * @constant
-     */
-    k: 0x6B,
-
-    /**
-     * l
-     *
-     * @type Integer
-     * @constant
-     */
-    l: 0x6C,
-
-    /**
-     * m
-     *
-     * @type Integer
-     * @constant
-     */
-    m: 0x6D,
-
-    /**
-     * n
-     *
-     * @type Integer
-     * @constant
-     */
-    n: 0x6E,
-
-    /**
-     * o
-     *
-     * @type Integer
-     * @constant
-     */
-    o: 0x6F,
-
-    /**
-     * p
-     *
-     * @type Integer
-     * @constant
-     */
-    p: 0x70,
-
-    /**
-     * q
-     *
-     * @type Integer
-     * @constant
-     */
-    q: 0x71,
-
-    /**
-     * r
-     *
-     * @type Integer
-     * @constant
-     */
-    r: 0x72,
-
-    /**
-     * s
-     *
-     * @type Integer
-     * @constant
-     */
-    s: 0x73,
-
-    /**
-     * t
-     *
-     * @type Integer
-     * @constant
-     */
-    t: 0x74,
-
-    /**
-     * u
-     *
-     * @type Integer
-     * @constant
-     */
-    u: 0x75,
-
-    /**
-     * v
-     *
-     * @type Integer
-     * @constant
-     */
-    v: 0x76,
-
-    /**
-     * w
-     *
-     * @type Integer
-     * @constant
-     */
-    w: 0x77,
-
-    /**
-     * x
-     *
-     * @type Integer
-     * @constant
-     */
-    x: 0x78,
-
-    /**
-     * y
-     *
-     * @type Integer
-     * @constant
-     */
-    y: 0x79,
-
-    /**
-     * z
-     *
-     * @type Integer
-     * @constant
-     */
-    z: 0x7A,
-
-    /**
-     * &#123;
-     *
-     * @type Integer
-     * @constant
-     */
-    LeftBrace: 0x7B,
-
-    /**
-     * |
-     *
-     * @type Integer
-     * @constant
-     */
-    VerticalBar: 0x7C,
-
-    /**
-     * &#125;
-     *
-     * @type Integer
-     * @constant
-     */
-    RightBrace: 0x7D,
-
-    /**
-     * ~
-     *
-     * @type Integer
-     * @constant
-     */
-    Tilde: 0x7E,
-
-    /**
-     * 削除
-     *
-     * @type Integer
-     * @constant
-     */
-    Delete: 0x7F
-};
-
-Jeeel.Code.CharCode.getChar = function (charCode) {
-    
-    var hash;
-    
-    if (this.getChar._hash) {
-        hash = this.getChar._hash;
-    } else {
-        hash = new Jeeel.Hash(this);
+     * インターフェース
+     * 
+     * @interface バリデートクラスを作る際のインターフェース
+     */
+    Interface: {
+        /**
+         * バリデートメソッドが呼べるかどうかを返す
+         * 
+         * @param {String} name バリデート名
+         * @return {Boolean} バリデートメソッドが呼べるかどうか
+         */
+        hasValidation: function (name) {},
         
-        this.getChar._hash = hash;
+        /**
+         * バリデートメソッドを取得する
+         * 
+         * @param {String} name バリデート名
+         * @return {Jeeel.Function.Callback} コールバック
+         */
+        getValidation: function (name) {}
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @abstractClass バリデータクラスを作る際の抽象クラス
+     * @implements Jeeel.Parameter.Validator.Interface
+     */
+    Abstract: function () {}
+};
+
+Jeeel.Parameter.Validator.Interface = Jeeel.Class.Interface.register('Jeeel.Parameter.Validator.Interface', Jeeel.Parameter.Validator.Interface);
+
+Jeeel.Parameter.Validator.Abstract.prototype = {
+    
+    /**
+     * バリデートを行う
+     * 
+     * @param {String} name バリデート名
+     * @param {Mixed} value バリデート対象
+     * @param {Array} [args] 引数リスト
+     * @return {Boolean} バリデート結果
+     */
+    validate: function(name, value, args) {
+        
+        args = args || [];
+        
+        args.unshift(value);
+        
+        name = "validate" + Jeeel.String.toPascalCase(name);
+        
+        return this[name].apply(this, args);
+    },
+    
+    /**
+     * バリデートメソッドが呼べるかどうかを返す
+     * 
+     * @param {String} name バリデート名
+     * @return {Boolean} バリデートメソッドが呼べるかどうか
+     */
+    hasValidation: function (name) {
+        name = "validate" + Jeeel.String.toPascalCase(name);
+        
+        return !!(this[name] && typeof this[name] === 'function');
+    },
+    
+    /**
+     * バリデートメソッドを取得する
+     * 
+     * @param {String} name バリデート名
+     * @return {Jeeel.Function.Callback} コールバック
+     */
+    getValidation: function (name) {
+        name = "validate" + Jeeel.String.toPascalCase(name);
+        
+        return this[name] && typeof this[name] === 'function' && new Jeeel.Function.Callback(name, this) || null;
     }
-
-    return hash.search(charCode, true);
 };
 
-(function () {
-    for (var i = 0; i < 128; i++) {
-        var chr = String.fromCharCode(i);
+Jeeel.Parameter.Validator.Abstract = Jeeel.Class.implement(Jeeel.Parameter.Validator.Abstract, Jeeel.Parameter.Validator.Interface);
 
-        if ( ! (chr in Jeeel.Code.CharCode)) {
-            Jeeel.Code.CharCode[chr] = i;
-        }
-    }
-})();
+Jeeel.file.Jeeel.Parameter.Validator = ['Base', 'Error'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Parameter.Validator, Jeeel.file.Jeeel.Parameter.Validator);
 
 /**
- * @namespace 文字のエンコーディングに関する列挙体
+ * コンストラクタ
+ * 
+ * @class 基本となるバリデータクラス
+ * @augments Jeeel.Parameter.Validator.Abstract
  */
-Jeeel.Code.CharEncoding = {
-
-    /**
-     * UTF-8
-     *
-     * @type String
-     * @constant
-     */
-    UTF8: 'UTF-8',
-
-    /**
-     * Shift_JIS
-     *
-     * @type String
-     * @constant
-     */
-    SHIFT_JIS: 'Shift_JIS',
-
-    /**
-     * JIS
-     *
-     * @type String
-     * @constant
-     */
-    JIS: 'ISO-2022-JP',
-
-    /**
-     * EUC-JP
-     *
-     * @type String
-     * @constant
-     */
-    EUC: 'EUC-JP'
+Jeeel.Parameter.Validator.Base = function () {
+    Jeeel.Parameter.Validator.Abstract.call(this);
 };
 
-/**
- * @namespace HTML特殊文字に関する列挙体
- */
-Jeeel.Code.HtmlCode = {
-  
-    /**
-     * (&nbsp;)半角空白
-     * 
-     * @type String
-     * @constant
-     */
-    HalfWidthSpace: '&nbsp;',
+Jeeel.Parameter.Validator.Base.prototype = {
     
     /**
-     * (&emsp;)全角空白
+     * 必須項目のバリデートを行う
      * 
-     * @type String
-     * @constant
+     * @param {Mixed} value バリデート値
+     * @return {Boolean} 空じゃなかったかどうか(null, undefined以外が通過)
      */
-    FullWidthSpace: '&emsp;',
-    
-    /**
-     * "
-     * 
-     * @type String
-     * @constant
-     */
-    DoubleQuote: '&quot;',
-    
-    /**
-     * &amp;
-     * 
-     * @type String
-     * @constant
-     */
-    Ampersand: '&amp;',
-    
-    /**
-     * &lt;
-     * 
-     * @type String
-     * @constant
-     */
-    LessThan: '&lt;',
-    
-    /**
-     * &gt;
-     * 
-     * @type String
-     * @constant
-     */
-    GreaterThan: '&gt;',
-    
-    /**
-     * &crarr;
-     * 
-     * @type String
-     * @constant
-     */
-    CarriageReturn: '&crarr;',
-    
-    /**
-     * &copy;
-     * 
-     * @type String
-     * @constant
-     */
-    Copyright: '&copy;',
-    TradeMark: '&trade;',
-    RegisteredTrademark : '&reg;',
-    PlusMinusSign: '&plusmn;',
-    MultiplicationSign: '&times;',
-    DivisionSign: '&divide;',
-    ZipCode: '&#12306;',
-    EncircledNumber1: '&#9312;',
-    EncircledNumber2: '&#9313;',
-    EncircledNumber3: '&#9314;',
-    EncircledNumber4: '&#9315;',
-    EncircledNumber5: '&#9316;',
-    EncircledNumber6: '&#9317;',
-    EncircledNumber7: '&#9318;',
-    EncircledNumber8: '&#9319;',
-    EncircledNumber9: '&#9320;',
-    EncircledNumber10: '&#9321;',
-    EncircledNumber11: '&#9322;',
-    EncircledNumber12: '&#9323;',
-    EncircledNumber13: '&#9324;',
-    EncircledNumber14: '&#9325;',
-    EncircledNumber15: '&#9326;',
-    EncircledNumber16: '&#9327;',
-    EncircledNumber17: '&#9328;',
-    EncircledNumber18: '&#9329;',
-    EncircledNumber19: '&#9330;',
-    EncircledNumber20: '&#9331;',
-    LargeRomanNumeral1: '&#8544;',
-    LargeRomanNumeral2: '&#8545;',
-    LargeRomanNumeral3: '&#8546;',
-    LargeRomanNumeral4: '&#8547;',
-    LargeRomanNumeral5: '&#8548;',
-    LargeRomanNumeral6: '&#8549;',
-    LargeRomanNumeral7: '&#8550;',
-    LargeRomanNumeral8: '&#8551;',
-    LargeRomanNumeral9: '&#8552;',
-    LargeRomanNumeral10: '&#8553;',
-    LargeRomanNumeral11: '&#8554;',
-    LargeRomanNumeral12: '&#8555;',
-    SmallRomanNumeral1: '&#8560;',
-    SmallRomanNumeral2: '&#8561;',
-    SmallRomanNumeral3: '&#8562;',
-    SmallRomanNumeral4: '&#8563;',
-    SmallRomanNumeral5: '&#8564;',
-    SmallRomanNumeral6: '&#8565;',
-    SmallRomanNumeral7: '&#8566;',
-    SmallRomanNumeral8: '&#8567;',
-    SmallRomanNumeral9: '&#8568;',
-    SmallRomanNumeral10: '&#8569;',
-    SmallRomanNumeral11: '&#8570;',
-    SmallRomanNumeral12: '&#8571;',
-    Millimeter: '&#13212;',
-    Centimeter: '&#13213;',
-    Kilometer: '&#13214;',
-    Milligram: '&#13198;',
-    Kilogram: '&#13199;',
-    BlackSpade: '&spades;',
-    BlackClub: '&clubs;',
-    BlackHeart: '&hearts;',
-    BlackDiamond: '&diams;',
-    BlackStar: '&#9733;',
-    WhiteSpade: '&#9828;',
-    WhiteClub: '&#9831;',
-    WhiteHeart: '&#9825;',
-    WhiteDiamond: '&#9826;',
-    WhiteStar: '&#9734;',
-    Feminine: '&#9792;',
-    Muscular: '&#9794;',
-    CheckBox: '&#9744;',
-    CheckBoxChecked: '&#9745;',
-    Fine: '&#9728;',
-    Rain: '&#9730;',
-    Snow: '&#9731;',
-    Cloud: '&#9729;',
-    BlackPawn: '&#9823;',
-    BlackKnight: '&#9822;',
-    BlackBishop: '&#9821;',
-    BlackRook: '&#9820;',
-    BlackQueen: '&#9819;',
-    BlackKing: '&#9818;',
-    WhitePawn: '&#9817;',
-    WhiteKnight: '&#9816;',
-    WhiteBishop: '&#9815;',
-    WhiteRook: '&#9814;',
-    WhiteQueen: '&#9813;',
-    WhiteKing: '&#9812;',
-    BioHazard: '&#9763;',
-    Hexagram: '&#10017;'
-};
-
-/**
- * @namespace 読み込み関連のメソッドを提供するModule
- */
-Jeeel.Loader = {
-
-    /**
-     * Prototype.jsが読み込まれているかどうかを返す。
-     * 
-     * @return {Boolean} 読み込みが完了していたらtrueそれ以外はfalseを返す
-     */
-    completePrototype: function () {
-        if (Jeeel._global.Prototype && ! Jeeel.Type.isEmpty(Prototype.Version)) {
-            return true;
-        }
-
-        return false;
+    validateRequired: function (value) {
+        return ! Jeeel.Type.isEmpty(value);
     },
-
+    
     /**
-     * jQuery.jsが読み込まれているかどうかを返す。
-     *
-     * @return {Boolean} 読み込みが完了していたらtrueそれ以外はfalseを返す
+     * 列挙体のバリデートを行う
+     * 
+     * @param {Mixed} value バリデート値
+     * @param {Array} enums 列挙体
+     * @param {Boolean} strict 値比較の際に型まで比較するかどうか
+     * @return {Boolean} 指定した列挙体中の値だったかどうか
      */
-    completeJQuery: function () {
-        if (Jeeel._global.jQuery && Jeeel.Type.isFunction(jQuery) && Jeeel.Type.isString(jQuery.prototype.jquery)) {
-            return true;
-        }
-
-        return false;
+    validateEnum: function (value, enums, strict) {
+        return ! this.validateRequired(value) || Jeeel.Hash.inHash(value, enums || [], strict);
     },
-
+    
     /**
-     * YUI.jsが読み込まれているかどうかを返す。
-     *
-     * @return {Boolean} 読み込みが完了していたらtrueそれ以外はfalseを返す
+     * 数値が下限以上かのバリデートを行う
+     * 
+     * @param {String|Number} value 数値
+     * @param {Number} min 下限
+     * @return {Boolean} 数値が下限以上かどうか
      */
-    completeYUI: function () {
-        if (Jeeel._global.YUI && Jeeel.Type.isFunction(YUI) && Jeeel.Type.isString(YUI.version)) {
-            return true;
-        }
-
-        return false;
+    validateNumericMin: function (value, min) {
+        return ! this.validateRequired(value) || (+min <= +value);
     },
-
+    
     /**
-     * JavaScriptを読み込む
-     *
-     * @param {String} url JavaScriptのURL
-     * @param {Function} [callback] 読み込み完了時のコールバック
-     * @param {String} [charCode] 明示的にキャラクターコードを設定する場合に指定(Jeeel.Code.CharEncoding参照)
-     * @return {Element} scriptタグのElement
-     * @see Jeeel.Code.CharEncoding
+     * 数値が上限以下かのバリデートを行う
+     * 
+     * @param {String|Number} value 数値
+     * @param {Number} max 上限
+     * @return {Boolean} 数値が上限以下かどうか
      */
-    loadScript: function (url, callback, charCode) {
-      
-        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
-            Jeeel.Acl.throwError('Access Error', 404);
+    validateNumericMax: function (value, max) {
+        return ! this.validateRequired(value) || (+value <= +max);
+    },
+    
+    /**
+     * 数値が範囲内かのバリデートを行う
+     * 
+     * @param {String|Number} value 数値
+     * @param {Number} min 下限
+     * @param {Number} max 上限
+     * @return {Boolean} 数値が範囲内かどうか
+     */
+    validateBetween: function (value, min, max) {
+        if ( ! this.validateRequired(value)) {
+            return true;
         }
         
-        var script  = Jeeel.Document.createElement('script');
-        script.type = 'text/javascript';
-
-        if (Jeeel.Type.isString(charCode)) {
-            script.charset = charCode;
+        value = +value;
+        
+        return (+min <= value && value <= +max);
+    },
+    
+    /**
+     * 文字列の長さの下限のバリデートを行う
+     * 
+     * @param {String} str 文字列
+     * @param {Integer} min 長さの下限
+     * @return {Boolean} 長さが下限以上かどうか
+     */
+    validateMinLength: function (str, min) {
+        if ( ! this.validateRequired(str)) {
+            return true;
         }
+        
+        str = '' + str;
+        min = Math.floor(+min);
+        
+        return min <= str.length;
+    },
+    
+    /**
+     * 文字列の長さの上限のバリデートを行う
+     * 
+     * @param {String} str 文字列
+     * @param {Integer} max 長さの上限
+     * @return {Boolean} 長さが上限以下かどうか
+     */
+    validateMaxLength: function (str, max) {
+        if ( ! this.validateRequired(str)) {
+            return true;
+        }
+        
+        str = '' + str;
+        max = Math.floor(+max);
+        
+        return str.length <= max;
+    },
 
-        if (callback) {
-            script.onreadystatechange = function () {
-                if (script.readyState === 'loaded' || script.readyState === 'complete') {
-                    script.onreadystatechange = null;
-                    script.onload = null;
-                    callback(script);
-                }
-            };
+    /**
+     * 文字列の長さのバリデートを行う
+     * 
+     * @param {String} str 文字列
+     * @param {Integer} min 長さの下限
+     * @param {Integer} max 長さの上限
+     * @return {Boolean} 長さが範囲以内かどうか
+     */
+    validateLength: function (str, min, max) {
+        if ( ! this.validateRequired(str)) {
+            return true;
+        }
+        
+        str = '' + str;
+        min = Math.floor(+min);
+        max = Math.floor(+max);
+        
+        return min <= str.length && str.length <= max;
+    },
+    
+    /**
+     * 半角英数字のバリデートを行う
+     * 
+     * @param {String} alnum 半角英数字
+     * @return {Boolean} 半角英数字かどうか
+     */
+    validateAlnum: function (alnum) {
+        return ! this.validateRequired(alnum) || /^[a-z0-9]*$/ig.test(alnum);
+    },
+    
+    /**
+     * 半角英字のバリデートを行う
+     * 
+     * @param {String} alpha 半角英字
+     * @return {Boolean} 半角英字かどうか
+     */
+    validateAlpha: function (alpha) {
+        return ! this.validateRequired(alpha) || /^[a-z]*$/ig.test(alpha);
+    },
+    
+    /**
+     * 数値のバリデートを行う
+     * 
+     * @param {String|Number} digits 数値
+     * @return {Boolean} 数値かどうか
+     */
+    validateDigits: function (digits) {
+        return ! this.validateRequired(digits) || /^[0-9]+$/ig.test(digits);
+    },
+    
+    /**
+     * 半角のバリデートを行う
+     * 
+     * @param {String} str 文字列
+     * @return {Boolean} 半角かどうか
+     */
+    validateHalfWidth: function (str) {
+        return  ! this.validateRequired(str) || /^[\u0000-\u007E]*$/ig.test(str);
+    },
+    
+    /**
+     * 全角のバリデートを行う
+     * 
+     * @param {String} str 文字列
+     * @return {Boolean} 半角かどうか
+     */
+    validateFullWidth: function (str) {
+        return  ! this.validateRequired(str) || /^[^\u0020-\u007E]*$/ig.test(str);
+    },
+    
+    /**
+     * ひらがなのバリデートを行う
+     * 
+     * @param {String} str 文字列
+     * @return {Boolean} ひらがなかどうか
+     */
+    validateHiragana: function (str) {
+        return ! this.validateRequired(str) || /^[\u3001\u3002\u3041-\u3096　]*$/ig.test(str);
+    },
+    
+    /**
+     * カタカナのバリデートを行う
+     * 
+     * @param {String} str 文字列
+     * @return {Boolean} カタカナかどうか
+     */
+    validateKatakana: function (str) {
+        return ! this.validateRequired(str) || /^[\u30A0-\u30FC\u31F0-\u31FF　]*$/ig.test(str);
+    },
+    
+    /**
+     * 半角カタカナのバリデートを行う
+     * 
+     * @param {String} str 文字列
+     * @return {Boolean} 半角カタカナかどうか
+     */
+    validateHalfWidthKana: function (str) {
+        return  ! this.validateRequired(str) || /^[\uFF65-\uFF9F ]*$/ig.test(str);
+    },
+    
+    /**
+     * 真偽値のバリデートを行う
+     * 
+     * @param {Boolean|Integer|String} bool 真偽値
+     * @return {Boolean} 真偽値かどうか
+     */
+    validateBool: function (bool) {
+        if ( ! this.validateRequired(bool)) {
+            return true;
+        }
+        
+        return bool === true || bool === false
+            || bool === 1    || bool === 0
+            || bool === '1'  || bool === '0';
+    },
+
+    /**
+     * Emailのバリデートを行う
+     * 
+     * @param {String} email Email
+     * @return {Boolean} Emailかどうか
+     */
+    validateEmail: function (email) {
+        if ( ! this.validateRequired(email)) {
+            return true;
+        }
+        
+        var reg = /^(?:(?:(?:(?:[a-zA-Z0-9_!#\$\%&'*+\/=?\^`{}~|\-]+)(?:\.(?:[a-zA-Z0-9_!#\$\%&'*+\/=?\^`{}~|\-]+))*)|(?:"(?:\\[^\r\n]|[^\\"])*")))\@(?:(?:(?:(?:[a-zA-Z0-9_!#\$\%&'*+\/=?\^`{}~|\-]+)(?:\.(?:[a-zA-Z0-9_!#\$\%&'*+\/=?\^`{}~|\-]+))*)|(?:\[(?:\\\S|[\x21-\x5a\x5e-\x7e])*\])))$/;
+        
+        return reg.test(email);
+    },
+
+    /**
+     * URLのバリデートを行う
+     * 
+     * @param {String} url URL
+     * @return {Boolean} URLかどうか
+     */
+    validateUrl: function (url) {
+        var reg = /^(https?|ftp):\/\/(?:([^@:]+)(?::([^@]+))?@)?([^:\/]+)(?::([0-9]+))?(\/[^?]*)?(?:\?([^#]*))?(?:#(.*))?$/;
+        
+        return ! this.validateRequired(url) || reg.test(url);
+    },
+    
+    /**
+     * IPのバリデートを行う
+     * 
+     * @param {String} ip IP
+     * @return {Boolean} IPかどうか
+     */
+    validateIp: function (ip) {
+        if ( ! this.validateRequired(ip)) {
+            return true;
+        }
+        
+        ip = '' + ip;
+        
+        var ips, reg;
+        
+        // IPv4の場合(IPv6未対応)
+        if (ip.indexOf('.') >= 0) {
+            ips = ip.split('.');
             
-            script.onload = function () {
-                script.onreadystatechange = null;
-                script.onload = null;
-                callback(script);
-            };
-        }
-        
-        script.src  = url;
-
-        Jeeel.Document.appendToHead(script);
-        
-        return script;
-    },
-
-    /**
-     * CSSを読み込む
-     *
-     * @param {String} url CSSのURL
-     * @param {String} [charCode] 明示的にキャラクターコードを設定する場合に指定(Jeeel.Code.CharEncoding参照)
-     * @return {Element} linkタグのElement
-     * @see Jeeel.Code.CharEncoding
-     */
-    loadStyle: function (url, charCode) {
-      
-        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
-            Jeeel.Acl.throwError('Access Error', 404);
-        }
-      
-        var style  = Jeeel.Document.createElement('link');
-        style.type = 'text/css';
-        style.rel  = 'stylesheet';
-
-        if (Jeeel.Type.isString(charCode)) {
-            style.charset = charCode;
-        }
-        
-        style.href = url;
-
-        Jeeel.Document.appendToHead(style);
-        
-        return style;
-    },
-
-    /**
-     * スクリプトを記述したJavaScript文字列を実行してヘッダに埋め込む
-     *
-     * @param {String} script JavaScript文字列
-     * @return {Element} scriptタグのElement
-     */
-    addScript: function (script) {
-        var scriptTag  = Jeeel.Document.createElement('script');
-        scriptTag.type = 'text/javascript';
-        scriptTag.innerHTML = script;
-
-        Jeeel.Document.appendToHead(scriptTag);
-        
-        return scriptTag;
-    },
-
-    /**
-     * スタイルを記述したCSS文字列を適用してヘッダに埋め込む
-     *
-     * @param {String} style CSS文字列
-     * @return {Element} styleタグのElement
-     */
-    addStyle: function (style) {
-        var styleTag  = Jeeel.Document.createElement('style');
-        styleTag.type = 'text/css';
-        
-        style = '\n' + style + '\n';
-
-        if (styleTag.styleSheet) {
-            styleTag.styleSheet.cssText = style;
-        } else {
-            styleTag.innerHTML = style;
-        }
-
-        Jeeel.Document.appendToHead(styleTag);
-        
-        return styleTag;
-    },
-    
-    /**
-     * ファイルの事前読み込みを行う<br />
-     * これを行う事により事前にキャッシュを作る事が可能になる
-     * 
-     * @param {String} url 読み込みファイルのURL
-     */
-    preloadFile: function (url) {},
-
-    /**
-     * 現在読み込み中のJavaScriptのscriptタグを取得する<br />
-     * 読み込み中のJavaScript内から呼ばないと意味がない
-     *
-     * @return {Element} scriptタグのElement
-     * @deprecated 今後削除予定
-     */
-    getCurrentScript: function () {
-        return (function (e) {
-            return (e.nodeName.toUpperCase() === 'SCRIPT' ? e : arguments.callee(e.lastChild));
-        })(Jeeel._doc);
-    },
-
-    /**
-     * 指定したURLのファイルがあるかどうかを返す
-     *
-     * @param {String} url ファイルのURL
-     * @return {Boolean} ファイルが存在するかどうか
-     */
-    existsFile: function (url) {
-      
-        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
-            Jeeel.Acl.throwError('Access Error', 404);
-        }
-      
-        var file = Jeeel.Net.Ajax.serverResponse(url);
-
-        if (Jeeel.Type.isString(file)) {
-            return true;
-        }
-
-        return false;
-    },
-    
-    /**
-     * @ignore
-     */
-    _init: function () {
-      
-        if (/*@cc_on!@*/false) {
-            /**
-             * @ignore
-             */
-            this.preloadFile = function (url) {
-                new Image().src = url;
-            };
-        } else {
-            /**
-             * @ignore
-             */
-            this.preloadFile = function (url) {
-              
-                if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
-                    Jeeel.Acl.throwError('Access Error', 404);
+            if (ips.length !== 4) {
+                return false;
+            }
+            
+            reg = /^0|[1-9][0-9]*$/g;
+            
+            for (var i = ips.length; i--;) {
+                if ( ! ips[i].match(reg)) {
+                    return false;
                 }
                 
-                var obj = Jeeel.Document.createElement('object');
+                ips[i] = +ips[i];
                 
-                obj.width  = 0;
-                obj.height = 0;
-                obj.data = url;
-                Jeeel.Document.appendToBody(obj);
-            };
+                if ( ! (0 <= ips[i] && ips[i] <= 255)) {
+                    return false;
+                }
+            }
+            
+            return true;
         }
-      
-        delete this._init;
+        
+        return false;
+    },
+
+    /**
+     * 文字列の正規表現でのバリデートを行う
+     * 
+     * @param {String} value 検証文字列
+     * @param {String} pattern 正規表現
+     * @return bool 正規表現にマッチするかどうか
+     */
+    validateRegex: function (value, pattern) {
+        return ! this.validateRequired(value) 
+            || !!('' + value).match(new RegExp(Jeeel.String.escapeRegExp(pattern)));
     }
 };
 
-Jeeel.Loader._init();Jeeel.directory.Jeeel.UserAgent = {
+Jeeel.Class.extend(Jeeel.Parameter.Validator.Base, Jeeel.Parameter.Validator.Abstract);
+
+Jeeel.Parameter.addDefaultValidator(new Jeeel.Parameter.Validator.Base());
+
+/**
+ * コンストラクタ
+ * 
+ * @class 検証エラーを管理するクラス
+ * @param {Jeeel.Parameter.Field} field 対象フィールド
+ * @param {Mixed} value フィールド値
+ * @param {String} validationName バリデートメソッド名
+ * @param {Array} [args] バリデートメソッドの引数リストリスト
+ */
+Jeeel.Parameter.Validator.Error = function (field, value, validationName, args) {
+    this._field = field;
+    this._value = value;
+    this._validationName = ('' + validationName).replace(/^_?validate/, '');
+    this._args = args || [];
+};
+
+Jeeel.Parameter.Validator.Error.prototype = {
+    _field: null,
+    _value: null,
+    _validationName: '',
+    _args: [],
+    _msg: '',
+    
+    /**
+     * フィールドを取得する
+     * 
+     * @return {Jeeel.Parameter.Field} フィールド
+     */
+    getValidationField: function() {
+        return this._field;
+    },
+
+    /**
+     * バリデートで引っ掛かったバリデーション名を取得する
+     * 
+     * @return {String} バリデーション名
+     */
+    getValidationName: function () {
+        return this._validationName;
+    },
+    
+    /**
+     * バリデートで引っ掛かったバリデート対象の値を取得する
+     * 
+     * @return {Mixed} バリデート対象値
+     */
+    getValidationValue: function () {
+        return this._value;
+    },
+    
+    /**
+     * バリデーションを通した際に渡した引数を取得する
+     * 
+     * @return {Array} 引数リスト
+     */
+    getValidationArgs: function () {
+        return this._args;
+    },
+    
+    /**
+     * 現在の内部情報からエラーメッセージを取得する
+     * 
+     * @return {String} エラーメッセージ
+     */
+    getMessage: function () {
+        var path = 'Parameter.Validator';
+        var res;
+        
+        if (Jeeel.Language.hasLanguage(path)) {
+            var language = Jeeel.Language.getLanguage(path);
+
+            var vName = Jeeel.String.toHyphenation(this._validationName).replace(/^-/, '');
+            
+            if (language[vName]) {
+                res = language[vName];
+            } else {
+                res = this._msg;
+            }
+        } else {
+            res = this._msg;
+        }
+
+        res = res.replace(':label', this._field.getLabel());
+        res = res.replace(':param:0', this._value);
+        
+        for (var i = this._args.length; i--;) {
+            res = res.replace(':param:' + (i + 1), this._args[i]);
+        }
+        
+        return res;
+    },
+    
+    /**
+     * エラーメッセージを設定する
+     * 
+     * @param {String} msg エラーメッセージ
+     * @return {Jeeel.Parameter.Validator.Error} 自インスタンス
+     */
+    setMessage: function (msg) {
+        this._msg = msg;
+        
+        return this;
+    },
+    
+    /**
+     * 文字列に変換する
+     * 
+     * @return string エラーメッセージ
+     */
+    toString: function () {
+        return this.getMessage();
+    }
+};
+
+if (Jeeel._auto) {
+    Jeeel._tmp();
+}
+Jeeel.directory.Jeeel.UserAgent = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -11302,6 +13095,25 @@ Jeeel.Loader._init();Jeeel.directory.Jeeel.UserAgent = {
 
 /**
  * @staticClass ブラウザの情報を判別するためのクラス
+ * @example
+ * このクラスはブラウザ情報からURL情報まで一括で管理するクラスである
+ * ブラウザ毎に正確に挙動を分けたい場合やURLのクエリなどを取得したい際に使用する
+ * 
+ * 例：
+ * Jeeel.UserAgent.isInternetExplorer(); // ブラウザがIEの場合にtrue
+ * Jeeel.UserAgent.isInternetExplorer(6); // 引数にバージョンを指定して、ブラウザがIE6の場合にtrueになる
+ * Jeeel.UserAgent.getVersion(); // ブラウザの正確なバージョン情報を返す、Chromeなら"19.0.1084.56"など
+ * Jeeel.UserAgent.getBrowserName(); // ブラウザの正確な名前を返す、Firefoxなら"Mozilla Firefox"など
+ * Jeeel.UserAgent.getQuery(); // URLのクエリ文字列を解析した連想配列を取得する
+ * 
+ * 他にも以下のメソッド等が良く使われる
+ * 
+ * Jeeel.UserAgent.isFirefox(4); // Firefoxかどうかを判定する、引数でバージョンを指定
+ * Jeeel.UserAgent.isChrome(); // Chromeかどうかを判定する、引数でバージョンを指定
+ * Jeeel.UserAgent.isOpera();  // Opearaかどうかを判定する、引数でバージョンを指定
+ * Jeeel.UserAgent.isSafari(); // Safariかどうかを判定する、引数でバージョンを指定
+ * Jeeel.UserAgent.isIPhone(); // iPhoneかどうかを判定する
+ * Jeeel.UserAgent.isAndroid(); // Androidかどうかを判定する
  */
 Jeeel.UserAgent = {
 
@@ -11419,6 +13231,13 @@ Jeeel.UserAgent = {
      * @return {Boolean} Mobileかどうか
      */
     isMobile: function () {},
+    
+    /**
+     * Workerとして動作しているかどうかを返す
+     * 
+     * @return {Boolean} Workerかどうか
+     */
+    isWorker: function () {},
 
     /**
      * ブラウザのレンダリングエンジンがTridentかどうかを返す
@@ -11490,7 +13309,9 @@ Jeeel.UserAgent = {
      * @return {String} ブラウザの使用言語
      */
     getLanguage: function () {
-        return navigator.language;
+        var lang = navigator.userLanguage || navigator.browserLanguage || navigator.language;
+        
+        return lang && lang.substr(0, 2) || Jeeel.Language.getDefaultLocale();
     },
 
     /**
@@ -11624,6 +13445,15 @@ Jeeel.UserAgent = {
     },
     
     /**
+     * リファラを取得する
+     * 
+     * @return {String} リファラ
+     */
+    getReferrer: function () {
+        return Jeeel._doc.referrer;
+    },
+    
+    /**
      * 現在のURLを解析して結果を返す
      * 
      * @return {Hash} URL解析結果の連想配列
@@ -11640,6 +13470,10 @@ Jeeel.UserAgent = {
      * @param {String} url 移行先URL
      */
     redirect: function (url) {
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
         location.replace(url);
     },
 
@@ -11743,6 +13577,8 @@ Jeeel.UserAgent = {
         this.isIPod = (uao.indexOf("(iPod;") !== -1 ? trueF : falseF);
         this.isMobile = (uao.indexOf("Mobile") !== -1 ? trueF : falseF);
         this.isAndroid = (uao.indexOf("Android") !== -1 ? trueF : falseF);
+        
+        this.isWorker = (Jeeel._global && Jeeel._global.importScripts ? trueF : falseF);
 
         idx = uao.indexOf("Firefox");
         
@@ -11886,6 +13722,13 @@ Jeeel.UserAgent = {
 };
 
 Jeeel.UserAgent._init();
+
+// 初期のロケールを設定
+if (Jeeel.UserAgent.isWorker()) {
+    Jeeel.Language.setLocale(Jeeel.UserAgent.getQuery().lang || Jeeel.Language.getDefaultLocale());
+} else {
+    Jeeel.Language.setLocale(Jeeel.UserAgent.getLanguage());
+}
 
 Jeeel.file.Jeeel.UserAgent = [];
 
@@ -12278,1039 +14121,6 @@ Jeeel.UserAgent.Geolocation.Position.prototype = {
     }
 };
 
-/**
- * @staticClass Json関連のモジュール
- */
-Jeeel.Json = {
-    
-    /**
-     * 指定した値をJsonにエンコードする<br/>
-     * なお参照も全て展開するので、<br />
-     * 参照先がDomの様な階層が深い場合やサイズオーバーが起こる<br />
-     * またプライベートプロパティ・メソッドまでは修正変換されないので、<br />
-     * デコード後にまったく同じように使えるとは限らない
-     *
-     * @param {Mixied} obj Jsonに変換するオブジェクト
-     * @param {Boolean} [serializeScript] エンコード時にJavaScriptの型について厳密に変換するかどうか
-     * @return {String} Jsonに変換後の文字列
-     * @throws {RangeError} 無限ループに入った場合またはオブジェクトのサイズが限界を超えた場合に発生する
-     * @throws {TypeError} 循環参照がある場合に発生する
-     */
-    encode: function (obj, serializeScript) {
-        
-        // 厳密変換でない場合高速化のため既存のJSONを使用する
-        if ( ! serializeScript && Jeeel._global.JSON) {
-            return JSON.stringify(obj);
-        }
-        
-        var res;
-
-        if (Jeeel.Type.isPrimitive(obj)) {
-            if (Jeeel.Type.isString(obj)) {
-                res = '"' + obj.replace('\\', '\\\\')
-                              .replace(/(\r\n|\n)/ig, '\\n')
-                              .replace(/\t/ig, '\\t')
-                              .replace('"', '\\"')
-                              .replace("'", "\\'") + '"';
-            } else {
-                res = '' + obj;
-            }
-        } else if (Jeeel.Type.isFunction(obj)) {
-
-            if (serializeScript) {
-                switch (obj) {
-                    case Object:
-                        res = 'Object';
-                        break;
-                        
-                    case Array:
-                        res = 'Array';
-                        break;
-                        
-                    case String:
-                        res = 'String';
-                        break;
-                        
-                    case Boolean:
-                        res = 'Boolean';
-                        break;
-                        
-                    case Date:
-                        res = 'Date';
-                        break;
-                        
-                    case RegExp:
-                        res = 'RegExp';
-                        break;
-                        
-                    default:
-                        if (Jeeel._debugMode && Jeeel.Debug && obj[Jeeel.Debug.Debugger.INFORMATION_NAME]) {
-                            res = obj[Jeeel.Debug.Debugger.INFORMATION_NAME].name;
-                        }
-                        break;
-                }
-            }
-
-            if ( ! res) {
-                res = obj.toString().replace(/\/\/[^\r\n]*(\r\n|\n)/ig, '')
-                                    .replace(/((\r\n|\n) +|\t|\r\n|\n){1,}/ig, ' ');
-            }
-        } else if (serializeScript) {
-            if (Jeeel.Type.isDate(obj)) {
-                res = 'new Date(' + obj.getTime() + ')';
-            } else if (Jeeel.Type.isMath(obj)) {
-                res = 'Math';
-            } else if (Jeeel.Type.isJSON(obj)) {
-                res = 'JSON';
-            } else if (Jeeel.Type.isRegularExpression(obj)) {
-                res = obj.toString();
-            }
-        }
-        
-        if ( ! res) {
-            if (Jeeel.Type.isArray(obj)) {
-                res  = [];
-
-                for (var i = 0, l = obj.length; i < l; i++) {
-                    res[i] = this.encode(obj[i], serializeScript);
-                }
-
-                res = '[' + res.join(',') + ']';
-            } else {
-                res = [];
-
-                for (var key in obj) {
-                    if (Jeeel._debugMode && Jeeel.Debug && key === Jeeel.Debug.Debugger.INFORMATION_NAME) {
-                        continue;
-                    }
-
-                    res[res.length] = '"' + key + '":' + this.encode(obj[key], serializeScript);
-                }
-
-                res = '{' + res.join(',') + '}';
-            }
-        }
-        
-        return res;
-    },
-    
-    /**
-     * 作成したJsonをデコードする<br />
-     * 検証を行い、evalして返す
-     *
-     * @param {String} json Json形式の文字列
-     * @param {Boolean} [isSecure] JSONの中身の安全性が確実な場合にtrueにすると検証なしで動作するため速くなる(また、完全なJSON形式でなくても動作するようになる)
-     * @return {Mixied} 変換後の値(空文字の場合はundefinedが返る)
-     * @throws {TypeError} jsonが文字列ではないときに発生
-     * @throws {SyntaxError} jsonがJson形式でないときに発生
-     */
-    decode: function (json, isSecure) {
-
-        // jsonの中身が空の場合nullではなくundefinedを返す("null"をデコードした時と区別するため)
-        if ( ! json) {
-            return void 0;
-        }
-
-        if ( ! Jeeel.Type.isString(json)) {
-            throw new TypeError('jsonが文字列ではありません。');
-        } else if ( ! isSecure) {
-            if (Jeeel._global.JSON) {
-                return JSON.parse(json);
-            } else if ( ! this.isJson(json)) {
-                throw new SyntaxError('jsonがJson形式になっていません。');
-            }
-        }
-
-        return eval('(' + json + ')');
-    },
-    
-    /**
-     * 完全なJson形式であるかどうかを返す(メソッド等が入っていた場合は不可)
-     *
-     * @param {String} json 検査対象の文字列
-     * @return {Boolean} Json形式であるかどうか
-     */
-    isJson: function (json) {
-
-        if ( ! Jeeel.Type.isString(json)) {
-            throw new TypeError('jsonが文字列ではありません。');
-        }
-
-        if (json.match(/^\s*$/)) {
-            return false;
-        }
-
-        return !(/[^,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]/.test(json.replace(/"(\\.|[^"\\])*"/g, ' ')));
-    }
-};
-Jeeel.directory.Jeeel.Session = {
-
-    /**
-     * 自身を文字列参照された場合の変換
-     *
-     * @return {String} 自身のディレクトリ
-     * @private
-     */
-    toString: function () {
-        return Jeeel.directory.Jeeel + 'Session/';
-    }
-};
-
-/**
- * @namespace Session関連のネームスペース
- */
-Jeeel.Session = {
-
-    /**
-     * Sessionの保存期間の初期値を取得する
-     *
-     * @return {Integer} 保存期間(秒)
-     */
-    getExpires: function () {
-        return Jeeel.Session.Core.expires;
-    },
-
-    /**
-     * Sessionの保存期間の初期値を設定する<br />
-     * マイナスを指定すると無制限になる
-     *
-     * @param {Integer} expires 保存期間(秒)
-     * @return {Jeeel.Session} 自オブジェクト
-     */
-    setExpires: function (expires) {
-
-        if ( ! Jeeel.Type.isInteger(expires)) {
-            throw new Error('expiresが整数ではありません。');
-        }
-
-        Jeeel.Session.Core.expires = expires;
-
-        return this;
-    },
-
-    /**
-     * Sessionの読み込み許可をするドメインの初期値を取得する
-     *
-     * @return {String} 読み込み可能ドメイン
-     */
-    getDomain: function () {
-        return Jeeel.Session.Core.domain;
-    },
-
-    /**
-     * Sessionの読み込み許可をするドメインの初期値を設定する
-     *
-     * @param {String} domain 読み込み可能ドメイン
-     * @return {Jeeel.Session} 自オブジェクト
-     */
-    setDomain: function (domain) {
-
-        if ( ! Jeeel.Type.isString(domain)) {
-            throw new Error('domainが文字列ではありません。');
-        }
-
-        Jeeel.Session.Core.domain = domain;
-
-        return this;
-    },
-
-    /**
-     * Sessionの読み込み可能パスの初期値を取得する
-     *
-     * @return {String} 読み込み可能パス
-     */
-    getPath: function () {
-        return Jeeel.Session.Core.path;
-    },
-
-    /**
-     * Sessionの読み込み可能パスの初期値を設定する
-     *
-     * @param {String} path 読み込み可能パス
-     * @return {Jeeel.Session} 自オブジェクト
-     */
-    setPath: function (path) {
-
-        if ( ! Jeeel.Type.isString(path)) {
-            throw new Error('pathが文字列ではありません。');
-        }
-
-        Jeeel.Session.Core.path = path;
-
-        return this;
-    }
-};
-
-Jeeel.file.Jeeel.Session = ['Core', 'Abstract', 'Cookie', 'Name'];
-
-if (Jeeel._extendMode.WebStorage && Jeeel._global && Jeeel._global.sessionStorage && Jeeel._global.localStorage) {
-    Jeeel.file.Jeeel.Session[Jeeel.file.Jeeel.Session.length] = 'WebStorage';
-}
-
-Jeeel._autoImports(Jeeel.directory.Jeeel.Session, Jeeel.file.Jeeel.Session);
-
-/**
- * コンストラクタ
- * 
- * @class セッション内のデータのやり取りを提供するコアクラス
- * @param {Hash} params リスト化したい値を保持するキー
- * @param {Integer} [expires] Sessionの保存期限(秒)<br />
- *                             マイナスを指定すると無制限になる
- * @param {String} [domain] 許可ドメイン
- * @param {String} [path] 許可パス
- */
-Jeeel.Session.Core = function (params, expires, domain, path) {
-    if ( ! Jeeel.Type.isHash(params)) {
-        throw new Error('paramsがHashではありません。');
-    }
-
-    this.params  = params;
-    this.created = (arguments[4] ? new Date(arguments[4]) : new Date());
-    this.expires = (Jeeel.Type.isInteger(expires) ? expires : 1440);
-    this.path    = (Jeeel.Type.isString(path) ? path : '/');
-    this.domain  = (Jeeel.Type.isString(domain) ? domain : Jeeel.UserAgent.getHostname());
-};
-
-/**
- * インスタンスの作成を行う
- *
- * @param {Hash} params リスト化したい値を保持するキー
- * @return {Jeeel.Session.Core} 作成したインスタンス
- */
-Jeeel.Session.Core.create = function (params) {
-    return new this(params, this.expires, this.domain, this.path);
-};
-
-/**
- * Sessionオブジェクトかどうかを返す
- *
- * @param {Mixied} val 判定値
- * @return {Boolean} 判定結果
- */
-Jeeel.Session.Core.isSessionObject = function (val) {
-    if ( ! Jeeel.Type.isObject(val)) {
-        return false;
-    }
-    else if ( ! Jeeel.Type.isHash(val.params)) {
-        return false;
-    }
-    else if ( ! Jeeel.Type.isString(val.created)) {
-        return false;
-    }
-    else if ( ! Jeeel.Type.isInteger(val.expires)) {
-        return false;
-    }
-    else if ( ! Jeeel.Type.isString(val.domain)) {
-        return false;
-    }
-    else if ( ! Jeeel.Type.isString(val.path)) {
-        return false;
-    }
-
-    return true;
-};
-
-/**
- * 現在のドメインが許可されているのかどうかを調べる
- *
- * @param {String} target 対象のドメイン
- * @return {Boolean} 許可されたドメインならばtrueそれ以外はfalseを返す
- */
-Jeeel.Session.Core.isAllowDomain = function (target) {
-    var domain = Jeeel.UserAgent.getHostname();
-
-    var reg = new RegExp('^'+target.replace('.', '\\.'));
-
-    if (domain.match(reg)) {
-        return true;
-    }
-
-    return false;
-};
-
-/**
- * 現在アクセスしているパスが許可されているのかどうか調べる
- *
- * @param {String} target 対象のパス
- * @return {Boolean} 許可されたパスならばtrueそれ以外はfalseを返す
- */
-Jeeel.Session.Core.isAllowPath = function (target) {
-    var path = Jeeel.UserAgent.getPath();
-
-    var reg = new RegExp('^'+target+(target.charAt(target.length-1) == '/' ? '' : '(/|$)'));
-
-    if (path.match(reg)) {
-        return true;
-    }
-
-    return false;
-};
-
-/**
- * シリアライズされてオブジェクトの復元を行う
- *
- * @param {String} serializeObj シリアライズされているオブジェクト
- * @return {Jeeel.Session.Core} 復元したインスタンス
- */
-Jeeel.Session.Core.unserialize = function (serializeObj) {
-    var session;
-
-    try {
-        session = Jeeel.Json.decode(decodeURIComponent(serializeObj));
-    } catch(e) {
-        session = {};
-    }
-    
-    if ( ! Jeeel.Type.isHash(session)) {
-        return this.create({});
-    }
-
-    var res = {};
-
-    for (var domain in session) {
-
-        if ( ! this.isAllowDomain(domain)) {
-            continue;
-        }
-
-        for (var path in session[domain]) {
-
-            if ( ! this.isAllowPath(path)) {
-                continue;
-            }
-
-            var val = session[domain][path];
-
-            if ( ! this.isSessionObject(val)) {
-                val = this.create({});
-            } else {
-                val = new this(val.params, val.expires, val.domain, val.path, val.created);
-            }
-
-            if (val.isTimeOver()) {
-                val = this.create({});
-            }
-
-            res = Jeeel.Hash.merge(res, val.params);
-        }
-
-        break;
-    }
-
-    session = this.create(res);
-
-    return session;
-};
-
-/**
- * クッキーの内容をロードする
- *
- * @param {String} cookieObj document.cookie内部の値
- * @return {Jeeel.Session.Core} 作成したインスタンス
- */
-Jeeel.Session.Core.loadCookie = function (cookieObj) {
-    var objs = cookieObj.split(/:|; /);
-
-    var params = {};
-
-    for (var i = 0, l = objs.length; i < l; i++) {
-        var pair = objs[i].split('=');
-
-        var session = decodeURIComponent(pair[1]);
-
-        try {
-            session = Jeeel.Json.decode(session);
-        } catch (e) {}
-
-        params[pair[0]] = session;
-    }
-
-    return this.create(params);
-};
-
-/**
- * Sessionの保存期限の初期値(秒)<br />
- * マイナスを指定すると無制限になる
- *
- * @type Integer
- */
-Jeeel.Session.Core.expires = 1440;
-
-/**
- * Sessionの読み込み可能ドメインの初期値
- *
- * @type String
- */
-Jeeel.Session.Core.domain = Jeeel.UserAgent.getHostname();
-
-if (Jeeel.Session.Core.domain === 'localhost') {
-    Jeeel.Session.Core.domain = '';
-}
-
-/**
- * Sessionの読み込み可能パスの初期値
- *
- * @type String
- */
-Jeeel.Session.Core.path = '/';
-
-Jeeel.Session.Core.prototype = {
-    
-    /**
-     * Sessionに保存するパラメータ
-     *
-     * @type Hash
-     */
-    params: {},
-
-    /**
-     * Sessionを作成した時刻
-     *
-     * @type Date
-     */
-    created: null,
-
-    /**
-     * Sessionの保存期限(秒)<br />
-     * マイナスを指定すると無制限になる
-     *
-     * @type Integer
-     */
-    expires: -1,
-
-    /**
-     * Sessionの読み込み可能パス
-     *
-     * @type String
-     */
-    path: '',
-
-    /**
-     * Sessionの読み込み可能ドメイン
-     *
-     * @type String
-     */
-    domain: '',
-    
-    /**
-     * シリアライズが可能なオブジェクトを返す
-     *
-     * @return {Object} シリアライズ可能オブジェクト
-     */
-    getSerializeableObject: function () {
-        return {
-            params:  this.params,
-            created: this.created.toGMTString(),
-            expires: this.expires,
-            domain:  this.domain,
-            path:    this.path
-        };
-    },
-
-    /**
-     * Sessionオブジェクトをシリアライズする
-     *
-     * @param {String} windowName window.nameの値
-     * @return {String} シリアライズされたSessionオブジェクト
-     */
-    serialize: function (windowName) {
-        var sessionOwner;
-
-        try {
-            sessionOwner = Jeeel.Json.decode(decodeURIComponent(windowName));
-        } catch(e) {
-            sessionOwner = {};
-        }
-
-        if ( ! Jeeel.Type.isObject(sessionOwner)) {
-            sessionOwner = {};
-        }
-
-        if ( ! (this.domain in sessionOwner)) {
-            sessionOwner[this.domain] = {};
-        }
-
-        if ( ! this.constructor.isSessionObject(sessionOwner[this.domain][this.path])) {
-            sessionOwner[this.domain][this.path] = this.getSerializeableObject();
-        } else {
-
-            var selfObj = this.getSerializeableObject();
-
-            delete selfObj.params;
-
-            sessionOwner[this.domain][this.path] = Jeeel.Hash.merge(sessionOwner[this.domain][this.path], selfObj);
-
-            for (var key in this.params) {
-                sessionOwner[this.domain][this.path].params[key] = this.params[key];
-
-                if ( ! Jeeel.Type.isSet(sessionOwner[this.domain][this.path].params[key])) {
-                    delete sessionOwner[this.domain][this.path].params[key];
-                }
-            }
-        }
-
-        return encodeURIComponent(Jeeel.Json.encode(sessionOwner));
-    },
-
-    /**
-     * Session情報をクッキーに保存できる形式に変換して返す
-     *
-     * @return {String} クッキー保存形式の文字列
-     */
-    getCookie: function () {
-        var expires = new Date(this.created.toString());
-
-        expires.setSeconds(expires.getSeconds() + this.expires);
-        expires = expires.toGMTString();
-
-        var params = [];
-
-        for (var key in this.params) {
-            if (Jeeel.Type.isString(this.params[key])) {
-                params[params.length] = key + '=' + encodeURIComponent(this.params[key]);
-            } else {
-                params[params.length] = key + '=' + encodeURIComponent(Jeeel.Json.encode(this.params[key]));
-            }
-        }
-
-        return params.join(':') + (this.expires < 0 ? '' : ';expires=' + expires) + (this.domain == '' ? '' : ';domain=' + this.domain) + ';path=' + this.path + ';';
-    },
-
-    /**
-     * このSessionオブジェクトの期限が切れていないかどうかを調べる
-     *
-     * @return {Boolean} 期限切れならばtrueそれ以外はfalseを返す
-     */
-    isTimeOver: function () {
-
-        if (this.expires < 0) {
-            return false;
-        }
-
-        var expires = new Date(this.created.toString());
-
-        expires.setSeconds(expires.getSeconds() + this.expires);
-
-        var now = new Date();
-
-        if (now.getTime() > expires.getTime()) {
-            return true;
-        }
-
-        return false;
-    },
-
-    /**
-     * 現在のドメインが許可されているのかどうかを調べる
-     *
-     * @return {Boolean} 許可されたドメインならばtrueそれ以外はfalseを返す
-     */
-    isAllowDomain: function () {
-        var domain = Jeeel.UserAgent.getHostname();
-
-        var reg = new RegExp('^'+this.domain.replace('.', '\\.'));
-
-        if (domain.match(reg)) {
-            return true;
-        }
-
-        return false;
-    },
-
-    /**
-     * 現在アクセスしているパスが許可されているのかどうか調べる
-     *
-     * @return {Boolean} 許可されたパスならばtrueそれ以外はfalseを返す
-     */
-    isAllowPath: function () {
-        var path = Jeeel.UserAgent.getPath();
-
-        var reg = new RegExp('^'+this.path+(this.path.charAt(this.path.length-1) == '/' ? '' : '(/|$)'));
-
-        if (path.match(reg)) {
-            return true;
-        }
-
-        return false;
-    },
-    
-    /**
-     * コンストラクタ
-     * 
-     * @param {Hash} params リスト化したい値を保持するキー
-     * @param {Integer} [expires] Sessionの保存期限(秒)<br />
-     *                             マイナスを指定すると無制限になる
-     * @param {String} [domain] 許可ドメイン
-     * @param {String} [path] 許可パス
-     * @constructor
-     */
-    constructor: Jeeel.Session.Core
-};
-
-/**
- * コンストラクタ
- *
- * @abstractClass セッションクラスを作る際の抽象クラス
- */
-Jeeel.Session.Abstract = function () {
-    this._session = Jeeel.Session.Core.create({});
-};
-
-Jeeel.Session.Abstract.prototype = {
-
-    /**
-     * セッションの必要値の保存領域
-     * 
-     * @type Jeeel.Session.Core
-     * @protected
-     */
-    _session: null,
-
-    /**
-     * パラメータを取得する
-     *
-     * @param {String} key 保存する値を示すキー
-     * @param {Mixied} [defaultValue] デフォルト値
-     * @return {Mixed} 保存されていた値
-     */
-    get: function (key, defaultValue) {
-        return (key in this._session.params ? this._session.params[key] : defaultValue);
-    },
-
-    /**
-     * パラメータを全て取得する
-     *
-     * @return {Hash} 保存されていた値の連想配列
-     */
-    getAll: function () {
-        return this._session.params;
-    },
-
-    /**
-     * パラメータを設定する
-     *
-     * @param {String} key 保存する値を示すキー
-     * @param {Mixed} value 保存する値
-     * @return {Jeeel.Session.Abstract} 自インスタンス
-     */
-    set: function (key, value) {
-        this._session.params[key] = value;
-
-        return this;
-    },
-
-    /**
-     * パラメータを設定する
-     *
-     * @param {Hash} values 保存する値の連想配列
-     * @return {Jeeel.Session.Abstract} 自インスタンス
-     */
-    setAll: function (values) {
-
-        if ( ! Jeeel.Type.isHash(values)) {
-            throw new Error('valuesがHashではありません。');
-        }
-
-        this._session.params = values;
-
-        return this;
-    },
-
-    /**
-     * 指定したキーの値を破棄する
-     *
-     * @param {String} key キー
-     * @return {Jeeel.Session.Abstract} 自インスタンス
-     */
-    unset: function (key) {
-        this._session.params[key] = undefined;
-
-        return this;
-    },
-
-    /**
-     * 指定したキーの値を保持しているかどうかを返す
-     *
-     * @param {String} key キー
-     * @return {Boolean} 値を保持していたらtrueそれ以外はfalseを返す
-     */
-    has: function (key) {
-        return key in this._session.params;
-    },
-
-    /**
-     * パラメータを全て破棄する
-     *
-     * @return {Jeeel.Session.Abstract} 自インスタンス
-     */
-    clear: function () {
-        this._session.params = {};
-        
-        return this;
-    },
-
-    /**
-     * Sessionの保存期間を取得する
-     *
-     * @return {Integer} 保存期間(秒)
-     */
-    getExpires: function () {
-        return this._session.expires;
-    },
-
-    /**
-     * Sessionの保存期間を設定する<br />
-     * マイナスを指定すると無制限になる
-     *
-     * @param {Integer} expires 保存期間(秒)
-     * @return {Jeeel.Session.Abstract} 自インスタンス
-     */
-    setExpires: function (expires) {
-
-        if ( ! Jeeel.Type.isInteger(expires)) {
-            throw new Error('expiresが整数ではありません。');
-        }
-
-        this._session.expires = expires;
-
-        return this;
-    },
-
-    /**
-     * Sessionの読み込み許可をするドメインを取得する
-     *
-     * @return {String} 読み込み可能ドメイン
-     */
-    getDomain: function () {
-        return this._session.domain;
-    },
-
-    /**
-     * Sessionの読み込み許可をするドメインを設定する
-     *
-     * @param {String} domain 読み込み可能ドメイン
-     * @return {Jeeel.Session.Abstract} 自インスタンス
-     */
-    setDomain: function (domain) {
-
-        if ( ! Jeeel.Type.isString(domain)) {
-            throw new Error('domainが文字列ではありません。');
-        }
-
-        this._session.domain = domain;
-
-        return this;
-    },
-
-    /**
-     * Sessionの読み込み可能パスを取得する
-     *
-     * @return {String} 読み込み可能パス
-     */
-    getPath: function () {
-        return this._session.path;
-    },
-
-    /**
-     * Sessionの読み込み可能パスを設定する
-     *
-     * @param {String} path 読み込み可能パス
-     * @return {Jeeel.Session.Abstract} 自インスタンス
-     */
-    setPath: function (path) {
-
-        if ( ! Jeeel.Type.isString(path)) {
-            throw new Error('pathが文字列ではありません。');
-        }
-
-        this._session.path = path;
-
-        return this;
-    }
-};
-/**
- * コンストラクタ<br />
- * コンストラクタを直接使用した場合はロードは行われない
- *
- * @class Cookieを使用してセッションを扱うクラス(クッキーが使用できるのを前提に動作する)
- * @augments Jeeel.Session.Abstract
- */
-Jeeel.Session.Cookie = function () {
-    Jeeel.Session.Abstract.call(this);
-};
-
-/**
- * インスタンスの作成を行う<br />
- * さらにロードも同時に行う
- *
- * @param {Boolean} [loadsCookie] クッキーのロードを行うかどうか(初期は行わない)
- * @return {Jeeel.Session.Cookie} 作成したインスタンス
- */
-Jeeel.Session.Cookie.create = function (loadsCookie) {
-    var obj = new this();
-
-    return (loadsCookie ? obj.load() : obj);
-};
-
-Jeeel.Session.Cookie.prototype = {
-    
-    /**
-     * 設定した値をセッションに保存する<br >
-     * 実際にクッキーに保存するのでログイン状態等に注意
-     *
-     * @return {Jeeel.Session.Cookie} 自インスタンス
-     */
-    save: function () {
-        Jeeel._doc.cookie = this._session.getCookie();
-
-        return this;
-    },
-    
-    /**
-     * セッションに保存されていた値を読み込む<br/>
-     * なお、現在保持している値は全て削除される
-     *
-     * @return {Jeeel.Session.Cookie} 自インスタンス
-     */
-    load: function () {
-        this._session = Jeeel.Session.Core.loadCookie(Jeeel._doc.cookie);
-
-        return this;
-    }
-};
-
-Jeeel.Class.extend(Jeeel.Session.Cookie, Jeeel.Session.Abstract);
-
-/**
- * コンストラクタ<br />
- * コンストラクタを直接使用した場合はロードは行われない
- *
- * @class Cookieを使用しないセッションを扱うクラス(但しサーバー側には干渉しない、またドメインが変わっても参照できるため重要な情報保持には向かない)<br />なおこのクラスはwindow.nameを使用している
- * @augments Jeeel.Session.Abstract
- */
-Jeeel.Session.Name = function () {
-    Jeeel.Session.Abstract.call(this);
-};
-
-/**
- * インスタンスの作成を行う<br />
- * さらにロードも同時に行う
- *
- * @return {Jeeel.Session.Name} 作成したインスタンス
- */
-Jeeel.Session.Name.create = function () {
-    return (new this()).load();
-};
-
-Jeeel.Session.Name.prototype = {
-  
-    /**
-     * 設定した値をセッションに保存する<br />
-     * なおセーブ時は前に保持していた値は削除された後保存されるので、<br />
-     * 注意して行う必要がある。
-     *
-     * @return {Jeeel.Session.Name} 自インスタンス
-     */
-    save: function () {
-        Jeeel._global.name = this._session.serialize(Jeeel._global.name);
-
-        return this;
-    },
-    
-    /**
-     * セッションに保存されていた値を読み込む<br/>
-     * なお、現在保持している値は全て削除される
-     *
-     * @return {Jeeel.Session.Name} 自インスタンス
-     */
-    load: function () {
-        this._session = Jeeel.Session.Core.unserialize(Jeeel._global.name);
-
-        return this;
-    }
-};
-
-Jeeel.Class.extend(Jeeel.Session.Name, Jeeel.Session.Abstract);
-
-/**
- * コンストラクタ<br />
- * コンストラクタを直接使用した場合はロードは行われない
- *
- * @class Cookieを使用しないセッションを扱うクラス(但しサーバー側には干渉しない、またドメイン・プロトコル・ポート番号で制御されるため異なるドメイン間等ではデータのやりとりは出来ない)<br />なおこのクラスはwindow.localStorageを使用している
- * @augments Jeeel.Session.Abstract
- * @param {Boolean} [isPersistent] データの永続化をするかどうか(ブラウザを閉じてもアクセス出来るか)
- * @param {String} [name] 保存名を明示的に指定する場合に指定
- */
-Jeeel.Session.WebStorage = function (isPersistent, name) {
-  
-    Jeeel.Session.Abstract.call(this);
-
-    /**
-     * 保存データを永続化するかどうか
-     * 
-     * @type Boolean
-     * @private
-     */
-    this._isPersistent = !!isPersistent;
-    
-    /**
-     * 保存する際に使用するキー
-     *
-     * @type String
-     * @private
-     */
-    this._sessionName = name || Jeeel.Session.WebStorage.STORAGE_NAME;
-};
-
-/**
- * インスタンスの作成を行う<br />
- * さらにロードも同時に行う
- *
- * @param {Boolean} [isPersistent] データの永続化をするかどうか(ブラウザを閉じてもアクセス出来るか)
- * @param {String} [name] 保存名を明示的に指定する場合に指定
- * @return {Jeeel.Session.WebStorage} 作成したインスタンス
- */
-Jeeel.Session.WebStorage.create = function (isPersistent, name) {
-    return (new this(isPersistent, name)).load();
-};
-
-/**
- * localStorageに保存する際のキー
- * 
- * @type String
- * @constant
- */
-Jeeel.Session.WebStorage.STORAGE_NAME = 'Jeeel-Session-WebStorage-Name';
-
-Jeeel.Session.WebStorage.prototype = {
-    
-    /**
-     * 設定した値をセッションに保存する<br />
-     * なおセーブ時は前に保持していた値は削除された後保存されるので、<br />
-     * 注意して行う必要がある。
-     *
-     * @return {Jeeel.Session.WebStorage} 自インスタンス
-     */
-    save: function () {
-        (this._isPersistent ? Jeeel._global.localStorage : Jeeel._global.sessionStorage).setItem(this._sessionName, this._session.serialize((this._isPersistent ? Jeeel._global.localStorage : Jeeel._global.sessionStorage).getItem(this._sessionName)));
-
-        return this;
-    },
-    
-    /**
-     * セッションに保存されていた値を読み込む<br/>
-     * なお、現在保持している値は全て削除される
-     *
-     * @return {Jeeel.Session.WebStorage} 自インスタンス
-     */
-    load: function () {
-        this._session = Jeeel.Session.Core.unserialize((this._isPersistent ? Jeeel._global.localStorage : Jeeel._global.sessionStorage).getItem(this._sessionName));
-
-        return this;
-    }
-};
-
-Jeeel.Class.extend(Jeeel.Session.WebStorage, Jeeel.Session.Abstract);
 Jeeel.directory.Jeeel.Dom = {
 
     /**
@@ -13326,6 +14136,92 @@ Jeeel.directory.Jeeel.Dom = {
 
 /**
  * @namespace Domに関するネームスペース
+ * @see Jeeel.Dom.Event
+ * @see Jeeel.Dom.Event.Type
+ * @see Jeeel.Dom.Element
+ * @see Jeeel.Dom.ElementOperator
+ * @see Jeeel.Dom.Document
+ * @see Jeeel.Dom.Window
+ * @example
+ * Domネームスペース以下はDOM関連の要素の操作やイベントのハンドリングなど多岐に渡るメイン機能の一つ
+ * その中でも特に使用される頻度が高いのは以下のクラスである
+ * Jeeel.Dom.Event
+ * Jeeel.Dom.Element
+ * Jeeel.Dom.ElementOperator
+ * Jeeel.Dom.Document
+ * Jeeel.Dom.Window
+ * 
+ * Jeeel.Dom.Event
+ * このクラスはイベント関連の制御を一括で行うクラスである
+ * このクラスはインスタンスを作成してから何かをする訳ではなく、静的メソッドからイベントを登録し呼び出されたタイミングで処理を行う
+ * 
+ * 例：
+ * var Test = {
+ *     
+ *     // evがJeeel.Dom.Eventインスタンスになる
+ *     onClick: function (ev) {
+ *         console.log(ev.mousePoint.x, ev.mousePoint.y);
+ *     }
+ * };
+ * 
+ * Jeeel.Dom.Event.addEventListener($ID('test'), Jeeel.Dom.Event.Type.CLICK, Test.onClick, Test);
+ * 
+ * addEventListenerでイベントを登録する際に引数は順に要素, イベント名, 関数, 関数内でのthisとなる
+ * 
+ * 
+ * Jeeel.Dom.Element
+ * このクラスは良く使われる可能性の高いクラスのひとつである
+ * このクラスはHTMLElementには無い幾つかの拡張機能を提供するクラスである
+ * このクラスはHTMLElementを引数に取ってインスタンス化してから使用する
+ * 
+ * 例：
+ * var elm = new Jeeel.Dom.Element($ID('test')); //他にもJeeel.Dom.Element.create($ID('test'))や$ELM($ID('test'))でも同じ意味である
+ * elm.setText('<p>Pタグ</p>'); // 文字列としてinnnerHTMLを書き換える
+ * elm.setHtml('<p>Pタグ</p>'); // HTMLとしてinnnerHTMLを書き換える
+ * elm.hasClassName('test'); // testという名前のクラスを保持しているかどうか調べる
+ * elm.toggle(1000); // jQueryでお馴染みのtoggleとほぼ同等でアニメーションを行う
+ * elm.insertTop(document.createElement('div')); // Prototype.jsでお馴染みのInsertion.Topとほぼ同等でラッパーしている要素無いのトップに指定要素を追加する
+ * elm.up(); // ラッパーしている要素自体をひとつ上に動かす(兄要素と交換する)
+ * 
+ * 他にも様々な機能があるがそれらはJeeel.Dom.Elementを参照
+ * 
+ * 
+ * Jeeel.Dom.ElementOperator
+ * 場合によってはもっとも多く使用される可能性の高いクラスである
+ * 先のJeeel.Dom.Elementを更にラッパーし複数の要素に対して操作を行うクラスである
+ * jQueryを参考にして作成してあるので近い機能が多く含まれている
+ * このクラスはインスタンス化の際にセレクタ、HTML要素、HTML要素の配列、NodeList数多くの種類の引数を取ることが出来る
+ * 
+ * 例：
+ * var elms = new Jeeel.Dom.ElementOperator('#test .child'); // Jeeel.Dom.ElementOperator.create('#test .child')や$ELMOP('#test .child')でも同じ意味である
+ * elms.addClass('hoge'); // 現在保持する全ての要素にクラス hoge を追加する
+ * elms.addClick(function (ev) { console.log('click'); }); // 現在保持する全ての要素にクリックイベントを追加する
+ * elms.$TAG('p'); // 現在保持する全ての要素内のpタグを検索して新たにJeeel.Dom.ElementOperatorインスタンスを作成して返す
+ * elms.filterOdd(); // 現在保持する全ての要素の内奇数の要素のみを収集し新たにインスタンス化して返す
+ * elms.setText('chain'); // 現在保持する全ての要素のinnnerHTMLを文字列 "chain" に書き換える
+ * 
+ * 
+ * Jeeel.Dom.Document
+ * このクラスは直接インスタンス化する機会が殆ど無い
+ * documentのラッパークラスである
+ * このクラスの機能を使うときは基本的にJeeel.Documentに代入されているインスタンスを使用する
+ * 検索系のショートカットがあるので直接検索メソッドが呼ばれることは殆ど無い
+ * 
+ * 例：
+ * Jeeel.Document.getElementsByClassName('child'); // $CLASS('child')と同じ、ドキュメント上からchildクラスの要素を検索して返す
+ * Jeeel.Document.getElementsBySelector('#test > .child'); // $QUERY('#test > .child')と同じ、ドキュメント上からIDがtestの直下のchildクラス要素を検索して返す
+ * Jeeel.Document.createElementList('<p>Pタグ</p>'); //指定したHTML文字列から要素の配列を作成して返す
+ * Jeeel.Document.getDocumentSize(); // 現在のドキュメントのサイズを取得する(スクロールの増減を含めた値)
+ * 
+ * 
+ * Jeeel.Dom.Window
+ * Jeeel.Dom.Documentと同じく直接インスタンス化する機会が殆ど無いクラスである
+ * windowのラッパークラスである
+ * このクラスの機能を使うときは基本的にJeeel.Windowに代入されているインスタンスを使用する
+ * 
+ * 例：
+ * Jeeel.Window.getWindowSize(); // 現在のウィンドウのサイズを取得する(スクロールの増減を含めない値)
+ * Jeeel.Window.createWindowOpener(); // window.openをラッピングし、新しく開くウィンドウに対してPOSTデータを送る機能などを追加したインスタンスを返す
  */
 Jeeel.Dom = {
 
@@ -13374,7 +14270,7 @@ if (Jeeel.Dom._tmp) {
 /**
  * コンストラクタ
  * 
- * @class 指定した要素内の検索を行うクラス
+ * @class 指定した要素内の検索を行うメソッドを自動選択して提供するクラス
  * @param {Node} target 検索対象ノード
  */
 Jeeel.Dom.Core.Searcher = function (target) {
@@ -13396,6 +14292,11 @@ Jeeel.Dom.Core.Searcher.create = function (target) {
     return new this(target);
 };
 
+/**
+ * キャッシュ
+ * 
+ * @type Hash
+ */
 Jeeel.Dom.Core.Searcher.caches = {};
 
 Jeeel.Dom.Core.Searcher.prototype = {
@@ -13509,6 +14410,94 @@ Jeeel.Dom.Core.Searcher.prototype = {
      */
     getElementsBySelector: function (selector) {
         var res = this._target.querySelectorAll(selector);
+        
+        return Jeeel.Hash.toArray(res);
+    },
+    
+    /**
+     * このElement内から指定IDのHTML要素を取得する
+     *
+     * @param {String} id 検索ID
+     * @return {Element} 取得したElement
+     */
+    selectElementById: function (id) {
+        return this._target.querySelector('#' + id) || null;
+    },
+    
+    /**
+     * このElement内から指定ClassのHTML要素を取得する
+     *
+     * @param {String|String[]} className 検索Class
+     * @return {Element[]} 取得したElement配列
+     */
+    selectElementsByClassName: function (className) {
+
+        if (Jeeel.Type.isArray(className)) {
+            className = className.join(', .');
+        }
+      
+        var res = this._target.querySelectorAll('.' + className);
+        
+        return Jeeel.Hash.toArray(res);
+    },
+    
+    /**
+     * このElement内から指定NameのHTML要素を取得する
+     * なおsubmitSearchを指定すると<br />
+     * この動作は一部本来のgetElementsByNameと違い、<br />
+     * c[]等で配列指定した値に対してもヒットする
+     *
+     * @param {String|String[]} name 検索Name
+     * @param {Boolean} [submitSearch=false] 送信時と同じようにc[]等の配列指定をヒットさせるかどうか
+     * @return {Element[]} 取得したElement配列
+     */
+    selectElementsByName: function (name, submitSearch) {
+      
+        var eq = '=';
+        
+        if (submitSearch) {
+            eq = '^=';
+        }
+        
+        if ( ! Jeeel.Type.isArray(name)) {
+            name = [name];
+        }
+        
+        for (var i = name.length; i--;) {
+            name[i] = '[name' + eq + '"' + name[i] + '"]';
+        }
+        
+        var res = this._target.querySelectorAll(name.join(', '));
+        
+        return Jeeel.Hash.toArray(res);
+    },
+    
+    /**
+     * このElement内から指定TagのHTML要素を取得する
+     *
+     * @param {String|String[]} tagName 検索Tag
+     * @return {Element[]} 取得したElement配列
+     */
+    selectElementsByTagName: function (tagName) {
+      
+        if (Jeeel.Type.isArray(tagName)) {
+            tagName = tagName.join(', ');
+        }
+      
+        var res = this._target.querySelectorAll(tagName);
+        
+        return Jeeel.Hash.toArray(res);
+    },
+    
+    /**
+     * このElement内から指定属性が指定値のHTML要素を取得する
+     *
+     * @param {String} attribute 属性名
+     * @param {String} value 属性値('*'を指定すると任意の値の意味になる)
+     * @return {Element[]} 取得したElement配列
+     */
+    selectElementsByAttribute: function (attribute, value) {
+        var res = this._target.querySelectorAll('[' + attribute + (value === '*' ? '' : '="' + value + '"') + ']');
         
         return Jeeel.Hash.toArray(res);
     },
@@ -13645,7 +14634,6 @@ Jeeel.Dom.Core.Searcher.prototype = {
      * @return {Element[]} 取得したElement配列
      */
     searchElementsByName: function (name, submitSearch) {
-        var rf = new Jeeel.Filter.String.RegularExpressionEscape();
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
         
         /**
@@ -13695,7 +14683,7 @@ Jeeel.Dom.Core.Searcher.prototype = {
                         }
                     }
                 } else {
-                    if (Jeeel.Type.inArray(name, regs, true)) {
+                    if (Jeeel.Hash.inHash(name, regs, true)) {
                         res[res.length] = target;
                     }
                 }
@@ -13733,7 +14721,7 @@ Jeeel.Dom.Core.Searcher.prototype = {
   
                 if (submitSearch) {
                     while (l--) {
-                        name[l] = new RegExp('^' + rf.filter(name[l]) + '(?:$|\\[)');
+                        name[l] = new RegExp('^' + Jeeel.String.escapeRegExp(name[l]) + '(?:$|\\[)');
                     }
                 }
 
@@ -13744,7 +14732,7 @@ Jeeel.Dom.Core.Searcher.prototype = {
                 }
                 
                 if (submitSearch) {
-                    name = new RegExp('^' + rf.filter(name) + '(?:$|\\[)');
+                    name = new RegExp('^' + Jeeel.String.escapeRegExp(name) + '(?:$|\\[)');
                 }
                 
                 search(res, this._target, name, submitSearch, true);
@@ -13796,7 +14784,7 @@ Jeeel.Dom.Core.Searcher.prototype = {
          */
         var multiSearch = function (res, target, tags, f) {
 
-            if ( ! f && Jeeel.Type.inArray(target.nodeName.toUpperCase(), tags, true)) {
+            if ( ! f && Jeeel.Hash.inHash(target.nodeName.toUpperCase(), tags, true)) {
                 res[res.length] = target;
             }
 
@@ -13828,7 +14816,7 @@ Jeeel.Dom.Core.Searcher.prototype = {
             if (isArr && l === 0) {
                 return res;
             } else if (isArr && l > 1) {
-                if (Jeeel.Type.inArray('*', tagName, true)) {
+                if (Jeeel.Hash.inHash('*', tagName, true)) {
                     search(res, this._target, '*', true);
                 } else {
                     while (l--) {
@@ -14023,32 +15011,32 @@ Jeeel.Dom.Core.Searcher.prototype = {
         }
         
         if ( ! this._target.getElementById) {
-            this.getElementById = this.searchElementById;
+            this.getElementById = this._target.querySelectorAll && this.selectElementById || this.searchElementById;
         }
         
         if ( ! this._target.getElementsByClassName) {
-            this.getElementsByClassName = this.searchElementsByClassName;
+            this.getElementsByClassName = this._target.querySelectorAll && this.selectElementsByClassName || this.searchElementsByClassName;
         }
         
         if ( ! this._target.getElementsByName) {
-            this.getElementsByName = this.searchElementsByName;
+            this.getElementsByName = this._target.querySelectorAll && this.selectElementsByName || this.searchElementsByName;
         }
         
         if ( ! this._target.getElementsByTagName) {
-            this.getElementsByTagName = this.searchElementsByTagName;
+            this.getElementsByTagName = this._target.querySelectorAll && this.selectElementsByTagName || this.searchElementsByTagName;
         }
 
         if ( ! this._target.getElementsByAttribute) {
-            this.getElementsByAttribute = this.searchElementsByAttribute;
+            this.getElementsByAttribute = this._target.querySelectorAll && this.selectElementsByAttribute || this.searchElementsByAttribute;
         }
         
         if ( ! this._target.getElementsByProperty) {
             this.getElementsByProperty = this.searchElementsByProperty;
         }
         
-        if ( ! this._target.querySelectorAll) {
+//        if ( ! this._target.querySelectorAll || ! Jeeel.Type.isDocument(this._target)) {
             this.getElementsBySelector = this.searchElementsBySelector;
-        }
+//        }
         
         cache = {};
         
@@ -14061,6 +15049,7 @@ Jeeel.Dom.Core.Searcher.prototype = {
         this.constructor.caches[this._target.nodeType] = cache;
     }
 };
+
 /**
  * @namespace Nodeに関する事を保持するネームスペース
  */
@@ -14190,7 +15179,7 @@ Jeeel.Dom.Window = function (window) {
     
     if ( ! window) {
         window = Jeeel._global;
-    } else if (window.nodeName && window.nodeName.toUpperCase() == 'IFRAME') {
+    } else if (window.nodeName && window.nodeName.toUpperCase() === 'IFRAME') {
         window = window.contentWindow;
     } else if (window instanceof Jeeel.Dom.Document) {
         this._document = window;
@@ -14535,7 +15524,8 @@ Jeeel.Dom.Window.prototype._init();
 
 Jeeel.file.Jeeel.Dom.Window = ['Opener', 'Interval'];
 
-Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Window, Jeeel.file.Jeeel.Dom.Window);Jeeel.directory.Jeeel.Dom.Window.Opener = {
+Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Window, Jeeel.file.Jeeel.Dom.Window);
+Jeeel.directory.Jeeel.Dom.Window.Opener = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -15545,6 +16535,11 @@ Jeeel.Dom.Document.prototype = {
      *
      * @param {String} html HTML文字列
      * @return {Node[]} 作成されたNodeリスト
+     * @example
+     * var doc = new Jeeel.Dom.Document();
+     * var html = '<div></div>ほげ<span>ぽんちょ</span>';
+     * var nodes = doc.createNodeList(html);
+     * // nodes => [HTMLDivElement, Text, HTMLSpanElement]
      */
     createNodeList: function (html) {
 
@@ -15629,6 +16624,11 @@ Jeeel.Dom.Document.prototype = {
      *
      * @param {String} html HTML文字列
      * @return {Element[]} 作成されたElementリスト
+     * @example
+     * var doc = new Jeeel.Dom.Document();
+     * var html = '<div></div>ほげ<span>ぽんちょ</span>';
+     * var nodes = doc.createElementList(html);
+     * // nodes => [HTMLDivElement, HTMLSpanElement]
      */
     createElementList: function (html) {
         var res = [];
@@ -15975,7 +16975,7 @@ if (Jeeel._doc) {
 }
 
 (function () {
-    if ( ! Jeeel.Document) {
+    if ( ! Jeeel._doc) {
         return;
     }
     
@@ -16088,10 +17088,16 @@ Jeeel.directory.Jeeel.Dom.Xml = {
  * コンストラクタ
  * 
  * @class XMLを簡単にアクセス可能にするクラス
- * @param {Document} xmlDocument XMLドキュメント
+ * @param {Document|String} xmlDocument XMLドキュメント
  * @throws {Error} xmlDocumentがXMLのドキュメントオブジェクトでない場合に発生
  */
 Jeeel.Dom.Xml = function (xmlDocument) {
+    
+    // 文字列はXML文字列として処理する
+    if (Jeeel.Type.isString(xmlDocument)) {
+        xmlDocument = this.constructor.Parser.parse(xmlDocument);
+    }
+    
     this._init(xmlDocument);
 };
 
@@ -16119,7 +17125,9 @@ Jeeel.Dom.Xml.load = function (url, params) {
                     .setAll(params || {})
                     .execute();
     
-    return new this(ajax.getResponse().responseXML);
+    var response = ajax.getResponse();
+    
+    return new this(response.responseXML || response.responseText);
 };
 
 /**
@@ -16140,7 +17148,7 @@ Jeeel.Dom.Xml.loadAsync = function (url, callback, params) {
     
     ajax.setAll(params || {})
         .setSuccessMethod(function (response) {
-            callback(new this(response.responseXML));
+            callback(new this(response.responseXML || response.responseText));
         }, this).execute();
 };
 
@@ -16289,6 +17297,8 @@ Jeeel.Dom.Xml.prototype = {
 
         var nodes = xmlDocument.childNodes;
         
+        this._childNodes = [];
+        
         for (var i = 0, l = nodes.length; i < l; i++) {
             this._childNodes[i] = new Jeeel.Dom.Xml.Node(nodes[i]);
             
@@ -16299,7 +17309,7 @@ Jeeel.Dom.Xml.prototype = {
     }
 };
 
-Jeeel.file.Jeeel.Dom.Xml = ['Node'];
+Jeeel.file.Jeeel.Dom.Xml = ['Node', 'Parser'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Xml, Jeeel.file.Jeeel.Dom.Xml);
 
@@ -16631,6 +17641,376 @@ Jeeel.Dom.Xml.Node.prototype = {
                         accessNodes[property] = xml[property];
                     }
                 }
+            }
+        }
+    }
+};
+
+/**
+ * @staticClass XMLをパースするための静的クラス(対応しているのは完全XML形式でヘッダ、通常要素、テキスト、属性、名前空間)
+ */
+Jeeel.Dom.Xml.Parser = {
+    
+    /**
+     * 元から存在するネームスペース
+     * 
+     * @type Hash
+     * @constant
+     */
+    NAMESPACES: {
+        xmlns: 'http://www.w3.org/2000/xmlns/'
+    },
+    
+    /**
+     * 現在パース中のXMLドキュメント
+     * 
+     * @type Hash
+     * @private
+     */
+    _xml: null,
+
+    /**
+     * XML文字列をパースする
+     * 
+     * @param {String} xml パース対象のXML文字列
+     * @return {Hash} パース後の簡易オブジェクト
+     */
+    parse: function (xml) {
+        xml = Jeeel.String.trim(xml);
+        
+        this._xml = {
+            nodeName: '#document',
+            nodeValue: null,
+            nodeType: Jeeel.Dom.Node.DOCUMENT_NODE,
+            innerXML: xml
+        };
+        
+        xml = this._parseXmlHeader(xml);
+        
+        this._parseXmlDocument(xml);
+        
+        this._xml.firstChild = this._xml.childNodes[0] || null;
+        this._xml.lastChild = this._xml.childNodes[this._xml.childNodes.length - 1] || null;
+        
+        return this._xml;
+    },
+    
+    /**
+     * XMLのヘッダを解析する
+     * 
+     * @param {String} xml 解析XML
+     * @return {String} ヘッダを取り除いた値
+     * @private
+     */
+    _parseXmlHeader: function (xml) {
+        var self = this;
+        
+        return xml.replace(/<\?xml(.*)?\?>/, function (match, header) {
+            
+            var v = header.match(/version=(?:([0-9.]+)|((["'])?[0-9.]+[^\\]\3))/);
+            var e = header.match(/encoding=(?:([^"']+)|((["'])?[^"']+[^\\]\3))/);
+            
+            self._xml.xmlVersion = v[1] || v[2] && v[2].replace(/^["']|["']$/g, '') || '';
+            self._xml.xmlEncoding = e[1] || e[2] && e[2].replace(/^["']|["']$/g, '') || '';
+            
+            return '';
+        });
+    },
+    
+    /**
+     * XMLのドキュメント本体を解析する
+     * 
+     * @param {String} xml 解析XML
+     * @private
+     */
+    _parseXmlDocument: function (xml) {
+        var inTag = false, isTagName = false, isAttrName = false, isAttrValue = false, isEndTag = false;
+        var attrName, prefix, tagName, tag, bchar, quot = null, txt = '', bi = null;
+        var i, j, l, tmp, tmpName, tmpTags = [], attrs, namespaceVal = this.NAMESPACES;
+        var parent;
+        
+        this._xml.childNodes = [];
+        this._xml.documentElement = null;
+        
+        parent = this._xml;
+        
+        for (i = 0, l = xml.length; i < l; i++) {
+            var chr = xml.charAt(i);
+            
+            switch (chr) {
+                case '<':
+                    inTag = true;
+                    isTagName = true;
+                    isAttrName = false;
+                    isAttrValue = false;
+                    isEndTag = false;
+                    tagName = '';
+                    prefix = null;
+                    attrs = [];
+                    bi = i;
+                    
+                    // 今までテキストを保持指定居た場合テキストノードを生成して親に入れる
+                    if (txt && ! ('documentElement' in parent)) {
+                        tag = {
+                            attributes: null,
+                            childNodes: [],
+                            parentNode: parent,
+                            nodeValue: txt,
+                            nodeName: '#text',
+                            prefix: null,
+                            namespaceURI: null,
+                            nodeType: Jeeel.Dom.Node.TEXT_NODE,
+                            innerXML: ''
+                        };
+                        
+                        parent.childNodes.push(tag);
+                    }
+                    break;
+                    
+                case '>':
+                    if ( ! inTag) {
+                        break;
+                    }
+                    
+                    inTag = false;
+                    
+                    // テキストが存在しておりそれが属性値の場合は属性を作成
+                    if (txt && isAttrValue) {
+                        attrs.push({
+                            nodeName: attrName,
+                            nodeValue: txt,
+                            prefix: prefix,
+                            namespaceURI: namespaceVal[prefix] || null
+                        });
+                    }
+                    
+                    // タグが閉じられているかどうかで分岐する
+                    if (isEndTag) {
+                        
+                        // 前後にタグが存在するタイプと1つのタグで開始と終了を併せ持つ場合で分岐する
+                        if (bchar !== '/') {
+                            tag = tmpTags.pop();
+                            
+                            // 開始タグと終了タグの名前が異なっていた場合はパースエラー
+                            if (tag.nodeName !== tagName) {
+                                throw new Error('Parse error.');
+                            }
+                            
+                            parent = parent.parentNode;
+                            
+                            tag.innerXML = xml.substring(tag.innerXML, bi);
+                            
+                            if ( ! tag.childNodes.length) {
+                                tag.nodeValue = tag.innerXML;
+                            }
+                            
+                            if (namespaceVal.__back) {
+                                namespaceVal = namespaceVal.__back;
+                            }
+                            
+                            tag.firstChild = tag.childNodes[0] || null;
+                            tag.lastChild = tag.childNodes[tag.childNodes.length - 1] || null;
+                        } else {
+                            tmpName = {};
+
+                            for (j = attrs.length; j--;) {
+                                if (tmp = attrs[j].nodeName.match(/^xmlns:(.+)$/)) {
+                                    tmpName[tmp[1]] = attrs[j].nodeValue;
+                                }
+                            }
+
+                            this._namespace.prototype = namespaceVal;
+                            tmp = namespaceVal;
+
+                            namespaceVal = new this._namespace(tmpName);
+                            namespaceVal.__back = tmp;
+                        
+                            tag = {
+                                attributes: attrs,
+                                childNodes: [],
+                                parentNode: parent,
+                                nodeName: tagName,
+                                nodeValue: null,
+                                prefix: prefix,
+                                namespaceURI: namespaceVal[prefix] || null,
+                                nodeType: Jeeel.Dom.Node.ELEMENT_NODE,
+                                innerXML: '',
+                                firstChild: null,
+                                lastChild: null
+                            };
+                            
+                            if (namespaceVal.__back) {
+                                namespaceVal = namespaceVal.__back;
+                            }
+                        }
+                        
+                        parent.childNodes.push(tag);
+                        
+                        // ルートノードが未定義で親がドキュメントだった場合はルートノードを定義する
+                        if (parent.nodeType === Jeeel.Dom.Node.DOCUMENT_NODE && ! parent.documentElement) {
+                            parent.documentElement = tag;
+                        }
+                    } else {
+                        tmpName = {};
+                        
+                        for (j = attrs.length; j--;) {
+                            if (tmp = attrs[j].nodeName.match(/^xmlns:(.+)$/)) {
+                                tmpName[tmp[1]] = attrs[j].nodeValue;
+                            }
+                        }
+                        
+                        this._namespace.prototype = namespaceVal;
+                        tmp = namespaceVal;
+                        
+                        namespaceVal = new this._namespace(tmpName);
+                        namespaceVal.__back = tmp;
+                      
+                        tag = {
+                            attributes: attrs,
+                            childNodes: [],
+                            parentNode: parent,
+                            nodeName: tagName,
+                            nodeValue: null,
+                            prefix: prefix,
+                            namespaceURI: namespaceVal[prefix] || null,
+                            nodeType: Jeeel.Dom.Node.ELEMENT_NODE,
+                            innerXML: i + 1,
+                            firstChild: null,
+                            lastChild: null
+                        };
+                        
+                        parent = tag;
+                        
+                        tmpTags.push(tag);
+                    }
+                    
+                    txt = '';
+
+                    break;
+                    
+                case '/':
+                    if (quot) {
+                        txt += chr;
+                        break;
+                    }
+                    
+                    if (inTag) {
+                        isEndTag = true;
+                    } else {
+                        txt += chr;
+                    }
+                    break;
+                    
+                case ':':
+                    if (quot) {
+                        txt += chr;
+                        break;
+                    }
+                    
+                    if (inTag) {
+                        if (isTagName) {
+                            prefix = tagName;
+                            tagName += chr;
+                        } else if (isAttrName) {
+                            prefix = attrName;
+                            attrName += chr;
+                        } else if (isAttrValue) {
+                            txt += chr;
+                        }
+                    } else {
+                        txt += chr;
+                    }
+                    break;
+                    
+                case ' ':
+                    if (quot) {
+                        txt += chr;
+                        break;
+                    }
+                    
+                    if (inTag && isTagName) {
+                        isTagName = false;
+                        isAttrName = true;
+                        isAttrValue = false;
+                        attrName = '';
+                        prefix = null;
+                    } else if (inTag && isAttrValue) {
+                        isAttrName = true;
+                        isAttrValue = false;
+
+                        attrs.push({
+                            nodeName: attrName,
+                            nodeValue: txt,
+                            prefix: prefix,
+                            namespaceURI: namespaceVal[prefix] || null
+                        });
+                        
+                        attrName = '';
+                        
+                    } else if ( ! inTag) {
+                        txt += chr;
+                    }
+                    break;
+                    
+                case '=':
+                    if (quot) {
+                        txt += chr;
+                        break;
+                    }
+                    
+                    if (inTag && isAttrName) {
+                        isAttrName = false;
+                        isAttrValue = true;
+                        txt = '';
+                    } else if ( ! inTag) {
+                        txt += chr;
+                    }
+                    break;
+                
+                case "'":
+                case '"':
+                    if ( ! inTag) {
+                        txt += chr;
+                        break;
+                    }
+                    
+                    if (quot === chr) {
+                        quot = null;
+                    } else if ( ! quot) {
+                        quot = chr;
+                    }
+                    break;
+                    
+                default:
+                    if (inTag) {
+                        if (isTagName) {
+                            tagName += chr;
+                        } else if (isAttrName) {
+                            attrName += chr;
+                        } else if (isAttrValue) {
+                            txt += chr;
+                        }
+                    } else {
+                        txt += chr;
+                    }
+                    break;
+            }
+            
+            bchar = chr;
+        }
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @class 名前空間に使用するための内部クラス
+     * @param {Hash} values 継承プロパティ
+     * @private
+     */
+    _namespace: function (values) {
+        if (values) {
+            for (var key in values) {
+                this[key] = values[key];
             }
         }
     }
@@ -17280,7 +18660,7 @@ Jeeel.Dom.Event.dispatchEvent = function (element, type, option) {
     
     if (Jeeel._doc.createEvent) {
         ev = Jeeel._doc.createEvent(evType);
-    } else if(Jeeel._doc.createEventObject) {
+    } else if (Jeeel._doc.createEventObject) {
         ev = Jeeel._doc.createEventObject(evType);
     }
     
@@ -17754,6 +19134,7 @@ Jeeel.Dom.Event.Type = {
         Jeeel.Dom.Event.Type.MOUSE_WHEEL = 'DOMMouseScroll';
     }
 })();
+
 /**
  * キーボードのコードに関する列挙体
  */
@@ -18942,6 +20323,7 @@ Jeeel.Dom.Event.Listener.prototype = {
     
     getType = add = remove = null;
 })();
+
 (function () {
     var instance;
     
@@ -19068,6 +20450,7 @@ Jeeel.Dom.Event.Manager.prototype = {
      */
     constructor: Jeeel.Dom.Event.Manager
 };
+
 /**
  * コンストラクタ
  * 
@@ -19569,7 +20952,8 @@ Jeeel.Dom.Style.create = function (style) {
 
             body.appendChild(iframe);
 
-            var iframeDoc = (iframe.contentWindow || iframe.contentDocument).document;
+            var iframeDoc = iframe.contentDocument || iframe.contentWindow && iframe.contentWindow.document;
+            
             iframeDoc.write((Jeeel.Document.getDocument().compatMode === 'CSS1Compat' ? '<!doctype html>' : '' ) + '<html><body>');
             iframeDoc.close();
 
@@ -19710,45 +21094,21 @@ Jeeel.Dom.Style.prototype = {
      * @return {Jeeel.Dom.Style} 自インスタンス
      */
     setStyleList: function (styles) {
-        var cssText = [];
-        var replaces = [];
-        
         styles = this._bundler.bundle(styles);
         
         for (var style in styles) {
-            var styleName  = Jeeel.String.toCamelCase(style);
-            var styleValue = styles[style];
+            var styleName = Jeeel.String.toCamelCase(style);
+            
+            try {
+                if (this._customStyle[styleName]) {
+                    this._customStyle[styleName](styles[style]);
 
-            // カスタムスタイルが存在したら実行もしくは名前を変更する
-            if (this._customStyle[styleName]) {
-                if (this._customStyle[styleName].usableFilter) {
-                    styleValue = this._customStyle[styleName](styleValue, true);
-                    styleName = this._customStyle[styleName].originName;
-                } else if (this._customStyle[styleName].originName) {
-                    styleName = this._customStyle[styleName].originName;
-                } else {
-                    this._customStyle[styleName](styleValue);
                     continue;
                 }
-            } else {
-                styleName = Jeeel.String.toHyphenation(style);
-            }
-            
-            // 数字の0または値が存在するとき値を設定し、空の場合は値を削除する
-            if (styleValue || styleValue === 0) {
-                cssText[cssText.length] = styleName + ':' + styleValue;
-            } else {
-                replaces.push(new RegExp(styleName + ':[^;]+;', 'i'));
-            }
+
+                this._style[styleName] = styles[style];
+            } catch (e) {}
         }
-        
-        var baseCss = this._style.cssText;
-        
-        for (var i = replaces.length; i--;) {
-            baseCss = baseCss.replace(replaces[i], '');
-        }
-        
-        this._style.cssText = baseCss + ';' + cssText.join(';');
         
         return this;
     },
@@ -20404,6 +21764,88 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Custom, Jeeel.file.Jeeel.Dom.
     
     var style = Jeeel._elm.style;
     var parts = [], i = 0, part, name, get, set, filter;
+    
+    // floatの登録
+    parts[i] = {name: 'float'};
+    
+    if ('float' in style) {
+        name = 'float';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style['float'] || this._computedStyle['float'] || 'none';
+        };
+        
+        /**
+         * @ignore
+         */
+        set = function (floatStyle) {
+            this._style['float'] = floatStyle;
+        };
+        
+        filter = null;
+    } else if ('cssFloat' in style) {
+        name = 'float';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.cssFloat || this._computedStyle.cssFloat || 'none';
+        };
+        
+        /**
+         * @ignore
+         */
+        set = function (floatStyle) {
+            this._style.cssFloat = floatStyle;
+        };
+        
+        filter = null;
+    } else if ('styleFloat' in style) {
+        name = 'float';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.styleFloat || this._computedStyle.styleFloat || 'none';
+        };
+        
+        /**
+         * @ignore
+         */
+        set = function (floatStyle) {
+            this._style.styleFloat = floatStyle;
+        };
+        
+        filter = null;
+    } else {
+        name = null;
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return 'none';
+        };
+        
+        /**
+         * @ignore
+         */
+        set = function (floatStyle) {};
+        
+        filter = null;
+    }
+    
+    parts[i].originName = name;
+    parts[i].get = get;
+    parts[i].set = set;
+    parts[i].filter = filter;
+    
+    i++;
     
     // opacityの登録
     parts[i] = {name: 'opacity'};
@@ -22947,6 +24389,7 @@ Jeeel.Dom.Style.Animation = function (element, style, params, duration, easing, 
     this._targetStyles = filter.filter(keys);
     
     this._style = style;
+    this._element = element;
     this._hook = new this.constructor.Hook(element, style);
     this._params = styles;
     
@@ -22971,6 +24414,13 @@ Jeeel.Dom.Style.Animation.create = function (style, params, duration, easing, co
     return new this(style, params, duration, easing, complete, step);
 };
 
+/**
+ * アニメーション中の要素リスト
+ * 
+ * @type Element[]
+ */
+Jeeel.Dom.Style.Animation.animated = [];
+
 Jeeel.Dom.Style.Animation.prototype = {
   
     /**
@@ -22980,6 +24430,14 @@ Jeeel.Dom.Style.Animation.prototype = {
      * @private
      */
     _style: null,
+    
+    /**
+     * 要素
+     * 
+     * @type Element
+     * @private
+     */
+    _element: null,
     
     /**
      * アニメーションフック
@@ -23330,6 +24788,8 @@ Jeeel.Dom.Style.Animation.prototype = {
             this._st = new Date().getTime() - this._ct;
             
             this._frameId = this.constructor.Frame.addTask(this.step);
+            
+            this.constructor.animated.push(this._element);
         }
         
         return this;
@@ -23345,6 +24805,13 @@ Jeeel.Dom.Style.Animation.prototype = {
             this.constructor.Frame.removeTask(this._frameId);
             
             this._frameId = null;
+            
+            for (var i = this.constructor.animated.length; i--;) {
+                if (this.constructor.animated[i] === this._element) {
+                    this.constructor.animated.splice(i, 1);
+                    break;
+                }
+            }
         }
         
         return this;
@@ -24012,7 +25479,7 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Animation.Hook, Jeeel.file.Je
         name: 'show',
         
         get: function (key, defaultPrm, deltaPrm, endPrm) {
-            if ( ! Jeeel.Type.inArray(key, displayParts, true)) {
+            if ( ! Jeeel.Hash.inHash(key, displayParts, true)) {
                 return null;
             }
             
@@ -24055,7 +25522,7 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Animation.Hook, Jeeel.file.Je
         name: 'hide',
         
         get: function (key, defaultPrm, deltaPrm, endPrm) {
-            if ( ! Jeeel.Type.inArray(key, displayParts, true)) {
+            if ( ! Jeeel.Hash.inHash(key, displayParts, true)) {
                 return null;
             }
             
@@ -24097,7 +25564,7 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Animation.Hook, Jeeel.file.Je
         name: 'toggle',
         
         get: function (key, defaultPrm, deltaPrm, endPrm) {
-            if ( ! Jeeel.Type.inArray(key, displayParts, true)) {
+            if ( ! Jeeel.Hash.inHash(key, displayParts, true)) {
                 return null;
             }
             
@@ -24294,7 +25761,7 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Animation.Custom, Jeeel.file.
         name: 'backgroundPosition',
         
         get: function (value) {
-            var pos = value.split(/\s+/);
+            var pos = value.replace(/\s+/g, ' ').split(' ');
             var res = {
                 backgroundPositionX: pos[0],
                 backgroundPositionY: pos[1]
@@ -24309,7 +25776,7 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Style.Animation.Custom, Jeeel.file.
         name: 'transform',
         
         get: function (value) {
-            var trs = value.replace(/,\s+/, ',').split(/\s+/);
+            var trs = value.replace(/,\s+/g, ',').replace(/\s+/g, ' ').split(' ');
             var reg = /^([a-zA-Z\-]+)\(([^\)]+)\)$/i;
             var res = {};
             
@@ -24587,6 +26054,7 @@ Jeeel.Dom.Style.Animation.Speed.SPEEDS = {
      */
     DEFAULT: 400
 };
+
 /**
  * @namespace イージング関数を保持するネームスペース<br />
  * t: currentTime(経過時間: 秒)<br />
@@ -25045,23 +26513,6 @@ Jeeel.Dom.Element = function (element) {
  */
 Jeeel.Dom.Element.create = function (element) {
     return new this(element);
-};
-
-/**
- * 指定したElementと任意のElementを交換する
- *
- * @param {Element} element 指定Element
- * @param {Element} replaceElement 交換Element
- * @return {Element} 挿入されていない方のElement
- */
-Jeeel.Dom.Element.replace = function (element, replaceElement) {
-    if ( ! element || ! element.parentNode || ! replaceElement) {
-        return replaceElement;
-    }
-
-    var parent = element.parentNode;
-    parent.replaceChild(replaceElement, element);
-    return element;
 };
 
 Jeeel.Dom.Element.prototype = {
@@ -25589,7 +27040,11 @@ Jeeel.Dom.Element.prototype = {
      * @param {String} text 設定文字列
      * @return {Jeeel.Dom.Element} 自インスタンス
      */
-    setText: function (text) {},
+    setText: function (text) {
+        this._element.innerHTML = Jeeel.String.escapeHtml(text, true);
+
+        return this;
+    },
     
     /**
      * このElementの次のElementを取得する
@@ -26249,17 +27704,19 @@ Jeeel.Dom.Element.prototype = {
     },
 
     /**
-     * このElementと任意のElementを交換する
+     * このElementの位置を任意のElementに置き換える
      *
-     * @param {Element} replaceElement 交換Element
+     * @param {Element} replaceElement 置き換えElement
      * @return {Jeeel.Dom.Element} 自インスタンス
      */
     replace: function (replaceElement) {
         var parent = this._element.parentNode;
+        
         parent.replaceChild(replaceElement, this._element);
+        
         return this;
     },
-
+    
     /**
      * このElementを上に移動する
      *
@@ -26319,7 +27776,7 @@ Jeeel.Dom.Element.prototype = {
         
         return this;
     },
-
+    
     /**
      * このElementを一番上に移動する
      * 
@@ -26427,7 +27884,6 @@ Jeeel.Dom.Element.prototype = {
         var div = Jeeel._elm;
         
         var _first, _option, _rect;
-        var ef = new Jeeel.Filter.Html.Escape(true);
         var slice = Array.prototype.slice;
         
         /**
@@ -26577,7 +28033,7 @@ Jeeel.Dom.Element.prototype = {
              * @ignore
              */
             this.getClassNames = function () {
-                return this._element.className.split(/\s+/);
+                return this._element.className.replace(/\s+/g, ' ').split(' ');
             };
             
             /**
@@ -26597,7 +28053,7 @@ Jeeel.Dom.Element.prototype = {
                 for (var i = 0, l = className.length; i < l; i++) {
                     if ( ! className[i]) {
                         continue;
-                    } else if(ec === className[i] || ec.search('\\b' + className[i] + '\\b') !== -1) {
+                    } else if (ec === className[i] || ec.search('\\b' + className[i] + '\\b') !== -1) {
                         continue;
                     }
                     
@@ -26651,7 +28107,7 @@ Jeeel.Dom.Element.prototype = {
                 var classNames = this.getClassNames();
 
                 for (var i = 0, l = className.length; i < l; i++) {
-                    if (Jeeel.Type.inArray(className[i], classNames, true)) {
+                    if (Jeeel.Hash.inHash(className[i], classNames, true)) {
                         this.removeClassName(className[i]);
                     } else {
                         this.addClassName(className[i]);
@@ -26734,15 +28190,6 @@ Jeeel.Dom.Element.prototype = {
             _searchTxt(res, this._element);
 
             return res.join('');
-        };
-        
-        /**
-         * @ignore
-         */
-        this.setText = function (text) {
-            this._element.innerHTML = ef.filter(text);
-
-            return this;
         };
         
         if (Jeeel.UserAgent.isInternetExplorer(6)) {
@@ -26850,9 +28297,21 @@ Jeeel.Dom.Element.Animator = function (style, returnInstance) {
 };
 
 Jeeel.Dom.Element.Animator.prototype = {
-  
+    
+    /**
+     * スタイルインスタンス
+     * 
+     * @type Jeeel.Dom.Style
+     * @private
+     */
     _style: null,
     
+    /**
+     * animate実行時の戻り値
+     * 
+     * @type Jeeel.Dom.Element
+     * @private
+     */
     _returnInstance: null,
     
     /**
@@ -26977,7 +28436,11 @@ Jeeel.Dom.Element.Animator.prototype = {
      * @return {Jeeel.Dom.Element.Animator} 自インスタンス
      */
     setCompleteCallback: function (callback, thisArg) {
-        this._complete = [callback, thisArg || this._returnInstance];
+        if (callback) {
+            this._complete = [callback, thisArg || this._returnInstance];
+        } else {
+            this._complete = null;
+        }
         
         return this;
     },
@@ -26990,7 +28453,11 @@ Jeeel.Dom.Element.Animator.prototype = {
      * @return {Jeeel.Dom.Element.Animator} 自インスタンス
      */
     setStepCallback: function (callback, thisArg) {
-        this._step = [callback, thisArg || this._returnInstance];
+        if (callback) {
+            this._step = [callback, thisArg || this._returnInstance];
+        } else {
+            this._step = null;
+        }
         
         return this;
     },
@@ -27067,6 +28534,15 @@ Jeeel.Dom.Element.Animator.prototype = {
         });
         
         return this._returnInstance;
+    },
+    
+    /**
+     * アニメーションが実行中かどうかを返す
+     * 
+     * @return {Boolean} 実行中かどうか
+     */
+    isAnimated: function () {
+        return Jeeel.Hash.inHash(this._returnInstance.getElement(), Jeeel.Dom.Style.Animation.animated, true);
     },
     
     /**
@@ -27318,7 +28794,7 @@ Jeeel.Dom.Element.Abstract.prototype = {
                 for (var i = 0, l = className.length; i < l; i++) {
                     if ( ! className[i]) {
                         continue;
-                    } else if(ec === className[i] || ec.search('\\b' + className[i] + '\\b') !== -1) {
+                    } else if (ec === className[i] || ec.search('\\b' + className[i] + '\\b') !== -1) {
                         continue;
                     }
                     
@@ -27366,7 +28842,7 @@ Jeeel.Dom.Element.Abstract.prototype = {
                 var classNames = this.getClassNames();
 
                 for (var i = 0, l = className.length; i < l; i++) {
-                    if (Jeeel.Type.inArray(className[i], classNames, true)) {
+                    if (Jeeel.Hash.inHash(className[i], classNames, true)) {
                         this.removeClassName(className[i]);
                     } else {
                         this.addClassName(className[i]);
@@ -28369,7 +29845,7 @@ Jeeel.Dom.ElementOperator.prototype = {
                 var tmp = this.getClassNames();
 
                 for (var i = 0, l = tmp.length; i < l; i++) {
-                    if (Jeeel.Type.inArray(tmp[i], className)) {
+                    if (Jeeel.Hash.inHash(tmp[i], className)) {
                         return this;
                     }
                 }
@@ -28404,7 +29880,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getTagName();
 
-                if (Jeeel.Type.inArray(tmp, tag)) {
+                if (Jeeel.Hash.inHash(tmp, tag)) {
                     return this;
                 }
             }
@@ -28430,7 +29906,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getAttribute(attribute);
 
-                if (Jeeel.Type.inArray(tmp, value)) {
+                if (Jeeel.Hash.inHash(tmp, value)) {
                     return this;
                 }
             }
@@ -28455,7 +29931,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getProperty(property);
 
-                if (Jeeel.Type.inArray(tmp, value)) {
+                if (Jeeel.Hash.inHash(tmp, value)) {
                     return this;
                 }
             }
@@ -28480,7 +29956,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getStyle(css);
 
-                if (Jeeel.Type.inArray(tmp, value)) {
+                if (Jeeel.Hash.inHash(tmp, value)) {
                     return this;
                 }
             }
@@ -28529,7 +30005,7 @@ Jeeel.Dom.ElementOperator.prototype = {
         var res = [];
         
         for (var i = 0; i < this.length; i++) {
-            if (Jeeel.Type.inArray(this[i], element)) {
+            if (Jeeel.Hash.inHash(this[i], element)) {
                 res[res.length] = this[i];
             }
         }
@@ -28554,7 +30030,7 @@ Jeeel.Dom.ElementOperator.prototype = {
                 var tmp = this.getClassNames();
 
                 for (var i = 0, l = tmp.length; i < l; i++) {
-                    if ( ! Jeeel.Type.inArray(tmp[i], className)) {
+                    if ( ! Jeeel.Hash.inHash(tmp[i], className)) {
                         return this;
                     }
                 }
@@ -28589,7 +30065,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getTagName();
 
-                if ( ! Jeeel.Type.inArray(tmp, tag)) {
+                if ( ! Jeeel.Hash.inHash(tmp, tag)) {
                     return this;
                 }
             }
@@ -28614,7 +30090,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getAttribute(attribute);
 
-                if ( ! Jeeel.Type.inArray(tmp, value)) {
+                if ( ! Jeeel.Hash.inHash(tmp, value)) {
                     return this;
                 }
             }
@@ -28639,7 +30115,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getProperty(property);
 
-                if ( ! Jeeel.Type.inArray(tmp, value)) {
+                if ( ! Jeeel.Hash.inHash(tmp, value)) {
                     return this;
                 }
             }
@@ -28664,7 +30140,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getStyle(css);
 
-                if ( !  Jeeel.Type.inArray(tmp, value)) {
+                if ( !  Jeeel.Hash.inHash(tmp, value)) {
                     return this;
                 }
             }
@@ -28714,7 +30190,7 @@ Jeeel.Dom.ElementOperator.prototype = {
             function () {
                 var tmp = this.getElement();
 
-                if ( ! Jeeel.Type.inArray(tmp, element)) {
+                if ( ! Jeeel.Hash.inHash(tmp, element)) {
                     return this;
                 }
             }
@@ -29641,7 +31117,6 @@ Jeeel.Dom.ElementOperator.prototype = {
     _init: function () {
         var ief = new Jeeel.Filter.Html.Form(),
             ivf = new Jeeel.Filter.Html.FormValue(),
-            ref = new Jeeel.Filter.String.RegularExpressionEscape(),
             auf = new Jeeel.Filter.Hash.Unique(true, true);
         
         /**
@@ -29656,7 +31131,7 @@ Jeeel.Dom.ElementOperator.prototype = {
 
             if (submitSearch) {
                 for (var i = name.length; i--;) {
-                    name[i] = new RegExp('^' + ref.filter(name[i]) + '(?:$|\\[)');
+                    name[i] = new RegExp('^' + Jeeel.String.escapeRegExp(name[i]) + '(?:$|\\[)');
                 }
 
                 res = this._each(
@@ -29675,7 +31150,7 @@ Jeeel.Dom.ElementOperator.prototype = {
                     function () {
                         var tmp = this.getName();
 
-                        if (Jeeel.Type.inArray(tmp, name)) {
+                        if (Jeeel.Hash.inHash(tmp, name)) {
                             return this;
                         }
                     }
@@ -29697,7 +31172,7 @@ Jeeel.Dom.ElementOperator.prototype = {
 
             if (submitSearch) {
                 for (var i = name.length; i--;) {
-                    name[i] = new RegExp('^' + ref.filter(name[i]) + '(?:$|\\[)');
+                    name[i] = new RegExp('^' + Jeeel.String.escapeRegExp(name[i]) + '(?:$|\\[)');
                 }
 
                 res = this._each(
@@ -29716,7 +31191,7 @@ Jeeel.Dom.ElementOperator.prototype = {
                     function () {
                         var tmp = this.getName();
 
-                        if ( ! Jeeel.Type.inArray(tmp, name)) {
+                        if ( ! Jeeel.Hash.inHash(tmp, name)) {
                             return this;
                         }
                     }
@@ -29820,9 +31295,21 @@ Jeeel.Dom.ElementOperator.Animator = function (animators, returnInstance) {
 };
 
 Jeeel.Dom.ElementOperator.Animator.prototype = {
-  
+    
+    /**
+     * アニメーターリスト
+     * 
+     * @type Jeeel.Dom.Element.Animator[]
+     * @private
+     */
     _animators: null,
     
+    /**
+     * 戻り値インスタンス
+     * 
+     * @type Jeeel.Dom.ElementOperator
+     * @private
+     */
     _returnInstance: null,
 
     /**
@@ -29958,6 +31445,21 @@ Jeeel.Dom.ElementOperator.Animator.prototype = {
         return this._returnInstance;
     },
     
+    /**
+     * アニメーションが実行中かどうかを返す
+     * 
+     * @return {Boolean} 実行中かどうか
+     */
+    isAnimated: function () {
+        for (var i = this._animators.length; i--;) {
+            if (this._animators[i].isAnimated()) {
+                return true;
+            }
+        }
+        
+        return false;
+    },
+    
     _callMethod: function (key, args) {
         for (var i = this._animators.length; i--;) {
             var animator = this._animators[i];
@@ -29993,50 +31495,69 @@ Jeeel.Dom.ElementOperator.Animator.prototype = {
  * @class セレクタを扱うクラス
  * @param {String} selector CSSセレクタ
  * @example
- * 以下が対応もしくは認識するセレクタの一覧
+ * 以下が対応もしくは認識するセレクタの一覧(CSS1, CSS2, CSS3, CSS4の一部 + 独自セレクタ)
  * *
  * E
  * E[foo]
  * E[foo="bar"]
+ * E[foo="bar" i]
  * E[foo~="bar"]
  * E[foo^="bar"]
  * E[foo$="bar"]
  * E[foo*="bar"]
  * E[foo|="en"]
  * E:root
+ * E:empty
  * E:nth-child(n)
  * E:nth-last-child(n)
  * E:nth-of-type(n)
  * E:nth-last-of-type(n)
- * E:first-child
  * E:last-child
  * E:first-of-type
  * E:last-of-type
  * E:only-child
  * E:only-of-type
- * E:empty
+ * E:column(selector)
+ * E:nth-column(n)
+ * E:nth-last-column(n)
+ * E:dir(ltr)
+ * E:lang(fr)
+ * E:any-link
  * E:link
  * E:visited
+ * E:local-link
+ * E:local-link(0)
+ * E:target
+ * E:scope
  * E:active
  * E:hover
  * E:focus
- * E:target
- * E:lang(fr)
  * E:enabled
  * E:disabled
  * E:checked
- * E:first-line
- * E:first-letter
- * E:before
- * E:after
+ * E:indeterminate
+ * E:required
+ * E:optional
+ * E:read-only
+ * E:read-write
+ * E::first-line
+ * E::first-letter
+ * E::before
+ * E::after
  * E.warning
  * E#myid
  * E:not(s)
+ * E:not(s1, s2)
+ * E:matches(s1, s2)
  * E F
  * E > F
  * E + F
  * E ~ F
- * ただし、:link, :visitedはセキュリティ上の理由でCSSと違った挙動をし、:before, :after, :first-line, :first-letterは完全に無視される。
+ * E! > F
+ * E:-jeeel-hidden
+ * E:-jeeel-visible
+ * E:-jeeel-animated
+ * ただし、:link, :visitedはセキュリティ上の理由でJSから取得する手段が無いためCSSと違った挙動をし、::before, ::after, ::first-line, ::first-letterは完全に無視される。
  * また、:active, :hover, :focusは今のところ全て空になる
  */
 Jeeel.Dom.Selector = function (selector) {
@@ -30081,13 +31602,7 @@ Jeeel.Dom.Selector.prototype = {
      */
     search: function (root) {
         
-        if (Jeeel.Type.isDocument(root)) {
-            root = root.documentElement;
-        }
-        
-        if (root.uniqueID) {
-            return this._quickSearch(root);
-        }
+        this._resetCaches();
         
         return this._search(root);
     },
@@ -30106,47 +31621,21 @@ Jeeel.Dom.Selector.prototype = {
      * @return {Element[]} 検索結果のリスト
      */
     _search: function (root) {
-        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
         var nodeLists = this._nodeLists;
         
         var i, l = 0, res = [];
         
         for (i = nodeLists.length; i--;) {
             res[i] = [];
-        }
-        
-        var search = function (target) {
-            
-            for (var i = nodeLists.length; i--;) {
-                if (nodeLists[i][0].isMatch(target)) {
-                    res[i].push(target);
-                }
-            }
 
-            var child = target.firstChild;
-
-            while(child) {
-
-                if (child.nodeType === nodeType) {
-                    search(child);
-                }
-
-                child = child.nextSibling;
-            }
-        };
-      
-        search(root);
-        
-        for (i = nodeLists.length; i--;) {
-            
             if (l < nodeLists[i].length) {
                 l = nodeLists[i].length;
             }
             
-            nodeLists[i].init(nodeLists[i][0].filter(res[i]));
+            nodeLists[i].init([root]);
         }
         
-        while (--l) {
+        while (l--) {
             for (i = nodeLists.length; i--;) {
                 res[i] = nodeLists[i].search();
                 
@@ -30166,106 +31655,11 @@ Jeeel.Dom.Selector.prototype = {
     },
     
     /**
-     * IEのuniqueIDを使用して検索速度を速めた検索を行う(正確にはソーティングを高速化する)
-     * 
-     * @param {Element} root 検索のルートノード
-     * @return {Element[]} 検索結果のリスト
-     */
-    _quickSearch: function (root) {
-        var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
-        var nodeLists = this._nodeLists;
-        
-        var idx = 0, indexes = {};
-        var i, l = 0, res = [];
-        
-        for (i = nodeLists.length; i--;) {
-            res[i] = [];
-        }
-        
-        var search = function (target) {
-            
-            indexes[target.uniqueID] = idx++;
-            
-            for (var i = nodeLists.length; i--;) {
-                if (nodeLists[i][0].isMatch(target)) {
-                    res[i].push(target);
-                }
-            }
-
-            var child = target.firstChild;
-
-            while(child) {
-
-                if (child.nodeType === nodeType) {
-                    search(child);
-                }
-
-                child = child.nextSibling;
-            }
-        };
-      
-        search(root);
-        
-        for (i = nodeLists.length; i--;) {
-            
-            if (l < nodeLists[i].length) {
-                l = nodeLists[i].length;
-            }
-            
-            nodeLists[i].init(nodeLists[i][0].filter(res[i]));
-        }
-        
-        while (--l) {
-            for (i = nodeLists.length; i--;) {
-                res[i] = nodeLists[i].search();
-                
-                nodeLists[i].next();
-            }
-        }
-        
-        var tmp = res;
-        
-        res = [];
-        
-        for (i = nodeLists.length; i--;) {
-            res = tmp[i].concat(res);
-        }
-        
-        res.sort(function (a, b) {
-            var aIdx = indexes[a.uniqueID], bIdx = indexes[b.uniqueID];
-            
-            if (aIdx < bIdx) {
-                return -1;
-            } else if (aIdx > bIdx) {
-                return 1;
-            }
-            
-            return 0;
-        });
-        
-        tmp = res;
-        
-        res = [];
-        
-        var belm;
-        
-        for (i = 0, l = tmp.length; i < l; i++) {
-            if (belm !== tmp[i]) {
-                res.push(tmp[i]);
-            }
-            
-            belm = tmp[i];
-        }
-        
-        return res;
-    },
-    
-    /**
-     * 指定した要素のリストをソーティングし、且重複を削除してする
+     * 指定した要素のリストをソーティングし、且重複を削除する
      * 
      * @param {Element} root ルートノード
      * @param {Element[]} elements 要素リスト
-     * @param {Element[]} ソート・フィルタ後の要素リスト
+     * @return {Element[]} ソート・フィルタ後の要素リスト
      */
     _uniqueSort: function (root, elements) {
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
@@ -30347,6 +31741,122 @@ Jeeel.Dom.Selector.prototype = {
      */
     _compile: function () {
         this._nodeLists = this.constructor.Compiler.compile(this._selector);
+    },
+    
+    _resetCaches: function () {
+        Jeeel._Object.JeeelDomSelector.resetCache();
+    }
+};
+
+/**
+ * @private
+ */
+Jeeel._Object.JeeelDomSelector = {
+    _caches: [],
+    
+    resetCache: function () {
+        this._caches = [];
+    },
+    
+    getSameCellCols: function (cell, reverse) {
+        var name;
+
+        var cells;
+        
+        var owner = cell.parentNode;
+        var i, j;
+        
+        while (true) {
+            name = owner.nodeName.toUpperCase();
+            
+            if (name === 'THEAD' || name === 'TBODY' || name === 'TFOOT') {
+                break;
+            }
+            
+            owner = owner.parentNode;
+        }
+        
+        for ( i = this._caches.length; i--;) {
+            if (this._caches[i].key === owner) {
+                cells = this._caches[i].val;
+            }
+        }
+        
+        if ( ! cells) {
+            cells = this._analyzeCells(owner);
+        }
+        
+        var res = [];
+        
+        for (i = cells.length; i--;) {
+            for (j = cells[i].length; j--;) {
+                if (cells[i][j] === cell) {
+                    
+                    res.push(reverse ? cells[i].length - j : j + 1);
+                }
+            }
+        }
+        
+        this._caches.push({
+            key: owner,
+            val: cells
+        });
+        
+        return res;
+    },
+    
+    _analyzeCells: function (owner) {
+        var cells = [];
+
+        var tr = owner.firstChild;
+        var rowLen = 0, cell, name, i, j;
+
+        while (tr) {
+            if (tr.nodeName.toUpperCase() === 'TR') {
+
+                if ( ! cells[rowLen]) {
+                    cells[rowLen] = [];
+                }
+
+                cell = tr.firstChild;
+
+                var row = rowLen, col = 0;
+
+                while (cell) {
+                    name = cell.nodeName.toUpperCase();
+
+                    if (name === 'TD' || name === 'TH') {
+
+                        while(cells[row] && cells[row][col]) {
+                            col++;
+                        }
+
+                        for (i = cell.rowSpan; i--;) {
+                            for (j = cell.colSpan; j--;) {
+
+                                if ( ! cells[row + i]) {
+                                    cells[row + i] = [];
+                                }
+
+                                if ( ! cells[row + i][col + j]) {
+                                    cells[row + i][col + j] = cell;
+                                }
+                            }
+                        }
+
+                        col += cell.colSpan;
+                    }
+
+                    cell = cell.nextSibling;
+                }
+
+                rowLen++;
+            }
+
+            tr = tr.nextSibling;
+        }
+        
+        return cells;
     }
 };
 
@@ -30374,7 +31884,7 @@ Jeeel.Dom.Selector.Compiler = {
         
         var parenthesisCount = 0;
         var bracketCount = 0;
-        var quoteIn = false;
+        var quote = null;
         var i, j, l, $continue, chr, bchr = null, filtered = [];
         
         var res = [];
@@ -30405,7 +31915,11 @@ Jeeel.Dom.Selector.Compiler = {
                   
                 case "'":
                 case '"':
-                    quoteIn = !quoteIn;
+                    if ( ! quote) {
+                        quote = chr;
+                    } else if (quote === chr) {
+                        quote = null;
+                    }
                     $continue = true;
                     break;
                     
@@ -30422,7 +31936,7 @@ Jeeel.Dom.Selector.Compiler = {
             
             switch (chr) {
                 case ' ':
-                    if (quoteIn) {
+                    if (quote) {
                         filtered.push(chr);
                     } else if (bchr !== chr) {
                         
@@ -30430,6 +31944,7 @@ Jeeel.Dom.Selector.Compiler = {
                             case '+':
                             case '~':
                             case '>':
+                            case '/':
                                 break;
                             
                             default:
@@ -30442,7 +31957,8 @@ Jeeel.Dom.Selector.Compiler = {
                 case '+':
                 case '~':
                 case '>':
-                    if ( ! quoteIn && bchr === ' ') {
+                case '/':
+                    if ( ! quote && bchr === ' ') {
                         filtered.pop();
                     }
                     
@@ -30450,7 +31966,7 @@ Jeeel.Dom.Selector.Compiler = {
                     break;
                     
                 case ',':
-                    if ( ! parenthesisCount && ! bracketCount && ! quoteIn) {
+                    if ( ! parenthesisCount && ! bracketCount && ! quote) {
                         j = 0;
                         
                         while (filtered[j] && filtered[j] === ' ') {
@@ -30463,6 +31979,8 @@ Jeeel.Dom.Selector.Compiler = {
                         
                         res[res.length] = this.compileNodeList(filtered.join(''));
                         filtered = [];
+                    } else {
+                        filtered.push(chr);
                     }
                     break;
 
@@ -30474,7 +31992,7 @@ Jeeel.Dom.Selector.Compiler = {
             bchr = chr;
         }
         
-        if ( ! parenthesisCount && ! bracketCount && ! quoteIn) {
+        if ( ! parenthesisCount && ! bracketCount && ! quote) {
             
             j = 0;
             
@@ -30508,8 +32026,8 @@ Jeeel.Dom.Selector.Compiler = {
         
         var parenthesisCount = 0;
         var bracketCount = 0;
-        var quoteIn = false;
-        var i, l, type = null, newType = null;
+        var quote = null;
+        var i, l, ref, type = 'default', newType = null;
         var beforeIndex = -1;
 
         for (i = 0, l = selector.length; i < l; i++) {
@@ -30538,13 +32056,17 @@ Jeeel.Dom.Selector.Compiler = {
                 
                 case "'":
                 case '"':
-                    quoteIn = !quoteIn;
+                    if ( ! quote) {
+                        quote = chr;
+                    } else if (quote === chr) {
+                        quote = null;
+                    }
                     continue;
                     break;
                     
             }
             
-            if (parenthesisCount || bracketCount || quoteIn) {
+            if (parenthesisCount || bracketCount || quote) {
                 continue;
             }
             
@@ -30565,21 +32087,50 @@ Jeeel.Dom.Selector.Compiler = {
                     newType = 'sbrother';
                     break;
                     
+                case '/':
+                    newType = 'reference';
+                    break;
+                    
                 default:
                     continue;
                     break;
             }
             
-            nodeList[nodeList.length++] = this.compileNode(selector.substring(beforeIndex + 1, i), type);
+            nodeList[nodeList.length++] = this.compileNode(selector.substring(beforeIndex + 1, i), type, ref);
             beforeIndex = i;
             type = newType;
+            
+            if (newType === 'reference') {
+                beforeIndex = selector.indexOf('/', i + 1);
+                
+                if (beforeIndex < 0) {
+                    throw new Error('Selector compile error.');
+                }
+                
+                ref = selector.substring(i + 1, beforeIndex);
+                
+                i = beforeIndex;
+            }
         }
         
-        if (parenthesisCount || bracketCount || quoteIn) {
-            throw new Error('Compile error.');
+        if (parenthesisCount || bracketCount || quote) {
+            throw new Error('Selector compile error.');
         }
         
-        nodeList[nodeList.length++] = this.compileNode(selector.substring(beforeIndex + 1, l), type);
+        nodeList[nodeList.length++] = this.compileNode(selector.substring(beforeIndex + 1, l), type, ref);
+        
+        var targetCnt = 0;
+        
+        for (i = nodeList.length; i--;) {
+            if (nodeList[i].isTarget) {
+                nodeList.targetIndex = i;
+                targetCnt++;
+            }
+        }
+        
+        if (targetCnt > 1) {
+            throw new Error('Selector compile error.');
+        }
         
         return nodeList;
     },
@@ -30588,10 +32139,15 @@ Jeeel.Dom.Selector.Compiler = {
      * ノードのコンパイルを行う
      * 
      * @param {String} selector セレクタ
-     * @param {String} relationType このノードと他ノードの関係を示す文字列
+     * @param {String} [relationType] このノードと他ノードの関係を示す文字列
+     * @param {String} [ref] 属性参照のキー
      * @return {Jeeel.Dom.Selector.Node} コンパイル結果
      */
-    compileNode: function (selector, relationType) {
+    compileNode: function (selector, relationType, ref) {
+      
+        if ( ! relationType) {
+            relationType = 'default';
+        }
         
         var cache = Jeeel.Dom.Selector.Node.caches[selector];
         
@@ -30599,11 +32155,11 @@ Jeeel.Dom.Selector.Compiler = {
             return cache[relationType];
         }
         
-        var node = new Jeeel.Dom.Selector.Node(selector, relationType);
+        var node = new Jeeel.Dom.Selector.Node(selector, relationType, ref);
         
         var parenthesisCount = 0;
         var bracketCount = 0;
-        var quoteIn = false;
+        var quote = null;
         var attrs = [];
         var beforeIndex = -1;
         var type = 'tag', newType;
@@ -30616,13 +32172,13 @@ Jeeel.Dom.Selector.Compiler = {
             
             switch (chr) {
                 case '#':
-                    if ( ! parenthesisCount || ! bracketCount || ! quoteIn) {
+                    if ( ! parenthesisCount || ! bracketCount || ! quote) {
                         newType = 'id';
                     }
                     break;
                     
                 case '.':
-                    if ( ! parenthesisCount || ! bracketCount || ! quoteIn) {
+                    if ( ! parenthesisCount || ! bracketCount || ! quote) {
                         newType = 'class';
                     }
                     break;
@@ -30630,13 +32186,19 @@ Jeeel.Dom.Selector.Compiler = {
                 case ':':
                     if (bchar === ':') {
                         continue;
-                    } else if ( ! parenthesisCount || ! bracketCount || ! quoteIn) {
+                    } else if ( ! parenthesisCount || ! bracketCount || ! quote) {
                         newType = 'mock';
                     }
                     break;
                     
+                case '!':
+                    if ( ! parenthesisCount || ! bracketCount || ! quote) {
+                        newType = 'parent';
+                    }
+                    break;
+                    
                 case '[':
-                    if ( ! parenthesisCount || ! bracketCount || ! quoteIn) {
+                    if ( ! parenthesisCount || ! bracketCount || ! quote) {
                         newType = 'attr';
                         sp = true;
                     }
@@ -30661,7 +32223,11 @@ Jeeel.Dom.Selector.Compiler = {
                     
                 case "'":
                 case '"':
-                    quoteIn = !quoteIn;
+                    if ( ! quote) {
+                        quote = chr;
+                    } else if (quote === chr) {
+                        quote = null;
+                    }
                     bchar = chr;
                     continue;
                     break;
@@ -30673,9 +32239,9 @@ Jeeel.Dom.Selector.Compiler = {
             
             bchar = chr;
             
-            sp = sp && bracketCount && ( ! parenthesisCount && ! quoteIn);
+            sp = sp && bracketCount && ( ! parenthesisCount && ! quote);
             
-            if ( ! sp && (parenthesisCount || bracketCount || quoteIn)) {
+            if ( ! sp && (parenthesisCount || bracketCount || quote)) {
                 continue;
             }
             
@@ -30699,6 +32265,10 @@ Jeeel.Dom.Selector.Compiler = {
                 case 'mock':
                     node.mocks.push(this.compileMock(node, selector.substring(beforeIndex + 1, i)));
                     break;
+                    
+                case 'parent':
+                    throw new Error('Selector compile error.');
+                    break;
             }
             
             type = newType;
@@ -30708,10 +32278,22 @@ Jeeel.Dom.Selector.Compiler = {
         switch (type) {
             case 'tag':
                 node.tag = selector.substring(beforeIndex + 1, l).toUpperCase();
+                
+                if (node.tag === 'HTML' || node.tag === 'BODY' || node.tag === 'HEAD') {
+                    node.isOnlyNode = true;
+                }
                 break;
 
             case 'id':
+                if (node.id) {
+                    throw new Error('Selector compile error.');
+                }
+                
                 node.id = selector.substring(beforeIndex + 1, l);
+                
+                if ( ! node.id) {
+                    throw new Error('Selector compile error.');
+                }
                 break;
 
             case 'class':
@@ -30725,11 +32307,43 @@ Jeeel.Dom.Selector.Compiler = {
             case 'mock':
                 node.mocks.push(this.compileMock(node, selector.substring(beforeIndex + 1, l)));
                 break;
+                
+            case 'parent':
+                if (selector.charAt(selector.length - 1) === chr) {
+                    node.isTarget = true;
+                }
+                break;
         }
         
         node.attrs = this.compileAttribute(attrs);
         
+        if ( ! node.isOnlyNode) {
+            for (i = node.mocks.length; i--;) {
+                if (node.mocks[i].isOnlyMock) {
+                    node.isOnlyNode = true;
+                    break;
+                }
+            }
+        }
+        
         return node;
+    },
+    
+    /**
+     * 複数のノードのコンパイルを行う
+     * 
+     * @param {String} selector セレクタ
+     * @return {Jeeel.Dom.Selector.Node[]} コンパイル結果
+     */
+    compileNodes: function (selector) {
+        var selectors = selector.replace(/\s+/g, '').split(',');
+        var nodes = [];
+        
+        for (var i = 0, l = selectors.length; i < l; i++) {
+            nodes[i] = this.compileNode(selectors[i]);
+        }
+        
+        return nodes;
     },
     
     /**
@@ -30739,49 +32353,68 @@ Jeeel.Dom.Selector.Compiler = {
      * @return {Hash[]} コンパイル後の属性リスト
      */
     compileAttribute: function (selectors) {
-        var regFilter = new Jeeel.Filter.String.RegularExpressionEscape();
-        var attrReg = /([a-z0-9_\-]+)(?:((?:\^|\$|\*)?=)([\s\S]*))?/gi;
+        var attrReg = /([a-z0-9_\-]+)\s*(?:([\^|$*~]?=)\s*([\s\S]*))?/gi;
         var attrs = [];
         
         for (var i = 0, l = selectors.length; i < l; i++) {
             selectors[i].replace(attrReg, function (match, name, eq, value) {
+                
+                name = name.toLowerCase();
+                
                 if (eq) {
-
-                    value = value.replace(/^(["'])([\s\S]*)\1$/g, '$2');
+                    
+                    var flg;
+                    
+                    value = value.replace(/^(["'])([\s\S]*)\1(?:\s+(i))?$/g, function (match, quot, orgValue, flag) {
+                        flg = flag;
+                        
+                        return orgValue;
+                    });
+                    
+                    if (flg !== 'i') {
+                        flg = Jeeel.Dom.Selector.Node.IGNORE_CASE[name] ? 'i' : '';
+                    }
 
                     switch (eq.charAt(0)) {
                         case '=':
                             attrs[attrs.length] = {
                                 name: name,
-                                reg: new RegExp('^' + regFilter.filter(value) + '$', 'g')
+                                reg: new RegExp('^' + Jeeel.String.escapeRegExp(value) + '$', 'g' + flg)
                             };
                             break;
-
-                        case '|':
+                            
+                        case '~':
                             attrs[attrs.length] = {
                                 name: name,
-                                reg: new RegExp('^' + regFilter.filter(value) + '-?', 'g')
+                                reg: new RegExp('(?:^| )' + Jeeel.String.escapeRegExp(value) + '(?: |$)', 'g' + flg)
                             };
                             break;
 
                         case '^':
                             attrs[attrs.length] = {
                                 name: name,
-                                reg: new RegExp('^' + regFilter.filter(value), 'g')
+                                reg: new RegExp('^' + Jeeel.String.escapeRegExp(value), 'g' + flg)
                             };
                             break;
 
                         case '$':
                             attrs[attrs.length] = {
                                 name: name,
-                                reg: new RegExp(regFilter.filter(value) + '$', 'g')
+                                reg: new RegExp(Jeeel.String.escapeRegExp(value) + '$', 'g' + flg)
                             };
                             break;
 
                         case '*':
                             attrs[attrs.length] = {
                                 name: name,
-                                reg: new RegExp(regFilter.filter(value), 'g')
+                                reg: new RegExp(Jeeel.String.escapeRegExp(value), 'g' + flg)
+                            };
+                            break;
+                            
+                        case '|':
+                            attrs[attrs.length] = {
+                                name: name,
+                                reg: new RegExp('^' + Jeeel.String.escapeRegExp(value) + '(?:-|$)', 'g' + flg)
                             };
                             break;
 
@@ -30814,10 +32447,12 @@ Jeeel.Dom.Selector.Compiler = {
     compileMock: function (node, selector) {
         var mock = new Jeeel.Dom.Selector.Mock(node, selector);
         
-        var reg = /^([a-z0-9_\-]+)(?:\((.+)\))?$/i;
+        var reg = /^([a-z0-9_\-]+)(?:\((.*)\))?$/i;
         
         selector.replace(reg, function (match, name, args) {
-            mock.name = name;
+            mock.name = name.toLowerCase();
+            
+            args = Jeeel.String.trim(args);
             
             if (args) {
                 mock.args = args;
@@ -30827,12 +32462,23 @@ Jeeel.Dom.Selector.Compiler = {
         return mock.compile();
     }
 };
+/**
+ * コンストラクタ
+ * 
+ * @class セレクタの1つのグループを管理するクラス
+ * @param {String} selector セレクタ
+ */
 Jeeel.Dom.Selector.NodeList = function (selector) {
     this.selector = selector;
     
     this.constructor.caches[selector] = this;
 };
 
+/**
+ * インスタンスキャッシュ
+ * 
+ * @type Hash
+ */
 Jeeel.Dom.Selector.NodeList.caches = {};
 
 Jeeel.Dom.Selector.NodeList.prototype = {
@@ -30851,40 +32497,99 @@ Jeeel.Dom.Selector.NodeList.prototype = {
      */
     length: 0,
     
+    /**
+     * 検索対象となるノードのインデックス
+     * 
+     * @type Integer
+     */
+    targetIndex: -1,
+    
+    /**
+     * 検索結果の要素リスト
+     * 
+     * @type Element[]
+     * @private
+     */
     _elements: null,
     
+    /**
+     * 検索結果の要素リストの履歴
+     * 
+     * @type Element[]
+     * @private
+     */
+    _histories: null,
+    
+    /**
+     * 現在の実行ノードのインデックス
+     * 
+     * @type Integer
+     * @private
+     */
     _currentIndex: 0,
     
+    /**
+     * 初期化を行う
+     * 
+     * @param {Element[]} elements 要素リスト
+     * @return {Jeeel.Dom.Selector.NodeList} 自インスタンス
+     */
     init: function (elements) {
         this._elements = elements;
-        this._currentIndex = 1;
+        this._histories = [];
+        this._currentIndex = 0;
         
         return this;
     },
     
+    /**
+     * 次の要素単位に移る
+     * 
+     * @return {Jeeel.Dom.Selector.NodeList} 自インスタンス
+     */
     next: function () {
         this._currentIndex++;
         
         return this;
     },
     
+    /**
+     * 現在の要素位置で検索を行い検索結果を返す
+     * 
+     * @return {Element[]} 要素リスト
+     */
     search: function () {
         if (this.length <= this._currentIndex) {
             return this._elements;
         }
         
         var nodeType = Jeeel.Dom.Node.ELEMENT_NODE;
-        var res = [], node = this[this._currentIndex];
+        var i, l, res = [], node = this[this._currentIndex];
+        var tmp, history = [];
+        var targetIndex = this.targetIndex;
         
         var search = function (target, f) {
             if ( ! f && node.isMatch(target)) {
                 res.push(target);
+                
+                if (targetIndex >= 0) {
+                    history.push({
+                        idx: i,
+                        elm: target
+                    });
+                }
+                
+                if (node.isOnlyNode) {
+                    return;
+                }
+            } else if ( ! f && res.length && node.isOnlyNode) {
+                return;
             }
 
             var child;
 
             switch (node.relationType) {
-              
+                
                 case 'default':
                     child = target.firstChild;
                     
@@ -30937,16 +32642,64 @@ Jeeel.Dom.Selector.NodeList.prototype = {
                         child = child.nextSibling;
                     }
                     break;
+                    
+                case 'reference':
+                    break;
             }
         };
         
-        for (var i = 0, l = this._elements.length; i < l; i++) {
+        for (i = 0, l = this._elements.length; i < l; i++) {
             search(this._elements[i], true);
         }
         
-        this._elements = node.filter(res);
+        this._elements = res;
+        
+        if (targetIndex >= 0) {
+            this._histories.push(history);
+
+            var j = this._currentIndex;
+
+            while (targetIndex < j--) {
+                history = this._histories[j + 1];
+
+                tmp = [];
+                
+                var map = {};
+
+                for (i = 0, l = history.length; i < l; i++) {
+                  
+                    if (map[history[i].idx]) {
+                        history[i].idx = map[history[i].idx];
+                    } else {
+                        tmp.push(this._histories[j][history[i].idx]);
+                        
+                        map[history[i].idx] = history[i].idx = tmp.length - 1;
+                    }
+                }
+
+                this._histories[j] = tmp;
+            }
+
+            if (this._currentIndex === this.length - 1) {
+                for (i = 0; i < this.length; i++) {
+                    if (this[i].isTarget) {
+                        return this._convertHistory(this._histories[i]);
+                    }
+                }
+            }
+        }
         
         return this._elements;
+    },
+    
+    _convertHistory: function (history) {
+        var res = [];
+        
+        for (var i = history.length; i--;) {
+            res[i] = history[i].elm;
+        }
+        
+        return res;
     },
     
     /**
@@ -30962,10 +32715,12 @@ Jeeel.Dom.Selector.NodeList.prototype = {
  * @class セレクタの中で要素を示すクラス(スペース, ~, +, > などを除いたセレクタ)
  * @param {String} selector セレクタ
  * @param {String} relationType 一つ前のノードとの関係性を示す文字列
+ * @param {String} [referenceKey] relationTypeが属性参照だった場合に指定
  */
-Jeeel.Dom.Selector.Node = function (selector, relationType) {
+Jeeel.Dom.Selector.Node = function (selector, relationType, referenceKey) {
     this.selector = selector;
     this.relationType = relationType || null;
+    this.referenceKey = referenceKey || null;
     this.classes = [];
     this.mocks = [];
     
@@ -30983,6 +32738,19 @@ Jeeel.Dom.Selector.Node = function (selector, relationType) {
  */
 Jeeel.Dom.Selector.Node.caches = {};
 
+Jeeel.Dom.Selector.Node.IGNORE_CASE = {
+    align: true,
+    charset: true,
+    type: true,
+    'http-equiv': true,
+    method: true,
+    'accept-charset': true,
+    lang: true,
+    dir: true,
+    rel: true,
+    shape: true
+};
+
 Jeeel.Dom.Selector.Node.prototype = {
     
     /**
@@ -30998,6 +32766,20 @@ Jeeel.Dom.Selector.Node.prototype = {
      * @type String
      */
     relationType: null,
+    
+    /**
+     * 関係が属性参照だった場合の属性名
+     * 
+     * @type String
+     */
+    referenceKey: null,
+    
+    /**
+     * 関係が属性参照だった場合の複数のIDリスト
+     * 
+     * @type String[]
+     */
+    referenceAttrs: null,
     
     /**
      * タグ名
@@ -31035,6 +32817,20 @@ Jeeel.Dom.Selector.Node.prototype = {
     mocks: [],
     
     /**
+     * このノードのヒットする要素が一つのみかどうか
+     * 
+     * @type Boolean
+     */
+    isOnlyNode: false,
+    
+    /**
+     * この要素が検索結果の対象になるかどうか
+     * 
+     * @type Boolean
+     */
+    isTarget: false,
+    
+    /**
      * 指定した要素がセレクタと一致するかどうか返す
      * 
      * @param {Element} element 調べる要素
@@ -31044,22 +32840,15 @@ Jeeel.Dom.Selector.Node.prototype = {
         
         var i, l;
         
-        // MOCK
-        for (i = 0, l = this.mocks.length; i < l; i++) {
-            if ( ! this.mocks[i].isMatch(element)) {
-                return false;
-            }
+        // ID
+        if (this.id && this.id !== element.id) {
+            return false;
         }
         
         var nodeName = element.nodeName.toUpperCase();
         
         // TAG
         if (this.tag !== '*' && this.tag !== nodeName) {
-            return false;
-        }
-        
-        // ID
-        if (this.id && this.id !== element.id) {
             return false;
         }
         
@@ -31075,12 +32864,14 @@ Jeeel.Dom.Selector.Node.prototype = {
                 for (i = tmp.length; i--;) {
                     classes[i] = tmp.item(i);
                 }
+            } else if (element.className && ('baseVal' in Object(element.className))) {
+                classes = element.className.baseVal.replace(/\s+/g, ' ').split(' ');
             } else {
-                classes = element.className.split(/\s+/g);
+                classes = element.className.replace(/\s+/g, ' ').split(' ');
             }
 
             for (i = this.classes.length; i--;) {
-                if ( ! Jeeel.Type.inArray(this.classes[i], classes, true)) {
+                if ( ! Jeeel.Hash.inHash(this.classes[i], classes, true)) {
                     return false;
                 }
             }
@@ -31103,23 +32894,14 @@ Jeeel.Dom.Selector.Node.prototype = {
             }
         }
         
-        return true;
-    },
-    
-    /**
-     * 指定した要素リストをフィルタリングする
-     * 
-     * @param {Element[]} elements 要素リスト
-     * @return {Element[]} フィルタリング後の要素リスト
-     */
-    filter: function (elements) {
-        
         // MOCK
-        for (var i = 0, l = this.mocks.length; i < l; i++) {
-            elements = this.mocks[i].filter(elements);
+        for (i = 0, l = this.mocks.length; i < l; i++) {
+            if ( ! this.mocks[i].isMatch(element)) {
+                return false;
+            }
         }
         
-        return elements;
+        return true;
     },
     
     /**
@@ -31132,8 +32914,8 @@ Jeeel.Dom.Selector.Node.prototype = {
 /**
  * コンストラクタ
  * 
- * @class 疑似クラスを扱うクラス
- * @param {Jeeel.Dom.Selector.Node} 親ノード
+ * @class 擬似クラスと擬似要素を扱うクラス
+ * @param {Jeeel.Dom.Selector.Node} node 親ノード
  * @param {String} selector セレクタ
  */
 Jeeel.Dom.Selector.Mock = function (node, selector) {
@@ -31142,54 +32924,125 @@ Jeeel.Dom.Selector.Mock = function (node, selector) {
 };
 
 /**
- * @namespace 疑似クラスのロジックを保有するネームスペース
+ * @namespace 擬似クラスのロジックを保有するネームスペース
  */
 Jeeel.Dom.Selector.Mock.LOGIC = {
   
     /**
-     * 否定疑似クラスを解析するロジック(:not)
+     * 否定擬似クラスを解析するロジック(:not)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
      */
     not: function (args) {
-        var node = Jeeel.Dom.Selector.Compiler.compileNode(args);
-        
         return {
             isMatch: function (element) {
-                return ! node.isMatch(element);
-            },
-            
-            filter: function (elements) {
-                var matches = node.filter(elements);
-                var res = [];
-                
-                for (var i = 0, l = elements.length; i < l; i++) {
-                    
-                    var element = elements[i];
-                    var $continue = false;
-                    
-                    for (var j = matches.length; j--;) {
-                        if (element === matches[j]) {
-                            $continue = true;
-                            break;
-                        }
+                for (var i = this._nodes.length; i--;) {
+                    if (this._nodes[i].isMatch(element)) {
+                        return false;
                     }
-                    
-                    if ($continue) {
-                        continue;
-                    }
-                    
-                    res.puh(element);
                 }
                 
-                return res;
+                return true;
+            },
+            
+            _nodes: Jeeel.Dom.Selector.Compiler.compileNodes(args)
+        };
+    },
+    
+    /**
+     * :matches擬似クラスを解析するロジック(:matches)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    matches: function (args) {
+        return {
+            isMatch: function (element) {
+                for (var i = this._nodes.length; i--;) {
+                    if (this._nodes[i].isMatch(element)) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            },
+            
+            _nodes: Jeeel.Dom.Selector.Compiler.compileNodes(args)
+        };
+    },
+    
+    /**
+     * 言語擬似クラスを解析するロジック(:dir)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    dir: function (args) {
+        if (args) {
+            args = args.toLowerCase();
+        }
+        
+        return {
+            isMatch: (args ? function (element) {
+                while(element) {
+                    
+                    if (element.dir) {
+                        return element.dir.toLowerCase() === args;
+                    }
+                    
+                    element = element.parentNode;
+                }
+                
+                return false;
+            } : Jeeel.Function.Template.RETURN_FALSE)
+        };
+    },
+    
+    /**
+     * 言語擬似クラスを解析するロジック(:lang)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    lang: function (args) {
+      
+        if (args) {
+            args = new RegExp('^' + args.toLowerCase() + '(?:-|$)', 'i');
+        }
+        
+        return {
+            isMatch: (args ? function (element) {
+                while(element) {
+                    
+                    if (element.lang) {
+                        return !!element.lang.match(args);
+                    }
+                    
+                    element = element.parentNode;
+                }
+                
+                return false;
+            } : Jeeel.Function.Template.RETURN_FALSE)
+        };
+    },
+    
+    /**
+     * :any-link擬似クラスを解析するロジック(:any-link)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    anyLink: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.nodeName.toUpperCase() === 'A' && !!element.href;
             }
         };
     },
     
     /**
-     * :link疑似クラスを解析するロジック(:link)
+     * :link擬似クラスを解析するロジック(:link)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -31197,13 +33050,13 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     link: function (args) {
         return {
             isMatch: function (element) {
-                return element.nodeName.toUpperCase() === 'A';
+                return element.nodeName.toUpperCase() === 'A' && !!element.href;
             }
         };
     },
     
     /**
-     * :visited疑似クラスを解析するロジック(:visited)
+     * :visited擬似クラスを解析するロジック(:visited)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -31215,51 +33068,38 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * :hover疑似クラスを解析するロジック(:hover)
+     * :local-link擬似クラスを解析するロジック(:local-link)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
      */
-    hover: function (args) {
+    localLink: function (args) {
+        
+        var limitHierarchy = false;
+        
+        if (args) {
+            args = +args;
+            
+            limitHierarchy = ! isNaN(args);
+            
+            args++;
+        }
+        
         return {
-            isMatch: Jeeel.Function.Template.RETURN_FALSE
+            isMatch: (limitHierarchy ? function (element) { 
+                var baseUrl = Jeeel.String.escapeRegExp(Jeeel.UserAgent.getBaseUrl());
+                
+                return element.nodeName.toUpperCase() === 'A' && element.href.match(new RegExp('^' + baseUrl + '(?:\\/[^\\/]*){' + args + '}$'));
+            } : function (element) {
+                var baseUrl = Jeeel.String.escapeRegExp(Jeeel.UserAgent.getBaseUrl());
+                
+                return element.nodeName.toUpperCase() === 'A' && element.href.match(new RegExp('^' + baseUrl));
+            })
         };
     },
     
     /**
-     * :active疑似クラスを解析するロジック(:active)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    active: function (args) {
-        return {
-            isMatch: Jeeel.Function.Template.RETURN_FALSE
-        };
-    },
-    
-    /**
-     * :first-line疑似クラスを解析するロジック(:first-line)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    firstLine: function (args) {
-        return {};
-    },
-    
-    /**
-     * :first-letter疑似クラスを解析するロジック(:first-letter)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    firstLetter: function (args) {
-        return {};
-    },
-    
-    /**
-     * ターゲット疑似クラスを解析するロジック(:target)
+     * ターゲット擬似クラスを解析するロジック(:target)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -31279,7 +33119,41 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * :focus疑似クラスを解析するロジック(:focus)
+     * :scope擬似クラスを解析するロジック(:scope)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    scope: function (args) {
+        return {};
+    },
+    
+    /**
+     * :active擬似クラスを解析するロジック(:active)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    active: function (args) {
+        return {
+            isMatch: Jeeel.Function.Template.RETURN_FALSE
+        };
+    },
+    
+    /**
+     * :hover擬似クラスを解析するロジック(:hover)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    hover: function (args) {
+        return {
+            isMatch: Jeeel.Function.Template.RETURN_FALSE
+        };
+    },
+
+    /**
+     * :focus擬似クラスを解析するロジック(:focus)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -31291,21 +33165,194 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * 言語疑似クラスを解析するロジック(:lang)
+     * :enabled擬似クラスを解析するロジック(:enabled)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
      */
-    lang: function (args) {
+    enabled: function (args) {
         return {
             isMatch: function (element) {
-                return element.lang === args;
+                return ! element.disabled;
             }
         };
     },
     
     /**
-     * :first-child疑似クラスを解析するロジック(:first-child)
+     * :disabled擬似クラスを解析するロジック(:disabled)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    disabled: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.disabled;
+            }
+        };
+    },
+    
+    /**
+     * :checked擬似クラスを解析するロジック(:checked)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    checked: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.checked;
+            }
+        };
+    },
+    
+    /**
+     * :indeterminate擬似クラスを解析するロジック(:indeterminate)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    indeterminate: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.nodeName.toUpperCase() === 'INPUT' && element.type && element.type.toLowerCase() === 'checkbox' && element.indeterminate;
+            }
+        };
+    },
+    
+    /**
+     * :required擬似クラスを解析するロジック(:required)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    required: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.required;
+            }
+        };
+    },
+    
+    /**
+     * :optional擬似クラスを解析するロジック(:optional)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    optional: function (args) {
+        return {
+            isMatch: function (element) {
+                return 'required' in element && !element.required;
+            }
+        };
+    },
+    
+    /**
+     * :read-only擬似クラスを解析するロジック(:read-only)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    readOnly: function (args) {
+        return {
+            isMatch: function (element) {
+                
+                if (element.contentEditable === 'true') {
+                    return false;
+                }
+                
+                var e = element;
+                
+                while (e.contentEditable === 'inherit') {
+
+                    e = e.parentNode;
+                    
+                    if (e.contentEditable === 'true') {
+                        return false;
+                    }
+                }
+                
+                return element.readOnly;
+            }
+        };
+    },
+    
+    /**
+     * :read-write擬似クラスを解析するロジック(:read-write)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    readWrite: function (args) {
+        return {
+            isMatch: function (element) {
+                
+                if (element.contentEditable === 'true') {
+                    return true;
+                }
+                
+                var e = element;
+                
+                while (e.contentEditable === 'inherit') {
+
+                    e = e.parentNode;
+                    
+                    if (e.contentEditable === 'true') {
+                        return true;
+                    }
+                }
+                
+                return 'readOnly' in element && ! element.readOnly;
+            }
+        };
+    },
+    
+    /**
+     * :root擬似クラスを解析するロジック(:root)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    root: function (args) {
+        return {
+            isMatch: function (element) {
+                return element.ownerDocument.documentElement === element;
+            },
+            
+            isOnlyMock: true
+        };
+    },
+    
+    /**
+     * :empty擬似クラスを解析するロジック(:empty)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    empty: function (args) {
+        return {
+            isMatch: function (element) {
+                
+                var type1 = Jeeel.Dom.Node.ELEMENT_NODE;
+                var type2 = Jeeel.Dom.Node.TEXT_NODE;
+                var child = element.firstChild;
+                
+                while (child) {
+                    if (child.nodeType === type1 || child.nodeType === type2) {
+                        return false;
+                    }
+                    
+                    child = child.nextSibling;
+                }
+                
+                return true;
+            }
+        };
+    },
+    
+    /**
+     * :first-child擬似クラスを解析するロジック(:first-child)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -31331,7 +33378,95 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * :last-child疑似クラスを解析するロジック(:last-child)
+     * :nth-child擬似クラスを解析するロジック(:nth-child)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    nthChild: function (args) {
+        var val = +args;
+        
+        var isMatch, isNth;
+        
+        if (val) {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                  
+                var p = element.previousSibling;
+                  
+                while (p) {
+                    if (p.nodeType === type) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+
+                return val === cnt;
+            };
+        } else if (args === 'odd') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                  
+                var p = element.previousSibling;
+                  
+                while (p) {
+                    if (p.nodeType === type) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+
+                return !!(cnt & 1);
+            };
+        } else if (args === 'even') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                  
+                var p = element.previousSibling;
+                  
+                while (p) {
+                    if (p.nodeType === type) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+
+                return !(cnt & 1);
+            };
+        } else {
+            isNth = this._getNth(args);
+            
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                var cnt = 1;
+                  
+                var p = element.previousSibling;
+                  
+                while (p) {
+                    if (p.nodeType === type) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+
+                return isNth(cnt);
+            };
+        }
+        
+        return {
+            isMatch: isMatch
+        };
+    },
+    
+    /**
+     * :last-child擬似クラスを解析するロジック(:last-child)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -31357,104 +33492,7 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * :before疑似クラスを解析するロジック(:before)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    before: function (args) {
-        return {};
-    },
-    
-    /**
-     * :after疑似クラスを解析するロジック(:after)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    after: function (args) {
-        return {};
-    },
-    
-    /**
-     * :root疑似クラスを解析するロジック(:root)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    root: function (args) {
-        return {
-            isMatch: function (element) {
-                return element.ownerDocument.documentElement === element;
-            }
-        };
-    },
-    
-    /**
-     * :nth-child疑似クラスを解析するロジック(:nth-child)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    nthChild: function (args) {
-        var val = +args;
-        
-        var filter, isNth;
-        
-        if (val) {
-            filter = function (elements) {
-                return elements[val] && [elements[val]] || [];
-            };
-        } else if (args === 'odd') {
-            filter = function (elements) {
-                
-                var res = [];
-                
-                for (var i = 0, l = elements.length; i < l; i++) {
-                    if (i & 1) {
-                        res[res.length] = elements[i];
-                    }
-                }
-                
-                return res;
-            };
-        } else if (args === 'even') {
-            filter = function (elements) {
-                
-                var res = [];
-                
-                for (var i = 0, l = elements.length; i < l; i++) {
-                    if ( ! (i & 1)) {
-                        res[res.length] = elements[i];
-                    }
-                }
-                
-                return res;
-            };
-        } else {
-            isNth = new Function('n', 'return n % (' + args.replace(/([0-9]+)n/g, '$1*n') + ') === 0;');
-            
-            filter = function (elements) {
-                
-                var res = [];
-                
-                for (var i = 0, l = elements.length; i <l; i++) {
-                    if (isNth(i)) {
-                        res[res.length] = elements[i];
-                    }
-                }
-                
-                return res;
-            };
-        }
-        
-        return {
-            filter: filter
-        };
-    },
-    
-    /**
-     * :nth-last-child疑似クラスを解析するロジック(:nth-last-child)
+     * :nth-last-child擬似クラスを解析するロジック(:nth-last-child)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -31462,218 +33500,77 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     nthLastChild: function (args) {
         var val = +args;
         
-        var filter, isNth;
-        
-        if (val) {
-            filter = function (elements) {
-                return elements[elements.length - val - 1] && [elements[elements.length - val - 1]] || [];
-            };
-        } else if (args === 'odd') {
-            filter = function (elements) {
-                
-                var res = [], lidx = elements.length - 1;
-                
-                for (var i = 0, l = elements.length; i < l; i++) {
-                    if ((lidx - i) & 1) {
-                        res[res.length] = elements[i];
-                    }
-                }
-                
-                return res;
-            };
-        } else if (args === 'even') {
-            filter = function (elements) {
-                
-                var res = [], lidx = elements.length - 1;
-                
-                for (var i = 0, l = elements.length; i < l; i++) {
-                    if ( ! ((lidx - i) & 1)) {
-                        res[res.length] = elements[i];
-                    }
-                }
-                
-                return res;
-            };
-        } else {
-            isNth = new Function('n', 'return n % (' + args.replace(/([0-9]+)n/g, '$1*n') + ') === 0;');
-            
-            filter = function (elements) {
-                
-                var res = [], lidx = elements.length - 1;
-                
-                for (var i = 0, l = elements.length; i <l; i++) {
-                    if (isNth(lidx - i)) {
-                        res[res.length] = elements[i];
-                    }
-                }
-                
-                return res;
-            };
-        }
-        
-        return {
-            filter: filter
-        };
-    },
-    
-    /**
-     * :first-of-type疑似クラスを解析するロジック(:first-of-type)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    firstOfType: function (args) {
-        return {
-            isMatch: function (element) {
-                var type = Jeeel.Dom.Node.ELEMENT_NODE;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
-                
-                var p = element.previousSibling;
-                  
-                while (p) {
-                    if (p.nodeType === type && this.node.isMatch(p)) {
-                        this.isMatch = isMatch;
-                        return false;
-                    }
-                    
-                    p = p.previousSibling;
-                }
-                
-                this.isMatch = isMatch;
-                
-                return true;
-            }
-        };
-    },
-    
-    /**
-     * :last-of-type疑似クラスを解析するロジック(:last-of-type)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    lastOfType: function (args) {
-        return {
-            isMatch: function (element) {
-                var type = Jeeel.Dom.Node.ELEMENT_NODE;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
-                
-                var n = element.nextSibling;
-                  
-                while (n) {
-                    if (n.nodeType === type && this.node.isMatch(n)) {
-                        this.isMatch = isMatch;
-                        return false;
-                    }
-                    
-                    n = n.nextSibling;
-                }
-                
-                this.isMatch = isMatch;
-                
-                return true;
-            }
-        };
-    },
-    
-    /**
-     * :nth-of-type疑似クラスを解析するロジック(:nth-of-type)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    nthOfType: function (args) {
-        var val = +args;
-        
         var isMatch, isNth;
         
         if (val) {
             isMatch = function (element) {
                 var type = Jeeel.Dom.Node.ELEMENT_NODE;
                 var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
                   
-                var p = element.previousSibling;
+                var n = element.nextSibling;
                   
-                while (p) {
-                    if (p.nodeType === type && this.node.isMatch(p)) {
+                while (n) {
+                    if (n.nodeType === type) {
                         cnt++;
                     }
                     
-                    p = p.previousSibling;
+                    n = n.nextSibling;
                 }
-                
-                this.isMatch = isMatch;
-                
+
                 return val === cnt;
             };
         } else if (args === 'odd') {
             isMatch = function (element) {
                 var type = Jeeel.Dom.Node.ELEMENT_NODE;
                 var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
-                
-                var p = element.previousSibling;
                   
-                while (p) {
-                    if (p.nodeType === type && this.node.isMatch(p)) {
+                var n = element.nextSibling;
+                  
+                while (n) {
+                    if (n.nodeType === type) {
                         cnt++;
                     }
-
-                    p = p.previousSibling;
+                    
+                    n = n.nextSibling;
                 }
-                
-                this.isMatch = isMatch;
-                
+
                 return !!(cnt & 1);
             };
         } else if (args === 'even') {
             isMatch = function (element) {
                 var type = Jeeel.Dom.Node.ELEMENT_NODE;
                 var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
                   
-                var p = element.previousSibling;
+                var n = element.nextSibling;
                   
-                while (p) {
-                    if (p.nodeType === type && this.node.isMatch(p)) {
+                while (n) {
+                    if (n.nodeType === type) {
                         cnt++;
                     }
-
-                    p = p.previousSibling;
+                    
+                    n = n.nextSibling;
                 }
-                
-                this.isMatch = isMatch;
-                
+
                 return !(cnt & 1);
             };
         } else {
-            isNth = new Function('i,n', 'return (i === ' + args.replace(/([0-9]+)n/g, '$1*n') + ') || (i > ' + args.replace(/([0-9]+)n/g, '$1*n') + ' ? arguments.callee(i, n + 1) : false);');
+            isNth = this._getNth(args);
             
             isMatch = function (element) {
                 var type = Jeeel.Dom.Node.ELEMENT_NODE;
                 var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
                   
-                var p = element.previousSibling;
+                var n = element.nextSibling;
                   
-                while (p) {
-                    if (p.nodeType === type && this.node.isMatch(p)) {
+                while (n) {
+                    if (n.nodeType === type) {
                         cnt++;
                     }
                     
-                    p = p.previousSibling;
+                    n = n.nextSibling;
                 }
-                
-                this.isMatch = isMatch;
-                
-                return isNth(cnt, 0);
+
+                return isNth(cnt);
             };
         }
         
@@ -31683,111 +33580,7 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * :nth-last-of-type疑似クラスを解析するロジック(:nth-last-of-type)
-     * 
-     * @param {String} args 引数
-     * @return {Hash} ロジック構成要素
-     */
-    nthLastOfType: function (args) {
-        var val = +args;
-        
-        var isMatch, isNth;
-        
-        if (val) {
-            isMatch = function (element) {
-                var type = Jeeel.Dom.Node.ELEMENT_NODE;
-                var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
-                  
-                var n = element.nextSibling;
-                  
-                while (n) {
-                    if (n.nodeType === type && this.node.isMatch(n)) {
-                        cnt++;
-                    }
-                    
-                    n = n.nextSibling;
-                }
-                
-                this.isMatch = isMatch;
-                
-                return val === cnt;
-            };
-        } else if (args === 'odd') {
-            isMatch = function (element) {
-                var type = Jeeel.Dom.Node.ELEMENT_NODE;
-                var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
-                  
-                var n = element.nextSibling;
-                  
-                while (n) {
-                    if (n.nodeType === type && this.node.isMatch(n)) {
-                        cnt++;
-                    }
-                    
-                    n = n.nextSibling;
-                }
-                
-                this.isMatch = isMatch;
-                
-                return !!(cnt & 1);
-            };
-        } else if (args === 'even') {
-            isMatch = function (element) {
-                var type = Jeeel.Dom.Node.ELEMENT_NODE;
-                var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
-                  
-                var n = element.nextSibling;
-                  
-                while (n) {
-                    if (n.nodeType === type && this.node.isMatch(n)) {
-                        cnt++;
-                    }
-                    
-                    n = n.nextSibling;
-                }
-                
-                this.isMatch = isMatch;
-                
-                return !(cnt & 1);
-            };
-        } else {
-            isNth = new Function('i,n', 'return (i === ' + args.replace(/([0-9]+)n/g, '$1*n') + ') || (i > ' + args.replace(/([0-9]+)n/g, '$1*n') + ' ? arguments.callee(i, n + 1) : false);');
-            
-            isMatch = function (element) {
-                var type = Jeeel.Dom.Node.ELEMENT_NODE;
-                var cnt = 1;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
-                  
-                var n = element.nextSibling;
-                  
-                while (n) {
-                    if (n.nodeType === type && this.node.isMatch(n)) {
-                        cnt++;
-                    }
-                    
-                    n = n.nextSibling;
-                }
-                
-                this.isMatch = isMatch;
-                
-                return isNth(cnt, 0);
-            };
-        }
-        
-        return {
-            isMatch: isMatch
-        };
-    },
-    
-    /**
-     * :only-child疑似クラスを解析するロジック(:only-child)
+     * :only-child擬似クラスを解析するロジック(:only-child)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -31815,7 +33608,287 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * :only-of-type疑似クラスを解析するロジック(:only-of-type)
+     * :first-of-type擬似クラスを解析するロジック(:first-of-type)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    firstOfType: function (args) {
+        return {
+            isMatch: function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                
+                var p = element.previousSibling;
+                
+                while (p) {
+                    if (p.nodeType === type && p.nodeName === nodeName) {
+                        return false;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+                
+                return true;
+            }
+        };
+    },
+    
+    /**
+     * :nth-of-type擬似クラスを解析するロジック(:nth-of-type)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    nthOfType: function (args) {
+        var val = +args;
+        
+        var isMatch, isNth;
+        
+        if (val) {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var p = element.previousSibling;
+                
+                while (p) {
+                    if (p.nodeType === type && p.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+                
+                return cnt === val;
+            };
+        } else if (args === 'odd') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var p = element.previousSibling;
+                
+                while (p) {
+                    if (p.nodeType === type && p.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+                
+                return !!(cnt & 1);
+            };
+        } else if (args === 'even') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var p = element.previousSibling;
+                
+                while (p) {
+                    if (p.nodeType === type && p.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+                
+                return !(cnt & 1);
+            };
+        } else {
+            isNth = this._getNth(args);
+            
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var p = element.previousSibling;
+                
+                while (p) {
+                    if (p.nodeType === type && p.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    p = p.previousSibling;
+                }
+                
+                return isNth(cnt);
+            };
+        }
+        
+        return {
+            isMatch: isMatch
+        };
+    },
+    
+    /**
+     * :last-of-type擬似クラスを解析するロジック(:last-of-type)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    lastOfType: function (args) {
+        return {
+            isMatch: function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                
+                var n = element.nextSibling;
+                
+                while (n) {
+                    if (n.nodeType === type && n.nodeName === nodeName) {
+                        return false;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                return true;
+            }
+        };
+    },
+    
+    /**
+     * :nth-last-of-type擬似クラスを解析するロジック(:nth-last-of-type)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    nthLastOfType: function (args) {
+        var val = +args;
+        
+        var isMatch, isNth;
+        
+        if (val) {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var n = element.nextSibling;
+                
+                while (n) {
+                    if (n.nodeType === type && n.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                return cnt === val;
+            };
+        } else if (args === 'odd') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var n = element.nextSibling;
+                
+                while (n) {
+                    if (n.nodeType === type && n.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                return !!(cnt & 1);
+            };
+        } else if (args === 'even') {
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var n = element.nextSibling;
+                
+                while (n) {
+                    if (n.nodeType === type && n.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                return !(cnt & 1);
+            };
+        } else {
+            isNth = this._getNth(args);
+            
+            isMatch = function (element) {
+                var type = Jeeel.Dom.Node.ELEMENT_NODE;
+                
+                if (element.parentNode.nodeType !== type) {
+                    return false;
+                }
+                
+                var nodeName = element.nodeName;
+                var cnt = 1;
+                var n = element.nextSibling;
+                
+                while (n) {
+                    if (n.nodeType === type && n.nodeName === nodeName) {
+                        cnt++;
+                    }
+                    
+                    n = n.nextSibling;
+                }
+                
+                return isNth(cnt);
+            };
+        }
+        
+        return {
+            isMatch: isMatch
+        };
+    },
+    
+    /**
+     * :only-of-type擬似クラスを解析するロジック(:only-of-type)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
@@ -31824,21 +33897,33 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
         return {
             isMatch: function (element) {
                 var type = Jeeel.Dom.Node.ELEMENT_NODE;
-                var isMatch = this.isMatch;
-                this.isMatch = Jeeel.Function.Template.RETURN_TRUE;
                 
-                var n = element.parentNode.firstChild;
-                  
-                while (n) {
-                    if (n.nodeType === type && n !== element && this.node.isMatch(n)) {
-                        this.isMatch = isMatch;
-                        return false;
-                    }
-                    
-                    n = n.nextSibling;
+                if (element.parentNode.nodeType !== type) {
+                    return false;
                 }
                 
-                this.isMatch = isMatch;
+                var nodeName = element.nodeName;
+                var n = element.nextSibling;
+                var p = element.previousSibling;
+                
+                while (n || p) {
+                    
+                    if (n) {
+                        if (n.nodeType === type && n.nodeName === nodeName) {
+                            return false;
+                        }
+
+                        n = n.nextSibling;
+                    }
+                    
+                    if (p) {
+                        if (p.nodeType === type && p.nodeName === nodeName) {
+                            return false;
+                        }
+
+                        p = p.previousSibling;
+                    }
+                }
                 
                 return true;
             }
@@ -31846,66 +33931,364 @@ Jeeel.Dom.Selector.Mock.LOGIC = {
     },
     
     /**
-     * :empty疑似クラスを解析するロジック(:empty)
+     * :nth-match擬似クラスを解析するロジック(:nth-match)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     * @ignore 未完成
+     */
+    nthMatch: function (args) {
+        
+        var isNth, nodes;
+        
+        args = args.match(/^(odd|even|[0-9n+\-]+)\s+of\s+(.+)$/g);
+        
+        isNth = this._getNth(args[1]);
+        nodes = Jeeel.Dom.Selector.Compiler.compileNodes(args[2]);
+        
+        if ( ! (args[1] && args[2])) {
+            throw new Error('Selector compile error.');
+        }
+        
+        return {};
+    },
+    
+    /**
+     * :column擬似クラスを解析するロジック(:column)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
      */
-    empty: function (args) {
+    column: function (args) {
+        var node = Jeeel.Dom.Selector.Compiler.compileNode(args);
+        
         return {
             isMatch: function (element) {
-                return element.childNodes.length === 0;
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                return node.isMatch(element);
             }
         };
     },
     
     /**
-     * :enabled疑似クラスを解析するロジック(:enabled)
+     * :nth-column擬似クラスを解析するロジック(:nth-column)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
      */
-    enabled: function (args) {
+    nthColumn: function (args) {
+        var val = +args;
+        
+        var isMatch, isNth;
+        
+        if (val) {
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element);
+                
+                for (var i = cols.length; i--;) {
+                    if (cols[i] === val) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        } else if (args === 'odd') {
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element);
+                
+                for (var i = cols.length; i--;) {
+                    if (cols[i] & 1) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        } else if (args === 'even') {
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element);
+                
+                for (var i = cols.length; i--;) {
+                    if ( ! (cols[i] & 1)) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        } else {
+            isNth = this._getNth(args);
+            
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element);
+                
+                for (var i = cols.length; i--;) {
+                    if (isNth(cols[i])) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        }
+        
+        return {
+            isMatch: isMatch
+        };
+    },
+    
+    /**
+     * :nth-last-column擬似クラスを解析するロジック(:nth-last-column)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    nthLastColumn: function (args) {
+        var val = +args;
+        
+        var isMatch, isNth;
+        
+        if (val) {
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element, true);
+                
+                for (var i = cols.length; i--;) {
+                    if (cols[i] === val) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        } else if (args === 'odd') {
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element, true);
+                
+                for (var i = cols.length; i--;) {
+                    if (cols[i] & 1) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        } else if (args === 'even') {
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element, true);
+                
+                for (var i = cols.length; i--;) {
+                    if ( ! (cols[i] & 1)) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        } else {
+            isNth = this._getNth(args);
+            
+            isMatch = function (element) {
+                var name = element.nodeName.toUpperCase();
+                
+                if ( ! (name === 'TD' || name === 'TH')) {
+                    return false;
+                }
+                
+                var cols = Jeeel._Object.JeeelDomSelector.getSameCellCols(element, true);
+                
+                for (var i = cols.length; i--;) {
+                    if (isNth(cols[i])) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            };
+        }
+        
+        return {
+            isMatch: isMatch
+        };
+    },
+    
+   /**
+     * ::first-line擬似要素を解析するロジック(::first-line)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    firstLine: function (args) {
+        return {};
+    },
+    
+    /**
+     * ::first-letter擬似要素を解析するロジック(::first-letter)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    firstLetter: function (args) {
+        return {};
+    },
+    
+    /**
+     * ::before擬似要素を解析するロジック(::before)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    before: function (args) {
+        return {};
+    },
+    
+    /**
+     * ::after擬似要素を解析するロジック(::after)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    after: function (args) {
+        return {};
+    },
+    
+    /**
+     * カスタム擬似クラス、非表示要素に適用(:-jeeel-hidden)
+     * 
+     * @param {String} args 引数
+     * @return {Hash} ロジック構成要素
+     */
+    JeeelHidden: function (args) {
         return {
             isMatch: function (element) {
-                return ! element.disabled;
+                
+                if (element.nodeName.toUpperCase() === 'INPUT' && element.type === 'hidden') {
+                    return true;
+                }
+                
+                var style = Jeeel.Document.getComputedStyle(element);
+                
+                return style.display === 'none' || style.visibility === 'hidden';
             }
         };
     },
     
     /**
-     * :disabled疑似クラスを解析するロジック(:disabled)
+     * カスタム擬似クラス、表示要素に適用(:-jeeel-visible)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
      */
-    disabled: function (args) {
+    JeeelVisible: function (args) {
         return {
             isMatch: function (element) {
-                return element.disabled;
+                
+                if (element.nodeName.toUpperCase() === 'INPUT' && element.type === 'hidden') {
+                    return false;
+                }
+                
+                var style = Jeeel.Document.getComputedStyle(element);
+                
+                return style.display !== 'none' && style.visibility !== 'hidden';
             }
         };
     },
     
     /**
-     * :checked疑似クラスを解析するロジック(:checked)
+     * カスタム擬似クラス、アニメーション中の要素に適用(:-jeeel-animated)
      * 
      * @param {String} args 引数
      * @return {Hash} ロジック構成要素
      */
-    checked: function (args) {
+    JeeelAnimated: function (args) {
         return {
             isMatch: function (element) {
-                return element.checked;
+                return Jeeel.Hash.inHash(element, Jeeel.Dom.Style.Animation.animated, true);
             }
         };
+    },
+    
+    /**
+     * nth系の引数部分を解析する関数を取得する
+     * 
+     * @param {String} nth 引数
+     * @return {Function} 引数解析関数
+     */
+    _getNth: function (nth) {
+        
+        if (nth === 'odd') {
+            return new Function('i',
+                'return !!(i & 1);'
+            );
+        } else if (nth === 'even') {
+            return new Function('i',
+                'return !(i & 1);'
+            );
+        } else if (nth.match(/^[0-9]+$/g)) {
+            return new Function('i',
+                'return i === ' + nth + ';'
+            );
+        }
+        
+        var minus = !!nth.match(/-[0-9]*n/g);
+        
+        return new Function('i,n,pnth', 
+            'if ( ! n) {n = 0;}var nth = ' + nth.replace(/(-?[0-9]+)n/g, '$1*n') + ';if (nth === pnth) {return false;}return (i === nth) || (' + (minus ? 'i < nth' : 'i > nth') + ' ? arguments.callee(i, n + 1, nth) : false);'
+        );
     }
 };
 
 Jeeel.Dom.Selector.Mock.prototype = {
   
     /**
-     * 疑似クラスセレクタ
+     * 擬似クラスセレクタ
      * 
      * @type String
      */
@@ -31919,18 +34302,25 @@ Jeeel.Dom.Selector.Mock.prototype = {
     node: null,
     
     /**
-     * 疑似クラスの名前
+     * 擬似クラスの名前
      * 
      * @type String
      */
     name: '',
     
     /**
-     * 疑似クラスの引数
+     * 擬似クラスの引数
      * 
      * @type String
      */
     args: '',
+    
+    /**
+     * 1つの要素にしかヒットしかないかどうか
+     * 
+     * @type Boolean
+     */
+    isOnlyMock: false,
     
     /**
      * 指定した要素がセレクタと一致するかどうか返す
@@ -31940,16 +34330,6 @@ Jeeel.Dom.Selector.Mock.prototype = {
      */
     isMatch: function (element) {
         return true;
-    },
-    
-    /**
-     * 指定した要素リストをフィルタリングする
-     * 
-     * @param {Element[]} elements 要素リスト
-     * @return {Element[]} フィルタリング後の要素リスト
-     */
-    filter: function (elements) {
-        return elements;
     },
     
     /**
@@ -31965,15 +34345,11 @@ Jeeel.Dom.Selector.Mock.prototype = {
         if ( ! tmp) {
             return this;
         }
+        
+        for (var key in tmp) {
+            this[key] = tmp[key];
+        }
 
-        if (tmp.isMatch) {
-            this.isMatch = tmp.isMatch;
-        }
-        
-        if (tmp.filter) {
-            this.filter = tmp.filter;
-        }
-        
         return this;
     },
     
@@ -32006,6 +34382,7 @@ Jeeel.Dom.Behavior = {
 Jeeel.file.Jeeel.Dom.Behavior = ['Rollover', 'Placeholder', 'Autofocus', 'EditInplace', 'Autoresize'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Dom.Behavior, Jeeel.file.Jeeel.Dom.Behavior);
+
 /**
  * ロールオーバーを有効にする
  * 
@@ -32099,8 +34476,6 @@ Jeeel.Dom.Behavior.Rollover = {
         
         var over, out;
         
-        var regFilter = new Jeeel.Filter.String.RegularExpressionEscape();
-        
         (function (pover, pout, sover, sout) {
             
             /**
@@ -32110,7 +34485,7 @@ Jeeel.Dom.Behavior.Rollover = {
                 var src = this.src;
                 
                 if (pout || pover) {
-                    src = src.replace(new RegExp('/?' + regFilter.filter(pout) + '([^/]*)$'), '/' + pover + '$1');
+                    src = src.replace(new RegExp('/?' + Jeeel.String.escapeRegExp(pout) + '([^/]*)$'), '/' + pover + '$1');
                 }
                 
                 if (sout || sover) {
@@ -32127,7 +34502,7 @@ Jeeel.Dom.Behavior.Rollover = {
                 var src = this.src;
                 
                 if (pover || pout) {
-                    src = src.replace(new RegExp('/?' + regFilter.filter(pover) + '([^/]*)$'), '/' + pout + '$1');
+                    src = src.replace(new RegExp('/?' + Jeeel.String.escapeRegExp(pover) + '([^/]*)$'), '/' + pout + '$1');
                 }
                 
                 if (sover || sout) {
@@ -32138,7 +34513,7 @@ Jeeel.Dom.Behavior.Rollover = {
             };
         })(this._prefix.on, this._prefix.off, this._suffix.on, this._suffix.off);
         
-        var reg = new RegExp('\\/?' + regFilter.filter(this._prefix.off) + '[^/]*' + regFilter.filter(this._suffix.off) + '\\.[^.]+$');
+        var reg = new RegExp('\\/?' + Jeeel.String.escapeRegExp(this._prefix.off) + '[^/]*' + Jeeel.String.escapeRegExp(this._suffix.off) + '\\.[^.]+$');
         
         for (var i = elements.length; i--;) {
             var element = elements[i];
@@ -32236,14 +34611,14 @@ Jeeel.Dom.Behavior.Placeholder = {
             
             if ( ! plc) {
                 continue;
-            } else if ( ! Jeeel.Type.inArray(nodeName, this.USABLE_LIST.NODES, true)) {
+            } else if ( ! Jeeel.Hash.inHash(nodeName, this.USABLE_LIST.NODES, true)) {
                 continue;
-            } else if (nodeName === 'INPUT' && ! Jeeel.Type.inArray(input.type, this.USABLE_LIST.TYPES, true)) {
+            } else if (nodeName === 'INPUT' && ! Jeeel.Hash.inHash(input.type, this.USABLE_LIST.TYPES, true)) {
                 continue;
             }
             
             // オーナーのフォームに対して送信時にplaceholder用の値を削除するトリガーをセットする
-            if (input.form && ! Jeeel.Type.inArray(input.form, forms, true)) {
+            if (input.form && ! Jeeel.Hash.inHash(input.form, forms, true)) {
                 Jeeel.Dom.Event.addEventListener(input.form, Jeeel.Dom.Event.Type.SUBMIT, this._submit, this);
                 
                 forms[forms.length] = input.form;
@@ -32281,9 +34656,9 @@ Jeeel.Dom.Behavior.Placeholder = {
 
         if ( ! plc) {
             return false;
-        } else if ( ! Jeeel.Type.inArray(nodeName, this.USABLE_LIST.NODES, true)) {
+        } else if ( ! Jeeel.Hash.inHash(nodeName, this.USABLE_LIST.NODES, true)) {
             return false;
-        } else if (nodeName === 'INPUT' && ! Jeeel.Type.inArray(input.type, this.USABLE_LIST.TYPES, true)) {
+        } else if (nodeName === 'INPUT' && ! Jeeel.Hash.inHash(input.type, this.USABLE_LIST.TYPES, true)) {
             return false;
         } else if ( ! Jeeel.Storage.Object.exists(input, this.STORAGE_NAME)) {
             return false;
@@ -32339,6 +34714,10 @@ Jeeel.Dom.Behavior.Placeholder = {
     _init: function () {
         delete this._init;
         
+        if ( ! Jeeel._doc) {
+            return;
+        }
+        
         var input = Jeeel._doc.createElement('input');
         
         input.type = 'text';
@@ -32352,6 +34731,7 @@ Jeeel.Dom.Behavior.Placeholder = {
 };
 
 Jeeel.Dom.Behavior.Placeholder._init();
+
 /**
  * オートフォーカスを有効にする
  * 
@@ -32415,6 +34795,10 @@ Jeeel.Dom.Behavior.Autofocus = {
     _init: function () {
         delete this._init;
         
+        if ( ! Jeeel._doc) {
+            return;
+        }
+        
         var input = Jeeel._doc.createElement('input');
         
         input.type = 'text';
@@ -32428,6 +34812,7 @@ Jeeel.Dom.Behavior.Autofocus = {
 };
 
 Jeeel.Dom.Behavior.Autofocus._init();
+
 /**
  * エディットインプレースを有効にする
  * 
@@ -32517,9 +34902,9 @@ Jeeel.Dom.Behavior.EditInplace = {
             var input = inputs[i];
             var nodeName = input.nodeName.toUpperCase();
 
-            if ( ! Jeeel.Type.inArray(nodeName, this.USABLE_LIST.NODES, true)) {
+            if ( ! Jeeel.Hash.inHash(nodeName, this.USABLE_LIST.NODES, true)) {
                 continue;
-            } else if (nodeName === 'INPUT' && ! Jeeel.Type.inArray(input.type, this.USABLE_LIST.TYPES, true)) {
+            } else if (nodeName === 'INPUT' && ! Jeeel.Hash.inHash(input.type, this.USABLE_LIST.TYPES, true)) {
                 continue;
             }
             
@@ -32615,6 +35000,7 @@ Jeeel.Dom.Behavior.EditInplace = {
         style.cssText += ';' + css.join(';');
     }
 };
+
 /**
  * オートリサイズを有効にする
  * 
@@ -32723,9 +35109,9 @@ Jeeel.Dom.Behavior.Autoresize = {
             var input = inputs[i];
             var nodeName = input.nodeName.toUpperCase();
 
-            if ( ! Jeeel.Type.inArray(nodeName, this.USABLE_LIST.NODES, true)) {
+            if ( ! Jeeel.Hash.inHash(nodeName, this.USABLE_LIST.NODES, true)) {
                 continue;
-            } else if (nodeName === 'INPUT' && ! Jeeel.Type.inArray(input.type, this.USABLE_LIST.TYPES, true)) {
+            } else if (nodeName === 'INPUT' && ! Jeeel.Hash.inHash(input.type, this.USABLE_LIST.TYPES, true)) {
                 continue;
             }
             
@@ -32807,6 +35193,7 @@ Jeeel.Dom.Behavior.Autoresize = {
         });
     }
 };
+
 /**
  * @namespace 特殊検索に使用する列挙体
  */
@@ -32857,10 +35244,396 @@ Jeeel.Dom.SearchOption = {
 
 /**
  * @namespace ネット関連のネームスペース
+ * @see Jeeel.Net.Ajax
+ * @see Jeeel.Net.Form
+ * @example
+ * Netのネームスペース以下はサーバーとの通信を軸にしたメイン機能の一つ
+ * その中でも以下のクラスの使用頻度は高い
+ * Jeeel.Net.Ajax
+ * Jeeel.Net.Form
+ * 
+ * Jeeel.Net.Ajax
+ * Ajaxを制御するクラス
+ * このクラスを使用するとHTTPパラメータの処理等を簡単に書けるようになる
+ * 
+ * 例：
+ * var Test = {
+ *     onSuccess: function (response) {
+ *         console.log(response.responseText);
+ *         console.log(response.getResponseJSON());
+ *     }
+ * };
+ * var ajax = new Jeeel.Net.Ajax('/test/index', 'GET'); // Jeeel.Net.Ajax.create('/test/index', 'GET')や$AJAX('/test/index', 'GET')でも同じ意味である
+ * ajax.setSuccessMethod(Test.onSuccess, Test); // 通信成功時のコールバックを設定する、2つめの引数は例によってコールバック中のthisである
+ * ajax.set('a', 88); // 単純なHTTPパラメータを設定する
+ * ajax.set('b'. [1, 2, 3, 4, 5, 6, [7, 8, 9, 10], {a: 'area'}]); // 多重配列や連想配列などの複雑なHTTPパラメータを設定する
+ * ajax.setField('test', 77); // 通信には関係の無いレスポンスに引き渡すパラメータを設定する
+ * ajax.execute(); // 実際にAjax通信を行う
+ * 
+ * 通信成功時などのコールバックの引数には基本的にJeeel.Net.Ajax.Responseインスタンスが渡される
+ * 主なプロパティ・機能は以下になる
+ * 
+ * response.responseText // 通信結果のテキスト
+ * response.getResponseJSON(); // responseTextをJSONとして処理し処理が出来なかったら代わりに空連想配列を返す
+ * response.getResponseXML(); // responseXMLを処理して簡単アクセスが出来るJeeel.Dom.Xmlクラスのインスタンスに変換する
+ * response.getField('test'); // ajax.setFieldで設定したキー test の値を取得する
+ * 
+ * 
+ * Jeeel.Net.Form
+ * 使い方によってはAjaxよりも多く使用する可能性のあるクラス
+ * このクラスはform要素をラッパーし操作管理するクラスである
+ * また、formだけでなくinput等のパラメータを扱う要素を含む要素をformとして扱いパラメータの変更も可能である
+ * 
+ * 例：
+ * <form id="form">
+ *   <input type="text" name="t" value="test" />
+ *   <input type="radio" name="r" value="1" />
+ *   <input type="radio" name="r" value="2" />
+ *   <input type="radio" name="r" value="3" checked />
+ *   <select name="s">
+ *     <option value="1" selected>1</option>
+ *     <option value="2">2</option>
+ *     <option value="3">3</option>
+ *   </select>
+ *   <input type="text" name="t" value="test-new" />
+ *   <input type="button" value="フォーム値表示" onclick="alert(Jeeel.Debug.objectExport($FORM(this.form).getAll()));" />
+ * </form>
+ * <div id="p-form">
+ *   <input type="hidden" name="h[]" value="1" />
+ *   <input type="hidden" name="h[]" value="2" />
+ *   <input type="hidden" name="h[]" value="3" />
+ *   <input type="hidden" name="h[a]" value="4" />
+ *   <input type="hidden" name="g[a][state]" value="10" />
+ *   <input type="hidden" name="g[b][state]" value="20" />
+ *   <input type="hidden" name="g[b][txt]" value="test" />
+ *   <input type="button" value="擬似フォーム値表示" onclick="alert(Jeeel.Debug.objectExport(Jeeel.Net.Form.createByPseudoForm(this.parentNode).getAll()));" />
+ * </div>
+ * var form1 = new Jeeel.Net.Form('form'); // Jeeel.Net.Form.create($ID('form'))や$FORM('form')でも同じである
+ * var form2 = Jeeel.Net.Form.createByPseudoForm('p-form', '/test/index/', 'GET'); // 擬似フォームから作成する場合は可ならずこちら
+ * form1.getAll(); // 指定されたフォーム、疑似フォームを解析しPHPと同じような連想配列を返す
+ *                 // #formを検索するので以下の連想配列が返ってくる
+ *                 // {t: 'test-new', r: '3', s: '1'}
+ *                 
+ * form2.getAll(); // #p-form検索するので以下の連想配列になる
+ *                 // {h: {0: '1', 1: '2', 2: '3', a: '4'}, g: {a: {state: '10'}, b: {state: '20', txt: 'test'}}}
+ * 
+ * form1.set('r', 2); // radioボタンの2番目にチェックが付く
+ * form2.set('r', 5); // 新たに名前がr、値が5のhiddenタグが生成され#p-form無いの一番下に追加される
+ * form1.unset('s'); // セレクトボックスの名前が消される
+ * form2.unset('g[b]'); // g[b]以下の要素の名前が破棄される
+ * form2.unsetElement('h[a]'); // 要素をDOM上から取り去る
+ * 
+ * 以上のメソッドを順に実行すると上記のHTMLは以下のような形式に変化する
+ * <form id="form">
+ *   <input type="text" name="t" value="test" />
+ *   <input type="radio" name="r" value="1" />
+ *   <input type="radio" name="r" value="2" checked />
+ *   <input type="radio" name="r" value="3" />
+ *   <select name="">
+ *     <option value="1" selected>1</option>
+ *     <option value="2">2</option>
+ *     <option value="3">3</option>
+ *   </select>
+ *   <input type="text" name="t" value="test-new" />
+ *   <input type="button" value="フォーム値表示" onclick="alert(Jeeel.Debug.objectExport($FORM(this.form).getAll()));" />
+ * </form>
+ * <div id="p-form">
+ *   <input type="hidden" name="h[]" value="1" />
+ *   <input type="hidden" name="h[]" value="2" />
+ *   <input type="hidden" name="h[]" value="3" />
+ *   <input type="hidden" name="g[a][state]" value="10" />
+ *   <input type="hidden" name="" value="20" />
+ *   <input type="hidden" name="" value="test" />
+ *   <input type="hidden" name="r" value="5" />
+ *   <input type="button" value="擬似フォーム値表示" onclick="alert(Jeeel.Debug.objectExport(Jeeel.Net.Form.createByPseudoForm(this.parentNode).getAll()));" />
+ * </div>
+ * 
+ * form1.submit(); // #formを送信する
+ * form2.submit(); // #p-formの値を元にformを生成し送信する
+ * form2.toAjax(); // インスタンスの値を元にJeeel.Net.Ajaxインスタンスを生成する
  */
 Jeeel.Net = {
-
+    
+    /**
+     * コンストラクタ
+     *
+     * @abstractClass ネット関係のクラスを作る際の抽象クラス
+     * @implements Jeeel.Parameter.Filter.Interface, Jeeel.Parameter.Validator.Interface
+     */
+    Abstract: function () {
+        this._params = new Jeeel.Parameter();
+        this._params.addValidator(this);
+        this._params.addFilter(this);
+    }
 };
+
+Jeeel.Net.Abstract.prototype = {
+    
+    /**
+     * 通信データ
+     * 
+     * @type Jeeel.Parameter
+     * @protected
+     */
+    _params: null,
+    
+    /**
+     * 通信パラメータの取得
+     *
+     * @param {String} key キー
+     * @param {Mixied} [defaultValue] デフォルト値
+     * @return {Mixied} 値
+     */
+    get: function (key, defaultValue) {
+        return this._params.get(key, defaultValue);
+    },
+    
+    /**
+     * 通信パラメータの全取得
+     *
+     * @return {Hash} 値リスト
+     */
+    getAll: function () {
+        return this._params.getAll();
+    },
+
+    /**
+     * 通信パラメータの設定
+     *
+     * @param {String} key キー
+     * @param {Mixied} val 値
+     * @return {Jeeel.Net.Abstract} 自インスタンス
+     */
+    set: function (key, val) {
+        this._params.set(key, val);
+
+        return this;
+    },
+
+    /**
+     * 通信パラメータを全て設定する
+     *
+     * @param {Hash} vals 値リスト
+     * @return {Jeeel.Net.Abstract} 自インスタンス
+     * @throws {Error} valsが配列式でない場合に起こる
+     */
+    setAll: function (vals) {
+
+        if ( ! Jeeel.Type.isHash(vals)) {
+            throw new Error('vals is not array or associative array.');
+        }
+
+        this._params.setAll(vals);
+
+        return this;
+    },
+
+    /**
+     * 指定したキーの通信パラメータを破棄する
+     *
+     * @param {String} key キー
+     * @return {Jeeel.Net.Abstract} 自インスタンス
+     */
+    unset: function (key) {
+        this._params.unset(key);
+
+        return this;
+    },
+
+    /**
+     * 指定キーの通信パラメータを保持しているかどうかを返す
+     *
+     * @param {String} key キー
+     * @return {Boolean} 値を保持していたらtrueそれ以外はfalseを返す
+     */
+    has: function (key) {
+        return this._params.has(key);
+    },
+    
+    /**
+     * 通信データのルールを追加する
+     * 
+     * @param {String} name フィールド名
+     * @param {String} label ラベル
+     * @param {Array|String} validationRules バリデートルール
+     * @param {Array|String} filtrationRules フィルタールール
+     * @return {Jeeel.Net.Abstract} 自インスタンス
+     */
+    addRule: function (name, label, validationRules, filtrationRules) {
+        this._params.addField(name, label, validationRules, filtrationRules);
+        
+        return this;
+    },
+    
+    /**
+     * フィールドを削除する
+     * 
+     * @param {String} name フィールド名
+     * @return {Jeeel.Net.Abstract} 自インスタンス
+     */
+    removeRule: function (name) {
+        this._params.removeField(name);
+        
+        return this;
+    },
+    
+    /**
+     * 設定した全てのフィルタ・検証を行う
+     * 
+     * @return {Jeeel.Net.Abstract} 自インスタンス
+     */
+    validate: function () {
+        this._params.validate();
+        
+        return this;
+    },
+    
+    /**
+     * バリーデータを全て通過したかどうかを返す
+     *
+     * @return {Boolean} 通過ならばtrueそれ以外はfalseを返す
+     */
+    isValid: function () {
+        return this._params.isValid();
+    },
+    
+    /**
+     * フィルタ・検証後の値を全て取得する
+     * 
+     * @return {Hash} 取得値
+     */
+    getValidatedValues: function () {
+        return this._params.getValidatedValues();
+    },
+    
+    /**
+     * エラーを全て返す
+     *
+     * @return {Hash} エラーのリスト
+     */
+    getErrors: function () {
+        return this._params.getErrors();
+    },
+    
+    /**
+     * 指定したフィールドのエラーを取得する
+     * 
+     * @param {String} name フィールド名
+     * @return {Jeeel.Parameter.Validator.Error|Mixed} エラー
+     */
+    getError: function(name) {
+        return this._params.getError(name);
+    },
+    
+    /**
+     * 全てのエラーを文字列として取得する
+     * 
+     * @return {String[]|Array} エラーリスト
+     */
+    getErrorMessages: function () {
+        return this._params.getErrorMessages();
+    },
+    
+    /**
+     * 指定したフィールドのエラーを文字列として取得する
+     * 
+     * @return {String|Mixed} エラー
+     */
+    getErrorMessage: function (name) {
+        return this._params.getErrorMessage(name);
+    },
+    
+    /**
+     * バリデートメソッドを追加する
+     * 
+     * @param {String} name バリデート名
+     * @param {Function} validation バリデートメソッド
+     * @param {Mixied} [thisArg] コールバック中のthisに相当する値(デフォルトはこのインスタンスになる)
+     * @return {Jeeel.Net.Abstract} 自インスタンス
+     */
+    addValidation: function (name, validation, thisArg) {
+        if ( ! Jeeel.Type.isFunction(validation)) {
+            throw new Error('validation must be a function.');
+        }
+        
+        name = Jeeel.String.toPascalCase(name);
+        
+        this['_validate' + name] = thisArg ? Jeeel.Function.simpleBind(validation, thisArg) : validation;
+        
+        return this;
+    },
+
+    /**
+     * バリデートメソッドが呼べるかどうかを返す
+     * 
+     * @param {String} name バリデート名
+     * @return {Boolean} バリデートメソッドが呼べるかどうか
+     */
+    hasValidation: function (name) {
+        name = '_validate' + Jeeel.String.toPascalCase(name);
+        
+        return !!(this[name] && typeof this[name] === 'function');
+    },
+    
+    /**
+     * バリデートメソッドを取得する
+     * 
+     * @param {String} name バリデート名
+     * @return {Jeeel.Function.Callback} コールバック
+     */
+    getValidation: function (name) {
+        name = '_validate' + Jeeel.String.toPascalCase(name);
+        
+        return this[name] && typeof this[name] === 'function' && new Jeeel.Function.Callback(name, this) || null;
+    },
+    
+    /**
+     * フィルタメソッドを追加する
+     * 
+     * @param {String} name フィルタ名
+     * @param {Function} filtration フィルタメソッド
+     * @param {Mixied} [thisArg] コールバック中のthisに相当する値(デフォルトはこのインスタンスになる)
+     * @return {Jeeel.Net.Abstract} 自インスタンス
+     */
+    addFiltration: function (name, filtration, thisArg) {
+        if ( ! Jeeel.Type.isFunction(filtration)) {
+            throw new Error('filtration must be a function.');
+        }
+        
+        name = Jeeel.String.toPascalCase(name);
+        
+        this['_filter' + name] = thisArg ? Jeeel.Function.simpleBind(filtration, thisArg) : filtration;
+        
+        return this;
+    },
+    
+    /**
+     * フィルタメソッドが呼べるかどうかを返す
+     * 
+     * @param {String} name フィルタ名
+     * @return {Boolean} フィルタメソッドが呼べるかどうか
+     */
+    hasFiltration: function (name) {
+        name = '_filter' + Jeeel.String.toPascalCase(name);
+        
+        return !!(this[name] && typeof this[name] === 'function');
+    },
+    
+    /**
+     * フィルタメソッドが取得する
+     * 
+     * @param {String} name フィルタ名
+     * @return {Jeeel.Function.Callback} コールバック
+     */
+    getFiltration: function (name) {
+        name = '_filter' + Jeeel.String.toPascalCase(name);
+        
+        return this[name] && typeof this[name] === 'function' && new Jeeel.Function.Callback(name, this) || null;
+    }
+};
+
+Jeeel.Net.Abstract = Jeeel.Class.implement(Jeeel.Net.Abstract, Jeeel.Parameter.Filter.Interface);
+Jeeel.Net.Abstract = Jeeel.Class.implement(Jeeel.Net.Abstract, Jeeel.Parameter.Validator.Interface);
 
 Jeeel.file.Jeeel.Net = ['Form', 'Ajax', 'Jsonp', 'Beacon'];
 
@@ -32880,18 +35653,22 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Net, Jeeel.file.Jeeel.Net);
  * コンストラクタ
  *
  * @class フォームの操作及び送信を管理するクラス
+ * @augments Jeeel.Net.Abstract
  * @param {String|Element} form フォームを示すIDもしくはフォーム自身
  * @throws {Error} 指定したformがフォームのIDもしくはフォーム自身でなかった場合に発生
  */
 Jeeel.Net.Form = function (form) {
+    
+    Jeeel.Net.Abstract.call(this);
+    
     if (Jeeel.Type.isString(form)) {
         form = Jeeel.Document.getElementById(form);
     }
 
-    if ( ! form || ! form.nodeName || form.nodeName.toLowerCase() !== 'form') {
+    if ( ! form || ! form.tagName || form.tagName.toUpperCase() !== 'FORM') {
         throw new Error('指定されたIDまたはElementはform固有のものではありません。');
     }
-
+    
     this._form = form;
     
     if (Jeeel.Type.isElement(arguments[1])) {
@@ -32924,8 +35701,6 @@ Jeeel.Net.Form.createByPseudoForm = function (pseudoForm, action, method) {
 
     newForm.style.display = 'none';
 
-    Jeeel.Document.appendToBody(newForm);
-    
     if (Jeeel.Type.isString(pseudoForm)) {
         pseudoForm = Jeeel.Document.getElementById(pseudoForm);
     }
@@ -32960,8 +35735,6 @@ Jeeel.Net.Form.newForm = function (action, method) {
     var newForm = Jeeel.Document.createElement('form');
 
     newForm.style.display = 'none';
-
-    Jeeel.Document.appendToBody(newForm);
 
     var res = new this(newForm);
     
@@ -33009,8 +35782,6 @@ Jeeel.Net.Form.copyBy = function (form, newForm) {
     res.setAction(base.getAction());
     res.setTarget(base.getTarget());
     res.setAll(base.getAll());
-
-    Jeeel.Document.appendToBody(newForm);
 
     return res.setRemoveFormAtSubmit(submitRemove);
 };
@@ -33261,8 +36032,16 @@ Jeeel.Net.Form.prototype = {
     
     /**
      * 値をhiddenでセットする<br />
-     * もし指定したキーが存在した場合は上書きを試みるが、値がHash形式だった場合は元の値を削除して新たに作る<br />
-     * また、セレクトボックスのに対して一覧にない値を上書きしようとすると挙動がブラウザによって変わる場合があるので注意
+     * 対象の要素が無い場合はhiddenで埋め込み、対象の要素がある場合は以下のような動作になる<br />
+     * radio: 指定した値のradioにチェックが付く<br />
+     * checkbox: 指定した値と同じだった場合にはチェックが付きそれ以外はチェックが外れる<br />
+     * select: 指定した値のオプションをセレクトする<br />
+     * それ以外: 値自体が上書きされる<br />
+     * また、対象の要素と埋め込もうとした値が一致しなかった場合は要素を削除してhiddenが埋め込まれる<br />
+     * 例: <br />
+     * name="test"の要素があった場合にJeeel.Net.Form#set('test', [1, 2, 3]);<br />
+     * こういう記述の場合要素に対して配列つまり test に対して test[0] などの名前で上書きしようとするので削除の対象となる<br />
+     * 同じく name="test[a]" に対して Jeeel.Net.Form#set('test', 44); などの指定も同じく削除の対象となる
      *
      * @param {String} key キー(inputタグのnameと同じ書式)
      * @param {Mixied} val 値
@@ -33286,7 +36065,7 @@ Jeeel.Net.Form.prototype = {
             val = base[key];
         }
         
-        var input = this.getElementAll()[key];
+        var input = this.getElementAll(true)[key];
         
         Jeeel.Dom.ElementOperator.create(this.getOverwrittenElements())
                                .filterName(key, true)
@@ -33323,9 +36102,9 @@ Jeeel.Net.Form.prototype = {
      * @return {Jeeel.Net.Form} 自インスタンス
      */
     unset: function (key) {
-        Jeeel.Dom.ElementOperator.create([this.getElement(key), this.getOverwrittenElements()])
-                               .filterName(key, true)
-                               .removeAttr('name');
+        Jeeel.Dom.ElementOperator.create([this.getElement(key, true), this.getOverwrittenElements()])
+                                 .filterName(key, true)
+                                 .removeAttr('name');
         
         return this;
     },
@@ -33348,7 +36127,7 @@ Jeeel.Net.Form.prototype = {
      * @return {Element|Hash} inputの要素
      */
     getElement: function (key) {
-        var param = this.getElementAll();
+        var param = this.getElementAll(arguments[1]);
         var names = this._getName('' + key);
         
         // 配列るキーの場合(a[b]やa[]の場合)
@@ -33434,7 +36213,7 @@ Jeeel.Net.Form.prototype = {
      * @return {Jeeel.Net.Form} 自インスタンス
      */
     unsetElement: function (key) {
-        Jeeel.Dom.ElementOperator.create([this.getElement(key), this.getOverwrittenElements()])
+        Jeeel.Dom.ElementOperator.create([this.getElement(key, true), this.getOverwrittenElements()])
                                .filterName(key, true)
                                .remove();
         
@@ -33461,19 +36240,48 @@ Jeeel.Net.Form.prototype = {
         select = new Jeeel.Dom.Element(select);
         
         var addOptions = [],
-            txtFilter = Jeeel.Filter.Html.Escape.create(),
             val, option;
         
         for (val in options) {
             option = Jeeel.Document.createElement('option');
             option.value = val;
-            option.innerHTML = txtFilter.filter(options[val]);
+            option.innerHTML = Jeeel.String.escapeHtml(options[val]);
             
             addOptions[addOptions.length] = option;
         }
         
         select.clearChildNodes()
               .appendChild(addOptions);
+        
+        return this;
+    },
+    
+    /**
+     * 自動的にフィルタ、バリデータを起動させるようにする
+     * 
+     * @ignore 未完成
+     */
+    enableAutoChecker: function () {
+        var elms = Jeeel.Dom.ElementOperator.create(this._pseudoForm || this._form).$QUERY('input[name]');
+        
+        for (var i = elms.length; i--;) {
+            var vRules = elms.getData('validationRules', i);
+            var fRules = elms.getData('filtrationRules', i);
+            
+            
+        }
+    },
+    
+    /**
+     * 設定した全てのフィルタ・検証を行う
+     * 
+     * @return {Jeeel.Net.Form} 自インスタンス
+     */
+    validate: function () {
+        this._params.clear();
+        this._params.setAll(this.getAll());
+        
+        this._super.validate.call(this);
         
         return this;
     },
@@ -33488,8 +36296,17 @@ Jeeel.Net.Form.prototype = {
             Jeeel.Acl.throwError('Access Error', 404);
         }
         
+        if ( ! this.isValid()) {
+            throw new Error('There is an error in the contents of the form.');
+        }
+        
         if (this._pseudoForm) {
             this._setAllForm(this.getAll());
+        }
+        
+        // formがDOM上に居ない場合IE等のブラウザにて送信が出来ないので埋め込んでから送信を行う
+        if ( ! this._form.parentNode || this._form.parentNode.nodeType === Jeeel.Dom.Node.DOCUMENT_FRAGMENT_NODE) {
+            Jeeel.Document.appendToBody(this._form);
         }
         
         this._form.submit();
@@ -33508,9 +36325,53 @@ Jeeel.Net.Form.prototype = {
      */
     toAjax: function () {
         var params = this.getAll();
-
-        return Jeeel.Net.Ajax.create(this.getAction(), this.getMethod())
-                           .setAll(params);
+        var fields = this._params.getFields();
+        
+        var ajax = new Jeeel.Net.Ajax(this.getAction(), this.getMethod());
+        
+        ajax.setAll(params);
+        
+        for (var i = fields.length; i--;) {
+            var field = fields[i];
+            
+            ajax.addRule(field.getName(), field.getLabel(), field.getValidateRules(), field.getFilterRules());
+        }
+        
+        return ajax;
+    },
+    
+    /**
+     * 必須項目のバリデートを行う(空文字も弾く様に上書き)
+     * 
+     * @param {Mixed} value バリデート値
+     * @return {Boolean} 空じゃなかったかどうか(null, undefined, ''以外が通過)
+     * @private
+     */
+    _validateRequired: function (value) {
+        return ! Jeeel.Type.isEmpty(value) && value !== '';
+    },
+    
+    /**
+     * 値が無かったら無視する(空文字も値なしとするように上書き)
+     * 
+     * @param {Mixed} value フィルタ値
+     * @return int フィルタ後の値
+     * @private
+     */
+    _filterOption: function (value) {
+        return this._validateRequired(value) ? value : Jeeel.Parameter.Filter.IGNORED_VALUE;
+    },
+    
+    /**
+     * 値が指定されていなかった場合に代わりに代替値を返す(空文字も値なしとするように上書き)
+     * 
+     * @param {Mixed} value 対象値
+     * @param {Mixed} defaultValue デフォルト値
+     * @return {Mixed} 処理後の値
+     * @private
+     */
+    _filterDefault: function (value, defaultValue) {
+        return this._validateRequired(value) ? value : defaultValue;
     },
     
     _init: function () {
@@ -33540,8 +36401,10 @@ Jeeel.Net.Form.prototype = {
         /**
          * @ignore
          */
-        this.getElementAll = function () {
-            return fnef.filter(this._pseudoForm || this._form);
+        this.getElementAll = function (secretPrm) {
+            var res = fnef.enableAccurateList(secretPrm).filter(this._pseudoForm || this._form);
+            
+            return res;
         };
         
         /**
@@ -33564,7 +36427,7 @@ Jeeel.Net.Form.prototype = {
          * @ignore
          */
         this._setAllForm = function (vals) {
-            var inputs = fnef.filter(this._form);
+            var inputs = fnef.enableAccurateList(true).filter(this._form);
 
             Jeeel.Hash.forEach(vals,
                 function (val, key) {
@@ -33579,13 +36442,23 @@ Jeeel.Net.Form.prototype = {
          * @ignore
          */
         this._set = function (key, val, input, toForm) {
-            // inputがElementの場合
-            if (Jeeel.Type.isElement(input)) {
-
-                // valが単体の場合そのまま代入
+            
+            var i;
+            
+            // inputが配列の場合(ラジオボタン)
+            if (Jeeel.Type.isArray(input)) {
+                
+                // valが単体の場合指定した値と合致するラジオボタンにチェックを付ける
                 if ( ! Jeeel.Type.isHash(val)) {
-                    input.value = uef.filter(val);
-                } 
+                    val = '' + val;
+                    
+                    for (i = input.length; i--;) {
+                        if (input[i].value === val) {
+                            input[i].checked = true;
+                            break;
+                        }
+                    }
+                }
 
                 // valが複数の場合inputと形式が一致しないためinputを削除してから値の設定を行う
                 else {
@@ -33593,7 +36466,26 @@ Jeeel.Net.Form.prototype = {
 
                     this._set(key, val, null, toForm);
                 }
-            } 
+            }
+            // inputがElementの場合
+            else if (Jeeel.Type.isElement(input)) {
+
+                // valが単体の場合そのまま代入
+                if ( ! Jeeel.Type.isHash(val)) {
+                    if (input.tagName.toUpperCase() === 'INPUT' && input.type.toLowerCase() === 'checkbox') {
+                        input.checked = input.value === ('' + val);
+                    } else {
+                        input.value = uef.filter(val);
+                    }
+                }
+
+                // valが複数の場合inputと形式が一致しないためinputを削除してから値の設定を行う
+                else {
+                    Jeeel.Dom.ElementOperator.create(input).remove();
+
+                    this._set(key, val, null, toForm);
+                }
+            }
             // inputがHashの場合
             else if (input) {
 
@@ -33613,7 +36505,7 @@ Jeeel.Net.Form.prototype = {
                     }, this
                 );
 
-            } 
+            }
             // inputが存在しない場合
             else {
 
@@ -33625,7 +36517,7 @@ Jeeel.Net.Form.prototype = {
 
                 // 作成したHiddenインスタンスを対象に埋め込む
                 if (Jeeel.Type.isArray(input)) {
-                    for (var i = 0; i < input.length; i++) {
+                    for (i = 0; i < input.length; i++) {
                         owner.appendChild(input[i]);
                     }
                 } else {
@@ -33638,7 +36530,10 @@ Jeeel.Net.Form.prototype = {
     }
 };
 
-Jeeel.Net.Form.prototype._init();Jeeel.directory.Jeeel.Net.Ajax = {
+Jeeel.Class.extend(Jeeel.Net.Form, Jeeel.Net.Abstract);
+
+Jeeel.Net.Form.prototype._init();
+Jeeel.directory.Jeeel.Net.Ajax = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -33655,6 +36550,7 @@ Jeeel.Net.Form.prototype._init();Jeeel.directory.Jeeel.Net.Ajax = {
  * コンストラクタ
  * 
  * @class Ajaxの制御を行うクラス
+ * @augments Jeeel.Net.Abstract
  * @param {String} url Ajax対象URLの文字列
  * @param {String} [method] HTTPメソッド(getまたはpost、大文字小文字は問わない、初期値はPOST)
  * @throws {Error} urlが指定されていない場合に起こる
@@ -33664,11 +36560,14 @@ Jeeel.Net.Ajax = function (url, method) {
     if ( ! Jeeel.Type.isString(url)) {
         throw new Error('URLを指定してください。');
     }
+    
+    Jeeel.Net.Abstract.call(this);
 
     this.setMethod(method);
-
+    
+    this._requestQueue = [];
+    
     this._url = url;
-    this._params = new Jeeel.Parameter();
     this._fields = new Jeeel.Parameter();
 };
 
@@ -33783,14 +36682,6 @@ Jeeel.Net.Ajax.serverResponse = function (url, parameter) {
 Jeeel.Net.Ajax.prototype = {
 
     /**
-     * Ajaxの際にサーバー側に渡すパラメータのハッシュを保持するJeeel.Parameter
-     *
-     * @type Jeeel.Parameter
-     * @private
-     */
-    _params: null,
-
-    /**
      * Ajaxの際にサーバー側に渡さずに戻り値に定義づけるパラメータのハッシュを保持するJeeel.Parameter
      *
      * @type Jeeel.Parameter
@@ -33853,6 +36744,14 @@ Jeeel.Net.Ajax.prototype = {
      * @private
      */
     _collisionPolicy: 0,
+    
+    /**
+     * 通信に必要な情報
+     * 
+     * @type Array
+     * @private
+     */
+    _requestQueue: [],
 
     /**
      * 作成メソッド
@@ -33943,6 +36842,14 @@ Jeeel.Net.Ajax.prototype = {
     _exception: null,
     
     /**
+     * 内部通信完了メソッド
+     * 
+     * @type Jeeel.Function.Callback
+     * @private
+     */
+    _innerComplete: null,
+    
+    /**
      * リクエスト
      *
      * @type Jeeel.Net.Ajax.Request
@@ -33986,7 +36893,7 @@ Jeeel.Net.Ajax.prototype = {
         if ( ! Jeeel.Type.isString(url)) {
             throw new Error('URLを指定してください。');
         }
-
+        
         this._url = url;
 
         return this;
@@ -34116,8 +37023,15 @@ Jeeel.Net.Ajax.prototype = {
             collisionPolicy = this.constructor.CollisionPolicy.IGNORE;
         }
         
-        if (collisionPolicy !== this.constructor.CollisionPolicy.CHANGE && collisionPolicy !== this.constructor.CollisionPolicy.IGNORE) {
-            collisionPolicy = this.constructor.CollisionPolicy.IGNORE;
+        switch (collisionPolicy) {
+            case this.constructor.CollisionPolicy.IGNORE:
+            case this.constructor.CollisionPolicy.CHANGE:
+            case this.constructor.CollisionPolicy.ENQUEUE:
+                break;
+                
+            default:
+                collisionPolicy = this.constructor.CollisionPolicy.IGNORE;
+                break;
         }
         
         this._collisionPolicy = collisionPolicy;
@@ -34291,85 +37205,6 @@ Jeeel.Net.Ajax.prototype = {
     },
     
     /**
-     * Ajaxパラメータの全取得
-     *
-     * @return {Hash} 値リスト
-     */
-    getAll: function () {
-        return this._params.getAll();
-    },
-
-    /**
-     * Ajaxパラメータの取得
-     *
-     * @param {String} key キー
-     * @param {Mixied} [defaultValue] デフォルト値
-     * @return {Mixied} 値
-     */
-    get: function (key, defaultValue) {
-        return this._params.get(key, defaultValue);
-    },
-
-    /**
-     * Ajaxパラメータの全設定
-     *
-     * @param {Hash} vals 値リスト
-     * @return {Jeeel.Net.Ajax} 自身のインスタンス
-     * @throws {Error} valsが配列式でない場合に起こる
-     */
-    setAll: function (vals) {
-
-        if ( ! Jeeel.Type.isHash(vals)) {
-            throw new Error('valsが配列・連想配列ではありあせん。');
-        }
-
-        var self = this;
-
-        Jeeel.Hash.forEach(vals,
-            function (val, key) {
-                self._params.set(key, val);
-            }
-        );
-
-        return this;
-    },
-
-    /**
-     * Ajaxパラメータの設定
-     *
-     * @param {String} key キー
-     * @param {Mixied} val 値
-     * @return {Jeeel.Net.Ajax} 自身のインスタンス
-     */
-    set: function (key, val) {
-        this._params.set(key, val);
-
-        return this;
-    },
-    
-    /**
-     * Ajaxパラメータの指定キーの値を破棄する
-     *
-     * @param {String} key キー
-     * @return {Jeeel.Net.Ajax} 自インスタンス
-     */
-    unset: function (key) {
-        this._params.unset(key);
-
-        return this;
-    },
-
-    /**
-     * Ajaxパラメータの指定キーの値を保持しているかどうかを返す
-     *
-     * @param {String} key キー
-     * @return {Boolean} 値を保持していたらtrueそれ以外はfalseを返す
-     */
-    has: function (key) {
-        return this._params.has(key);
-    },
-
-    /**
      * レスポンスフィールドパラメータの全取得
      *
      * @return {Hash} 値リスト
@@ -34397,20 +37232,11 @@ Jeeel.Net.Ajax.prototype = {
      * @throws {Error} valsが配列式でない場合に起こる
      */
     setFieldAll: function (vals) {
-
         if ( ! Jeeel.Type.isHash(vals)) {
             throw new Error('valsが配列・連想配列ではありあせん。');
         }
 
-        this._fields.setAll({});
-
-        var self = this;
-
-        Jeeel.Hash.forEach(vals,
-            function (val, key) {
-                self._fields.set(key, val);
-            }
-        );
+        this._fields.setAll(vals);
 
         return this;
     },
@@ -34456,7 +37282,7 @@ Jeeel.Net.Ajax.prototype = {
      * @return {Boolean} 通信中かどうか
      */
     isExecuting: function () {
-        return this._executing;
+        return this._executing || !!this._requestQueue.length;
     },
     
     /**
@@ -34497,13 +37323,28 @@ Jeeel.Net.Ajax.prototype = {
             Jeeel.Acl.throwError('Access Error', 404);
         }
         
+        if ( ! this.isValid()) {
+            throw new Error('There is an error in the submission.');
+        }
+        
         // 通信中だった場合コリジョンポリシーに基づき動作を変える
         if (this._executing) {
             
-            if (this._collisionPolicy === this.constructor.CollisionPolicy.IGNORE) {
-                return this;
-            } else {
-                this.abort();
+            switch (this._collisionPolicy) {
+                case this.constructor.CollisionPolicy.IGNORE:
+                    return this;
+                    break;
+                
+                case this.constructor.CollisionPolicy.CHANGE:
+                    this.abort();
+                    break;
+                    
+                case this.constructor.CollisionPolicy.ENQUEUE:
+                    var ajax = this.clone();
+                    this._requestQueue.push(ajax);
+                    (this._requestQueue[this._requestQueue.length - 2] || this)._innerComplete = Jeeel.Function.Callback.create('_onRequestComplete', this);
+                    return this;
+                    break;
             }
         }
         
@@ -34536,12 +37377,16 @@ Jeeel.Net.Ajax.prototype = {
 
                 self._response  = response;
                 self._executing = false;
+                
+                if ( ! (self._retry && self._retry.retrying) && self._innerComplete) {
+                    self._innerComplete.call();
+                }
             },
             onSuccess: function (response, jsonHeader){
                 self._callMethod('_success', [response, jsonHeader]);
             },
             onFailure: function (response, jsonHeader){
-                if (self._retry && ! self._retry.limit || (self._retry.count < self._retry.limit)) {
+                if (self._retry && ( ! self._retry.limit || (self._retry.count < self._retry.limit))) {
                     self._retry.retrying = true;
                     self._retry.count++;
                     
@@ -34558,7 +37403,7 @@ Jeeel.Net.Ajax.prototype = {
                 self._callMethod('_abort', [response, jsonHeader]);
             },
             onTimeout: function (response, jsonHeader) {
-                if (self._retry && ! self._retry.limit || (self._retry.count < self._retry.limit)) {
+                if (self._retry && ( ! self._retry.limit || (self._retry.count < self._retry.limit))) {
                     self._retry.retrying = true;
                     self._retry.count++;
                     
@@ -34609,6 +37454,42 @@ Jeeel.Net.Ajax.prototype = {
     },
     
     /**
+     * インスタンスの複製を作成する
+     * 
+     * @return {Jeeel.Net.Ajax} 複製インスタンス
+     */
+    clone: function () {
+        var ajax = new this.constructor(this._url, this._method);
+        
+        for (var key in this) {
+            if (this.hasOwnProperty(key)) {
+                
+                // 状態変数や一時変数は複製すべきではない
+                switch (key) {
+                    case '_requestQueue':
+                    case '_innerComplete':
+                    case '_executing':
+                    case '_request':
+                    case '_response':
+                    case '_error':
+                        continue;
+                        break;
+                }
+                
+                if (Jeeel.Type.isArray(this[key])) {
+                    ajax[key] = this[key].concat();
+                } else if (this[key] instanceof Jeeel.Parameter) {
+                    ajax[key] = this[key].clone();
+                } else {
+                    ajax[key] = this[key];
+                }
+            }
+        }
+        
+        return ajax;
+    },
+    
+    /**
      * コンストラクタ
      * 
      * @param {String} url Ajax対象URLの文字列
@@ -34629,8 +37510,26 @@ Jeeel.Net.Ajax.prototype = {
         }
         
         this[name].func.apply(this[name].thisArg || this, args || []);
+    },
+    
+    /**
+     * _innerCompleteに対して登録するコールバック
+     */
+    _onRequestComplete: function () {
+        
+        switch (this._collisionPolicy) {
+            case this.constructor.CollisionPolicy.ENQUEUE:
+                var ajax = this._requestQueue.shift();
+                
+                if (ajax) {
+                    ajax.execute();
+                }
+                break;
+        }
     }
 };
+
+Jeeel.Class.extend(Jeeel.Net.Ajax, Jeeel.Net.Abstract);
 
 Jeeel.file.Jeeel.Net.Ajax = ['Request', 'Response', 'CollisionPolicy'];
 
@@ -34809,7 +37708,7 @@ Jeeel.Net.Ajax.Request.prototype = {
         this.method = this.options.method;
         var params = Jeeel.Method.clone(this.options.parameters);
 
-        if ( ! Jeeel.Type.inArray(this.method, ['get', 'post'])) {
+        if ( ! Jeeel.Hash.inHash(this.method, ['get', 'post'])) {
             params['_method'] = this.method;
             this.method = 'post';
         }
@@ -34922,38 +37821,36 @@ Jeeel.Net.Ajax.Request.prototype = {
      * @param {String} readyState 現在のステートを表す文字列
      */
     readyStateChange: function (readyState) {
-        var state = Jeeel.Net.Ajax.Request.Events[readyState];
-        var response = new Jeeel.Net.Ajax.Response(this);
+        
+        try {
+            var state = Jeeel.Net.Ajax.Request.Events[readyState];
+            var response = new Jeeel.Net.Ajax.Response(this);
 
-        if (state == 'Complete') {
-            try {
+            if (state == 'Complete') {
                 this._complete = true;
                 (this.options['on' + response.status] ||
-                 this.options['on' + (this.isSuccess() ? 'Success' : 'Failure')] ||
-                 Jeeel.Function.Template.EMPTY)(response, response.headerJSON);
-            } catch (e) {
-                this.dispatchException(e);
+                this.options['on' + (this.isSuccess() ? 'Success' : 'Failure')] ||
+                Jeeel.Function.Template.EMPTY)(response, response.headerJSON);
+
+                var contentType = response.getHeader('Content-type');
+
+                if (this.options.evalJS == 'force'
+                    || (this.options.evalJS && this.isSameOrigin() && contentType
+                        && contentType.match(/^\s*(text|application)\/(x-)?(java|ecma)script(;.*)?\s*$/i)))
+                {
+                    this.evalResponse();
+                }
             }
 
-            var contentType = response.getHeader('Content-type');
-            if (this.options.evalJS == 'force'
-                || (this.options.evalJS && this.isSameOrigin() && contentType
-                    && contentType.match(/^\s*(text|application)\/(x-)?(java|ecma)script(;.*)?\s*$/i)))
-            {
-                this.evalResponse();
-            }
-        }
-
-        try {
             (this.options['on' + state] || Jeeel.Function.Template.EMPTY)(response, response.headerJSON);
             Jeeel.Net.Ajax.Request.dispatch('on' + state, this, response, response.headerJSON);
+
+            if (state == 'Complete') {
+                this.transport.onreadystatechange = Jeeel.Function.Template.EMPTY;
+                clearTimeout(this._timeoutId);
+            }
         } catch (e) {
             this.dispatchException(e);
-        }
-
-        if (state == 'Complete') {
-            this.transport.onreadystatechange = Jeeel.Function.Template.EMPTY;
-            clearTimeout(this._timeoutId);
         }
     },
 
@@ -34967,7 +37864,7 @@ Jeeel.Net.Ajax.Request.prototype = {
             'Accept': 'text/javascript, text/html, application/xml, text/xml, */*'
         };
 
-        if (this.method == 'post') {
+        if (this.method === 'post') {
             headers['Content-type'] = this.options.contentType +
             (this.options.encoding ? '; charset=' + this.options.encoding : '');
 
@@ -34978,7 +37875,7 @@ Jeeel.Net.Ajax.Request.prototype = {
             }
         }
 
-        if (typeof this.options.requestHeaders == 'object') {
+        if (typeof this.options.requestHeaders === 'object') {
             var extras = this.options.requestHeaders;
 
             if (Jeeel.Type.isFunction(extras.push)) {
@@ -35020,7 +37917,16 @@ Jeeel.Net.Ajax.Request.prototype = {
         } else {
             throw error;
         }
-    }
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @constructor
+     * @param {String} url 対象URL
+     * @param {Hash} options オプション
+     */
+    constructor: Jeeel.Net.Ajax.Request
 };
 
 /**
@@ -35038,14 +37944,14 @@ Jeeel.Net.Ajax.Response = function (request) {
     var transport = self.transport = request.transport;
     var readyState = self.readyState = transport.readyState;
 
-    if((readyState > 2 && ! Jeeel.UserAgent.isInternetExplorer()) || readyState == 4) {
+    if ((readyState > 2 && ! Jeeel.UserAgent.isInternetExplorer()) || readyState == 4) {
         self.status       = self.getStatus();
         self.statusText   = self.getStatusText();
         self.responseText = (transport.responseText ? transport.responseText : '');
         self.headerJSON   = self._getHeaderJSON();
     }
 
-    if(readyState == 4) {
+    if (readyState == 4) {
         var xml = transport.responseXML;
         self.responseXML  = Jeeel.Type.isUndefined(xml) ? null : xml;
         self.responseJSON = self._getResponseJSON();
@@ -35113,7 +38019,7 @@ Jeeel.Net.Ajax.Response.prototype = {
      * @return {Mixied} 値
      */
     getField: function (key, defaultValue) {
-        return (Jeeel.Type.isSet(this.fields[key]) ? this.fields[key] : defaultValue);
+        return Jeeel.Type.isSet(this.fields[key]) ? this.fields[key] : defaultValue;
     },
 
     /**
@@ -35202,7 +38108,7 @@ Jeeel.Net.Ajax.Response.prototype = {
         var options = this.request.options;
         
         try {
-            res = Jeeel.Json.decode(decodeURIComponent(this.responseText), ( ! options.sanitizeJSON && this.request.isSameOrigin()));
+            res = Jeeel.Json.decode(decodeURIComponent(this.responseText), ! options.sanitizeJSON && this.request.isSameOrigin());
         } catch (e) {
             res = {};
         }
@@ -35212,7 +38118,7 @@ Jeeel.Net.Ajax.Response.prototype = {
     
     /**
      * 戻り値を強制的にXMLに変換して取得する<br />
-     * 変換できなかった場合は空の連想配列になる
+     * 変換できなかった場合はnullになる
      *
      * @return {Jeeel.Dom.Xml} 変換後のXMLインスタンス
      */
@@ -35220,7 +38126,7 @@ Jeeel.Net.Ajax.Response.prototype = {
         var res;
 
         try {
-            res = new Jeeel.Dom.Xml(this.responseXML);
+            res = new Jeeel.Dom.Xml(this.responseXML || this.responseText);
         } catch (e) {
             res = null;
         }
@@ -35266,7 +38172,7 @@ Jeeel.Net.Ajax.Response.prototype = {
         }
 
         try {
-            return Jeeel.Json.decode(decodeURIComponent(this.responseText), ( ! options.sanitizeJSON && this.request.isSameOrigin()));
+            return Jeeel.Json.decode(decodeURIComponent(this.responseText), ! options.sanitizeJSON && this.request.isSameOrigin());
         } catch (e) {
             this.request.dispatchException(e);
         }
@@ -35292,14 +38198,28 @@ Jeeel.Net.Ajax.CollisionPolicy = {
      * @type Integer
      * @constant
      */
-    CHANGE: 1
-};(function () {
+    CHANGE: 1,
+    
+    /**
+     * 現在通信中のリクエストの終了後に次の通信を行う用にキューにリクエストを入れる
+     *
+     * @type Integer
+     * @constant
+     */
+    ENQUEUE: 2
+};
+
+if (Jeeel._auto) {
+    Jeeel._tmp();
+}
+(function () {
     var index = 0;
     
     /**
      * コンストラクタ
      * 
      * @class Jsonp通信の制御を行うクラス
+     * @augments Jeeel.Net.Abstract
      * @param {String} url Jsonp通信URL
      * @throws {Error} urlが指定されていない場合に起こる
      */
@@ -35307,9 +38227,10 @@ Jeeel.Net.Ajax.CollisionPolicy = {
         if ( ! Jeeel.Type.isString(url)) {
             throw new Error('URLを指定してください。');
         }
+        
+        Jeeel.Net.Abstract.call(this);
 
         this._url = url;
-        this._params = new Jeeel.Parameter();
         this._loaded = Jeeel.Function.simpleBind(this._loaded, this);
 
         this._id = index++;
@@ -35336,14 +38257,6 @@ Jeeel.Net.Jsonp.prototype = {
      * @private
      */
     _id: null,
-
-    /**
-     * Jsonp通信の際にサーバー側に渡すパラメータのハッシュを保持するJeeel.Parameter
-     *
-     * @type Jeeel.Parameter
-     * @private
-     */
-    _params: null,
 
     /**
      * Jsonp通信URL
@@ -35433,87 +38346,6 @@ Jeeel.Net.Jsonp.prototype = {
     },
 
     /**
-     * Jsonpパラメータの全取得
-     *
-     * @return {Hash} 値リスト
-     */
-    getAll: function () {
-        return this._params.getAll();
-    },
-
-    /**
-     * Jsonpパラメータの取得
-     *
-     * @param {String} key キー
-     * @param {Mixied} [defaultValue] デフォルト値
-     * @return {Mixied} 値
-     */
-    get: function (key, defaultValue) {
-        return this._params.get(key, defaultValue);
-    },
-
-    /**
-     * Jsonpパラメータを総入れ替えする
-     *
-     * @param {Hash} vals 値リスト
-     * @return {Jeeel.Net.Jsonp} 自インスタンス
-     * @throws {Error} valsが配列式でない場合に起こる
-     */
-    setAll: function (vals) {
-
-        if ( ! Jeeel.Type.isHash(vals)) {
-            throw new Error('valsが配列・連想配列ではありあせん。');
-        }
-
-        this._params.setAll({});
-
-        var self = this;
-
-        Jeeel.Hash.forEach(vals,
-            function (val, key) {
-                self._params.set(key, val);
-            }
-        );
-
-        return this;
-    },
-
-    /**
-     * Jsonpパラメータの設定
-     *
-     * @param {String} key キー
-     * @param {Mixied} val 値
-     * @return {Jeeel.Net.Jsonp} 自インスタンス
-     */
-    set: function (key, val) {
-        this._params.set(key, val);
-
-        return this;
-    },
-    
-    /**
-     * Jsonpパラメータの指定キーの値を破棄する
-     *
-     * @param {String} key キー
-     * @return {Jeeel.Net.Jsonp} 自インスタンス
-     */
-    unset: function (key) {
-        this._params.unset(key);
-
-        return this;
-    },
-
-    /**
-     * Jsonpパラメータの指定キーの値を保持しているかどうかを返す
-     *
-     * @param {String} key キー
-     * @return {Boolean} 値を保持していたらtrueそれ以外はfalseを返す
-     */
-    has: function (key) {
-        return this._params.has(key);
-    },
-
-    /**
      * 実際にJsonp通信を実行する
      *
      * @return {Jeeel.Net.Jsonp} 自インスタンス
@@ -35521,6 +38353,10 @@ Jeeel.Net.Jsonp.prototype = {
     execute: function () {
         if (Jeeel.Acl && Jeeel.Acl.isDenied(this._url, '*', 'Url')) {
             Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
+        if ( ! this.isValid()) {
+            throw new Error('There is an error in the submission.');
         }
       
         var url = this._url + '?' + this._params.toQueryString();
@@ -35556,15 +38392,26 @@ Jeeel.Net.Jsonp.prototype = {
         this._script = null;
     }
 };
+
+Jeeel.Class.extend(Jeeel.Net.Jsonp, Jeeel.Net.Abstract);
+
 /**
  * コンストラクタ
  * 
  * @class ビーコンを使用した通信を提供するクラス
+ * @augments Jeeel.Net.Abstract
  * @param {String} url データ送信先URL
+ * @throws {Error} urlが指定されていない場合に起こる
  */
 Jeeel.Net.Beacon = function (url) {
+
+    if ( ! Jeeel.Type.isString(url)) {
+        throw new Error('URLを指定してください。');
+    }
+        
+    Jeeel.Net.Abstract.call(this);
+    
     this._url = url;
-    this._params = new Jeeel.Parameter();
     this._onLoad = Jeeel.Function.simpleBind(this._onLoad, this);
     this._onError = Jeeel.Function.simpleBind(this._onError, this);
 };
@@ -35581,14 +38428,6 @@ Jeeel.Net.Beacon.create = function (url) {
 
 Jeeel.Net.Beacon.prototype = {
   
-    /**
-     * ビーコン通信の際にサーバー側に渡すパラメータのハッシュを保持するJeeel.Parameter
-     *
-     * @type Jeeel.Parameter
-     * @private
-     */
-    _params: null,
-
     /**
      * ビーコン通信URL
      *
@@ -35650,88 +38489,7 @@ Jeeel.Net.Beacon.prototype = {
         
         return this;
     },
-    
-    /**
-     * ビーコンパラメータの全取得
-     *
-     * @return {Hash} 値リスト
-     */
-    getAll: function () {
-        return this._params.getAll();
-    },
 
-    /**
-     * ビーコンパラメータの取得
-     *
-     * @param {String} key キー
-     * @param {Mixied} [defaultValue] デフォルト値
-     * @return {Mixied} 値
-     */
-    get: function (key, defaultValue) {
-        return this._params.get(key, defaultValue);
-    },
-
-    /**
-     * ビーコンパラメータを総入れ替えする
-     *
-     * @param {Hash} vals 値リスト
-     * @return {Jeeel.Net.Beacon} 自インスタンス
-     * @throws {Error} valsが配列式でない場合に起こる
-     */
-    setAll: function (vals) {
-
-        if ( ! Jeeel.Type.isHash(vals)) {
-            throw new Error('valsが配列・連想配列ではありあせん。');
-        }
-
-        this._params.setAll({});
-
-        var self = this;
-
-        Jeeel.Hash.forEach(vals,
-            function (val, key) {
-                self._params.set(key, val);
-            }
-        );
-
-        return this;
-    },
-
-    /**
-     * ビーコンパラメータの設定
-     *
-     * @param {String} key キー
-     * @param {Mixied} val 値
-     * @return {Jeeel.Net.Beacon} 自インスタンス
-     */
-    set: function (key, val) {
-        this._params.set(key, val);
-
-        return this;
-    },
-    
-    /**
-     * ビーコンパラメータの指定キーの値を破棄する
-     *
-     * @param {String} key キー
-     * @return {Jeeel.Net.Beacon} 自インスタンス
-     */
-    unset: function (key) {
-        this._params.unset(key);
-
-        return this;
-    },
-
-    /**
-     * ビーコンパラメータの指定キーの値を保持しているかどうかを返す
-     *
-     * @param {String} key キー
-     * @return {Boolean} 値を保持していたらtrueそれ以外はfalseを返す
-     */
-    has: function (key) {
-        return this._params.has(key);
-    },
-    
     /**
      * 実際にビーコン通信を実行する
      *
@@ -35740,6 +38498,10 @@ Jeeel.Net.Beacon.prototype = {
     execute: function () {
         if (Jeeel.Acl && Jeeel.Acl.isDenied(this._url, '*', 'Url')) {
             Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
+        if ( ! this.isValid()) {
+            throw new Error('There is an error in the submission.');
         }
         
         var url = this._url + '?' + this._params.toQueryString();
@@ -35783,6 +38545,7 @@ Jeeel.Net.Beacon.prototype = {
     }
 };
 
+Jeeel.Class.extend(Jeeel.Net.Beacon, Jeeel.Net.Abstract);
 
 /**
  * コンストラクタ
@@ -36289,6 +39052,2759 @@ Jeeel.Net.Socket.prototype = {
      */
     constructor: Jeeel.Net.Socket
 };
+
+Jeeel.directory.Jeeel.Code = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel + 'Code/';
+    }
+};
+
+/**
+ * @namespace コード関連のネームスペース
+ */
+Jeeel.Code = {
+
+};
+
+Jeeel.file.Jeeel.Code = ['CharCode', 'CharEncoding', 'HtmlCode'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Code, Jeeel.file.Jeeel.Code);
+
+/**
+ * @namespace 文字コードに関する列挙体
+ */
+Jeeel.Code.CharCode = {
+
+    /**
+     * 空文字
+     *
+     * @type Integer
+     * @constant
+     */
+    Null: 0x00,
+
+    /**
+     * ヘッダ開始
+     *
+     * @type Integer
+     * @constant
+     */
+    StartOfHeading: 0x01,
+
+    /**
+     * テキスト開始
+     *
+     * @type Integer
+     * @constant
+     */
+    StartOfText: 0x02,
+
+    /**
+     * テキスト終了
+     *
+     * @type Integer
+     * @constant
+     */
+    EndOfText: 0x03,
+
+    /**
+     * 伝送終了
+     *
+     * @type Integer
+     * @constant
+     */
+    EndOfTransmission: 0x04,
+
+    /**
+     * 問い合わせ
+     *
+     * @type Integer
+     * @constant
+     */
+    Enquiry: 0x05,
+    
+    /**
+     * 肯定応答
+     *
+     * @type Integer
+     * @constant
+     */
+    Acknowledge: 0x06,
+
+    /**
+     * ベル
+     *
+     * @type Integer
+     * @constant
+     */
+    Bell: 0x07,
+
+    /**
+     * 1文字後退
+     *
+     * @type Integer
+     * @constant
+     */
+    BackSpace: 0x08,
+
+    /**
+     * 水平タブ
+     *
+     * @type Integer
+     * @constant
+     */
+    HorizontalTabulation: 0x09,
+    
+    /**
+     * 改行
+     *
+     * @type Integer
+     * @constant
+     */
+    LineFeed: 0x0A,
+
+    /**
+     * 垂直タブ
+     *
+     * @type Integer
+     * @constant
+     */
+    VerticalTabulation: 0x0B,
+    
+    /**
+     * 改ページ
+     *
+     * @type Integer
+     * @constant
+     */
+    FormFeed: 0x0C,
+
+    /**
+     * 復帰
+     *
+     * @type Integer
+     * @constant
+     */
+    CarriageReturn: 0x0D,
+    
+    /**
+     * シフトアウト
+     *
+     * @type Integer
+     * @constant
+     */
+    ShiftOut: 0x0E,
+
+    /**
+     * シフトイン
+     *
+     * @type Integer
+     * @constant
+     */
+    ShiftIn: 0x0F,
+    
+    /**
+     * データリンク拡張
+     *
+     * @type Integer
+     * @constant
+     */
+    DataLinkEscape: 0x10,
+
+    /**
+     * 装置制御1(XON)
+     *
+     * @type Integer
+     * @constant
+     */
+    DeviceControl1: 0x11,
+
+    /**
+     * 装置制御2
+     *
+     * @type Integer
+     * @constant
+     */
+    DeviceControl2: 0x12,
+
+    /**
+     * 装置制御3(XOFF)
+     *
+     * @type Integer
+     * @constant
+     */
+    DeviceControl3: 0x13,
+    
+    /**
+     * 装置制御4
+     *
+     * @type Integer
+     * @constant
+     */
+    DeviceControl4: 0x14,
+
+    /**
+     * 否定応答
+     *
+     * @type Integer
+     * @constant
+     */
+    NegativeAcKnowledge: 0x15,
+
+    /**
+     * 同期信号
+     *
+     * @type Integer
+     * @constant
+     */
+    SynchronousIdle: 0x16,
+
+    /**
+     * ブロック転送終了
+     *
+     * @type Integer
+     * @constant
+     */
+    EndOfTransmissionBlock: 0x17,
+
+    /**
+     * 取り消し
+     *
+     * @type Integer
+     * @constant
+     */
+    Cancel: 0x18,
+
+    /**
+     * メディア終了
+     *
+     * @type Integer
+     * @constant
+     */
+    EndOfMedium: 0x19,
+    
+    /**
+     * 置換(EOF)
+     *
+     * @type Integer
+     * @constant
+     */
+    SubstituteCharacter: 0x1A,
+
+    /**
+     * エスケープ
+     *
+     * @type Integer
+     * @constant
+     */
+    Escape: 0x1B,
+
+    /**
+     * ファイル区切り
+     *
+     * @type Integer
+     * @constant
+     */
+    FileSeparator: 0x1C,
+
+    /**
+     * グループ区切り
+     *
+     * @type Integer
+     * @constant
+     */
+    GroupSeparator: 0x1D,
+
+    /**
+     * レコード区切り
+     *
+     * @type Integer
+     * @constant
+     */
+    RecordSeparator: 0x1E,
+
+    /**
+     * ユニット区切り
+     *
+     * @type Integer
+     * @constant
+     */
+    UnitSeparator: 0x1F,
+
+    /**
+     * 空白
+     *
+     * @type Integer
+     * @constant
+     */
+    Space: 0x20,
+
+    /**
+     * !
+     *
+     * @type Integer
+     * @constant
+     */
+    ExclamationMark: 0x21,
+
+    /**
+     * "
+     *
+     * @type Integer
+     * @constant
+     */
+    DoubleQuote: 0x22,
+
+    /**
+     * #
+     *
+     * @type Integer
+     * @constant
+     */
+    Sharp: 0x23,
+
+    /**
+     * $
+     *
+     * @type Integer
+     * @constant
+     */
+    DollarMark: 0x24,
+
+    /**
+     * %
+     *
+     * @type Integer
+     * @constant
+     */
+    PercentSign: 0x25,
+
+    /**
+     * &amp;
+     *
+     * @type Integer
+     * @constant
+     */
+    Ampersand: 0x26,
+
+    /**
+     * '
+     *
+     * @type Integer
+     * @constant
+     */
+    SingleQuote: 0x27,
+
+    /**
+     * (
+     *
+     * @type Integer
+     * @constant
+     */
+    LeftParenthesis: 0x28,
+
+    /**
+     * )
+     *
+     * @type Integer
+     * @constant
+     */
+    RightParenthesis: 0x29,
+
+    /**
+     * &lowast;
+     *
+     * @type Integer
+     * @constant
+     */
+    MultiplicationSign: 0x2A,
+
+    /**
+     * +
+     *
+     * @type Integer
+     * @constant
+     */
+    AdditionSign: 0x2B,
+
+    /**
+     * ,
+     *
+     * @type Integer
+     * @constant
+     */
+    Comma: 0x2C,
+
+    /**
+     * -
+     *
+     * @type Integer
+     * @constant
+     */
+    SubtractionSign: 0x2D,
+
+    /**
+     * .
+     *
+     * @type Integer
+     * @constant
+     */
+    Period: 0x2E,
+    
+    /**
+     * /
+     *
+     * @type Integer
+     * @constant
+     */
+    DivisionSign: 0x2F,
+
+    /**
+     * 0
+     *
+     * @type Integer
+     * @constant
+     */
+    0: 0x30,
+
+    /**
+     * 1
+     *
+     * @type Integer
+     * @constant
+     */
+    1: 0x31,
+
+    /**
+     * 2
+     *
+     * @type Integer
+     * @constant
+     */
+    2: 0x32,
+
+    /**
+     * 3
+     *
+     * @type Integer
+     * @constant
+     */
+    3: 0x33,
+
+    /**
+     * 4
+     *
+     * @type Integer
+     * @constant
+     */
+    4: 0x34,
+
+    /**
+     * 5
+     *
+     * @type Integer
+     * @constant
+     */
+    5: 0x35,
+
+    /**
+     * 6
+     *
+     * @type Integer
+     * @constant
+     */
+    6: 0x36,
+
+    /**
+     * 7
+     *
+     * @type Integer
+     * @constant
+     */
+    7: 0x37,
+
+    /**
+     * 8
+     *
+     * @type Integer
+     * @constant
+     */
+    8: 0x38,
+
+    /**
+     * 9
+     *
+     * @type Integer
+     * @constant
+     */
+    9: 0x39,
+
+    /**
+     * :
+     *
+     * @type Integer
+     * @constant
+     */
+    Colon: 0x3A,
+
+    /**
+     * ;
+     *
+     * @type Integer
+     * @constant
+     */
+    Semicolon: 0x3B,
+
+    /**
+     * &lt;
+     *
+     * @type Integer
+     * @constant
+     */
+    LessThan: 0x3C,
+
+    /**
+     * =
+     *
+     * @type Integer
+     * @constant
+     */
+    EqualsSign: 0x3D,
+
+    /**
+     * &gt;
+     *
+     * @type Integer
+     * @constant
+     */
+    GreaterThan: 0x3E,
+
+    /**
+     * ?
+     *
+     * @type Integer
+     * @constant
+     */
+    QuestionMark: 0x3F,
+
+    /**
+     * &#64;
+     *
+     * @type Integer
+     * @constant
+     */
+    Atmark: 0x40,
+
+    /**
+     * A
+     *
+     * @type Integer
+     * @constant
+     */
+    A: 0x41,
+
+    /**
+     * B
+     *
+     * @type Integer
+     * @constant
+     */
+    B: 0x42,
+
+    /**
+     * C
+     *
+     * @type Integer
+     * @constant
+     */
+    C: 0x43,
+
+    /**
+     * D
+     *
+     * @type Integer
+     * @constant
+     */
+    D: 0x44,
+
+    /**
+     * E
+     *
+     * @type Integer
+     * @constant
+     */
+    E: 0x45,
+
+    /**
+     * F
+     *
+     * @type Integer
+     * @constant
+     */
+    F: 0x46,
+
+    /**
+     * G
+     *
+     * @type Integer
+     * @constant
+     */
+    G: 0x47,
+
+    /**
+     * H
+     *
+     * @type Integer
+     * @constant
+     */
+    H: 0x48,
+
+    /**
+     * I
+     *
+     * @type Integer
+     * @constant
+     */
+    I: 0x49,
+
+    /**
+     * J
+     *
+     * @type Integer
+     * @constant
+     */
+    J: 0x4A,
+
+    /**
+     * K
+     *
+     * @type Integer
+     * @constant
+     */
+    K: 0x4B,
+
+    /**
+     * L
+     *
+     * @type Integer
+     * @constant
+     */
+    L: 0x4C,
+
+    /**
+     * M
+     *
+     * @type Integer
+     * @constant
+     */
+    M: 0x4D,
+
+    /**
+     * N
+     *
+     * @type Integer
+     * @constant
+     */
+    N: 0x4E,
+
+    /**
+     * O
+     *
+     * @type Integer
+     * @constant
+     */
+    O: 0x4F,
+
+    /**
+     * P
+     *
+     * @type Integer
+     * @constant
+     */
+    P: 0x50,
+
+    /**
+     * Q
+     *
+     * @type Integer
+     * @constant
+     */
+    Q: 0x51,
+
+    /**
+     * R
+     *
+     * @type Integer
+     * @constant
+     */
+    R: 0x52,
+
+    /**
+     * S
+     *
+     * @type Integer
+     * @constant
+     */
+    S: 0x53,
+
+    /**
+     * T
+     *
+     * @type Integer
+     * @constant
+     */
+    T: 0x54,
+
+    /**
+     * U
+     *
+     * @type Integer
+     * @constant
+     */
+    U: 0x55,
+
+    /**
+     * V
+     *
+     * @type Integer
+     * @constant
+     */
+    V: 0x56,
+
+    /**
+     * W
+     *
+     * @type Integer
+     * @constant
+     */
+    W: 0x57,
+
+    /**
+     * X
+     *
+     * @type Integer
+     * @constant
+     */
+    X: 0x58,
+
+    /**
+     * Y
+     *
+     * @type Integer
+     * @constant
+     */
+    Y: 0x59,
+
+    /**
+     * Z
+     *
+     * @type Integer
+     * @constant
+     */
+    Z: 0x5A,
+
+    /**
+     * [
+     *
+     * @type Integer
+     * @constant
+     */
+    LeftBracket: 0x5B,
+
+    /**
+     * \
+     *
+     * @type Integer
+     * @constant
+     */
+    YenMark: 0x5C,
+
+    /**
+     * ]
+     *
+     * @type Integer
+     * @constant
+     */
+    RightBracket: 0x5D,
+
+    /**
+     * ^
+     *
+     * @type Integer
+     * @constant
+     */
+    Caret: 0x5E,
+
+    /**
+     * _
+     *
+     * @type Integer
+     * @constant
+     */
+    Underscore: 0x5F,
+
+    /**
+     * `
+     *
+     * @type Integer
+     * @constant
+     */
+    BackQuote: 0x60,
+
+    /**
+     * a
+     *
+     * @type Integer
+     * @constant
+     */
+    a: 0x61,
+
+    /**
+     * b
+     *
+     * @type Integer
+     * @constant
+     */
+    b: 0x62,
+
+    /**
+     * c
+     *
+     * @type Integer
+     * @constant
+     */
+    c: 0x63,
+
+    /**
+     * d
+     *
+     * @type Integer
+     * @constant
+     */
+    d: 0x64,
+
+    /**
+     * e
+     *
+     * @type Integer
+     * @constant
+     */
+    e: 0x65,
+
+    /**
+     * f
+     *
+     * @type Integer
+     * @constant
+     */
+    f: 0x66,
+
+    /**
+     * g
+     *
+     * @type Integer
+     * @constant
+     */
+    g: 0x67,
+
+    /**
+     * h
+     *
+     * @type Integer
+     * @constant
+     */
+    h: 0x68,
+
+    /**
+     * i
+     *
+     * @type Integer
+     * @constant
+     */
+    i: 0x69,
+
+    /**
+     * j
+     *
+     * @type Integer
+     * @constant
+     */
+    j: 0x6A,
+
+    /**
+     * k
+     *
+     * @type Integer
+     * @constant
+     */
+    k: 0x6B,
+
+    /**
+     * l
+     *
+     * @type Integer
+     * @constant
+     */
+    l: 0x6C,
+
+    /**
+     * m
+     *
+     * @type Integer
+     * @constant
+     */
+    m: 0x6D,
+
+    /**
+     * n
+     *
+     * @type Integer
+     * @constant
+     */
+    n: 0x6E,
+
+    /**
+     * o
+     *
+     * @type Integer
+     * @constant
+     */
+    o: 0x6F,
+
+    /**
+     * p
+     *
+     * @type Integer
+     * @constant
+     */
+    p: 0x70,
+
+    /**
+     * q
+     *
+     * @type Integer
+     * @constant
+     */
+    q: 0x71,
+
+    /**
+     * r
+     *
+     * @type Integer
+     * @constant
+     */
+    r: 0x72,
+
+    /**
+     * s
+     *
+     * @type Integer
+     * @constant
+     */
+    s: 0x73,
+
+    /**
+     * t
+     *
+     * @type Integer
+     * @constant
+     */
+    t: 0x74,
+
+    /**
+     * u
+     *
+     * @type Integer
+     * @constant
+     */
+    u: 0x75,
+
+    /**
+     * v
+     *
+     * @type Integer
+     * @constant
+     */
+    v: 0x76,
+
+    /**
+     * w
+     *
+     * @type Integer
+     * @constant
+     */
+    w: 0x77,
+
+    /**
+     * x
+     *
+     * @type Integer
+     * @constant
+     */
+    x: 0x78,
+
+    /**
+     * y
+     *
+     * @type Integer
+     * @constant
+     */
+    y: 0x79,
+
+    /**
+     * z
+     *
+     * @type Integer
+     * @constant
+     */
+    z: 0x7A,
+
+    /**
+     * &#123;
+     *
+     * @type Integer
+     * @constant
+     */
+    LeftBrace: 0x7B,
+
+    /**
+     * |
+     *
+     * @type Integer
+     * @constant
+     */
+    VerticalBar: 0x7C,
+
+    /**
+     * &#125;
+     *
+     * @type Integer
+     * @constant
+     */
+    RightBrace: 0x7D,
+
+    /**
+     * ~
+     *
+     * @type Integer
+     * @constant
+     */
+    Tilde: 0x7E,
+
+    /**
+     * 削除
+     *
+     * @type Integer
+     * @constant
+     */
+    Delete: 0x7F
+};
+
+Jeeel.Code.CharCode.getChar = function (charCode) {
+    
+    var hash;
+    
+    if (this.getChar._hash) {
+        hash = this.getChar._hash;
+    } else {
+        hash = new Jeeel.Hash(this);
+        
+        this.getChar._hash = hash;
+    }
+
+    return hash.search(charCode, true);
+};
+
+(function () {
+    for (var i = 0; i < 128; i++) {
+        var chr = String.fromCharCode(i);
+
+        if ( ! (chr in Jeeel.Code.CharCode)) {
+            Jeeel.Code.CharCode[chr] = i;
+        }
+    }
+})();
+
+/**
+ * @namespace 文字のエンコーディングに関する列挙体
+ */
+Jeeel.Code.CharEncoding = {
+
+    /**
+     * UTF-8
+     *
+     * @type String
+     * @constant
+     */
+    UTF8: 'UTF-8',
+
+    /**
+     * Shift_JIS
+     *
+     * @type String
+     * @constant
+     */
+    SHIFT_JIS: 'Shift_JIS',
+
+    /**
+     * JIS
+     *
+     * @type String
+     * @constant
+     */
+    JIS: 'ISO-2022-JP',
+
+    /**
+     * EUC-JP
+     *
+     * @type String
+     * @constant
+     */
+    EUC: 'EUC-JP'
+};
+
+/**
+ * @namespace HTML特殊文字に関する列挙体
+ */
+Jeeel.Code.HtmlCode = {
+  
+    /**
+     * (&nbsp;)半角空白
+     * 
+     * @type String
+     * @constant
+     */
+    HalfWidthSpace: '&nbsp;',
+    
+    /**
+     * (&emsp;)全角空白
+     * 
+     * @type String
+     * @constant
+     */
+    FullWidthSpace: '&emsp;',
+    
+    /**
+     * "
+     * 
+     * @type String
+     * @constant
+     */
+    DoubleQuote: '&quot;',
+    
+    /**
+     * &amp;
+     * 
+     * @type String
+     * @constant
+     */
+    Ampersand: '&amp;',
+    
+    /**
+     * &lt;
+     * 
+     * @type String
+     * @constant
+     */
+    LessThan: '&lt;',
+    
+    /**
+     * &gt;
+     * 
+     * @type String
+     * @constant
+     */
+    GreaterThan: '&gt;',
+    
+    /**
+     * &crarr;
+     * 
+     * @type String
+     * @constant
+     */
+    CarriageReturn: '&crarr;',
+    
+    /**
+     * &copy;
+     * 
+     * @type String
+     * @constant
+     */
+    Copyright: '&copy;',
+    TradeMark: '&trade;',
+    RegisteredTrademark : '&reg;',
+    PlusMinusSign: '&plusmn;',
+    MultiplicationSign: '&times;',
+    DivisionSign: '&divide;',
+    ZipCode: '&#12306;',
+    EncircledNumber1: '&#9312;',
+    EncircledNumber2: '&#9313;',
+    EncircledNumber3: '&#9314;',
+    EncircledNumber4: '&#9315;',
+    EncircledNumber5: '&#9316;',
+    EncircledNumber6: '&#9317;',
+    EncircledNumber7: '&#9318;',
+    EncircledNumber8: '&#9319;',
+    EncircledNumber9: '&#9320;',
+    EncircledNumber10: '&#9321;',
+    EncircledNumber11: '&#9322;',
+    EncircledNumber12: '&#9323;',
+    EncircledNumber13: '&#9324;',
+    EncircledNumber14: '&#9325;',
+    EncircledNumber15: '&#9326;',
+    EncircledNumber16: '&#9327;',
+    EncircledNumber17: '&#9328;',
+    EncircledNumber18: '&#9329;',
+    EncircledNumber19: '&#9330;',
+    EncircledNumber20: '&#9331;',
+    LargeRomanNumeral1: '&#8544;',
+    LargeRomanNumeral2: '&#8545;',
+    LargeRomanNumeral3: '&#8546;',
+    LargeRomanNumeral4: '&#8547;',
+    LargeRomanNumeral5: '&#8548;',
+    LargeRomanNumeral6: '&#8549;',
+    LargeRomanNumeral7: '&#8550;',
+    LargeRomanNumeral8: '&#8551;',
+    LargeRomanNumeral9: '&#8552;',
+    LargeRomanNumeral10: '&#8553;',
+    LargeRomanNumeral11: '&#8554;',
+    LargeRomanNumeral12: '&#8555;',
+    SmallRomanNumeral1: '&#8560;',
+    SmallRomanNumeral2: '&#8561;',
+    SmallRomanNumeral3: '&#8562;',
+    SmallRomanNumeral4: '&#8563;',
+    SmallRomanNumeral5: '&#8564;',
+    SmallRomanNumeral6: '&#8565;',
+    SmallRomanNumeral7: '&#8566;',
+    SmallRomanNumeral8: '&#8567;',
+    SmallRomanNumeral9: '&#8568;',
+    SmallRomanNumeral10: '&#8569;',
+    SmallRomanNumeral11: '&#8570;',
+    SmallRomanNumeral12: '&#8571;',
+    Millimeter: '&#13212;',
+    Centimeter: '&#13213;',
+    Kilometer: '&#13214;',
+    Milligram: '&#13198;',
+    Kilogram: '&#13199;',
+    BlackSpade: '&spades;',
+    BlackClub: '&clubs;',
+    BlackHeart: '&hearts;',
+    BlackDiamond: '&diams;',
+    BlackStar: '&#9733;',
+    WhiteSpade: '&#9828;',
+    WhiteClub: '&#9831;',
+    WhiteHeart: '&#9825;',
+    WhiteDiamond: '&#9826;',
+    WhiteStar: '&#9734;',
+    Feminine: '&#9792;',
+    Muscular: '&#9794;',
+    CheckBox: '&#9744;',
+    CheckBoxChecked: '&#9745;',
+    Fine: '&#9728;',
+    Rain: '&#9730;',
+    Snow: '&#9731;',
+    Cloud: '&#9729;',
+    BlackPawn: '&#9823;',
+    BlackKnight: '&#9822;',
+    BlackBishop: '&#9821;',
+    BlackRook: '&#9820;',
+    BlackQueen: '&#9819;',
+    BlackKing: '&#9818;',
+    WhitePawn: '&#9817;',
+    WhiteKnight: '&#9816;',
+    WhiteBishop: '&#9815;',
+    WhiteRook: '&#9814;',
+    WhiteQueen: '&#9813;',
+    WhiteKing: '&#9812;',
+    BioHazard: '&#9763;',
+    Hexagram: '&#10017;'
+};
+
+/**
+ * @staticClass 読み込み関連のメソッドを提供するスタティッククラス
+ * @example
+ * CSS、JSの読み込み、埋め込み機能を主とするクラス
+ * CSSやJSを途中から読み込みたい場合や文字列をCSSとして解釈したい場合などに使用する
+ * 
+ * 例：
+ * Jeeel.Loader.loadScript('/st/js/test.js'); // 新しくJSを読み込む
+ * Jeeel.Loader.loadStyle('/st/css/test.css'); // 新しくCSSを読み込む
+ * Jeeel.Loader.addScript('#test {color: red;}'); // JS文字列を指定してスクリプトを実行させる
+ * Jeeel.Loader.addStyle('#test {color: red;}'); // CSS文字列を指定してスタイルを有効にする
+ * Jeeel.Loader.preloadFile('/st/img/test.png'); // 今後JSで読み込む予定のファイルを事前読み込みしておき読み込んだ後にすぐ使えるようにする
+ */
+Jeeel.Loader = {
+
+    /**
+     * Prototype.jsが読み込まれているかどうかを返す。
+     * 
+     * @return {Boolean} 読み込みが完了していたらtrueそれ以外はfalseを返す
+     */
+    completePrototype: function () {
+        if (Jeeel._global.Prototype && ! Jeeel.Type.isEmpty(Prototype.Version)) {
+            return true;
+        }
+
+        return false;
+    },
+
+    /**
+     * jQuery.jsが読み込まれているかどうかを返す。
+     *
+     * @return {Boolean} 読み込みが完了していたらtrueそれ以外はfalseを返す
+     */
+    completeJQuery: function () {
+        if (Jeeel._global.jQuery && Jeeel.Type.isFunction(jQuery) && Jeeel.Type.isString(jQuery.prototype.jquery)) {
+            return true;
+        }
+
+        return false;
+    },
+
+    /**
+     * YUI.jsが読み込まれているかどうかを返す。
+     *
+     * @return {Boolean} 読み込みが完了していたらtrueそれ以外はfalseを返す
+     */
+    completeYUI: function () {
+        if (Jeeel._global.YUI && Jeeel.Type.isFunction(YUI) && Jeeel.Type.isString(YUI.version)) {
+            return true;
+        }
+
+        return false;
+    },
+
+    /**
+     * JavaScriptを読み込む
+     *
+     * @param {String} url JavaScriptのURL
+     * @param {Function} [callback] 読み込み完了時のコールバック
+     * @param {String} [charCode] 明示的にキャラクターコードを設定する場合に指定(Jeeel.Code.CharEncoding参照)
+     * @return {Element} scriptタグのElement
+     * @see Jeeel.Code.CharEncoding
+     */
+    loadScript: function (url, callback, charCode) {
+      
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
+        var script  = Jeeel.Document.createElement('script');
+        script.type = 'text/javascript';
+
+        if (Jeeel.Type.isString(charCode)) {
+            script.charset = charCode;
+        }
+
+        if (callback) {
+            script.onreadystatechange = function () {
+                if (script.readyState === 'loaded' || script.readyState === 'complete') {
+                    script.onreadystatechange = null;
+                    script.onload = null;
+                    callback(script);
+                }
+            };
+            
+            script.onload = function () {
+                script.onreadystatechange = null;
+                script.onload = null;
+                callback(script);
+            };
+        }
+        
+        script.src  = url;
+
+        Jeeel.Document.appendToHead(script);
+        
+        return script;
+    },
+
+    /**
+     * CSSを読み込む
+     *
+     * @param {String} url CSSのURL
+     * @param {String} [charCode] 明示的にキャラクターコードを設定する場合に指定(Jeeel.Code.CharEncoding参照)
+     * @return {Element} linkタグのElement
+     * @see Jeeel.Code.CharEncoding
+     */
+    loadStyle: function (url, charCode) {
+      
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+      
+        var style  = Jeeel.Document.createElement('link');
+        style.type = 'text/css';
+        style.rel  = 'stylesheet';
+
+        if (Jeeel.Type.isString(charCode)) {
+            style.charset = charCode;
+        }
+        
+        style.href = url;
+
+        Jeeel.Document.appendToHead(style);
+        
+        return style;
+    },
+
+    /**
+     * スクリプトを記述したJavaScript文字列を実行してヘッダに埋め込む
+     *
+     * @param {String} script JavaScript文字列
+     * @return {Element} scriptタグのElement
+     */
+    addScript: function (script) {
+        var scriptTag  = Jeeel.Document.createElement('script');
+        scriptTag.type = 'text/javascript';
+        scriptTag.innerHTML = script;
+
+        Jeeel.Document.appendToHead(scriptTag);
+        
+        return scriptTag;
+    },
+
+    /**
+     * スタイルを記述したCSS文字列を適用してヘッダに埋め込む
+     *
+     * @param {String} style CSS文字列
+     * @return {Element} styleタグのElement
+     */
+    addStyle: function (style) {
+        var styleTag  = Jeeel.Document.createElement('style');
+        styleTag.type = 'text/css';
+        
+        style = '\n' + style + '\n';
+
+        if (styleTag.styleSheet) {
+            styleTag.styleSheet.cssText = style;
+        } else {
+            styleTag.innerHTML = style;
+        }
+
+        Jeeel.Document.appendToHead(styleTag);
+        
+        return styleTag;
+    },
+    
+    /**
+     * ファイルの事前読み込みを行う<br />
+     * これを行う事により事前にキャッシュを作る事が可能になる
+     * 
+     * @param {String} url 読み込みファイルのURL
+     */
+    preloadFile: function (url) {},
+
+    /**
+     * 現在読み込み中のJavaScriptのscriptタグを取得する<br />
+     * 読み込み中のJavaScript内から呼ばないと意味がない
+     *
+     * @return {Element} scriptタグのElement
+     * @deprecated 今後削除予定
+     */
+    getCurrentScript: function () {
+        return (function (e) {
+            return (e.nodeName.toUpperCase() === 'SCRIPT' ? e : arguments.callee(e.lastChild));
+        })(Jeeel._doc);
+    },
+
+    /**
+     * 指定したURLのファイルがあるかどうかを返す
+     *
+     * @param {String} url ファイルのURL
+     * @return {Boolean} ファイルが存在するかどうか
+     */
+    existsFile: function (url) {
+      
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+      
+        var file = Jeeel.Net.Ajax.serverResponse(url);
+
+        if (Jeeel.Type.isString(file)) {
+            return true;
+        }
+
+        return false;
+    },
+    
+    /**
+     * @ignore
+     */
+    _init: function () {
+      
+        if (/*@cc_on!@*/false) {
+            /**
+             * @ignore
+             */
+            this.preloadFile = function (url) {
+                if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+                    Jeeel.Acl.throwError('Access Error', 404);
+                }
+                
+                new Image().src = url;
+            };
+        } else {
+            /**
+             * @ignore
+             */
+            this.preloadFile = function (url) {
+              
+                if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+                    Jeeel.Acl.throwError('Access Error', 404);
+                }
+                
+                var obj = Jeeel.Document.createElement('object');
+                
+                obj.width  = 0;
+                obj.height = 0;
+                obj.data = url;
+                Jeeel.Document.appendToBody(obj);
+            };
+        }
+      
+        delete this._init;
+    }
+};
+
+Jeeel.Loader._init();
+/**
+ * @staticClass Json関連のモジュール
+ * @example
+ * JSONのエンコードとデコードを提供するクラス
+ * クロスブラウザのためにもJSONよりこのクラスを使うのが望ましい
+ * 
+ * 例：
+ * Jeeel.Json.encode({a: [1, 2, 3], b: 'テスト'}); // '{"a": [1, 2, 3], "b": "テスト"}' が返ってくる
+ * Jeeel.Json.decode('[1,2,3,4,5]'); // [1, 2, 3, 4, 5] が返ってくる
+ * 
+ * このクラスは通常のJSONよりも複雑な記述を使用する事が出来るが常にノンセキュアでデコードを行うことになるので信頼出来るか分からない外部とのやり取りなどでは使用しない方が良い
+ * 
+ * var json = Jeeel.Json.encode({date: new Date('2012/11/22'), reg: /^test-.*$/}, true); // 2つ目の引数をtrueにすることで既存のオブジェクトのコンストラクタ等を使用するようになり、
+ *                                                                                       // '{"date":new Date(1353510000000),"reg":/^test-.*$/}' が返ってくる
+ * Jeeel.Json.decode(json, true); // 2つ目の引数をtrueにすることで関数やnew, 正規表現等を含んだJSONを復元できる。
+ *                                // ただしセキュアであること前提で動くのでjsonに悪意のあるコードが含まれていても実行する
+ *                                // 左の戻り値は{date: new Date('2012/11/22'), reg: /^test-.*$/}となり復元されていることが確認できるはず
+ */
+Jeeel.Json = {
+    
+    /**
+     * 指定した値をJsonにエンコードする<br/>
+     * なお参照も全て展開するので、<br />
+     * 参照先がDomの様な階層が深い場合やサイズオーバーが起こる<br />
+     * またプライベートプロパティ・メソッドまでは修正変換されないので、<br />
+     * デコード後にまったく同じように使えるとは限らない
+     *
+     * @param {Mixied} obj Jsonに変換するオブジェクト
+     * @param {Boolean} [serializeScript] エンコード時にJavaScriptの型について厳密に変換するかどうか
+     * @return {String} Jsonに変換後の文字列
+     * @throws {RangeError} 無限ループに入った場合またはオブジェクトのサイズが限界を超えた場合に発生する
+     * @throws {TypeError} 循環参照がある場合に発生する
+     */
+    encode: function (obj, serializeScript) {
+        
+        // 厳密変換でない場合高速化のため既存のJSONを使用する
+        if ( ! serializeScript && Jeeel._global.JSON) {
+            return JSON.stringify(obj);
+        }
+        
+        var res;
+
+        if (Jeeel.Type.isPrimitive(obj)) {
+            if (Jeeel.Type.isString(obj)) {
+                res = '"' + obj.replace('\\', '\\\\')
+                              .replace(/(\r\n|\n)/ig, '\\n')
+                              .replace(/\t/ig, '\\t')
+                              .replace('"', '\\"')
+                              .replace("'", "\\'") + '"';
+            } else {
+                res = '' + obj;
+            }
+        } else if (Jeeel.Type.isFunction(obj)) {
+
+            if (serializeScript) {
+                switch (obj) {
+                    case Object:
+                        res = 'Object';
+                        break;
+                        
+                    case Array:
+                        res = 'Array';
+                        break;
+                        
+                    case String:
+                        res = 'String';
+                        break;
+                        
+                    case Boolean:
+                        res = 'Boolean';
+                        break;
+                        
+                    case Date:
+                        res = 'Date';
+                        break;
+                        
+                    case RegExp:
+                        res = 'RegExp';
+                        break;
+                        
+                    default:
+                        if (Jeeel._debugMode && Jeeel.Debug && obj[Jeeel.Debug.Debugger.INFORMATION_NAME]) {
+                            res = obj[Jeeel.Debug.Debugger.INFORMATION_NAME].name;
+                        }
+                        break;
+                }
+            }
+
+            if ( ! res) {
+                res = obj.toString().replace(/\/\/[^\r\n]*(\r\n|\n)/ig, '')
+                                    .replace(/((\r\n|\n) +|\t|\r\n|\n){1,}/ig, ' ');
+            }
+        } else if (serializeScript) {
+            if (Jeeel.Type.isDate(obj)) {
+                res = 'new Date(' + obj.getTime() + ')';
+            } else if (Jeeel.Type.isMath(obj)) {
+                res = 'Math';
+            } else if (Jeeel.Type.isJSON(obj)) {
+                res = 'JSON';
+            } else if (Jeeel.Type.isRegularExpression(obj)) {
+                res = obj.toString();
+            }
+        }
+        
+        if ( ! res) {
+            if (Jeeel.Type.isArray(obj)) {
+                res  = [];
+
+                for (var i = 0, l = obj.length; i < l; i++) {
+                    res[i] = this.encode(obj[i], serializeScript);
+                }
+
+                res = '[' + res.join(',') + ']';
+            } else {
+                res = [];
+
+                for (var key in obj) {
+                    if (Jeeel._debugMode && Jeeel.Debug && key === Jeeel.Debug.Debugger.INFORMATION_NAME) {
+                        continue;
+                    }
+
+                    res[res.length] = '"' + key + '":' + this.encode(obj[key], serializeScript);
+                }
+
+                res = '{' + res.join(',') + '}';
+            }
+        }
+        
+        return res;
+    },
+    
+    /**
+     * 作成したJsonをデコードする<br />
+     * 検証を行い、evalして返す
+     *
+     * @param {String} json Json形式の文字列
+     * @param {Boolean} [isSecure] JSONの中身の安全性が確実な場合にtrueにすると検証なしで動作するため速くなる(また、完全なJSON形式でなくても動作するようになる)
+     * @return {Mixied} 変換後の値(空文字の場合はundefinedが返る)
+     * @throws {TypeError} jsonが文字列ではないときに発生
+     * @throws {SyntaxError} jsonがJson形式でないときに発生
+     */
+    decode: function (json, isSecure) {
+
+        // jsonの中身が空の場合nullではなくundefinedを返す("null"をデコードした時と区別するため)
+        if ( ! json) {
+            return void 0;
+        }
+
+        if ( ! Jeeel.Type.isString(json)) {
+            throw new TypeError('jsonが文字列ではありません。');
+        } else if ( ! isSecure) {
+            if (Jeeel._global.JSON) {
+                return JSON.parse(json);
+            } else if ( ! this.isJson(json)) {
+                throw new SyntaxError('jsonがJson形式になっていません。');
+            }
+        }
+
+        return eval('(' + json + ')');
+    },
+    
+    /**
+     * 完全なJson形式であるかどうかを返す(メソッド等が入っていた場合は不可)
+     *
+     * @param {String} json 検査対象の文字列
+     * @return {Boolean} Json形式であるかどうか
+     */
+    isJson: function (json) {
+
+        if ( ! Jeeel.Type.isString(json)) {
+            throw new TypeError('jsonが文字列ではありません。');
+        }
+
+        if (json.match(/^\s*$/)) {
+            return false;
+        }
+
+        return !(/[^,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]/.test(json.replace(/"(\\.|[^"\\])*"/g, ' ')));
+    }
+};
+Jeeel.directory.Jeeel.Session = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel + 'Session/';
+    }
+};
+
+/**
+ * @namespace Session関連のネームスペース
+ * @example
+ * Sessionネームスペース以下はセッション、擬似セッションを管理する機能を保持する
+ * 以下にようなクラスが存在する
+ * Jeeel.Session.Cookie
+ * Jeeel.Session.Name
+ * Jeeel.Session.WebStorage
+ * 
+ * Jeeel.Session.Cookie
+ * クッキーを扱うクラス
+ * 制御可能なのは読み込み、書き込み、クッキーの寿命、有効パス、有効ドメインとなる
+ * 
+ * 
+ * 例：
+ * document.cookieの中身を以下とする
+ * "sid=aabbggsshhyy; aa=555"
+ * 
+ * var cookie = Jeeel.Session.Cookie.create(); // new Jeeel.Session.Cookie()だとクッキーの読み込みを行わない
+ * cookie.load(); // 現在の値を破棄して新しくクッキーを読み込み解析する
+ * cookie.getAll(); // 現在のクッキーの値を連想配列にして返す、{sid: 'aabbggsshhyy', aa: 555}
+ * cookie.set('b', [12, 55, {a: 'y', v: true}]); // 現在の保持値に値を設定する
+ * cookie.save(); // 実際にクッキーに値を書き込む、変更された箇所のみ書き込まれる
+ *                // 実際のクッキーの値は以下のようになる
+ *                // "sid=aabbggsshhyy; aa=555; b=%5B12%2C55%2C%7B%22a%22%3A%22y%22%2C%22v%22%3Atrue%7D%5D"
+ *                // bの値は複雑な値になるのでこのクラスか類似した機能下でしか復元できない
+ *                // 実際に保存されている値はJSON化した後encodeURIComponentでエスケープした状態である
+ * cookie.setExpires(360); // 今から保存するクッキーの有効期限を6分間とする(インスタンスを作成した時点ではブラウザを閉じるまで)
+ * cookie.set('c', 55).save(); // ここで保存したcに対して有効期限が設定される
+ * 
+ * 
+ * Jeeel.Session.Name
+ * window.nameを使用して擬似的にセッションを作り出すクラス
+ * 使用するためにはグローバル変数にnameが無いこと、window.nameを使用したスクリプトが動いていないことが条件になる
+ * また別画面、別ドメインに遷移しても値が消えないため重要なデータを保存するとデータ漏えいが起こる可能性もある
+ * 
+ * 例：
+ * window.nameは空とする
+ * 基本的な操作はJeeel.Session.Cookieと同じである
+ * 違うのはデフォルトの有効期限と保存時の形式くらいである
+ * 
+ * var winName = Jeeel.Session.Name.create();
+ * winName.setExpires(360); // 今から保存する値の有効期限を6分間とする(インスタンスを作成した時点では1日)
+ * winName.getDomain('test.co.jp'); // 今から保存する値の有効ドメインを指定する(インスタンス作成時は現在のドメイン)
+ * winName.set('test', 888);
+ * winName.save();
+ * 
+ * Jeeel.Session.WebStorage
+ * localStorage, sessionStorageを使用して擬似的にセッションを作り出すクラス
+ * storageを使用するので他のクラスよりも大容量のデータを保存出来セキュリティも高い
+ * また永続保存する媒体として適している
+ * 
+ * 例：
+ * var storage = Jeeel.Session.WebStorage.create(true, 'test'); // このクラスはlocalStorage, sessionStorageの使い分けをするため1つめの引数で永続保存(localStorageを使用するかどうか)をするかどうかを指定する
+ *                                                              // また2つめの引数では任意にstorageに保存する際の名前を指定できる
+ * 
+ * storage.setExpires(1800); // 今から保存する値の有効期限を1時間とする(インスタンスを作成した時点では1日)
+ * storage.setPath('/test/index/'); // 今から保存する値の有効パスを指定する(インスタンスを作成した時点ではルートパス: "/")
+ * storage.set('test', 888);
+ * storage.save();
+ */
+Jeeel.Session = {
+
+    /**
+     * Sessionの保存期間の初期値を取得する
+     *
+     * @return {Integer} 保存期間(秒)
+     */
+    getExpires: function () {
+        return Jeeel.Session.Core.expires;
+    },
+
+    /**
+     * Sessionの保存期間の初期値を設定する<br />
+     * マイナスを指定すると無制限になる
+     *
+     * @param {Integer} expires 保存期間(秒)
+     * @return {Jeeel.Session} 自オブジェクト
+     */
+    setExpires: function (expires) {
+
+        if ( ! Jeeel.Type.isInteger(expires)) {
+            throw new Error('expiresが整数ではありません。');
+        }
+
+        Jeeel.Session.Core.expires = expires;
+
+        return this;
+    },
+
+    /**
+     * Sessionの読み込み許可をするドメインの初期値を取得する
+     *
+     * @return {String} 読み込み可能ドメイン
+     */
+    getDomain: function () {
+        return Jeeel.Session.Core.domain;
+    },
+
+    /**
+     * Sessionの読み込み許可をするドメインの初期値を設定する
+     *
+     * @param {String} domain 読み込み可能ドメイン
+     * @return {Jeeel.Session} 自オブジェクト
+     */
+    setDomain: function (domain) {
+
+        if ( ! Jeeel.Type.isString(domain)) {
+            throw new Error('domainが文字列ではありません。');
+        }
+
+        Jeeel.Session.Core.domain = domain;
+
+        return this;
+    },
+
+    /**
+     * Sessionの読み込み可能パスの初期値を取得する
+     *
+     * @return {String} 読み込み可能パス
+     */
+    getPath: function () {
+        return Jeeel.Session.Core.path;
+    },
+
+    /**
+     * Sessionの読み込み可能パスの初期値を設定する
+     *
+     * @param {String} path 読み込み可能パス
+     * @return {Jeeel.Session} 自オブジェクト
+     */
+    setPath: function (path) {
+
+        if ( ! Jeeel.Type.isString(path)) {
+            throw new Error('pathが文字列ではありません。');
+        }
+
+        Jeeel.Session.Core.path = path;
+
+        return this;
+    }
+};
+
+Jeeel.file.Jeeel.Session = ['Core', 'Abstract', 'Cookie', 'Name'];
+
+if (Jeeel._extendMode.WebStorage && Jeeel._global && Jeeel._global.sessionStorage && Jeeel._global.localStorage) {
+    Jeeel.file.Jeeel.Session[Jeeel.file.Jeeel.Session.length] = 'WebStorage';
+}
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Session, Jeeel.file.Jeeel.Session);
+
+/**
+ * コンストラクタ
+ * 
+ * @class セッション内のデータのやり取りを提供するコアクラス
+ * @param {Hash} params リスト化したい値を保持するキー
+ * @param {Integer} [expires] Sessionの保存期限(秒)<br />
+ *                             マイナスを指定すると無制限になる
+ * @param {String} [domain] 許可ドメイン
+ * @param {String} [path] 許可パス
+ */
+Jeeel.Session.Core = function (params, expires, domain, path, id) {
+    if ( ! Jeeel.Type.isHash(params)) {
+        throw new Error('paramsがHashではありません。');
+    }
+
+    this.params  = params;
+    this.created = (arguments[5] ? new Date(arguments[5]) : new Date());
+    this.expires = (Jeeel.Type.isInteger(expires) ? expires : 0);
+    this.path    = (Jeeel.Type.isString(path) ? path : '/');
+    this.domain  = (Jeeel.Type.isString(domain) ? domain : Jeeel.UserAgent.getHostname());
+    
+    if (id) {
+        this.id = id;
+    }
+};
+
+/**
+ * インスタンスの作成を行う
+ *
+ * @param {Hash} params リスト化したい値を保持するキー
+ * @return {Jeeel.Session.Core} 作成したインスタンス
+ */
+Jeeel.Session.Core.create = function (params) {
+    return new this(params, this.expires, this.domain, this.path);
+};
+
+/**
+ * Sessionオブジェクトかどうかを返す
+ *
+ * @param {Mixied} val 判定値
+ * @return {Boolean} 判定結果
+ */
+Jeeel.Session.Core.isSessionObject = function (val) {
+    if ( ! Jeeel.Type.isObject(val)) {
+        return false;
+    }
+    else if ( ! Jeeel.Type.isHash(val.params)) {
+        return false;
+    }
+    else if ( ! Jeeel.Type.isString(val.created)) {
+        return false;
+    }
+    else if ( ! Jeeel.Type.isInteger(val.expires)) {
+        return false;
+    }
+    else if ( ! Jeeel.Type.isString(val.domain)) {
+        return false;
+    }
+    else if ( ! Jeeel.Type.isString(val.path)) {
+        return false;
+    }
+    else if ( ! Jeeel.Type.isString(val.id)) {
+        return false;
+    }
+
+    return true;
+};
+
+/**
+ * 現在のドメインが許可されているのかどうかを調べる
+ *
+ * @param {String} target 対象のドメイン
+ * @return {Boolean} 許可されたドメインならばtrueそれ以外はfalseを返す
+ */
+Jeeel.Session.Core.isAllowDomain = function (target) {
+    var domain = Jeeel.UserAgent.getHostname();
+
+    var reg = new RegExp('^'+target.replace('.', '\\.'));
+
+    if (domain.match(reg)) {
+        return true;
+    }
+
+    return false;
+};
+
+/**
+ * 現在アクセスしているパスが許可されているのかどうか調べる
+ *
+ * @param {String} target 対象のパス
+ * @return {Boolean} 許可されたパスならばtrueそれ以外はfalseを返す
+ */
+Jeeel.Session.Core.isAllowPath = function (target) {
+    var path = Jeeel.UserAgent.getPath();
+
+    var reg = new RegExp('^'+target+(target.charAt(target.length-1) == '/' ? '' : '(/|$)'));
+
+    if (path.match(reg)) {
+        return true;
+    }
+
+    return false;
+};
+
+/**
+ * シリアライズされてオブジェクトの復元を行う
+ *
+ * @param {String} serializeObj シリアライズされているオブジェクト
+ * @return {Jeeel.Session.Core} 復元したインスタンス
+ */
+Jeeel.Session.Core.unserialize = function (serializeObj) {
+    var session;
+
+    try {
+        session = Jeeel.Json.decode(decodeURIComponent(serializeObj));
+    } catch(e) {
+        session = {};
+    }
+    
+    if ( ! Jeeel.Type.isHash(session)) {
+        return this.create({});
+    }
+
+    var res = {};
+
+    for (var domain in session) {
+
+        if ( ! this.isAllowDomain(domain)) {
+            continue;
+        }
+
+        for (var path in session[domain]) {
+
+            if ( ! this.isAllowPath(path)) {
+                continue;
+            }
+
+            var val = session[domain][path];
+
+            if ( ! this.isSessionObject(val)) {
+                val = this.create({});
+            } else {
+                val = new this(val.params, val.expires, val.domain, val.path, val.id, val.created);
+            }
+
+            if (val.isTimeOver()) {
+                val = this.create({});
+            }
+
+            res = Jeeel.Hash.merge(res, val.params);
+        }
+
+        break;
+    }
+
+    session = this.create(res);
+
+    return session;
+};
+
+/**
+ * クッキーの内容をロードする
+ *
+ * @param {String} cookieObj document.cookie内部の値
+ * @return {Jeeel.Session.Core} 作成したインスタンス
+ */
+Jeeel.Session.Core.loadCookie = function (cookieObj) {
+    var objs = cookieObj.split('; ');
+
+    var params = {};
+
+    for (var i = 0, l = objs.length; i < l; i++) {
+        var pair = objs[i].split('=');
+
+        var session = decodeURIComponent(pair[1]);
+
+        try {
+            session = Jeeel.Json.decode(session);
+        } catch (e) {}
+
+        params[pair[0]] = session;
+    }
+
+    return this.create(params);
+};
+
+/**
+ * Sessionの保存期限の初期値(秒)<br />
+ * 0を指定でブラウザを閉じるまでで(cookieのみ)、<br />
+ * マイナスを指定すると無制限になる
+ *
+ * @type Integer
+ */
+Jeeel.Session.Core.expires = 0;
+
+/**
+ * Sessionの読み込み可能ドメインの初期値
+ *
+ * @type String
+ */
+Jeeel.Session.Core.domain = Jeeel.UserAgent.getHostname();
+
+if (Jeeel.Session.Core.domain === 'localhost') {
+    Jeeel.Session.Core.domain = '';
+}
+
+/**
+ * Sessionの読み込み可能パスの初期値
+ *
+ * @type String
+ */
+Jeeel.Session.Core.path = Jeeel.UserAgent.getPath();
+
+Jeeel.Session.Core.prototype = {
+    
+    /**
+     * Sessionに保存するパラメータ
+     *
+     * @type Hash
+     */
+    params: {},
+
+    /**
+     * Sessionを作成した時刻
+     *
+     * @type Date
+     */
+    created: null,
+
+    /**
+     * Sessionの保存期限(秒)<br />
+     * 0を指定でブラウザを閉じるまでで(cookieのみ)、<br />
+     * マイナスを指定すると無制限になる
+     *
+     * @type Integer
+     */
+    expires: 0,
+
+    /**
+     * Sessionの読み込み可能パス
+     *
+     * @type String
+     */
+    path: '',
+
+    /**
+     * Sessionの読み込み可能ドメイン
+     *
+     * @type String
+     */
+    domain: '',
+    
+    /**
+     * Sessionが作成されたID
+     * 
+     * @type String
+     */
+    id: Jeeel.UNIQUE_ID,
+    
+    /**
+     * シリアライズが可能なオブジェクトを返す
+     *
+     * @return {Object} シリアライズ可能オブジェクト
+     */
+    getSerializeableObject: function () {
+        return {
+            params:  this.params,
+            created: this.created.toGMTString(),
+            expires: this.expires,
+            domain:  this.domain,
+            path:    this.path,
+            id:      Jeeel.UNIQUE_ID
+        };
+    },
+
+    /**
+     * Sessionオブジェクトをシリアライズする
+     *
+     * @param {String} windowName window.nameの値
+     * @return {String} シリアライズされたSessionオブジェクト
+     */
+    serialize: function (windowName) {
+        var sessionOwner;
+
+        try {
+            sessionOwner = Jeeel.Json.decode(decodeURIComponent(windowName));
+        } catch(e) {
+            sessionOwner = {};
+        }
+
+        if ( ! Jeeel.Type.isObject(sessionOwner)) {
+            sessionOwner = {};
+        }
+
+        if ( ! (this.domain in sessionOwner)) {
+            sessionOwner[this.domain] = {};
+        }
+
+        if ( ! this.constructor.isSessionObject(sessionOwner[this.domain][this.path])) {
+            sessionOwner[this.domain][this.path] = this.getSerializeableObject();
+        } else {
+
+            var selfObj = this.getSerializeableObject();
+
+            delete selfObj.params;
+
+            sessionOwner[this.domain][this.path] = Jeeel.Hash.merge(sessionOwner[this.domain][this.path], selfObj);
+
+            for (var key in this.params) {
+                sessionOwner[this.domain][this.path].params[key] = this.params[key];
+
+                if ( ! Jeeel.Type.isSet(sessionOwner[this.domain][this.path].params[key])) {
+                    delete sessionOwner[this.domain][this.path].params[key];
+                }
+            }
+        }
+
+        return encodeURIComponent(Jeeel.Json.encode(sessionOwner));
+    },
+
+    /**
+     * Session情報をクッキーに保存できる形式に変換して返す
+     *
+     * @return {String[]} クッキー保存形式の文字列
+     */
+    getCookies: function () {
+        var expires = new Date(this.created.toString());
+
+        expires.setSeconds(expires.getSeconds() + (this.expires < 0 ? Math.pow(2, 32) : this.expires));
+        expires = expires.toGMTString();
+
+        var res = [];
+        var ext = (this.expires === 0 ? '' : ';expires=' + expires) + (this.domain == '' ? '' : ';domain=' + this.domain) + ';path=' + this.path + ';';
+        var rmExt = new Date();
+        
+        rmExt.setDate(rmExt.getDate() - 1);
+        rmExt = ';expires=' + rmExt.toGMTString() + (this.domain == '' ? '' : ';domain=' + this.domain) + ';path=' + this.path + ';';
+
+        for (var key in this.params) {
+            if (Jeeel.Type.isUndefined(this.params[key])) {
+                res[res.length] = key + '=null' + rmExt;
+            } else if (Jeeel.Type.isString(this.params[key])) {
+                res[res.length] = key + '=' + encodeURIComponent(this.params[key]) + ext;
+            } else {
+                res[res.length] = key + '=' + encodeURIComponent(Jeeel.Json.encode(this.params[key])) + ext;
+            }
+        }
+
+        return res;
+    },
+
+    /**
+     * このSessionオブジェクトの期限が切れていないかどうかを調べる
+     *
+     * @return {Boolean} 期限切れならばtrueそれ以外はfalseを返す
+     */
+    isTimeOver: function () {
+
+        if (this.expires < 0) {
+            return false;
+        } else if (this.expires === 0) {
+            this.expires = 86400;
+        }
+
+        var expires = new Date(this.created.toString());
+
+        expires.setSeconds(expires.getSeconds() + this.expires);
+
+        var now = new Date();
+
+        if (now.getTime() > expires.getTime()) {
+            return true;
+        }
+
+        return false;
+    },
+
+    /**
+     * 現在のドメインが許可されているのかどうかを調べる
+     *
+     * @return {Boolean} 許可されたドメインならばtrueそれ以外はfalseを返す
+     */
+    isAllowDomain: function () {
+        var domain = Jeeel.UserAgent.getHostname();
+
+        var reg = new RegExp('^' + this.domain.replace('.', '\\.'));
+
+        if (domain.match(reg)) {
+            return true;
+        }
+
+        return false;
+    },
+
+    /**
+     * 現在アクセスしているパスが許可されているのかどうか調べる
+     *
+     * @return {Boolean} 許可されたパスならばtrueそれ以外はfalseを返す
+     */
+    isAllowPath: function () {
+        var path = Jeeel.UserAgent.getPath();
+
+        var reg = new RegExp('^' + this.path+(this.path.charAt(this.path.length-1) == '/' ? '' : '(/|$)'));
+
+        if (path.match(reg)) {
+            return true;
+        }
+
+        return false;
+    },
+    
+    /**
+     * コンストラクタ
+     * 
+     * @param {Hash} params リスト化したい値を保持するキー
+     * @param {Integer} [expires] Sessionの保存期限(秒)<br />
+     *                             マイナスを指定すると無制限になる
+     * @param {String} [domain] 許可ドメイン
+     * @param {String} [path] 許可パス
+     * @constructor
+     */
+    constructor: Jeeel.Session.Core
+};
+
+/**
+ * コンストラクタ
+ *
+ * @abstractClass セッションクラスを作る際の抽象クラス
+ */
+Jeeel.Session.Abstract = function () {
+    this._session = Jeeel.Session.Core.create({});
+    this._changedValues = {};
+};
+
+Jeeel.Session.Abstract.prototype = {
+
+    /**
+     * セッションの必要値の保存領域
+     * 
+     * @type Jeeel.Session.Core
+     * @protected
+     */
+    _session: null,
+    
+    /**
+     * 変更された値
+     * 
+     * @type Hash
+     * @private
+     */
+    _changedValues: {},
+
+    /**
+     * パラメータを取得する
+     *
+     * @param {String} key 保存する値を示すキー
+     * @param {Mixied} [defaultValue] デフォルト値
+     * @return {Mixed} 保存されていた値
+     */
+    get: function (key, defaultValue) {
+        return (key in this._session.params ? this._session.params[key] : defaultValue);
+    },
+
+    /**
+     * パラメータを全て取得する
+     *
+     * @return {Hash} 保存されていた値の連想配列
+     */
+    getAll: function () {
+        return this._session.params;
+    },
+
+    /**
+     * パラメータを設定する
+     *
+     * @param {String} key 保存する値を示すキー
+     * @param {Mixed} value 保存する値
+     * @return {Jeeel.Session.Abstract} 自インスタンス
+     */
+    set: function (key, value) {
+        this._session.params[key] = value;
+        this._changedValues[key] = value;
+
+        return this;
+    },
+
+    /**
+     * パラメータを設定する
+     *
+     * @param {Hash} values 保存する値の連想配列
+     * @return {Jeeel.Session.Abstract} 自インスタンス
+     */
+    setAll: function (values) {
+
+        if ( ! Jeeel.Type.isHash(values)) {
+            throw new Error('valuesがHashではありません。');
+        }
+
+        Jeeel.Hash.forEach(values, function (val, key) {
+            this._session.params[key] = val;
+            this._changedValues[key] = val;
+        }, this);
+
+        return this;
+    },
+
+    /**
+     * 指定したキーの値を破棄する
+     *
+     * @param {String} key キー
+     * @return {Jeeel.Session.Abstract} 自インスタンス
+     */
+    unset: function (key) {
+        this._session.params[key] = undefined;
+        this._changedValues[key] = undefined;
+
+        return this;
+    },
+    
+    /**
+     * パラメータを全て破棄する
+     *
+     * @return {Jeeel.Session.Abstract} 自インスタンス
+     */
+    clear: function () {
+        for (var key in this._session.params) {
+            this._session.params[key] = undefined;
+            this._changedValues[key] = undefined;
+        }
+        
+        return this;
+    },
+
+    /**
+     * 指定したキーの値を保持しているかどうかを返す
+     *
+     * @param {String} key キー
+     * @return {Boolean} 値を保持していたらtrueそれ以外はfalseを返す
+     */
+    has: function (key) {
+        return key in this._session.params && this._session.params[key] !== undefined;
+    },
+
+    /**
+     * Sessionの保存期間を取得する
+     *
+     * @return {Integer} 保存期間(秒)
+     */
+    getExpires: function () {
+        return this._session.expires;
+    },
+
+    /**
+     * Sessionの保存期間を設定する<br />
+     * 0を指定でブラウザを閉じるまでで(cookieのみ)、<br />
+     * マイナスを指定すると無制限になる
+     *
+     * @param {Integer} expires 保存期間(秒)
+     * @return {Jeeel.Session.Abstract} 自インスタンス
+     */
+    setExpires: function (expires) {
+
+        if ( ! Jeeel.Type.isInteger(expires)) {
+            throw new Error('expiresが整数ではありません。');
+        }
+
+        this._session.expires = expires;
+
+        return this;
+    },
+
+    /**
+     * Sessionの読み込み許可をするドメインを取得する
+     *
+     * @return {String} 読み込み可能ドメイン
+     */
+    getDomain: function () {
+        return this._session.domain;
+    },
+
+    /**
+     * Sessionの読み込み許可をするドメインを設定する
+     *
+     * @param {String} domain 読み込み可能ドメイン
+     * @return {Jeeel.Session.Abstract} 自インスタンス
+     */
+    setDomain: function (domain) {
+
+        if ( ! Jeeel.Type.isString(domain)) {
+            throw new Error('domainが文字列ではありません。');
+        }
+
+        this._session.domain = domain;
+
+        return this;
+    },
+
+    /**
+     * Sessionの読み込み可能パスを取得する
+     *
+     * @return {String} 読み込み可能パス
+     */
+    getPath: function () {
+        return this._session.path;
+    },
+
+    /**
+     * Sessionの読み込み可能パスを設定する
+     *
+     * @param {String} path 読み込み可能パス
+     * @return {Jeeel.Session.Abstract} 自インスタンス
+     */
+    setPath: function (path) {
+
+        if ( ! Jeeel.Type.isString(path)) {
+            throw new Error('pathが文字列ではありません。');
+        }
+
+        this._session.path = path;
+
+        return this;
+    }
+};
+/**
+ * コンストラクタ<br />
+ * コンストラクタを直接使用した場合はロードは行われない
+ *
+ * @class Cookieを使用してセッションを扱うクラス(クッキーが使用できるのを前提に動作する)
+ * @augments Jeeel.Session.Abstract
+ * @example
+ * // 通常通りに使用する場合は以下のような形になる
+ * var cookie = Jeeel.Session.Cookie.create(); //インスタンスを作成し、同時にクッキーの読み込みも行う(#loadも同時に行っている)
+ * cookie.getAll(); //値を全て取得する
+ * cookie.set('test', [1, 2, 34, 5, 7]); //値を設定する(設定する値はなんでも良い: 複雑なインスタンスは除く)
+ * cookie.setAll({test2: 111, test3: 'str'}); //連想配列の値を個別に保存する
+ * cookie.unset('test4'); //test4の値を破棄する(saveを呼ぶとその時設定中のドメイン・パスの値を消去する)
+ * cookie.save(); //現在のインスタンス内部の値をクッキーに保存する(変更がなされた箇所のみなのでtest, test2, test3, test4(元々の値があれば)のみとなる)
+ * 
+ * // saveを行った後のクッキーのイメージは以下のような感じになる
+ * // document.cookie == "test=[1, 2, 34, 5, 7]; test2=111; test3='str'"
+ * 
+ * // ドメインやパス、保存期間などを設定する場合は以下の設定を行ってから#saveメソッドを呼ぶ必要がある
+ * // 但し既に保存されているものとパス等がが違った場合上書きではなく新規になるので注意
+ * // 更に詳しく知る場合はJeeel.Session.Abstractのメソッド一覧を参照
+ * cookie.setDomain('www.test.com'); //デフォルトで現在のドメインになる(localhostは除く)
+ * cookie.setPath('/test/index/'); //デフォルトでは現在のパスになる
+ * cookie.setExpires(172800); //デフォルトではブラウザを閉じるまで
+ */
+Jeeel.Session.Cookie = function () {
+    Jeeel.Session.Abstract.call(this);
+};
+
+/**
+ * インスタンスの作成を行う<br />
+ * さらにロードも同時に行う
+ *
+ * @return {Jeeel.Session.Cookie} 作成したインスタンス
+ */
+Jeeel.Session.Cookie.create = function () {
+    return (new this()).load();
+};
+
+Jeeel.Session.Cookie.prototype = {
+    
+    /**
+     * 設定した値をセッションに保存する<br >
+     * 実際にクッキーに保存するのは変更が加えられた要素のみである
+     *
+     * @return {Jeeel.Session.Cookie} 自インスタンス
+     */
+    save: function () {
+        var tmp = this._session.params;
+        
+        this._session.params = this._changedValues;
+        
+        var cookies = this._session.getCookies();
+        
+        this._session.params = tmp;
+        this._changedValues = {};
+        
+        for (var i = cookies.length; i--;) {
+            Jeeel._doc.cookie = cookies[i];
+        }
+
+        return this;
+    },
+    
+    /**
+     * セッションに保存されていた値を読み込む<br/>
+     * なお、現在保持している値は全て削除される
+     *
+     * @return {Jeeel.Session.Cookie} 自インスタンス
+     */
+    load: function () {
+        this._session = Jeeel.Session.Core.loadCookie(Jeeel._doc.cookie);
+        this._changedValues = {};
+
+        return this;
+    }
+};
+
+Jeeel.Class.extend(Jeeel.Session.Cookie, Jeeel.Session.Abstract);
+
+/**
+ * コンストラクタ<br />
+ * コンストラクタを直接使用した場合はロードは行われない
+ *
+ * @class Cookieを使用しないセッションを扱うクラス(但しサーバー側には干渉しない、またドメインが変わっても参照できるため重要な情報保持には向かない)<br />
+ *         なおこのクラスはwindow.nameを使用している(グローバル変数nameが存在する場合やwindow.nameを他の用途に使用している場合は使用できない)
+ * @augments Jeeel.Session.Abstract
+ * @example
+ * // 基本的にな使い方はJeeel.Session.Cookieと殆ど変らない
+ * // 但し、window.nameを使用しているためグローバルにnameの名前の変数名を定義すると動作出来なくなる
+ * // また保存もwindowが閉じられると無効になったり、サーバー側には送信しなかったり、どのページに遷移しても読み込むことが出来たりなどセキュリティが低く制限も多い
+ * var sname = Jeeel.Session.Name.create(); //インスタンスを作成し、同時にwindow.nameの読み込みも行う(#loadも同時に行っている)
+ * sname.getAll(); //値を全て取得する
+ * sname.set('test', [1, 2, 34, 5, 7]); //値を設定する(設定する値はなんでも良い: 複雑なインスタンスは除く)
+ * sname.setAll({test2: 111, test3: 'str'})
+ * sname.save(); //現在のインスタンス内部の値をwindow.nameに保存する
+ * 
+ * // saveを行った後のwindow.nameのイメージは以下のような感じになる
+ * // window.name == "{test:[1, 2, 34, 5, 7], test2:111; test3:'str'}"
+ * 
+ * // ドメインやパス、保存期間などを設定する場合は以下の設定を行ってから#saveメソッドを呼ぶ必要がある
+ * // 但し既に保存されているものとパス等がが違った場合上書きではなく新規になるので注意
+ * // 更に詳しく知る場合はJeeel.Session.Abstractのメソッド一覧を参照
+ * sname.setDomain('www.test.com'); //デフォルトで現在のドメインになる(localhostは除く)
+ * sname.setPath('/test/index/'); //デフォルトでは現在のパスになる
+ * sname.setExpires(172800); //デフォルトではブラウザを閉じるまで(擬似)
+ */
+Jeeel.Session.Name = function () {
+    Jeeel.Session.Abstract.call(this);
+};
+
+/**
+ * インスタンスの作成を行う<br />
+ * さらにロードも同時に行う
+ *
+ * @return {Jeeel.Session.Name} 作成したインスタンス
+ */
+Jeeel.Session.Name.create = function () {
+    return (new this()).load();
+};
+
+Jeeel.Session.Name.prototype = {
+  
+    /**
+     * 設定した値をセッションに保存する<br />
+     * なおセーブ時は前に保持していた値は削除された後保存されるので、<br />
+     * 注意して行う必要がある。
+     *
+     * @return {Jeeel.Session.Name} 自インスタンス
+     */
+    save: function () {
+        var tmp = this._session.params;
+        this._session.params = this._changedValues;
+        
+        Jeeel._global.name = this._session.serialize(Jeeel._global.name);
+        
+        this._session.params = tmp;
+        this._changedValues = {};
+
+        return this;
+    },
+    
+    /**
+     * セッションに保存されていた値を読み込む<br/>
+     * なお、現在保持している値は全て削除される
+     *
+     * @return {Jeeel.Session.Name} 自インスタンス
+     */
+    load: function () {
+        this._session = Jeeel.Session.Core.unserialize(Jeeel._global.name);
+        this._changedValues = {};
+
+        return this;
+    }
+};
+
+Jeeel.Class.extend(Jeeel.Session.Name, Jeeel.Session.Abstract);
+
+/**
+ * コンストラクタ<br />
+ * コンストラクタを直接使用した場合はロードは行われない
+ *
+ * @class Cookieを使用しないセッションを扱うクラス(但しサーバー側には干渉しない、またドメイン・プロトコル・ポート番号で制御されるため異なるドメイン間等ではデータのやりとりは出来ない)<br />なおこのクラスはwindow.localStorage, sessionStorageを使用している
+ * @augments Jeeel.Session.Abstract
+ * @param {Boolean} [isPersistent] データの永続化をするかどうか(ブラウザを閉じてもアクセス出来るか)
+ * @param {String} [name] 保存名を明示的に指定する場合に指定
+ * @example
+ * // 基本的にな使い方はJeeel.Session.Cookieと殆ど変らない
+ * // 但し、window.nameを使用しているためグローバルにnameの名前の変数名を定義すると動作出来なくなる
+ * var storage = Jeeel.Session.WebStorage.create(true); //インスタンスを作成し、同時にwindow.localStorageの読み込みも行う(#loadも同時に行っている)
+ * storage.getAll(); //値を全て取得する
+ * storage.set('test', [1, 2, 34, 5, 7]); //値を設定する(設定する値はなんでも良い: 複雑なインスタンスは除く)
+ * storage.setAll({test2: 111, test3: 'str'})
+ * storage.save(); //現在のインスタンス内部の値をwindow.localStorageに保存する
+ * 
+ * // saveを行った後のwindow.nameのイメージは以下のような感じになる
+ * // window.localStorage == "{test:[1, 2, 34, 5, 7], test2:111; test3:'str'}"
+ * 
+ * // パス、保存期間などを設定する場合は以下の設定を行ってから#saveメソッドを呼ぶ必要がある
+ * // 但し既に保存されているものとパス等がが違った場合上書きではなく新規になるので注意
+ * // 更に詳しく知る場合はJeeel.Session.Abstractのメソッド一覧を参照
+ * storage.setDomain('www.test.com'); //この設定はこのクラスにおいて無意味である(window.localStorageがそもそもクロスドメインを許可していないため)
+ * storage.setPath('/test/index/'); //デフォルトでは現在のパスになる
+ * storage.setExpires(172800); //デフォルトではブラウザを閉じるまで(擬似)
+ */
+Jeeel.Session.WebStorage = function (isPersistent, name) {
+  
+    Jeeel.Session.Abstract.call(this);
+
+    /**
+     * 保存データを永続化するかどうか
+     * 
+     * @type Boolean
+     * @private
+     */
+    this._isPersistent = !!isPersistent;
+    
+    /**
+     * 保存する際に使用するキー
+     *
+     * @type String
+     * @private
+     */
+    this._sessionName = name || Jeeel.Session.WebStorage.STORAGE_NAME;
+};
+
+/**
+ * インスタンスの作成を行う<br />
+ * さらにロードも同時に行う
+ *
+ * @param {Boolean} [isPersistent] データの永続化をするかどうか(ブラウザを閉じてもアクセス出来るか)
+ * @param {String} [name] 保存名を明示的に指定する場合に指定
+ * @return {Jeeel.Session.WebStorage} 作成したインスタンス
+ */
+Jeeel.Session.WebStorage.create = function (isPersistent, name) {
+    return (new this(isPersistent, name)).load();
+};
+
+/**
+ * localStorageに保存する際のキー
+ * 
+ * @type String
+ * @constant
+ */
+Jeeel.Session.WebStorage.STORAGE_NAME = 'Jeeel-Session-WebStorage-Name';
+
+Jeeel.Session.WebStorage.prototype = {
+    
+    /**
+     * 設定した値をセッションに保存する<br />
+     * なおセーブ時は前に保持していた値は削除された後保存されるので、<br />
+     * 注意して行う必要がある。
+     *
+     * @return {Jeeel.Session.WebStorage} 自インスタンス
+     */
+    save: function () {
+        var tmp = this._session.params;
+        this._session.params = this._changedValues;
+        
+        (this._isPersistent ? Jeeel._global.localStorage : Jeeel._global.sessionStorage).setItem(this._sessionName, this._session.serialize((this._isPersistent ? Jeeel._global.localStorage : Jeeel._global.sessionStorage).getItem(this._sessionName)));
+
+        this._session.params = tmp;
+        this._changedValues = {};
+
+        return this;
+    },
+    
+    /**
+     * セッションに保存されていた値を読み込む<br/>
+     * なお、現在保持している値は全て削除される
+     *
+     * @return {Jeeel.Session.WebStorage} 自インスタンス
+     */
+    load: function () {
+        this._session = Jeeel.Session.Core.unserialize((this._isPersistent ? Jeeel._global.localStorage : Jeeel._global.sessionStorage).getItem(this._sessionName));
+        this._changedValues = {};
+
+        return this;
+    }
+};
+
+Jeeel.Class.extend(Jeeel.Session.WebStorage, Jeeel.Session.Abstract);
 /**
  * コンストラクタ
  * 
@@ -36308,6 +41824,106 @@ Jeeel.Net.Socket.prototype = {
  *           <li> {?escape?}, {?/escape?}: タグで囲まれたテンプレートの出力のHTMLタグ等を全てエスケープして表示する</li>
  *           <li> {#COMMENT#}: 表示も実行もされないコメント</li>
  *         </ul>
+ * @example
+ * Smartyの様なテンプレートエンジンとして使用することが出来るクラス
+ * 
+ * 例：
+ * ------------------------------------------------------------------------------------------
+ * {#キャプチャを行う#}
+ * {?capture 'hoge'?}
+ *   Pop Up
+ * {?/capture?}
+ * {#通常出力#}
+ * <h1>{+Jeeel.VERSION+}</h1>
+ * {?function 'title'?}{?strip?}
+ *   <li>タイトル-{+i+}</li>
+ *   {?if Math.random() < 0.5?}
+ *     {#再帰呼び出し#}
+ *     Recall {+title({i: Math.random()})+}
+ *   {?/if?}
+ * {?/strip?}{?/function?}
+ * <footer>
+ *   {#JSの実行#}
+ *   {!
+ *     var tpl = '';
+ *     tpl += '<h2>';
+ *     tpl += 'hoge';
+ *     tpl += Math.random();
+ *     tpl += '</h2>';
+ *     
+ *     var j = 10;
+ *   !}
+ *   {#whileループ#}
+ *   {?while j--?}
+ *     {#if分岐#}
+ *     {?if parseInt(Math.random() * 2) % 2?}
+ *       <div>
+ *         {#HTMLのエスケープ#}
+ *         {?escape?}
+ *           {+tpl+}
+ *         {?/escape?}
+ *       </div>
+ *     {?else?}
+ *       失敗
+ *     {?/if?}
+ *   {?/while?}
+ *   {+pot+}{+foot+}
+ * </footer>
+ * ------------------------------------------------------------------------------------------
+ * 
+ * 以上のようなファイルが/test/js-templateに存在した場合に以下の文を実行する事が出来る
+ * 
+ * var template = Jeeel.Template.create();
+ * template.assign('foot', '777'); // footの名前のテンプレート変数を定義する
+ * template.fetchFile('/test/js-template'); // 先のファイルを読み込んでコンパイルし実行する
+ * 
+ * 上記をサンプルにするとHTMLタグ以外にSmartyに似たタグが混じっているのが分かる
+ * {#と#}に挟まれた箇所はコメントとなる 例、{#ここはコメント#}
+ * {+と+}に挟まれた箇所は実行＋表示になる 例、{+Math.random()+}
+ * {!と!}に挟まれた箇所は複数行の実行になる 例、{! var a = 10; a += 50; a -= 30 !}
+ * {?と?}に挟まれた箇所は制御構文にある 例、{?if a > 50?}<div>テスト</div>{?/if?}
+ * これらを組み合わせることでテンプレート変数を動的に割り当てHTML文字列を作成することを主とする
+ * 
+ * シンプルな例
+ * ----------------------------------------------
+ * <table>
+ *   <tr>
+ *     <th>名前</th>
+ *     <th>コメント</th>
+ *   </tr>
+ *   {?for var i = 0; i < list.length; i++?}
+ *     <tr>
+ *       <td>{+list[i].name+}</td>
+ *       <td>{+list[i].comment+}</td>
+ *     </tr>
+ *   {?/for?}
+ * </table>
+ * ----------------------------------------------
+ * 上記のような文字列が変数strに入っているとする
+ * 
+ * var tpl = Jeeel.Template.create();
+ * tpl.assign('list', [{name: 'a', 'Aです'}, {name: 'b', 'Bです'}]);
+ * var res = tpl.fetchTemplate(str);
+ * 
+ * 上記を実行した場合は結果resは以下になる
+ * ----------------------------------------------
+ * <table>
+ *   <tr>
+ *     <th>名前</th>
+ *     <th>コメント</th>
+ *   </tr>
+ *     <tr>
+ *       <td>a</td>
+ *       <td>Aです</td>
+ *     </tr>
+ *     <tr>
+ *       <td>b</td>
+ *       <td>Bです</td>
+ *     </tr>
+ * </table>
+ * ----------------------------------------------
+ * 
+ * ファイルと通信するとあまり効率が良くないので、予めテンプレート文字列をJS側に定義しておくか引き渡しておくと効率が良い
  */
 Jeeel.Template = function () {
     this._params = {};
@@ -37050,7 +42666,7 @@ Jeeel.Template.prototype = {
      */
     _replaceEscape: function (template) {
         return template.replace(this.constructor.PATTERNS.ESCAPE, "\u001e; if ( ! $$__escapetmp__$$) { $$__escapetmp__$$ = $$__out__$$; $$__out__$$ = \u001e")
-                       .replace(this.constructor.PATTERNS.END_ESCAPE, "\u001e; $$__out__$$ = $$__escapetmp__$$ + Jeeel.Filter.Html.Escape.create().filter($$__out__$$); $$__escapetmp__$$ = null;} $$__out__$$ += \u001e");
+                       .replace(this.constructor.PATTERNS.END_ESCAPE, "\u001e; $$__out__$$ = $$__escapetmp__$$ + Jeeel.String.escapeHtml($$__out__$$); $$__escapetmp__$$ = null;} $$__out__$$ += \u001e");
     }
 };
 
@@ -37061,6 +42677,30 @@ Jeeel.Template.prototype = {
  * @param {Function} func 一定時間毎に呼び出されるコールバック(関数内のthisはここで作成するインスタンスになる)
  * @param {Integer} interval コールバックを呼び出す間隔(ミリ秒)
  * @param {Mixied} var_args 可変引数、コールバックに渡す引数
+ * @example
+ * setIntervalやsetTimeoutのタイマーを管理するクラス
+ * intervalを途中で一時停止したり、呼びだされるコールバックに引数を渡す機能を使いたい場合に使用する(引数はブラウザのバグや未実装の影響でsetIntervalやsetTimeoutを直接使うとクロスブラウザでなくなる)
+ * またタイマーが呼び出された回数や最後のタイマーの戻り値なども取得できる
+ * 
+ * 例：
+ * function test (a, b) {
+ *     return (a + b) * Math.random();
+ * }
+ * 
+ * var timer = Jeeel.Timer.create(test, 3000, 12, 45);
+ * 
+ * // 3秒経過
+ * 
+ * timer.getLastResult(); // 0 ～ 57の間の数が返ってくる
+ * timer.stop(); // タイマーを一時停止する
+ * 
+ * // 3秒経過
+ * 
+ * timer.start(); // タイマーを再開する
+ * 
+ * // 6秒経過
+ * 
+ * timer.getCount(); // 3が返ってくる(3回コールバックが実行された意味になる)
  */
 Jeeel.Timer = function (func, interval, var_args) {
 
@@ -37143,7 +42783,7 @@ Jeeel.Timer.setLimitInterval = function (func, interval, limit, var_args) {
 /**
  * 指定時間後にメソッドを実行する
  *
- * @param {Function} func コールバックメソッド
+ * @param {Function|Jeeel.Function.Callback} func コールバックメソッド
  * @param {Integer} delayTime コールバックを呼び出す遅延時間(ミリ秒)
  * @param {Mixied} var_args コールバックに渡す引数を可変的に渡す
  * @return {Integer} タイムアウトID
@@ -37154,7 +42794,9 @@ Jeeel.Timer.setTimeout = function (func, delayTime, var_args) {
     /**
      * @ignore
      */
-    var _func = function () {
+    var _func = (func instanceof Jeeel.Function.Callback) ? function () {
+        return func.apply(args);
+    } : function () {
         return func.apply(this, args);
     };
 
@@ -38389,7 +44031,7 @@ Jeeel.Object = {
 
 };
 
-Jeeel.file.Jeeel.Object = ['Item', 'Point', 'Size', 'Rect', 'Color', 'Date', 'Fraction', 'Font', 'Technical'];
+Jeeel.file.Jeeel.Object = ['Item', 'Point', 'Size', 'Rect', 'Color', 'Date', 'Font', 'Technical'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Object, Jeeel.file.Jeeel.Object);
 
@@ -38734,7 +44376,7 @@ Jeeel.directory.Jeeel.Object.Color = {
  * コンストラクタ
  *
  * @class 色を扱うクラス
- * @param {Mixied} color 色を表す値
+ * @param {String|Jeeel.Object.Color.Rgb|Jeeel.Object.Color.Hsl} color 色を表す値
  */
 Jeeel.Object.Color = function (color) {
     var rgb, hsl;
@@ -38745,10 +44387,32 @@ Jeeel.Object.Color = function (color) {
     } else if (color instanceof this.constructor.Hsl) {
         hsl = color;
         rgb = this.constructor.hslToRgb(hsl);
+    } else if (Jeeel.Type.isString(color)) {
+        if (color.match(/^hsla?\(/i)) {
+            color = new this.constructor.Hsl(color);
+        } else {
+            color = new this.constructor.Rgb(color);
+        }
+        
+        this.constructor.call(this, color);
+        
+        return;
+    } else {
+        throw new Error('color is unknown type.');
     }
     
     this._rgb = rgb;
     this._hsl = hsl;
+};
+
+/**
+ * インスタンスの作成を行う
+ * 
+ * @param {String|Jeeel.Object.Color.Rgb|Jeeel.Object.Color.Hsl} color 色を表す値
+ * @return {Jeeel.Object.Color} 作成したインスタンス
+ */
+Jeeel.Object.Color.create = function (color) {
+    return new this(color);
 };
 
 /**
@@ -38910,9 +44574,9 @@ Jeeel.Object.Color.calculateRgb = function (hue, saturation, luminance) {
 
             if (hVal < 60) {
                 list[i] = min + sub * hVal / 60;
-            } else if(hVal < 180) {
+            } else if (hVal < 180) {
                 list[i] = max;
-            } else if(hVal < 240) {
+            } else if (hVal < 240) {
                 list[i] = min + sub * (240 - hVal) / 60;
             } else {
                 list[i] = min;
@@ -38920,7 +44584,7 @@ Jeeel.Object.Color.calculateRgb = function (hue, saturation, luminance) {
 
             if (i === 0) {
                 hVal = h;
-            } else if(i === 1) {
+            } else if (i === 1) {
                 hVal = h - 120;
 
                 if (hVal < 0) {
@@ -39298,6 +44962,7 @@ Jeeel.Object.Color.prototype = {
 Jeeel.file.Jeeel.Object.Color = ['Rgb', 'Hsl', 'Code'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Object.Color, Jeeel.file.Jeeel.Object.Color);
+
 /**
  * コンストラクタ
  *
@@ -39336,10 +45001,10 @@ Jeeel.Object.Color.Rgb = function (red, green, blue, alpha) {
                 rgbString = Jeeel.Object.Color.Code[rgbString];
             }
             
-            rgbString = rgbString.replace(/^(#|0x)/, '');
+            rgbString = rgbString.replace(/^(#|0x)/i, '');
             
-            if (rgbString.match(/^RGBA?\(/i)) {
-                rgbString = rgbString.replace(/^RGBA?\(/i, '').replace(')', '').replace(/ /g, '');
+            if (rgbString.match(/^rgba?\(/i)) {
+                rgbString = rgbString.replace(/^rgba?\(/i, '').replace(')', '').replace(/ /g, '');
                 
                 var rgb = rgbString.split(',');
                 
@@ -39348,13 +45013,13 @@ Jeeel.Object.Color.Rgb = function (red, green, blue, alpha) {
                 blue  = +rgb[2];
                 alpha = rgb[3] ? +rgb[3] : 1;
             } else {
-                if (rgbString.length != 3 && rgbString.length != 6) {
+                if (rgbString.length !== 3 && rgbString.length !== 6) {
                     throw new Error('rgb文字列の長さが不自然です。');
                 } else if ( ! Jeeel.Type.isHexadecimalNumber(rgbString)) {
                     throw new Error('rgb文字列の形式が正しくありません。');
                 }
 
-                if (rgbString.length == 3) {
+                if (rgbString.length === 3) {
                     red   = ('0x' + rgbString.charAt(0)) * 17;
                     green = ('0x' + rgbString.charAt(1)) * 17;
                     blue  = ('0x' + rgbString.charAt(2)) * 17;
@@ -39540,10 +45205,8 @@ Jeeel.Object.Color.Hsl = function (hue, saturation, luminance, alpha) {
         case 1:
             var hslString = '' + arguments[0];
             
-            hslString = hslString.replace(/^(#|0x)/, '');
-            
-            if (hslString.match(/^hsla?\(/)) {
-                hslString = hslString.replace(/^hsla?\(/, '').replace(')', '').replace(/ /g, '');
+            if (hslString.match(/^hsla?\(/i)) {
+                hslString = hslString.replace(/^hsla?\(/i, '').replace(')', '').replace(/ /g, '');
                 
                 var hsl = hslString.split(',');
                 
@@ -39660,7 +45323,7 @@ Jeeel.Object.Color.Hsl.prototype = {
 };
 
 /**
- * カラーコードの列挙体
+ * @namespace カラーコードの列挙体
  */
 Jeeel.Object.Color.Code = {
   
@@ -39784,6 +45447,7 @@ Jeeel.Object.Color.Code = {
      */
     TRANSPARENT: 'rgba(0, 0, 0, 0)'
 };
+
 /**
  * コンストラクタ
  *
@@ -39798,7 +45462,7 @@ Jeeel.Object.Date = function (date, offset) {
     if (Jeeel.Type.isString(date)) {
         date = new Date(date.replace(/-/g, '/'));
         
-        if (offset) {
+        if (offset || offset === 0) {
             dateOffset = (offset + date.getTimezoneOffset()) * 60000;
             date = new Date(date.getTime() + dateOffset);
         }
@@ -39815,11 +45479,19 @@ Jeeel.Object.Date = function (date, offset) {
     this._date = date;
     
     // ローカルを基準とした表示なのでグリニッジを標準とする
-    this._offset = offset || -date.getTimezoneOffset();
+    this._offset = (offset || offset === 0 ? offset : -date.getTimezoneOffset());
     
     this._refreshProperty();
     
     this._timestamp = new Date();
+    
+    if ( ! Jeeel.Object.Date._lock && ! Jeeel.Language.hasLanguage('Object.Date')) {
+        Jeeel.Object.Date._lock = true;
+        
+        Jeeel.Language.loadLanguage('Object.Date', function () {
+            Jeeel.Object.Date._lock = false;
+        });
+    }
 };
 
 /**
@@ -39960,12 +45632,21 @@ Jeeel.Object.Date.timeToSecond = function (time) {
 };
 
 /**
- * 曜日と曜日を表す数値のペアリスト
- *
- * @type String[]
- * @constant
+ * 曜日のリストを取得する
+ * 
+ * @return {String[]} 曜日のリスト
  */
-Jeeel.Object.Date.DAYS = ['日', '月', '火', '水', '木', '金', '土'];
+Jeeel.Object.Date.getDays = function () {
+    var lang = Jeeel.Language.getLanguage('Object.Date');
+    
+    var res = [];
+    
+    for (var i = 7; i--;) {
+        res[i] = lang['d' + i]['short'];
+    }
+    
+    return res;
+};
 
 Jeeel.Object.Date.prototype = {
 
@@ -40156,10 +45837,12 @@ Jeeel.Object.Date.prototype = {
     /**
      * 曜日名を取得する
      *
-     * @return {String} 曜日の短縮名(日,月,火,...等)
+     * @return {String} 曜日の短縮名(Sun,Mon,日,月,...等)
      */
     getDayName: function () {
-        return this.constructor.DAYS[this.day];
+        var lang = Jeeel.Language.getLanguage('Object.Date');
+        
+        return lang['d' + this.day]['short'];
     },
     
     /**
@@ -40419,10 +46102,11 @@ Jeeel.Object.Date.prototype = {
     /**
      * 指定したフォーマットに従って文字列変換する<br />
      * フォーマットはphpのdateフォーマットと同等である<br />
-     * なお一部は日本語化されており、英語での表記は出ないので注意
+     * 曜日名は現在設定されているロケールによって変化する
      *
      * @param {String} [format] フォーマット(省略時はDateTime形式になる)
      * @return {String} 変換後の文字列
+     * @see Jeeel.Language
      */
     toString: function (format) {
 
@@ -40447,15 +46131,15 @@ Jeeel.Object.Date.prototype = {
         if (halfHour == 0) {
             halfHour = 12;
         }
+        
+        var lang = Jeeel.Language.getLanguage('Object.Date');
 
         /**
          * @ignore
          */
         var formatList = {
             d: this._getNum(date),
-            D: this.constructor.DAYS[day],
             j: date,
-            l: this.constructor.DAYS[day] + '曜日',
             N: (day == 0 ? 7 : day),
             w: day,
             m: this._getNum(month),
@@ -40471,7 +46155,9 @@ Jeeel.Object.Date.prototype = {
             H: this._getNum(hour),
             i: this._getNum(minute),
             s: this._getNum(second),
-            U: unixTime
+            U: unixTime,
+            D: lang['d' + day]['short'],
+            l: lang['d' + day]['full']
         };
 
         for (var key in formatList) {
@@ -40501,13 +46187,7 @@ Jeeel.Object.Date.prototype = {
      * @private
      */
     _getNum: function (num) {
-        num = '' + num;
-
-        if (num.length < 2) {
-            num = '0' + num;
-        }
-
-        return num;
+        return Jeeel.String.padLeft(num, 2, '0');
     },
     
     /**
@@ -40520,9 +46200,7 @@ Jeeel.Object.Date.prototype = {
         
         var date = this._date;
         
-        if (this._offset) {
-            date = new Date(date.getTime() - (this._offset + date.getTimezoneOffset()) * 60000);
-        }
+        date = new Date(date.getTime() - (this._offset + date.getTimezoneOffset()) * 60000);
         
         this.year  = date.getFullYear();
         this.month = date.getMonth() + 1;
@@ -40538,187 +46216,15 @@ Jeeel.Object.Date.prototype = {
     }
 };
 
-/**
- * コンストラクタ
- * 
- * @class 分数を管理するクラス
- * @param {Number|String} numeric 分数化する数値もしくは数値文字列
- */
-Jeeel.Object.Fraction = function (numeric){};
+// 言語設定ファイルの初期ロード
+if ( ! Jeeel.Object.Date._lock && ! Jeeel.Language.hasLanguage('Object.Date')) {
+    Jeeel.Object.Date._lock = true;
 
-/**
- * コンストラクタ
- * 
- * @class 分数を管理するクラス
- * @param {Integer} numerator 分子
- * @param {Integer} denominator 分母
- */
-Jeeel.Object.Fraction = function (numerator, denominator) {
-  
-    switch (arguments.length) {
-        case 1:
-            var numeric = Jeeel.String.trim('' + arguments[0]);
+    Jeeel.Language.loadLanguage('Object.Date', function () {
+        Jeeel.Object.Date._lock = false;
+    });
+}
 
-            var pidx = numeric.lastIndexOf('.');
-            denominator = 1;
-
-            if (pidx + 1) {
-                denominator = Math.pow(10, numeric.length - pidx - 1);
-            }
-
-            numerator = +(numeric.replace('.', ''));
-            break;
-
-        case 2:
-            break;
-
-        default:
-            throw new Error('引数の数が違います。');
-            break;
-    }
-    
-    /**
-     * 分子
-     * 
-     * @type Integer
-     */
-    this.numerator = +numerator;
-    
-    /**
-     * 分母
-     * 
-     * @type Integer
-     */
-    this.denominator = +denominator;
-};
-
-Jeeel.Object.Fraction.prototype = {
-
-    /**
-     * 複製を行う
-     *
-     * @return {Jeeel.Object.Fraction} 複製したインスタンス
-     */
-    clone: function () {
-        return new Jeeel.Object.Fraction(this.numerator, this.denominator);
-    },
-
-    /**
-     * 内部比較を行い結果を返す
-     *
-     * @param {Jeeel.Object.Fraction} fraction 比較オブジェクト
-     * @return {Boolean} 判定結果
-     */
-    equals: function (fraction) {
-        return this.numerator === fraction.numerator
-            && this.denominator === fraction.denominator;
-    },
-    
-    /**
-     * 約分を行う
-     * 
-     * @return {Jeeel.Object.Fraction} 自インスタンス
-     */
-    reduce: function () {
-        var gcd = Jeeel.Number.getGcd(this.numerator, this.denominator);
-        
-        this.numerator /= gcd;
-        this.denominator /= gcd;
-        
-        return this;
-    },
-    
-    /**
-     * 通分を行う
-     * 
-     * @param {Jeeel.Object.Fraction} fraction 通分対象の分数インスタンス
-     * @return {Jeeel.Object.Fraction} 自インスタンス
-     */
-    reduceCommonDenominator: function (fraction) {
-        var commonNum = Jeeel.Number.getLcm(this.denominator, fraction.denominator) / this.denominator;
-        
-        this.numerator *= commonNum;
-        this.denominator *= commonNum;
-        
-        return this;
-    },
-    
-    /**
-     * 分数を足し合わせる
-     * 
-     * @param {Jeeel.Object.Fraction} fraction 足し合わせる分数インスタンス
-     * @return {Jeeel.Object.Fraction} 自インスタンス
-     */
-    add: function (fraction) {
-        fraction = fraction.clone().reduceCommonDenominator(this);
-        
-        this.reduceCommonDenominator(fraction);
-        
-        this.numerator += fraction.numerator;
-        
-        return this;
-    },
-    
-    /**
-     * 分数を差し引く
-     * 
-     * @param {Jeeel.Object.Fraction} fraction 差し引く分数インスタンス
-     * @return {Jeeel.Object.Fraction} 自インスタンス
-     */
-    sub: function (fraction) {
-        fraction = fraction.clone().reduceCommonDenominator(this);
-        
-        this.reduceCommonDenominator(fraction);
-        
-        this.numerator -= fraction.numerator;
-        
-        return this;
-    },
-    
-    /**
-     * 分数を掛け合わせる
-     * 
-     * @param {Jeeel.Object.Fraction} fraction 掛け合わせる分数インスタンス
-     * @return {Jeeel.Object.Fraction} 自インスタンス
-     */
-    mul: function (fraction) {
-        this.numerator *= fraction.numerator;
-        this.denominator *= fraction.denominator;
-        
-        return this;
-    },
-    
-    /**
-     * 分数を割る
-     * 
-     * @param {Jeeel.Object.Fraction} fraction 割る分数インスタンス
-     * @return {Jeeel.Object.Fraction} 自インスタンス
-     */
-    div: function (fraction) {
-        this.numerator *= fraction.denominator;
-        this.denominator *= fraction.numerator;
-        
-        return this;
-    },
-
-    /**
-     * 文字列に変換する
-     *
-     * @return {String} 文字列に変換した自インスタンス
-     */
-    toString: function () {
-        return this.numerator + ' / ' + this.denominator;
-    },
-    
-    /**
-     * 数値に変換する
-     * 
-     * @return {Number} 数値に変換した自インスタンス
-     */
-    valueOf: function () {
-        return this.numerator / this.denominator;
-    }
-};
 /**
  * コンストラクタ
  * 
@@ -40901,7 +46407,7 @@ Jeeel.Object.Technical.LineIndex.prototype = {
  */
 Jeeel.Object.Technical.Trace = function (func) {
     var self = this;
-    self.args = Array.prototype.slice.call(func.arguments, 0, func.arguments.length);
+    self.args = func.arguments && Array.prototype.slice.call(func.arguments, 0, func.arguments.length) || [];
     self.name = (func[Jeeel.Debug.Debugger.INFORMATION_NAME] || {}).name || func.name;
     self.func = func;
 };
@@ -40967,500 +46473,6 @@ Jeeel.Object.Technical.Information.prototype = {
      * @type Mixied
      */
     parent: ''
-};
-
-/**
- * コンストラクタ
- * 
- * @class 配列・連想配列に対して操作を行うクラス
- * @param {Hash} [params] 入力パラメータ
- * @throws {Error} paramsを指定してかつが配列式でない場合に起こる
- */
-Jeeel.Parameter = function (params) {
-
-    if ( ! params) {
-        params = {};
-    } else if ( ! Jeeel.Type.isHash(params)) {
-        throw new Error('paramsには配列式が使えなければなりません。');
-    }
-
-    this._params = params;
-};
-
-/**
- * インスタンスの作成
- *
- * @param {Hash} [params] 入力パラメータ
- * @return {Jeeel.Parameter} 作成したインスタンス
- * @throws {Error} paramsを指定してかつが配列式でない場合に起こる
- */
-Jeeel.Parameter.create = function (params) {
-    return new this(params);
-};
-
-Jeeel.Parameter.prototype = {
-
-    /**
-     * パラメータ
-     *
-     * @type Hash
-     * @private
-     */
-    _params: null,
-
-    /**
-     * エラー
-     *
-     * @type Hash
-     * @private
-     */
-    _errors: null,
-
-    /**
-     * ストレージ
-     *
-     * @type Jeeel.Storage.Abstract
-     * @private
-     */
-    _storage: null,
-    
-    /**
-     * 指定したキーの値を取得する
-     *
-     * @param {String} key キー
-     * @param {Mixied} [defaultValue] デフォルト値
-     * @return {Mixied} 取得値
-     */
-    get: function (key, defaultValue) {
-        if ( ! (key in this._params)) {
-            return defaultValue;
-        } else {
-            return this._params[key];
-        }
-    },
-
-    /**
-     * Hashの最初の値を取得する
-     *
-     * @param {Mixied} [defaultValue] デフォルト値
-     * @return {Mixied} 取得値
-     */
-    getOne: function (defaultValue) {
-        var result;
-
-        Jeeel.Hash.forEach(this._params,
-            function (val) {
-
-                result = val;
-
-                return Jeeel.Hash.FOR_EACH_EXIT;
-            }
-        );
-
-        if (Jeeel.Type.isEmpty(result)) {
-            return defaultValue;
-        }
-
-        return result;
-    },
-
-    /**
-     * 全ての値を返す
-     *
-     * @return {Hash} 取得値
-     */
-    getAll: function () {
-        return this._params;
-    },
-
-    /**
-     * 現インスタンスの配列に値を保存する
-     *
-     * @param {String} key 保存する値を示すキー
-     * @param {Mixed} val 保存する値
-     * @return {Jeeel.Parameter} 自インスタンス
-     */
-    set: function (key, val) {
-        this._params[key] = val;
-
-        return this;
-    },
-
-    /**
-     * 全ての値を上書きする
-     *
-     * @param {Hash} params 上書きする値リスト
-     * @return {Jeeel.Parameter} 自インスタンス
-     * @throws {Error} paramsが配列式でない場合に起こる
-     */
-    setAll: function (params) {
-        if ( ! Jeeel.Type.isHash(params)) {
-           throw new Error('paramsには配列式が使えなければなりません。');
-        }
-
-        for (var key in params) {
-            this._params[key] = params[key];
-        }
-
-        return this;
-    },
-
-    /**
-     * 現在保持している内部値のキーのリストを作成して取得する
-     * 
-     * @return {String[]} キーのリスト
-     */
-    getKeys: function () {
-        return Jeeel.Hash.getKeys(this._params);
-    },
-
-    /**
-     * 現在保持している内部値のリストを作成して取得する
-     *
-     * @return {Array} キーのリスト
-     */
-    getValues: function () {
-        return Jeeel.Hash.getValues(this._params);
-    },
-    
-    /**
-     * 指定したキーの値を破棄する
-     *
-     * @param {String} key キー
-     * @return {Jeeel.Parameter} 自インスタンス
-     */
-    unset: function (key) {
-        delete this._params[key];
-
-        return this;
-    },
-
-    /**
-     * 指定したキーの値を保持しているかどうかを返す
-     *
-     * @param {String} key キー
-     * @return {Boolean} 値を保持していたらtrueそれ以外はfalseを返す
-     */
-    has: function (key) {
-        return key in this._params;
-    },
-
-    /**
-     * パラメータにフィルターを掛けた値を新しくインスタンスとして返す
-     *
-     * @param {Jeeel.Filter.Abstract} filter Jeeel.Filter.Abstractを継承したクラスのフィルター
-     * @param {String|String[]} keys 指定キーの要素のみを対象とする
-     * @return {Jeeel.Parameter} フィルターを掛けた新しいインスタンス
-     */
-    filter: function (filter, keys) {
-        var value;
-
-        if (keys) {
-            value = this.filterEach(filter, keys).getAll();
-        }
-        else {
-            value = filter.filter(this.getAll());
-        }
-
-        if ( ! Jeeel.Type.isHash(value)) {
-            value = [value];
-        }
-
-        return Jeeel.Parameter.create(value);
-    },
-
-    /**
-     * フィルターを配列の各要素にそれぞれ掛けていく
-     *
-     * @param {Jeeel.Filter.Abstract} innerFilter 内部フィルター
-     * @param {String[]} [keys] 操作許可キーリスト(初期値は全て)
-     * @return {Jeeel.Parameter} フィルターを掛けた新しいインスタンス
-     */
-    filterEach: function (innerFilter, keys) {
-        var filter = Jeeel.Filter.Each.create(innerFilter, keys);
-
-        return this.filter(filter);
-    },
-
-    /**
-     * 現インスタンスの内部値を文字列として結合し返す
-     *
-     * @param {String} [separator] 連結時の区切り文字列
-     * @param {String[]} [keys] 連結するキーのリスト
-     * @return {String} 結合後の値
-     */
-    join: function (separator, keys) {
-        return this.filter(Jeeel.Filter.Join.create(separator, keys)).getOne('');
-    },
-
-    /**
-     * バリデートを掛ける
-     *
-     * @param {Jeeel.Validator.Abstract} validator Jeeel.Validator.Abstractを継承したクラスのバリデータ
-     * @return {Jeeel.Parameter} 自インスタンス
-     */
-    validate: function (validator) {
-        if (this._errors === null) {
-            this._errors = {};
-        }
-
-        this.setErrors(validator.validate(this.getAll()));
-
-        return this;
-    },
-
-    /**
-     * isVaildをバリデートしなければ通過できないようにする
-     *
-     * @return {Jeeel.Parameter} 自インスタンス
-     */
-    taint: function () {
-        if (Jeeel.Type.isEmptyHash(this._errors)) {
-            this._errors = null;
-        }
-
-        return this;
-    },
-
-    /**
-     * isVaildをバリデートしなくても通過できるようにする
-     *
-     * @return {Jeeel.Parameter} 自インスタンス
-     */
-    unTaint: function () {
-        this._errors = {};
-
-        return this;
-    },
-
-    /**
-     * エラーを全て返す
-     *
-     * @return {Hash} エラーのリスト
-     */
-    getErrors: function () {
-        return this._errors;
-    },
-
-    /**
-     * エラーを全て変更する
-     *
-     * @param {Hash} errors エラーのリスト
-     * @return {Jeeel.Parameter} 自インスタンス
-     */
-    setErrors: function (errors) {
-        this._errors = errors;
-
-        return this;
-    },
-
-    /**
-     * エラーをセットする
-     *
-     * @param {String} key エラーのキー
-     * @param {Mixed} val エラーの内容
-     * @return {Jeeel.Parameter} 自インスタンス
-     */
-    setError: function (key, val) {
-        this._errors[key] = val;
-
-        return this;
-    },
-
-    /**
-     * エラーの追加を行う
-     *
-     * @param {String} key エラーのキー
-     * @param {Mixed} val エラーの内容
-     * @return {Jeeel.Parameter} 自インスタンス
-     */
-    addError: function (key, val) {
-        if ( ! (key in this._errors)) {
-            this._errors[key] = [];
-        }
-        else if ( ! Jeeel.Type.isArray(this._errors[key])) {
-            this._errors[key] = [this._errors[key]];
-        }
-
-        this._errors[key].push(val);
-
-        return this;
-    },
-
-    /**
-     * バリーデータを全て通過したかどうかを返す
-     *
-     * @return {Boolean} 通過ならばtrueそれ以外はfalseを返す
-     */
-    isValid: function () {
-        if (this._errors === null) {
-            return false;
-        }
-
-        for (var key in this.getErrors()) {
-            return false;
-        }
-
-        return true;
-    },
-
-    /**
-     * keyで指定された値をとりだし、Jeeel.Parameterのインスタンスとして返す<br />
-     * 取り出した値が配列ではなかった場合、かわりにdefaultが使われる<br />
-     * defaultが配列ではなかった場合、[default]が使われる<br />
-     * defaultが指定されなかった（またはnullだった)場合、[]が使われる
-     *
-     * @param {String} key 取りだす要素のキー
-     * @param {Mixed} [defaultValue] デフォルト値
-     * @return {Jeeel.Parameter} 取りだした要素を含んだインスタンス
-     */
-    getElement: function (key, defaultValue) {
-        var val = this.get(key, null);
-
-        if (val === null) {
-            val = [];
-        }
-
-        if ( ! Jeeel.Type.isHash(val) && Jeeel.Type.isSet(defaultValue)) {
-
-            if ( ! Jeeel.Type.isHash(defaultValue)) {
-                defaultValue = [defaultValue];
-            }
-
-            val = defaultValue;
-        }
-
-        return Jeeel.Parameter.create(val);
-    },
-
-    /**
-     * keysで指定された部分集合をJeeel.Parameterのインスタンスとして返す。<br />
-     * defaultは、キーが存在しなかった場合のデフォルト値として使われる。<br />
-     * defaultが配列array(x => y, ...) だった場合、キーxのデフォルトにyが適用される。<br />
-     * defaultが配列で、キー '*' => z を持つ場合、すべてのキーのデフォルトにzが適用される。<br />
-     * defaultが配列で、キー a => v を持ち、aが配列だった場合、<br />
-     *     aで指定された全てのキーのデフォルトに、vが適用される<br />
-     * '*' => z と 'x' => y が指定された場合、yが優先される<br />
-     * defaultが配列ではなかった場合、すべてのキーに対して、defaultが適用される。<br />
-     * defaultが指定されない場合、部分集合に含まれない。
-     *
-     * @param {String|String[]} keys 部分集合を表す複数のキー
-     * @param {Mixed} [defaultValue] キーが存在しなかった場合のデフォルト値
-     * @return {Jeeel.Parameter} 部分集合を持ったインスタンス
-     */
-    getSubset: function (keys, defaultValue) {
-        return this.filter(Jeeel.Filter.Subset.create(keys, defaultValue));
-    },
-
-    /**
-     * 現インスタンス内部の値をシリアライズして返す<br />
-     * その際指定したキーの値のみをシリアライズ出来、<br />
-     * かつその内部の部分配列をシリアライズ出来る
-     *
-     * @param {String} [key] 指定キー
-     * @param {String|String[]} [subset] 部分配列を指定するキーリスト
-     * @return {String} Json化した内部値
-     */
-    serialize: function (key, subset) {
-        var params = (key ? this.getElement(key) : this);
-        params = (subset ? params.getSubset(subset) : params);
-
-        return Jeeel.Json.encode(params.getAll());
-    },
-
-    /**
-     * Jeeel.Storage.Abstractを継承したストレージをセットする
-     *
-     * @param {Jeeel.Storage.Abstract} storage ストレージ
-     * @return {Jeeel.Parameter} 自インスタンス
-     */
-    setStorage: function (storage) {
-        this._storage = storage;
-
-        return this;
-    },
-
-    /**
-     * ストレージを取得する
-     *
-     * @return {Jeeel.Storage.Abstract} 取得したストレージ
-     * @throws {Error} ストレージがセットされていない場合に投げられる
-     */
-    getStorage: function () {
-        if ( ! this._storage) {
-            throw new Error('ストレージがセットされていません。');
-        }
-
-        return this._storage;
-    },
-
-
-    /**
-     * ストレージにパラメータを保存する
-     *
-     * @param {Jeeel.Storage.Abstract} [storage] 任意のストレージを使う場合に指定
-     * @return {Jeeel.Parameter} 自インスタンス
-     * @throws {Error} ストレージを指定せず、ストレージがセットされていない場合に投げられる
-     */
-    save: function (storage) {
-        if ( ! storage) {
-            storage = this.getStorage();
-        }
-
-        storage.save(this.getAll());
-
-        return this;
-    },
-
-    /**
-     * ストレージからパラメータを読み込む
-     *
-     * @param {Jeeel.Storage.Abstract} [storage] 任意のストレージを使う場合に指定
-     * @return {Jeeel.Parameter} 自インスタンス
-     * @throws {Error} ストレージを指定せず、ストレージがセットされていない場合に投げられる
-     */
-    load: function (storage) {
-        if ( ! storage) {
-            storage = this.getStorage();
-        }
-
-        this.setAll(storage.load());
-
-        return this;
-    },
-
-    /**
-     * 内部の保持値をGetパラメータ用の値に変更して返す<br />
-     * Getパラメータの先頭に?はつかない
-     *
-     * @return {String} Getパラメータを示す文字列
-     */
-    toQueryString: function () {
-        return Jeeel.Filter.Url.QueryString.create().filter(this._params);
-    },
-
-    /**
-     * 内部要素にforeachをかける<br />
-     * 詳しくはJeeel.Hash.forEach参照
-     *
-     * @param {Function} eachMethod コールバックメソッド
-     * @param {Mixied} [thisArg] thisに相当する値
-     * @return {Jeeel.Parameter} 自インスタンス
-     * @see Jeeel.Hash.forEach
-     */
-    each: function (eachMethod, thisArg) {
-        Jeeel.Hash.forEach(this._params, eachMethod, thisArg);
-        
-        return this;
-    },
-    
-    /**
-     * コンストラクタ
-     * 
-     * @param {Hash} [params] 入力パラメータ
-     * @constructor
-     */
-    constructor: Jeeel.Parameter
 };
 Jeeel.directory.Jeeel.Validator = {
 
@@ -41583,7 +46595,7 @@ Jeeel.Validator.Helper = function (val, plugins) {
     
     for (var name in plugins) {
         
-        if (Jeeel.Type.inArray(name, notValidator)) {
+        if (Jeeel.Hash.inHash(name, notValidator)) {
             continue;
         }
 
@@ -41594,9 +46606,9 @@ Jeeel.Validator.Helper = function (val, plugins) {
 
     for (var property in this) {
 
-        if (property[0] === '_' || Jeeel.Type.inArray(property, notValidator)) {
+        if (property[0] === '_' || Jeeel.Hash.inHash(property, notValidator)) {
             continue;
-        } else if (Jeeel.Type.keyExists(property, plugins)) {
+        } else if (Jeeel.Hash.keyExists(property, plugins)) {
             this[property] = (function (_property, method) {
                 return function () {
                     var args = [self._value];
@@ -41744,7 +46756,7 @@ Jeeel.Validator.Helper.prototype = {
      * @return {Boolean} エラーがあったらtrueそれ以外はfalseを返す
      */
     hasError: function (name) {
-        return Jeeel.Type.inArray(name, this._errors);
+        return Jeeel.Hash.inHash(name, this._errors);
     },
     
     /**
@@ -42062,6 +47074,7 @@ Jeeel.Class.extend(Jeeel.Storage.Session.Abstract, Jeeel.Storage.Abstract);
  * @augments Jeeel.Storage.Session.Abstract
  * @param {String} name 読み込み・保存時の名前
  * @throws {Error} nameを文字列で指定しなかった場合に発生
+ * @see Jeeel.Session.Cookie
  */
 Jeeel.Storage.Session.Cookie = function (name) {
 
@@ -42130,6 +47143,7 @@ Jeeel.Class.extend(Jeeel.Storage.Session.Cookie, Jeeel.Storage.Session.Abstract)
  * @augments Jeeel.Storage.Session.Abstract
  * @param {String} name 読み込み・保存時の名前
  * @throws {Error} nameを文字列で指定しなかった場合に発生
+ * @see Jeeel.Session.Name
  */
 Jeeel.Storage.Session.Name = function (name) {
 
@@ -42198,6 +47212,7 @@ Jeeel.Class.extend(Jeeel.Storage.Session.Name, Jeeel.Storage.Session.Abstract);
  * @param {String} name 読み込み・保存時の名前
  * @param {Boolean} [isPersistent] データの永続化をするかどうか(ブラウザを閉じてもアクセス出来るか)
  * @throws {Error} nameを文字列で指定しなかった場合に発生
+ * @see Jeeel.Storage.Session.Abstract
  */
 Jeeel.Storage.Session.WebStorage = function (name, isPersistent) {
 
@@ -42840,7 +47855,7 @@ Jeeel.Config.prototype = {
  */
 Jeeel.Error = function (message, code, nestCount) {
   
-    if (Error && Error.call) {
+    if (Jeeel._global.Error && Error.call) {
         var err = Error.call(this, message);
         var pairs = Jeeel.Hash.getPairs(err, false);
 
@@ -42910,7 +47925,8 @@ Jeeel.Error.prototype = {
     constructor: Jeeel.Error
 };
 
-Jeeel.Class.extend(Jeeel.Error, Error);Jeeel.directory.Jeeel.Util = {
+Jeeel.Class.extend(Jeeel.Error, Error);
+Jeeel.directory.Jeeel.Util = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -43035,6 +48051,32 @@ Jeeel.directory.Jeeel.Gui = {
 
 /**
  * @namespace GUI関連のネームスペース
+ * @see Jeeel.Gui.ColorPicker
+ * @see Jeeel.Gui.Scrollbar.Vertical
+ * @example
+ * Guiのネームスペース以下は独自で生成したGUIパーツを保持する拡張機能の一つ
+ * カラーピッカーやスクロールバー、カレンダーなどがある
+ * この機能は拡張なので、まだ十分と言えるだけパーツを保持していないがあるパーツにおいては十分に使えるものとなっている
+ * 
+ * Jeeel.Gui.ColorPicker
+ * カラーピッカーを扱うクラス
+ * 指定したテキストボックスなどに色選択をさせてデータを入力させる補助ツールとして使用する
+ * 
+ * 例：
+ * var picker = Jeeel.Gui.ColorPicker.create();
+ * picker.addTarget($ID('text')); // このカラーピッカーが起動する要素を追加する(クリックイベント)
+ * 
+ * Jeeel.Gui.Scrollbar.Vertical
+ * 垂直方向にスクロールバー
+ * 通常のスクロールバーと違いdivで生成した擬似スクロールバーである
+ * このクラスを使用するとある要素のスクロールを離れた位置のスクロールバーで操作したり、
+ * 複数の要素のスクロールを1つのスクロールバーで操作したりできる
+ * 
+ * 例：
+ * var vscroll = Jeeel.Gui.Scrollbar.Vertical.create();
+ * vscroll.getScrollbar(); // このクラスは要素を勝手にbodyなどに埋め込まないため取得してから手動で埋め込む必要がる
+ * vscroll.addScrollEvent(Test.onscroll, Test); // スクロールバーがスクロールした際に発生するイベントをハンドルする
+ * vscroll.setContainerHeight(788); // このスクロールバーが対応するコンテナの高さを設定する
  */
 Jeeel.Gui = {
     
@@ -44172,7 +49214,7 @@ Jeeel.Gui.ColorPicker.prototype = {
             return;
         }
         
-        var color = Jeeel.Object.Color.createRgbString(ctdText);
+        var color = Jeeel.Object.Color.create(ctdText);
         
         this.setColor(color);
     },
@@ -44395,7 +49437,7 @@ Jeeel.Gui.ColorPicker.prototype = {
             height: p.height + 'px'
         });
         
-        var isIEQuirks = !!(Jeeel._doc.uniqueID && Jeeel._doc.compatMode == "BackCompat");
+        var isIEQuirks = !!(Jeeel._doc.uniqueID && Jeeel._doc.compatMode === "BackCompat");
         
         Jeeel.Dom.Element.create(colorIndicator).setStyleList({
             width: isIEQuirks ? "5px" : "3px",
@@ -45220,7 +50262,6 @@ Jeeel.Class.extend(Jeeel.Gui.Scrollbar.Horizontal, Jeeel.Gui.Abstract);
  * コンストラクタ
  * @class カレンダーを扱うクラス
  * @param {Boolean} [multiSelect] 日付複数選択するかどうか
- * @ignore 未完成
  */
 Jeeel.Gui.Calendar = function (multiSelect) { 
     Jeeel.Gui.Abstract.call(this);
@@ -45878,7 +50919,7 @@ Jeeel.Gui.Calendar.prototype = {
         }
         
         var dates = toMonth.getDatesOfMonth();
-        var l = Jeeel.Object.Date.DAYS.length;
+        var l = Jeeel.Object.Date.getDays().length;
         var title = this._calendar.$CLASS(this.constructor.CLASS.TITLE);
         var body = this._calendar.$CLASS(this.constructor.CLASS.WEEK);
         
@@ -46013,7 +51054,7 @@ Jeeel.Gui.Calendar.prototype = {
         
         opBar.appendChild([pYear, pMonth, today, nMonth, nYear]);
         
-        var tr, th, td, w, l = Jeeel.Object.Date.DAYS.length;
+        var tr, th, td, w, l = Jeeel.Object.Date.getDays().length;
         var dayClasses = this.constructor.CLASS.DAYS;
         var weekTitle = this._createElm('tr')
                             .addClass(this.constructor.CLASS.TABLE_HEADER);
@@ -46027,7 +51068,7 @@ Jeeel.Gui.Calendar.prototype = {
         for (w = 0; w < l; w++) {
             th = this._createElm('th');
             th.addClass([this.constructor.CLASS.TABLE_HEADER_TITLE, dayClasses[w]])
-              .setText(Jeeel.Object.Date.DAYS[w]);
+              .setText(Jeeel.Object.Date.getDays()[w].substr(0, 1));
             
             weekTitle.appendChild(th);
         }
@@ -46682,7 +51723,11 @@ Jeeel.directory.Jeeel.Worker = {
  * @class マルチスレッドを提供するクラス(1インスタンスにつき1スレッド)
  */
 Jeeel.Worker = function () {
-    var script = Jeeel.directory.Jeeel.Worker + 'Thread.js';
+    var script = Jeeel.directory.Jeeel.Worker + 'Thread.js?lang=' + Jeeel.Language.getLocale();
+    
+    if (Jeeel.QUERY) {
+        script += '&' + Jeeel.QUERY.replace(/lang=[a-z]+&?/g, '');
+    }
     
     this._worker = new Worker(script);
     this._errors = [];
@@ -46743,7 +51788,7 @@ Jeeel.Worker.prototype = {
         var event = Jeeel.Dom.Event.getEventObject();
         var data = event.data;
         
-        if (Jeeel.Type.inArray(data.type, [Jeeel.Worker.Type.EXECUTE_SCRIPT])) {
+        if (Jeeel.Hash.inHash(data.type, [Jeeel.Worker.Type.EXECUTE_SCRIPT])) {
             return;
         }
         
@@ -46799,10 +51844,7 @@ Jeeel.Worker.prototype = {
         
         var i, l, script = [];
         var globalValues = [
-            '_JEEEL_CLEAN_MODE_',
-            '_JEEEL_DEBUG_MODE_',
-            '_JEEEL_EXTEND_MODE_',
-            '_JEEEL_FULL_MODE_'
+            'jeeelConfig'
         ];
 
         for (i = 0, l = globalValues.length; i < l; i++) {
@@ -46811,7 +51853,7 @@ Jeeel.Worker.prototype = {
         
         var scriptData = {
             type: Jeeel.Worker.Type.EXECUTE_SCRIPT,
-            data: '_JEEEL_MANUAL_LOAD_ = true;\n' + script.join('\n')
+            data: script.join('\n') + '\nif ( ! jeeelConfig) {jeeelConfig = {manualLoad: true};}\n'
         };
         
         this._worker.postMessage(Jeeel.Json.encode(scriptData));
@@ -46856,7 +51898,7 @@ Jeeel.Worker.prototype = {
             data: task
         };
         
-        this._post(Jeeel.Json.encode(taskData));
+        this._post(Jeeel.Json.encode(taskData, true));
         
         return this;
     },
@@ -46902,7 +51944,7 @@ Jeeel.Worker.prototype = {
     execute: function (data) {
         var messageData = {
             type: Jeeel.Worker.Type.EXECUTE_TASK,
-            data: (Jeeel.Type.isSet(data) ? data : null)
+            data: Jeeel.Type.isSet(data) ? data : null
         };
         
         this._post(Jeeel.Json.encode(messageData, true));
@@ -46948,6 +51990,7 @@ Jeeel.Worker.prototype = {
 Jeeel.file.Jeeel.Worker = ['Type'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Worker, Jeeel.file.Jeeel.Worker);
+
 /**
  * @namespace Worker内で使用されるイベントタイプを示す列挙体
  */
@@ -47285,6 +52328,7 @@ Jeeel.Database.Relation.Connection.prototype = {
         );
     }
 };
+
 Jeeel.Database.Relation.Transaction = function (transaction) {
     this._transaction = transaction;
 };
@@ -47570,7 +52614,7 @@ Jeeel.Database.Relation.Table.prototype = {
      */
     setPrimaryKey: function (var_args) {
 
-        if (arguments.length == 0) {
+        if (arguments.length === 0) {
             throw new Error('キーは少なくとも1つは指定してください。');
         }
 
@@ -47600,7 +52644,7 @@ Jeeel.Database.Relation.Table.prototype = {
      */
     addUniqueKey: function (var_args) {
       
-        if (arguments.length == 0) {
+        if (arguments.length === 0) {
             throw new Error('キーは少なくとも1つは指定してください。');
         }
         
@@ -47629,7 +52673,7 @@ Jeeel.Database.Relation.Table.prototype = {
      * @return {Jeeel.Database.Relation.Table} 自インスタンス
      */
     addIndexKey: function (var_args) {
-        if (arguments.length == 0) {
+        if (arguments.length === 0) {
             throw new Error('キーは少なくとも1つは指定してください。');
         }
 
@@ -47788,7 +52832,7 @@ Jeeel.Database.Relation.Table.Column.prototype = {
     toString: function () {
         var sql = '`' + this._name + '` ' + this._type
                 + (this._null ? '' : ' NOT NULL')
-                + (this._default == 'NULL' ? '' : ' DEFAULT ' + this._default)
+                + (this._default === 'NULL' ? '' : ' DEFAULT ' + this._default)
                 + (this._extra ? ' ' + this._extra : '')
                 + (this._comment ? ' COMMENT ' + this._comment : '');
 
@@ -47816,7 +52860,7 @@ Jeeel.directory.Jeeel.Database.Relation.Table.Key = {
  * @see Jeeel.Database.Relation.Table.Key.Type
  */
 Jeeel.Database.Relation.Table.Key = function (type) {
-    if ( ! Jeeel.Type.inArray(type, Jeeel.Database.Relation.Table.Key.Type, true)) {
+    if ( ! Jeeel.Hash.inHash(type, Jeeel.Database.Relation.Table.Key.Type, true)) {
         throw new Error('キーの種類が間違っています。');
     }
 
@@ -47887,7 +52931,7 @@ Jeeel.Database.Relation.Table.Key.prototype = {
      * @return {Jeeel.Database.Relation.Table.Key} 自インスタンス
      */
     setType: function (type) {
-        if ( ! Jeeel.Type.inArray(type, Jeeel.Database.Relation.Table.Key.Type, true)) {
+        if ( ! Jeeel.Hash.inHash(type, Jeeel.Database.Relation.Table.Key.Type, true)) {
             throw new Error('キーの種類が間違っています。');
         }
 
@@ -47966,7 +53010,7 @@ Jeeel.file.Jeeel.Database.Relation.Table.Key = ['Type'];
 Jeeel._autoImports(Jeeel.directory.Jeeel.Database.Relation.Table.Key, Jeeel.file.Jeeel.Database.Relation.Table.Key);
 
 /**
- * キーの種類についての列挙対
+ * @namespace キーの種類についての列挙体
  */
 Jeeel.Database.Relation.Table.Key.Type = {
 
@@ -48124,6 +53168,7 @@ Jeeel.File = {
 Jeeel.file.Jeeel.File = ['Reader', 'Data'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.File, Jeeel.file.Jeeel.File);
+
 /**
  * コンストラクタ
  * 
@@ -48767,7 +53812,9 @@ Jeeel.Media.Audio.create = function (audio) {
     return new this(audio);
 };
 
-Jeeel.Media.Audio.prototype = new Jeeel.Media.Abstract();
+Jeeel.Media.Audio.prototype = {};
+
+Jeeel.Class.extend(Jeeel.Media.Audio, Jeeel.Media.Abstract);
 
 /**
  * コンストラクタ
@@ -48909,6 +53956,62 @@ Jeeel.directory.Jeeel.Graphics = {
 
 /**
  * @namespace グラフィックス関連のネームスペース
+ * @see Jeeel.Graphics.Raster
+ * @see Jeeel.Graphics.Vector
+ * @see Jeeel.Graphics.Pen
+ * @see Jeeel.Graphics.Brush
+ * @see Jeeel.Object.Color
+ * @see Jeeel.Object.Font
+ * @example
+ * Graphicsのネームスペース以下はcanvasやSVGなどのグラフィックス機能を保持している拡張機能の一つ
+ * この機能には大きく分けて2つの種類が存在する
+ * 双方の機能ともに共通の抽象クラスを持ち操作メソッド自体は同じであり、共通の記述で操作できるようになっている
+ * ただ、双方まだ対応していないメソッドが存在するため、複雑なメソッドは未実装エラーが出る箇所がある
+ * 
+ * 
+ * Jeeel.Graphics.Raster
+ * ラスター系(ドット単位の色情報で構成されるグラフィックス)の機能を扱うクラス
+ * 現在はcanvas要素に対しての描画を補助するクラスのみ
+ * 
+ * Jeeel.Graphics.Vector
+ * ベクター系(座標と式で構成されるグラフィックス)の機能を扱うクラス
+ * 現在はSVGの要素を容易に操作できるようにした機能のみ
+ * 
+ * 
+ * Jeeel.Graphics.Raster
+ * var canvas = $ID('canvas'); // canvas要素を取得する
+ * var graphics = Jeeel.Graphics.Raster.factoryCanvas(canvas); // canvasからラスターインスタンスを作成する
+ * 
+ * Jeeel.Graphics.Vector
+ * var svg = $ID('svg'); // svg要素を取得する
+ * var graphics = Jeeel.Graphics.Vector.factorySvg(svg); // SVGからベクターインスタンスを作成する
+ * 
+ * Rasterは現在
+ * strokePie, fillPie, drawArc が未実装である
+ * 
+ * 以下上記のメソッド以外は共通で使用可能
+ * 
+ * graphics.drawLine(10, 10, 110, 110); // ラインを引く
+ * graphics.strokeRect(10, 10, 100, 100); // 長方形の枠を引く
+ * graphics.fillText('text', 5, 5); // 塗りつぶしのテキストを描画する
+ * graphics.fillRect(10, 10, 100, 100); // 長方形を塗りつぶす
+ * graphics.fillPie(100, 100, 50, 50, 0, Math.PI * 2 / 3); // 0°～60°の扇型を塗りつぶす
+ * var pen = graphics.getPen(); // ストロークの設定を行うペンを取得する
+ * var brush = graphics.getBrush(); // 塗りつぶしのためのブラシを取得する
+ * var font = graphics.getFont(); // テキストを記述するためのフォントを取得する
+ * 
+ * pen.setWidth(5); // ラインの幅を5pxにする(setPenで設定しなくても即時反映する)
+ * pen.setColor(Jeeel.Object.Color.createRgb(255, 0, 0)); // ラインの色を赤に設定する
+ * 
+ * brush.setColor(Jeeel.Object.Color.createRgb(0, 0, 255)); // 塗りつぶしの色を緑に設定する
+ * 
+ * font.size = '50px'; // テキストのフォントサイズを50pxにする
+ * font.weight = 'bold'; // テキストのフォントを太字にする
+ * 
+ * graphics.drawLine(20, 20, 50, 50); // 5pxのラインを赤で引く
+ * graphics.fillRect(100, 100, 100, 50); // 緑で長方形を塗りつぶす
+ * graphics.strokeRect(100, 100, 100, 50); // 赤の5pxのラインで長方形を描く
+ * graphics.fillText('テスト文字', 100, 100); // 緑色の50pxの太字で"テスト文字列"とテキストを描画する
  */
 Jeeel.Graphics = {
 
@@ -49503,6 +54606,7 @@ Jeeel.Graphics.Pen.prototype = {
         return this;
     }
 };
+
 /**
  * コンストラクタ
  * 
@@ -49576,7 +54680,8 @@ Jeeel.Graphics.Brush.prototype = {
         
         return this;
     }
-};Jeeel.directory.Jeeel.Graphics.Raster = {
+};
+Jeeel.directory.Jeeel.Graphics.Raster = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -49641,7 +54746,8 @@ Jeeel.Class.extend(Jeeel.Graphics.Raster, Jeeel.Graphics.Abstract);
 
 Jeeel.file.Jeeel.Graphics.Raster = ['Canvas'];
 
-Jeeel._autoImports(Jeeel.directory.Jeeel.Graphics.Raster, Jeeel.file.Jeeel.Graphics.Raster);Jeeel.directory.Jeeel.Graphics.Raster.Canvas = {
+Jeeel._autoImports(Jeeel.directory.Jeeel.Graphics.Raster, Jeeel.file.Jeeel.Graphics.Raster);
+Jeeel.directory.Jeeel.Graphics.Raster.Canvas = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -49673,7 +54779,8 @@ Jeeel.Graphics.Raster.Canvas = {
 
 Jeeel.file.Jeeel.Graphics.Raster.Canvas = ['Context'];
 
-Jeeel._autoImports(Jeeel.directory.Jeeel.Graphics.Raster.Canvas, Jeeel.file.Jeeel.Graphics.Raster.Canvas);Jeeel.directory.Jeeel.Graphics.Raster.Canvas.Context = {
+Jeeel._autoImports(Jeeel.directory.Jeeel.Graphics.Raster.Canvas, Jeeel.file.Jeeel.Graphics.Raster.Canvas);
+Jeeel.directory.Jeeel.Graphics.Raster.Canvas.Context = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -50253,6 +55360,7 @@ Jeeel.Graphics.Raster.Canvas.Context['2d'].prototype = {
 Jeeel.file.Jeeel.Graphics.Raster.Canvas.Context = ['Type'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Graphics.Raster.Canvas.Context, Jeeel.file.Jeeel.Graphics.Raster.Canvas.Context);
+
 /**
  * @namespace canvasのcontextに使用できるcontextIdの列挙体
  */
@@ -50265,7 +55373,8 @@ Jeeel.Graphics.Raster.Canvas.Context.Type = {
      * @constant
      */
     TWO_DIMENSION: '2d'
-};Jeeel.directory.Jeeel.Graphics.Vector = {
+};
+Jeeel.directory.Jeeel.Graphics.Vector = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -50310,6 +55419,7 @@ Jeeel.Class.extend(Jeeel.Graphics.Vector, Jeeel.Graphics.Abstract);
 Jeeel.file.Jeeel.Graphics.Vector = ['Svg'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Graphics.Vector, Jeeel.file.Jeeel.Graphics.Vector);
+
 /**
  * コンストラクタ
  * 
@@ -50832,7 +55942,8 @@ Jeeel.Graphics.Vector.Svg.prototype = {
         
         return d.join(' ');
     }
-};Jeeel.directory.Jeeel.Framework = {
+};
+Jeeel.directory.Jeeel.Framework = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -50847,6 +55958,317 @@ Jeeel.Graphics.Vector.Svg.prototype = {
 
 /**
  * @namespace 大規模アプリケーション開発を円滑にするための汎用クラス等を保持するネームスペース
+ * @see Jeeel.Framework.EventDispatcher
+ * @see Jeeel.Framework.Event
+ * @see Jeeel.Framework.Layer
+ * @see Jeeel.Framework.Net.Connect
+ * @see Jeeel.Framework.Mvc.Model
+ * @see Jeeel.Framework.Mvc.View
+ * @see Jeeel.Framework.Mvc.Controller
+ * @see Jeeel.Framework.Acl
+ * @see Jeeel.Framework.Acl.Role.Abstract
+ * @see Jeeel.Framework.Acl.Resource.Abstract
+ * @see Jeeel.Framework.Acl.Role.User
+ * @see Jeeel.Framework.Acl.Resource.Url
+ * @example
+ * Frameworkネームスペース以下は大規模アプリケーション開発の補助ツールを提供する
+ * この機能は現在大きく分けてMVCモデルのアプリの枠組みとACLを用いた認証システム機能を保持する
+ * 
+ * 
+ * MVCモデル
+ * この機能は継承前提のモデルであり枠組みとして使用するクラスも既に継承関係がある状態である
+ * 枠組みに入る前の基底クラスを以下に示す
+ * 
+ * Jeeel.Framework.EventDispatcher
+ * このクラスはイベントの送信、ハンドリングなどイベントの操作を行うクラス
+ * このクラスは継承なしで使用できなく、継承後のクラスを使用して実装する
+ * 
+ * Jeeel.Framework.Event
+ * ディスパッチャーと一緒に使うイベントの基底クラスで継承なしでも使用できる
+ * 
+ * Jeeel.Framework.Layer extends Jeeel.Framework.EventDispatcher
+ * ディスパッチャーを継承するクラスで、それに加えて親子関係を管理するクラス
+ * また子要素に追加、削除する時点で専用イベントを発生させるようになる
+ * ディスパッチしたイベントも親子間のイベント伝搬を行いActionScriptのように、
+ * キャプチャ段階、ターゲット段階、バグリング段階(設定をするとフォーリング段階も)を経てイベントが伝搬する
+ * すなわち発生した要素の一番上のルート要素から発生要素まで辿って行き、またルート要素まで戻っていく一般的な(ASでは)イベントフローと、
+ * ディスパッチするイベントの設定でフォーリング段階を追加した場合、発生要素以下の子要素全てに伝搬して行く逆フローが存在する
+ * 発生の順番はキャプチャ、ターゲット、バブリング、フォーリングの順番で発生する
+ * 
+ * Jeeel.Framework.Net.Connect
+ * サーバーへの接続を提供するクラスで、接続結果からコールバックを呼ぶ最低限の機能を保持したクラス
+ * ただし、接続後の呼び出されるコールバックを指定しない場合は継承後のクラスのメソッドを呼ぶ仕様になっている
+ * 
+ * 
+ * 派生クラス(MVC)
+ * 以下のクラスは派生クラスであるが、MVC合わせて1パーツになるという考えのもと実装してある(.NetのPictureBoxなどを初めとする1パーツで最小完結型)
+ * 従って大きなパーツを生成する際には1パーツ単位を複数組み合わせて実装する手法をお勧めする
+ * 
+ * モデルクラス
+ * Jeeel.Framework.Mvc.Model extends Jeeel.Framework.Net.Connect
+ * コネクトクラスを継承し、計算・サーバー接続を担うクラス
+ * 
+ * ビュークラス
+ * Jeeel.Framework.Mvc.View extends Jeeel.Framework.Layer
+ * レイヤークラスを継承し、HTML要素への描画指示やDOMイベントをハンドリングするクラス
+ * このクラスはHTML要素と1対で対応し、対応するコントローラが親コントローラに追加された時に、
+ * 親コントローラのビューに対して自動的にaddChildされる機能を保有する
+ * ビューの親子関係は実要素となり、そのままHTML要素と同じ構成になるのが望ましい
+ * また、子要素に対してコントローラに保持されないビューを追加する事も可能で、コントローラと組み合わせる必要のないくらい単純な要素に適用する(表示のみなど)
+ * 
+ * コントローラクラス
+ * Jeeel.Framework.Mvc.Controller extends Jeeel.Framework.Layer
+ * レイヤークラスを継承し、制御を担うクラス
+ * このクラスはモデル、ビューを管理するクラスであり外部との中継役でもある
+ * パーツ単位で親子関係を築く場合はこのクラス同士が結合し、ビュー同士も自動結合しそれに伴いHTML要素も結合する運びとなる
+ * 基本的にイベントをディスパッチするのはこのクラスで行うべきである
+ * 
+ * 例：
+ * <div id="mvc-owner">
+ * </div>
+ * 
+ * // 親コントローラの定義
+ * var Parent = function () {
+ *     Jeeel.Framework.Mvc.Controller.call(this);
+ *     
+ *     this.addEventListener('child-click', this.onClick, false, this);
+ * };
+ * 
+ * Parent.prototype = {
+ *     onClick: function () {
+ *         this._model.countClick();
+ *     }
+ * };
+ * 
+ * Jeeel.Class.extend(Parent, Jeeel.Framework.Mvc.Controller);
+ * 
+ * // 親モデルの定義
+ * var ParentModel = function () {
+ *     Jeeel.Framework.Mvc.Model.call(this);
+ * };
+ * 
+ * ParentModel.prototype = {
+ *     _cnt: 0,
+ *     
+ *     countClick: function () {
+ *         this._cnt++;
+ *         
+ *         this.notify();
+ *     }
+ * };
+ * 
+ * Jeeel.Class.extend(ParentModel, Jeeel.Framework.Mvc.Model);
+ * 
+ * // 親ビューの定義
+ * var ParentView = function () {
+ *     Jeeel.Framework.Mvc.View.call(this, 'mvc-owner');
+ * };
+ * 
+ * ParentView.prototype = {
+ * };
+ * 
+ * Jeeel.Class.extend(ParentView, Jeeel.Framework.Mvc.View);
+ * 
+ * 
+ * // 子コントローラの定義
+ * var Child = function () {
+ *     Jeeel.Framework.Mvc.Controller.call(this);
+ *     
+ *     this._view.addEventListener('child-click', this.onClick, false, this);
+ * };
+ * 
+ * Child.prototype = {
+ *     onClick: function (mvcEvent) {
+ *         this.dispatchEvent(mvcEvent.clone(true));
+ *     }
+ * };
+ * 
+ * Jeeel.Class.extend(Child, Jeeel.Framework.Mvc.Controller);
+ * 
+ * // 子ビューの定義
+ * var ChildView = function () {
+ *     var elm = document.createElement('div');
+ *     
+ *     elm.innerHTML = 'Click Please!!.';
+ *     
+ *     Jeeel.Framework.Mvc.View.call(this, elm, true);
+ *     
+ *     this.addDomEventListener(Jeeel.Dom.Event.Type.CLICK, this.onClick, this);
+ * };
+ * 
+ * ChildView.prototype = {
+ *     onClick: function (domEvent) {
+ *         var mvcEvent = new Jeeel.Framework.Event('child-click');
+ *         
+ *         this.dispatchEvent(mvcEvent);
+ *     },
+ *     
+ *     update: function () {
+ *         this._element.innerHTML = 'Clicked!!';
+ *     }
+ * };
+ * 
+ * Jeeel.Class.extend(ChildView, Jeeel.Framework.Mvc.View);
+ * 
+ * 
+ * 以上のようなHTML、クラスがあった場合に以下のコードを実行する
+ * 
+ * var parent = new Parent();
+ * var parentModel = new ParentModel();
+ * var parentView = new ParentView();
+ * 
+ * parent.setModel(parentModel);
+ * parent.setView(parentView);
+ * 
+ * var child = new Child();
+ * child.setView(new ChildView());
+ * 
+ * parent.addChild(child);
+ * 
+ * その場合まずHTML要素は以下のようになる
+ * 
+ * <div id="mvc-owner">
+ *   <div>Click Please!!.</div>
+ * </div>
+ * 
+ * そしてクラスのインスタンス間のつながりは以下のようになる
+ * 
+ * parent: Parent
+ *   _model: ParentModel
+ *     _cnt: Integer
+ *   _view: ParentView
+ *     _element: <div id="mvc-owner"></div>
+ *     _children: Array
+ *       0: ChildView
+ *   _children: Array
+ *     0: Child
+ *       _view: ChildView
+ *         _element: <div>Click Please!!.</div>
+ *         _parent: ParentView
+ *         
+ * 少し分かりにくいがPearentインスタンスのビューにはParentViewインスタンス、
+ * ChildインスタンスのビューにはChildViewインスタンスがそれぞれセットされている
+ * そしてPearentインスタンスの子要素にはChildインスタンス、
+ * ParentViewインスタンスの子要素にはChildViewインスタンスがそれぞれ親子関係を結んでいる
+ * 
+ * 図で親子関係を示すと以下のようになる
+ * PC: Parentインスタンス(parent)
+ * PV: ParentViewインスタンス(parent._view)
+ * CC: Childインスタンス(child)
+ * CV: ChildViewインスタンス(child._view)
+ * 
+ * PC―CC
+ * ｜  ｜
+ * PV…CV
+ * 
+ * この状態になった後CVのHTML要素に対してClickをすると以下のようなイベント伝搬＋メソッドの呼び出しが起こる
+ * <div>Click Please!!.</div>  ← DOM上でクリック
+ * ↓
+ * ChildView#onClick
+ * ↓
+ * Child#onClick
+ * ↓
+ * Parent#onClick
+ * ↓
+ * ParentModel#countClick
+ * ↓
+ * Parent#update スーパークラスで実装済み
+ * ↓
+ * ParentView#update スーパークラスで実装済み
+ * ↓
+ * ChildView#update
+ * 
+ * この伝搬はDOM上でのクリックをChildView#onClickでハンドリング後MVCイベントを生成しディスパッチする
+ * Childで対応するビュー(ChildView)に対してイベントハンドリングをしていたのでChild#onClickが呼ばれる
+ * Child#onClick内でMVCイベントを複製して親コントローラに対してディスパッチする(イベント伝搬)
+ * Parentで自分に対してイベントハンドリングをしていたのでParent#onClickが呼ばれる
+ * その後モデルのParentModel#countClickを呼びクリック回数をカウントした後それを更新した主旨をコントローラ(Parent)に伝える(updateメソッド)
+ * コントローラ(Parent)はスパークラスでの実装通りにビュー(ParentView)に対して再描画指令(updateメソッド)を出す
+ * ビューはスーパークラスの実装通りに子要素のupdateメソッドを呼びChildView#updateが呼ばれる
+ * そしてChildView#updateにてClickした要素のinnnerHTMLがClickedに変化する
+ * 
+ * 他にも以下のようなメソッドが良く使用される
+ * 
+ * parent.update(); // 実装依存、初期ではビューのupdateを呼ぶ
+ * parent.getView(); // ビューを取得する
+ * parent.getModel(); // モデルを取得する
+ * parentView.update(); // 実装依存、初期では子要素のupdateを呼ぶ(通常はコントローラを通して呼ばれる)
+ * parentModel.notify(); // モデルのデータが更新された主旨をコントローラに伝える(コントローラのupdateメソッドを呼ぶ)
+ * 
+ * 
+ * 
+ * ACL認証機能
+ * 
+ * Jeeel.Framework.Acl
+ * ロールベースアクセス制御を管理するクラス
+ * このインスタンスに対してロールとリソースを追加していきアクセス許可を制御する
+ * 
+ * Jeeel.Framework.Acl.Role.Abstract
+ * ロールの基底クラス
+ * 以降に示すロールユーザー以外を定義したい場合に継承して使用する
+ * 
+ * Jeeel.Framework.Acl.Resource.Abstract
+ * リソースの基底クラス
+ * 以降に示すURLリソース以外を定義したい場合に継承して使用する
+ * 
+ * Jeeel.Framework.Acl.Role.User extends Jeeel.Framework.Acl.Role.Abstract
+ * ロールの基本クラスであるロールユーザー
+ * このクラスはユーザー名を引数に取る単純なロールである
+ * ロールは継承を行うことが可能であり(例えばGuestユーザーを継承したAdministratorユーザーなど)、
+ * スーパーユーザーの権限はサブユーザーに引き継がれる
+ * 
+ * Jeeel.Framework.Acl.Resource.Url extends Jeeel.Framework.Acl.Resource.Abstract
+ * リソースの基本クラスであるURリソース
+ * このクラスはURL(リソースID)と下位下層を同じリソース内と見るかどうかのみを保持するリソースである
+ * リソースには権限の種類を追加する事が出来、URLの場合はAccessのみ保持する
+ * もし車のリソースがあった場合はIDとなるのは車の車種、
+ * 権限の種類はRide, Drive, Buy, Sell等となると思われる
+ * 
+ * これらの基本クラスを使う限りでは以下の箇所にJeeel.Framework.Aclインスタンスが入っているので利用が簡単である
+ * Jeeel.Acl: Jeeel.Framework.Acl
+ * このインスタンスは通常のACLに加えてJeeelを通してサーバーにアクセスしたりフォーム、アンカーなどのURL遷移を自動制御することが出来る
+ * ロールは初期値でAdministrator(全権限)を保持している
+ * 
+ * 以下のメソッドが良く使用される
+ * Jeeel.Acl.enableAutoControl(); // form、aに対して自動制御を行う(URLの)
+ * Jeeel.Acl.addErrorEvent(func, thisArg); // ACLで不許可のURLに対してアクセスしようとしたした際のエラーイベントを追加する
+ * 
+ * 
+ * 例：
+ * 現在のURLがhttp://test.co.jp/indexだとする
+ * 
+ * Jeeel.Acl.enableAutoControl();
+ * 
+ * var role = Jeeel.Framework.Acl.Role.User.create('Guest');
+ * var resource1 = Jeeel.Framework.Acl.Resource.Url.create('/index');
+ * var resource2 = Jeeel.Framework.Acl.Resource.Url.create('/test');
+ * 
+ * Jeeel.Acl.addRole(role);
+ * Jeeel.Acl.addResource(resource1);
+ * Jeeel.Acl.addResource(resource2);
+ * 
+ * Jeeel.Acl.addRole.switchRole('Guest');
+ * Jeeel.Acl.allow('/index');
+ *
+ * Jeeel.Acl.isAllowed('/index'); // true
+ * Jeeel.Acl.isAllowed('/test'); // false
+ * Jeeel.Acl.isAllowed('/join'); // false
+ * Jeeel.Acl.isAllowed('http://test.co.jp/index'); // true
+ * Jeeel.Acl.isAllowed('http://index.co.jp/index'); // false
+ * 
+ * Jeeel.UserAgent.setUrl('/index'); // Success
+ * Jeeel.UserAgent.setUrl('/test'); // Error
+ * 
+ * Jeeel.Acl.addRole.switchRole('Administrator');
+ * 
+ * Jeeel.Acl.isAllowed('/index'); // true
+ * Jeeel.Acl.isAllowed('/test'); // true
+ * Jeeel.Acl.isAllowed('/join'); // true
+ * Jeeel.Acl.isAllowed('http://test.co.jp/index'); // true
+ * Jeeel.Acl.isAllowed('http://index.co.jp/index'); // true
+ * 
+ * Jeeel.UserAgent.setUrl('/index'); // Success
+ * Jeeel.UserAgent.setUrl('/test'); // Success
  */
 Jeeel.Framework = {
     
@@ -51035,7 +56457,8 @@ Jeeel.Framework.Net.Connect.prototype = {
      * @constructor
      */
     constructor: Jeeel.Framework.Net.Connect
-};Jeeel.directory.Jeeel.Framework.Event = {
+};
+Jeeel.directory.Jeeel.Framework.Event = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -51172,7 +56595,7 @@ Jeeel.Framework.Event.prototype = {
      * 
      * @return {Boolean} バブリング処理をするかどうか
      */
-    getBubbles: function () {
+    useBubbles: function () {
         return this._bubbles;
     },
     
@@ -51181,7 +56604,7 @@ Jeeel.Framework.Event.prototype = {
      * 
      * @return {Boolean} フォーリング処理をするかどうか
      */
-    getFalls: function () {
+    useFalls: function () {
         return this._falls;
     },
     
@@ -51529,13 +56952,13 @@ Jeeel.Framework.EventDispatcher.prototype = {
                 break;
                 
             case Jeeel.Framework.Event.Phase.TARGETING:
-                if (event.getBubbles() || event.getFalls()) {
-                    if (event.getBubbles()) {
+                if (event.useBubbles() || event.useFalls()) {
+                    if (event.useBubbles()) {
                         event._phase = Jeeel.Framework.Event.Phase.BUBBLING;
                         this._flowBubblingPhaseEvent(event);
                     }
                     
-                    if (event.getFalls()) {
+                    if (event.useFalls()) {
                         event._phase = Jeeel.Framework.Event.Phase.FALLING;
                         this._flowFallingPhaseEvent(event);
                     }
@@ -51546,13 +56969,13 @@ Jeeel.Framework.EventDispatcher.prototype = {
                 break;
             
             case Jeeel.Framework.Event.Phase.BUBBLING:
-                if (event.getBubbles()) {
+                if (event.useBubbles()) {
                     this._flowBubblingPhaseEvent(event);
                 }
                 break;
                 
             case Jeeel.Framework.Event.Phase.FALLING:
-                if (event.getFalls()) {
+                if (event.useFalls()) {
                     this._flowFallingPhaseEvent(event);
                 }
                 break;
@@ -51628,6 +57051,7 @@ Jeeel.Framework.EventDispatcher.prototype = {
         return this;
     }
 };
+
 /**
  * コンストラクタ
  * 
@@ -51804,7 +57228,7 @@ Jeeel.Framework.Layer.prototype = {
      */
     _flowBubblingPhaseEvent: function (event) {
         // 上位伝播対象でイベントがキャンセルしていない場合に親レイヤーに伝播する
-        if (this._parent && event.getBubbles() && ! event._cancelFlow) {
+        if (this._parent && event.useBubbles() && ! event._cancelFlow) {
             this._parent._flowEvent(event);
         }
     },
@@ -51818,7 +57242,7 @@ Jeeel.Framework.Layer.prototype = {
      */
     _flowFallingPhaseEvent: function (event) {
         // 下位伝播対象でイベントがキャンセルしていない場合に子レイヤーに伝播する
-        if (event.getFalls() && ! event._cancelFlow) {
+        if (event.useFalls() && ! event._cancelFlow) {
             for (var i =  this._children.length; i--;) {
                 this._children[i]._flowEvent(event);
             }
@@ -52307,6 +57731,8 @@ Jeeel.Framework.Mvc.View.prototype = {
      * コンストラクタ
      * 
      * @param {Element|String} element このビューが扱うElement
+     * @param {Boolean} [useAutoAdd] このビューのオーナーコントローラが親コントローラに追加された時に、<br />
+     *                                自動的にこのビューのElementを親コントローラのビューに追加するかどうか
      * @constructor
      */
     constructor: Jeeel.Framework.Mvc.View
@@ -52325,6 +57751,36 @@ Jeeel.Class.extend(Jeeel.Framework.Mvc.View, Jeeel.Framework.Layer);
  *         また、EventDispatcherも継承しているのでイベントの制御も可能であり、<br />
  *         子に追加された時や削除された時はデフォルトでイベントがディスパッチされるようになっている
  * @augments Jeeel.Framework.Layer
+ * @example
+ * コントローラとビューは対応するビュー・モデルやオーナーコントローラが無くても存在出来るが、モデルは必ずオーナーコントローラが無ければならない
+ * RC: ルートコントローラ
+ * RV: ルートビュー
+ * RM: ルートモデル
+ * C1: グループ1のコントローラ
+ * V1: グループ1のビュー
+ * M1: グループ1のモデル
+ * V2: グループ2のビュー
+ * 
+ * RM  M1
+ * ｜  ｜
+ * RC―C1
+ * ｜  ｜
+ * RV…V1―V2
+ * 
+ * この図はMVCの構成の一例である
+ * まず大本のルートコントローラとそれに付属するモデルとビューが1つずつ存在する
+ * ルートコントローラは子供にコントローラ、モデル、ビューのセットを保持しており、V1はuseAutoAddをtrueにしたことにより、RVの子要素ともなっている
+ * この構成は基本構成であり、MVCで完結する要素がそれぞれ親子関係を築き、ビューは内部的に親子関係になるといった具合である
+ * 
+ * それに対してV2はオーナーコントローラもそれに対するモデルも無い
+ * この構成は要素が描画のみでデータや制御を持たない場合に用いられる
+ * ビューはHTML上の1つの要素と紐付けられるので、要素内の子要素が簡単な描画だけ行うような形式の時に用いる
+ * この形式の場合はV1内部でV2を生成し明示的にaddChildするのが一般的だと思われる
+ * 
+ * コントローラやビューは複数の子要素を持てるのでそれを用いて大規模な要素を分割していく手法を用いるべきである
+ * コントローラやビューはディスパッチャーを継承しているので、イベントをディスパッチするとキャプチャ段階、ターゲット段階、バブリング段階(もうひとつフォーリング段階もあるが通常は使わない)の順に伝搬を行う
+ * イベントはstopされるまで全ての対象の要素に対して伝搬していくが、必ずコントローラ同士かビュー同士の伝搬になる
+ * ルートコントローラ及びルートビューは親が存在しないため、HTMLに対して反映させるためには手動で要素を追加もしくは追加してある要素からルートビューを作成する必要がある
  */
 Jeeel.Framework.Mvc.Controller = function () {
     Jeeel.Framework.Layer.call(this);
@@ -52436,6 +57892,7 @@ Jeeel.Framework.Mvc.Controller.prototype = {
     /**
      * 親に追加された時に呼び出される(デフォルトの挙動)
      * 
+     * @param {Jeeel.Framework.Mvc.Controller} parent 親コントローラ
      * @protected
      */
     _onAddedThis: function (parent) {
@@ -52445,6 +57902,7 @@ Jeeel.Framework.Mvc.Controller.prototype = {
     /**
      * 親から削除された時に呼び出される(デフォルトの挙動)
      * 
+     * @param {Jeeel.Framework.Mvc.Controller} parent 親コントローラ
      * @protected
      */
     _onRemovedThis: function (parent) {
@@ -52994,7 +58452,7 @@ Jeeel.Framework.Acl.Role.Abstract.prototype = {
         
         // 実際にリソースに存在する権限かどうかを確認してフィルターをかける
         for (var i = authorizations.length; i--;) {
-            if (authorizations[i] === '*' || Jeeel.Type.inArray(authorizations[i], resourcePerms, true)) {
+            if (authorizations[i] === '*' || Jeeel.Hash.inHash(authorizations[i], resourcePerms, true)) {
                 perms.push(authorizations[i]);
             }
         }
@@ -53026,7 +58484,7 @@ Jeeel.Framework.Acl.Role.Abstract.prototype = {
             if (authorizations[type][id].perms !== '*') {
                 
                 // 追加権限に*を含んでいた場合は強制的に全権限になる
-                if (Jeeel.Type.inArray('*', perms, true)) {
+                if (Jeeel.Hash.inHash('*', perms, true)) {
                     authorizations[type][id].perms = '*';
                 } else {
                     var tmp = Jeeel.Hash.merge(authorizations[type][id].perms, perms);
@@ -53055,7 +58513,7 @@ Jeeel.Framework.Acl.Role.Abstract.prototype = {
         
         // 実際にリソースに存在する権限かどうかを確認してフィルターをかける
         for (i = authorizations.length; i--;) {
-            if (authorizations[i] === '*' || Jeeel.Type.inArray(authorizations[i], resourcePerms, true)) {
+            if (authorizations[i] === '*' || Jeeel.Hash.inHash(authorizations[i], resourcePerms, true)) {
                 perms.push(authorizations[i]);
             }
         }
@@ -53083,13 +58541,13 @@ Jeeel.Framework.Acl.Role.Abstract.prototype = {
             var clear = false;
             var tmp;
             
-            if (Jeeel.Type.inArray('*', perms, true)) {
+            if (Jeeel.Hash.inHash('*', perms, true)) {
                 clear = true;
             } else if (authorizations[type][id].perms === '*') {
                 tmp = [];
                 
                 for (i = resourcePerms.length; i--;) {
-                    if ( ! Jeeel.Type.inArray(resourcePerms[i], perms, true)) {
+                    if ( ! Jeeel.Hash.inHash(resourcePerms[i], perms, true)) {
                         tmp.push(resourcePerms[i]);
                     }
                 }
@@ -53101,7 +58559,7 @@ Jeeel.Framework.Acl.Role.Abstract.prototype = {
                 var tmp = [];
                 
                 for (i = authorizations[type][id].perms.length; i--;) {
-                    if (Jeeel.Type.inArray(authorizations[type][id].perms[i], perms, true)) {
+                    if (Jeeel.Hash.inHash(authorizations[type][id].perms[i], perms, true)) {
                         tmp.push(authorizations[type][id].perms[i]);
                     }
                 }
@@ -53135,7 +58593,7 @@ Jeeel.Framework.Acl.Role.Abstract.prototype = {
             var rperms = resource.getAuthorizations();
             
             for (i = rperms.length; i--;) {
-                if ( ! Jeeel.Type.inArray(rperms[i], alloweds, true)) {
+                if ( ! Jeeel.Hash.inHash(rperms[i], alloweds, true)) {
                     return false;
                 }
             }
@@ -53172,7 +58630,7 @@ Jeeel.Framework.Acl.Role.Abstract.prototype = {
         }
         
         for (var i = denieds.length; i--;) {
-            if (Jeeel.Type.inArray(denieds[i], authorizations, true)) {
+            if (Jeeel.Hash.inHash(denieds[i], authorizations, true)) {
                 return true;
             }
         }
@@ -53231,6 +58689,7 @@ Jeeel.Framework.Acl.Role.User.prototype = {
 };
 
 Jeeel.Class.extend(Jeeel.Framework.Acl.Role.User, Jeeel.Framework.Acl.Role.Abstract);
+
 /**
  * コンストラクタ
  * 
@@ -53361,7 +58820,8 @@ Jeeel.Framework.Acl.Role.Manager.prototype = {
         
         return this;
     }
-};Jeeel.directory.Jeeel.Framework.Acl.Resource = {
+};
+Jeeel.directory.Jeeel.Framework.Acl.Resource = {
 
     /**
      * 自身を文字列参照された場合の変換
@@ -53472,7 +58932,6 @@ Jeeel._autoImports(Jeeel.directory.Jeeel.Framework.Acl.Resource, Jeeel.file.Jeee
 Jeeel.Framework.Acl.Resource.Url = function (url, includeHierarchy) {
     Jeeel.Framework.Acl.Resource.Abstract.call(this);
     
-    var filter = Jeeel.Filter.String.RegularExpressionEscape.create();
     var absUrl = Jeeel.UserAgent.getBaseUrl() + url;
     
     var suffix;
@@ -53484,8 +58943,8 @@ Jeeel.Framework.Acl.Resource.Url = function (url, includeHierarchy) {
     }
     
     this._url = url;
-    this._reg = new RegExp('^' + filter.filter(this._url) + suffix, 'i');
-    this._regFull = new RegExp('^' + filter.filter(absUrl) + suffix, 'i');
+    this._reg = new RegExp('^' + Jeeel.String.escapeRegExp(this._url) + suffix, 'i');
+    this._regFull = new RegExp('^' + Jeeel.String.escapeRegExp(absUrl) + suffix, 'i');
     
     // URLのリソースはアクセス以外に権限がない
     this.addAuthorization('Access');
@@ -53543,6 +59002,7 @@ Jeeel.Framework.Acl.Resource.Url.prototype = {
 };
 
 Jeeel.Class.extend(Jeeel.Framework.Acl.Resource.Url, Jeeel.Framework.Acl.Resource.Abstract);
+
 /**
  * コンストラクタ
  * 
@@ -53868,6 +59328,7 @@ if (Jeeel.Acl) {
         throw err;
     };
 }
+
 /**
  * コンストラクタ
  * 
@@ -53920,9 +59381,160 @@ Jeeel.Class.extend(Jeeel.Framework.Acl.Error, Jeeel.Error);Jeeel.directory.Jeeel
 
 /**
  * @namespace デバッグ関連の機能を保持するネームスペース
+ * @example
+ * Debugネームスペース以下にはJSのデバッグに使える機能を保有する
+ * この機能は主にIEやスマフォでのデバッグに役に立つ
+ * その中でも主に以下のクラスが筆頭に立つ
+ * Jeeel.Debug.Console
+ * Jeeel.Debug.ErrorMessage
+ * Jeeel.Debug.Timer
+ * Jeeel.Debug.Profiler
+ * 
+ * Jeeel.Debug.Console
+ * ChromeやFirefoxを初めとする高機能ブラウザに搭載されているJSコンソールの再現である
+ * このクラスは主にIE8以下などのコンソール機能が弱いブラウザで使用する
+ * 
+ * 例：
+ * Jeeel.Debug.Console.create(); // JSコンソールを生成し画面上に表示する、createConsole()と同じ意味
+ * Jeeel.Debug.Console.log(); // JSコンソール上にログを出す
+ * Jeeel.Debug.Console.clear(); // JSコンソールの履歴・表示を全て消去する
+ * 
+ * コンソールを生成した後は画面上に出たテキストエリア(コンソール)で操作を行う
+ * コンソール上では通常通りにキーを入力すればグローバル階層からの予測変換とともにJSを入力する事が可能になる
+ * またwindow.nameに履歴を保存するのでタブを閉じない限り履歴が保持される
+ * 以下が通常記述以外の操作になる
+ * 
+ * Ctrl+m：複数行モードと単数行モードの変更
+ * 
+ * 単数行モード時
+ *
+ * ↑, PageUp：実行履歴を上がる
+ * ↓, PageDown：実行履歴を下る
+ * Enter：実行
+ * 
+ * 複数行モード時
+ *
+ * Ctrl+↑, Ctrl+PageUp：実行履歴を上がる
+ * Ctrl+↓, Ctrl+PageDown：実行履歴を下る
+ * Ctrl+Enter：実行 
+ * 
+ * 
+ * Jeeel.Debug.ErrorMessage
+ * 単にメッセージやHTMLをダンプするダンパーである
+ * 基本的にJeeel以下にデバッグモードだったら機能する幾つかのメソッドがあるのでそちらを利用する
+ * 
+ * 例：
+ * Jeeel.Debug.ErrorMessage.dump(1, 'eee'); // 画面上に可変引数で取った値を文字列として出力する、Jeeel.errorDumpがこれに相当する
+ * Jeeel.Debug.ErrorMessage.dumpHtml('<p>Test!!</p>', '<div>AAA</div>'); // 画面上に可変引数で取った値をHTMLとして出力する、Jeeel.errorHtmlDumpがこれに相当する
+ * Jeeel.Debug.ErrorMessage.dumpStripTags('<p>Test!!</p>', '<div>AAA</div>'); // 画面上に可変引数で取った値をタグ取りしてから出力する、対応するメソッドはない
+ * 
+ * 
+ * Jeeel.Debug.Timer
+ * 処理に掛った時間を計測するタイマー
+ * Jeeel.Timerとの違いは遅延実行などの制御ではなく、ストップウォッチに近い機能を提供するところである
+ * 
+ * 例：
+ * var timer = Jeeel.Debug.Timer.create(); // mew Jeeel.Debug.Timer()でも同じ
+ * 
+ * // 重い処理(2500ms経過したとする)
+ * timer.lap('A'); // ラップを記録する
+ * timer.interval('A'); // インターバルを記録する
+ * 
+ * // 重い処理(1500ms経過したとする)
+ * timer.lap('B'); // ラップを記録する
+ * timer.interval('B'); // インターバルを記録する
+ * timer.stop(); // タイマーを停止する
+ * 
+ * 上記のように記録を取ると以下のような値が取得できる
+ * timer.loadAllLap(); // {A: 2500, B: 4000}
+ * timer.loadAllInterval(); // {A: 2500, B: 1500}
+ * 
+ * 
+ * Jeeel.Debug.Profiler
+ * 何処の処理が重いのかを判定するプロファイラー
+ * 指定した名前空間や関数に対してトリガーを仕込みそれぞれの関数の呼び出し回数、経過時間、その平均等を割り出すことが出来る
+ * 
+ * 例：
+ * var Test = {
+ *     getHoge: funcion () {
+ *         return this.getFuga();
+ *     },
+ *     
+ *     getFuga: function () {
+ *         return this.Circle.getArea();
+ *     },
+ *     
+ *     Circle: {
+ *         getArea: function () {
+ *             return ths.getHalfDiameter() * ths.getHalfDiameter() * Math.PI;
+ *         },
+ *         
+ *         getHalfDiameter: function () {
+ *             return 2.5;
+ *         }
+ *     }
+ * };
+ * 
+ * Jeeel.Debug.Profiler.profile(Test, 'Test', true); // Testネームスペース以下を全てプロファイル対象にする
+ * 
+ * Test.getHoge();
+ * Test.getHoge();
+ * Test.getHoge();
+ * Test.getHoge();
+ * 
+ * 上記の様に4回先のメソッドを実行すると
+ * 4回プロファイルが作成される
+ * 
+ * Jeeel.Debug.Profiler.getAverageProfileHash(); // 基本的にこのメソッドだけで十分、メソッド毎の平均して掛った時間を連想配列として返す
+ * Jeeel.Debug.Profiler.getBottleneckProfile(); // 一番実行に時間が掛ったプロファイルを取得する
+ * var m = Jeeel.Debug.Profiler.getProfiles(); // このメソッドを実行するとプロファイルマネージャーインスタンスが取得できる
+ * m.getProfiles(); // このメソッドを実行するとプロファイルの時系列順配列を取得できる
+ * 
+ * このクラスは調節状況であり、継承などが複雑になりすぎるとデータを追えなくなってしまうことがある
+ * クロージャなどのJSからアクセスできない関数には対応出来ないなどの欠点もある
+ * 
+ * <input type="button" value="コンソール生成" onclick="createConsole();" />
  */
 Jeeel.Debug = {
 
+};
+
+/**
+ * @private
+ */
+Jeeel._Object.JeeelDebug = {
+    /**
+     * 不特定なオブジェクトの名前を取得する
+     *
+     * @param {Mixied} obj 展開対象のオブジェクト
+     * @return {String} 名前
+     */
+    getUnknownObjectName: function (obj) {
+        var objType;
+        var tmp;
+
+        if (obj.__proto__ && obj.__proto__.constructor && obj.__proto__.constructor[Jeeel.Debug.Debugger.INFORMATION_NAME]) {
+            objType = obj.__proto__.constructor[Jeeel.Debug.Debugger.INFORMATION_NAME].name;
+        }
+        else if ( ! obj.__proto__ && Object.getPrototypeOf && (tmp = Object.getPrototypeOf(obj)).constructor && tmp.constructor[Jeeel.Debug.Debugger.INFORMATION_NAME]) {
+            objType = tmp.constructor[Jeeel.Debug.Debugger.INFORMATION_NAME].name;
+        }
+        else if ( ! obj.__proto__ && ! Object.getPrototypeOf && obj.hasOwnProperty && obj.hasOwnProperty('constructor') && obj.constructor !== Object) {
+            objType = obj._super && obj._super.constructor && obj._super.constructor[Jeeel.Debug.Debugger.INFORMATION_NAME].name || 'Object';
+        }
+        else if ( ! obj.__proto__ && obj.constructor && obj.constructor[Jeeel.Debug.Debugger.INFORMATION_NAME]) {
+            objType = obj.constructor[Jeeel.Debug.Debugger.INFORMATION_NAME].name;
+        }
+        else if (obj.constructor && obj.constructor.name) {
+            objType = obj.constructor.name;
+        }
+        else {
+            objType = Object.prototype.toString.call(obj);
+            objType = objType.substring(8, objType.length - 1);
+        }
+
+        return objType;
+    }
 };
 
 Jeeel.file.Jeeel.Debug = ['ObjectExport', 'ObjectExpander', 'ErrorMessage', 'Timer', 'Console', 'Profiler', 'UnitTest', 'Debugger', 'Compressor'];
@@ -53949,19 +59561,19 @@ Jeeel.Debug.objectExport = function (obj) {
             return '"' + obj + '"';
         }
         
-        return obj;
+        return '' + obj;
     }
 
     if (Jeeel.Type.isFunction(obj)) {
         var str = obj.toString();
         var remove = str.match(/ +}$/gi);
         if (remove) {
-            remove = remove[0].substring(0, remove[0].length-1);
-            var regExp = new RegExp('(\\n|\\r\\n)'+remove, 'ig');
+            remove = remove[0].substring(0, remove[0].length - 1);
+            var regExp = new RegExp('(\\n|\\r\\n)' + remove, 'ig');
             str = str.replace(regExp, '\n');
         }
 
-        return str.replace(/(\n|\r\n)/ig, '$1'+sp);
+        return str.replace(/(\n|\r\n)/ig, '$1' + sp);
     }
 
     cnt++;
@@ -53973,9 +59585,9 @@ Jeeel.Debug.objectExport = function (obj) {
             res[i] = sp + '    ' + i + ': ' + arguments.callee(obj[i], cnt);
         }
 
-        return 'array {\n' + res.join(',\n') + '\n' + sp + '}';
+        return 'Array {\n' + res.join(',\n') + '\n' + sp + '}';
     } else {
-        var className = res;
+        var className = Jeeel._Object.JeeelDebug.getUnknownObjectName(obj);
         
         res = [];
 
@@ -54236,12 +59848,13 @@ Jeeel.Debug.ObjectExpander.prototype = {
      * @param {String} [key] オブジェクトに対応するキー
      * @param {Boolean} [isSimple=false] シンプルな形で取得するかどうか
      * @param {Boolean} [isFirst=false] 最初の呼び出しかどうか
+     * @param {Boolean} [isHided=false] この展開キーが隠されているかどうか
      * @return {Element} テーブルタグのHTML要素
      * @private
      */
-    _createExpander: function (obj, key, isSimple, isFirst) {
+    _createExpander: function (obj, key, isSimple, isFirst, isHided) {
 
-        var elm = this._expandObject.call(this, obj, key, isFirst);
+        var elm = this._expandObject.call(this, obj, key, isHided, isFirst);
 
         if (isSimple && ! elm.canExpand && ! elm.isError) {
             return elm;
@@ -54388,25 +60001,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
      * @return {String} 名前
      * @private
      */
-    _getUnknownObjectName: function (obj) {
-        var objType;
-
-        if (obj.__proto__ && obj.__proto__.constructor && obj.__proto__.constructor[Jeeel.Debug.Debugger.INFORMATION_NAME]) {
-            objType = obj.__proto__.constructor[Jeeel.Debug.Debugger.INFORMATION_NAME].name;
-        }
-        else if ( ! obj.__proto__ && obj.constructor && obj.constructor[Jeeel.Debug.Debugger.INFORMATION_NAME]) {
-            objType = obj.constructor[Jeeel.Debug.Debugger.INFORMATION_NAME].name;
-        }
-        else if(obj.constructor && obj.constructor.name) {
-            objType = obj.constructor.name;
-        }
-        else {
-            objType = Object.prototype.toString.call(obj);
-            objType = objType.substring(8, objType.length - 1);
-        }
-
-        return objType;
-    },
+    _getUnknownObjectName: Jeeel._Object.JeeelDebug.getUnknownObjectName,
 
     /**
      * 不特定なオブジェクトの展開を定義づける
@@ -54429,13 +60024,14 @@ Jeeel.Debug.ObjectExpander.prototype = {
      * @return {Element} 要素を示す文字列等を含むHTML要素
      * @private
      */
-    _expandObject: function (obj, key, isFirst) {
+    _expandObject: function (obj, key, isHided, isFirst) {
 
         var elm = Jeeel.Document.createElement('font');
         var type;
         var canExpand = true;
         var isError   = false;
         var isElement = false;
+        var isArray   = false;
 
         try {
             type = Jeeel.Type.getType(obj);
@@ -54447,7 +60043,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
         switch (type) {
             case Jeeel.Type.ObjectType.STRING:
                 elm.color = 'red';
-                elm.innerHTML = '&quot;' + Jeeel.Filter.Html.Escape.create(true).filter(obj) + '&quot;';
+                elm.innerHTML = '&quot;' + Jeeel.String.escapeHtml(obj, true) + '&quot;';
 
                 if (obj.match(/^(https?|ttp):\/\/.+/)) {
                     var url = (obj.match(/^ttp:\/\/.+/) ? 'h' + obj : obj);
@@ -54460,13 +60056,13 @@ Jeeel.Debug.ObjectExpander.prototype = {
 
             case Jeeel.Type.ObjectType.REGULAR_EXPRESSION:
                 elm.color = 'violet';
-                elm.innerHTML = Jeeel.Filter.Html.Escape.create(true).filter('' + obj);
+                elm.innerHTML = Jeeel.String.escapeHtml('' + obj, true);
                 canExpand = false;
                 break;
 
             case Jeeel.Type.ObjectType.DATE:
                 elm.color = 'black';
-                elm.innerHTML = Jeeel.Filter.Html.Escape.create(true).filter(obj.toString());
+                elm.innerHTML = Jeeel.String.escapeHtml(obj.toString(), true);
                 break;
 
             case Jeeel.Type.ObjectType.BOOLEAN:
@@ -54485,7 +60081,9 @@ Jeeel.Debug.ObjectExpander.prototype = {
 
             case Jeeel.Type.ObjectType.ARGUMENTS:
             case Jeeel.Type.ObjectType.ARRAY:
-                if ( ! isFirst) {
+                isArray = true;
+                
+                if ( ! isFirst || obj.length > 100) {
                     elm.innerHTML = type + '[' + obj.length + ']';
                     break;
                 }
@@ -54532,7 +60130,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
                 break;
 
             case Jeeel.Type.ObjectType.FUNCTION:
-                var func = Jeeel.Filter.Html.Escape.create(false).filter('' + obj).toString().replace(/(\r\n|\n)/g, '&crarr;');
+                var func = Jeeel.String.escapeHtml('' + obj).replace(/(\r\n|\n)/g, '&crarr;');
                 elm.color = 'black';
                 elm.innerHTML = (func.length > 100 ? func.substr(0, 100) + ' ...' : func);
                 break;
@@ -54592,7 +60190,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
                 name.innerHTML = obj.name;
                 
                 elm.color = '#1A1AA6';
-                elm.innerHTML = Jeeel.Filter.Html.Escape.create(true).filter('"' + obj.value + '"');
+                elm.innerHTML = Jeeel.String.escapeHtml('"' + obj.value + '"', true);
                 
                 div.appendChild(name);
                 div.appendChild(elm);
@@ -54612,7 +60210,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
 
                 var replaceCR = !(obj.data.match(/^(\r|\n|\t| )*$/) && true);
                 elm.color = 'black';
-                elm.innerHTML = Jeeel.Filter.Html.Escape.create(replaceCR).filter('"' + obj.data + '"');
+                elm.innerHTML = Jeeel.String.escapeHtml('"' + obj.data + '"', replaceCR);
 
                 canExpand = false;
                 break;
@@ -54626,7 +60224,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
                 }
                 
                 elm.color = '#236E25';
-                elm.innerHTML = Jeeel.Filter.Html.Escape.create(true).filter('<!--' + obj.data + '-->');
+                elm.innerHTML = Jeeel.String.escapeHtml('<!--' + obj.data + '-->', true);
                 canExpand = false;
                 break;
 
@@ -54639,7 +60237,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
 
             case Jeeel.Type.ObjectType.ERROR:
                 elm.color = 'red';
-                elm.innerHTML = Jeeel.Filter.Html.Escape.create(true).filter(obj.name + ': ' + obj.message);
+                elm.innerHTML = Jeeel.String.escapeHtml(obj.name + ': ' + obj.message, true);
                 canExpand = false;
                 isError = true;
                 break;
@@ -54670,8 +60268,13 @@ Jeeel.Debug.ObjectExpander.prototype = {
             var tre = Jeeel.Document.createElement('tr');
             var the = Jeeel.Document.createElement('th');
             var tde = Jeeel.Document.createElement('td');
+            var col = '881391';
+            
+            if (isHided) {
+                col = 'B771BD';
+            }
 
-            the.innerHTML = '<font color="#881391">' + key + '</font>:&nbsp;&nbsp;';
+            the.innerHTML = '<font color="#' + col + '">' + key + '</font>:&nbsp;&nbsp;';
 
             the.style.verticalAlign = 'top';
             tde.appendChild(elm);
@@ -54687,6 +60290,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
         elm.canExpand = canExpand;
         elm.isError   = isError;
         elm.isElement = isElement;
+        elm.isArray   = isArray;
         
         return elm;
     },
@@ -54709,13 +60313,13 @@ Jeeel.Debug.ObjectExpander.prototype = {
             return;
         }
 
-        var i, l, th;
+        var i, l, tmp, th;
 
         th = tbody.firstChild.firstChild;
         th.innerHTML = Jeeel.Debug.ObjectExpander.EXPAND_ARROW;
 
         if (isFirst) {
-            var tr, td;
+            var tr;
             var list = Jeeel.Hash.getPairs(obj);
             var flag = Jeeel._doc.createDocumentFragment();
             
@@ -54723,19 +60327,34 @@ Jeeel.Debug.ObjectExpander.prototype = {
                 var key = list[i].key;
                 var val = list[i].value;
                 
-                tr = Jeeel.Document.createElement('tr');
-                th = Jeeel.Document.createElement('th');
-                td = Jeeel.Document.createElement('td');
+                if (Object.getOwnPropertyDescriptor && Object.prototype.hasOwnProperty && Object.prototype.hasOwnProperty.call(obj, key)) {
+                  
+                    try {
+                        tmp = Object.getOwnPropertyDescriptor(obj, key);
+                    } catch (e) {
+                        tmp = {
+                            enumerable: key !== '__proto__'
+                        };
+                    }
 
-                var elm = this._createExpander.call(this, val, key);
+                    if (tmp && (tmp.get || tmp.set)) {
+                        if (tmp.get) {
+                            tr = this._createExpanderTr(tmp.get, 'get ' + key, ! tmp.enumerable);
+                            flag.appendChild(tr);
+                        }
 
-                td.appendChild(elm);
-                
-                tr.appendChild(th);
-                tr.appendChild(td);
-                tr.className = this.constructor.EXPAND_CHILD_CLASS;
-                
-                flag.appendChild(tr);
+                        if (tmp.set) {
+                            tr = this._createExpanderTr(tmp.set, 'set ' + key, ! tmp.enumerable);
+                            flag.appendChild(tr);
+                        }
+                    } else {
+                        tr = this._createExpanderTr(val, key, !tmp || !tmp.enumerable);
+                        flag.appendChild(tr);
+                    }
+                } else {
+                    tr = this._createExpanderTr(val, key, key === '__proto__');
+                    flag.appendChild(tr);
+                }
             }
             
             tbody.appendChild(flag);
@@ -54748,6 +60367,22 @@ Jeeel.Debug.ObjectExpander.prototype = {
                 }
             }
         }
+    },
+    
+    _createExpanderTr: function (val, key, isHided) {
+        var tr = Jeeel.Document.createElement('tr');
+        var th = Jeeel.Document.createElement('th');
+        var td = Jeeel.Document.createElement('td');
+
+        var elm = this._createExpander.call(this, val, key, false, false, isHided);
+
+        td.appendChild(elm);
+
+        tr.appendChild(th);
+        tr.appendChild(td);
+        tr.className = this.constructor.EXPAND_CHILD_CLASS;
+
+        return tr;
     },
 
     /**
@@ -54813,19 +60448,8 @@ Jeeel.Debug.ObjectExpander.prototype = {
                 if (Jeeel.Type.isText(children[i]) && children[i].data.match(/^(\r|\n|\t| )*$/)) {
                     continue;
                 }
-
-                tr = Jeeel.Document.createElement('tr');
-                th = Jeeel.Document.createElement('th');
-                td = Jeeel.Document.createElement('td');
-
-                var elm = this._createExpander.call(this, children[i]);
-
-                td.appendChild(elm);
                 
-                tr.appendChild(th);
-                tr.appendChild(td);
-                tr.className = this.constructor.EXPAND_CHILD_CLASS;
-
+                tr = this._createExpanderTr(children[i]);
                 flag.appendChild(tr);
             }
 
@@ -54925,25 +60549,14 @@ Jeeel.Debug.ObjectExpander.prototype = {
         th.innerHTML = this.constructor.EXPAND_ARROW;
 
         if (isFirst) {
-            var tr, td;
+            var tr;
             var flag = Jeeel.Document.createDocumentFragment();
             var length = obj.childNodes.length;
 
             for (i = 0; i < length; i++) {
                 var val = obj.childNodes[i];
-
-                tr = Jeeel.Document.createElement('tr');
-                th = Jeeel.Document.createElement('th');
-                td = Jeeel.Document.createElement('td');
                 
-                var elm = this._createExpander.call(this, val);
-
-                td.appendChild(elm);
-
-                tr.appendChild(th);
-                tr.appendChild(td);
-                tr.className = this.constructor.EXPAND_CHILD_CLASS;
-                
+                tr = this._createExpanderTr(val);
                 flag.appendChild(tr);
             }
             
@@ -55112,7 +60725,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
                     multiLine = true;
                 }
                 
-                var txt = (isOpendElm ? Jeeel.Filter.Html.Escape.create(true).filter(innerText) : '_');
+                var txt = (isOpendElm ? Jeeel.String.escapeHtml(innerText, true) : '_');
                 
                 if (isOpendElm && multiLine) {
                     txt = '<br />' + txt + '<br />';
@@ -55133,7 +60746,7 @@ Jeeel.Debug.ObjectExpander.prototype = {
     _isAlwaysOpenedElement: function (element) {
         var closeElm = ['SCRIPT', 'STYLE'];
 
-//        if (Jeeel.Type.inArray(element.tagName.toUpperCase(), closeElm)) {
+//        if (Jeeel.Hash.inHash(element.tagName.toUpperCase(), closeElm)) {
 //            return true;
 //        }
 
@@ -55186,7 +60799,21 @@ Jeeel.Debug.ErrorMessage = {
      *
      * @param {Mixied} var_args 可変引数、ダンプするエラーを羅列する
      */
-    dump: function (var_args) {},
+    dump: function (var_args) {
+        var div = Jeeel.Debug.ErrorMessage._create();
+
+        var error = [];
+
+        for (var i = 0, l = arguments.length; i < l; i++) {
+            error[i] = Jeeel.String.escapeHtml(arguments[i], true);
+        }
+
+        Jeeel.Debug.ErrorMessage._setLinefeed();
+
+        div.innerHTML += error.join(' ');
+
+        Jeeel.Debug.ErrorMessage._setLinefeedTimer();
+    },
 
     /**
      * タグを全て取り除いたエラーダンプする<br />
@@ -55253,7 +60880,9 @@ Jeeel.Debug.ErrorMessage = {
      *
      * @return {String} 取得したエラーメッセージ
      */
-    getText: function () {},
+    getText: function () {
+        return Jeeel.String.unescapeHtml(Jeeel.Debug.ErrorMessage._create().innerHTML, true);
+    },
     
     _setLinefeed: function () {
         if (this._setLf) {
@@ -55271,37 +60900,9 @@ Jeeel.Debug.ErrorMessage = {
             Jeeel.Debug.ErrorMessage._setLf = true;
             Jeeel.Debug.ErrorMessage._timer = 0;
         }, 0);
-    },
-    
-    _init: function () {
-        var ef = new Jeeel.Filter.Html.Escape(true);
-        var uf = new Jeeel.Filter.Html.Unescape(true);
-        
-        this.dump = function (var_args) {
-            var div = Jeeel.Debug.ErrorMessage._create();
-
-            var error = [];
-
-            for (var i = 0, l = arguments.length; i < l; i++) {
-                error[i] = ef.filter(arguments[i]);
-            }
-            
-            Jeeel.Debug.ErrorMessage._setLinefeed();
-
-            div.innerHTML += error.join(' ');
-            
-            Jeeel.Debug.ErrorMessage._setLinefeedTimer();
-        };
-        
-        this.getText = function () {
-            return uf.filter(Jeeel.Debug.ErrorMessage._create().innerHTML);
-        };
-        
-        delete this._init;
     }
 };
 
-Jeeel.Debug.ErrorMessage._init();
 /**
  * コンストラクタ
  * 
@@ -55793,7 +61394,7 @@ Jeeel.Debug.Console = {
         var self = this;
         var session = Jeeel.Session.Name.create();
 
-        this._consoleSession = session.setExpires(-1);
+        this._consoleSession = session.setExpires(-1).setPath('/');
         
         this._consoleIn  = Jeeel.Dom.Element.Textarea.create(Jeeel.Document.getElementById(this.CONSOLE_LOG_ID));
         this._consoleOut = Jeeel.Document.getElementById(this.CONSOLE_RESULT_ID);
@@ -55832,9 +61433,9 @@ Jeeel.Debug.Console = {
             var timeoutId;
             
             if (self._codeAssistData.use) {
-                if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Space, Jeeel.Dom.Event.KeyCode.LeftBracket, Jeeel.Dom.Event.KeyCode.RightBracket])) {
+                if (Jeeel.Hash.inHash(keyCode, [Jeeel.Dom.Event.KeyCode.Space, Jeeel.Dom.Event.KeyCode.LeftBracket, Jeeel.Dom.Event.KeyCode.RightBracket])) {
                     self._codeAssistDataClose();
-                } else if (self._codeAssistData.enable || Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Period, Jeeel.Dom.Event.KeyCode.BackSpace]) || ! self._consoleIn.getText()) {
+                } else if (self._codeAssistData.enable || Jeeel.Hash.inHash(keyCode, [Jeeel.Dom.Event.KeyCode.Period, Jeeel.Dom.Event.KeyCode.BackSpace]) || ! self._consoleIn.getText()) {
                     timeoutId = Jeeel.Timer.setTimeout(self._setCodeAssistData, 1);
                 }
             }
@@ -55847,7 +61448,7 @@ Jeeel.Debug.Console = {
                 
                 return false;
                 
-            } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Up, Jeeel.Dom.Event.KeyCode.PageUp])) {
+            } else if (Jeeel.Hash.inHash(keyCode, [Jeeel.Dom.Event.KeyCode.Up, Jeeel.Dom.Event.KeyCode.PageUp])) {
 
                 e.stop();
 
@@ -55857,7 +61458,7 @@ Jeeel.Debug.Console = {
 
                 return false;
                 
-            } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Down, Jeeel.Dom.Event.KeyCode.PageDown])) {
+            } else if (Jeeel.Hash.inHash(keyCode, [Jeeel.Dom.Event.KeyCode.Down, Jeeel.Dom.Event.KeyCode.PageDown])) {
                 
                 e.stop();
 
@@ -55919,7 +61520,7 @@ Jeeel.Debug.Console = {
 
                     return false;
 
-                } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Up, Jeeel.Dom.Event.KeyCode.PageUp])) {
+                } else if (Jeeel.Hash.inHash(keyCode, [Jeeel.Dom.Event.KeyCode.Up, Jeeel.Dom.Event.KeyCode.PageUp])) {
 
                     e.stop();
 
@@ -55927,7 +61528,7 @@ Jeeel.Debug.Console = {
 
                     return false;
 
-                } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Down, Jeeel.Dom.Event.KeyCode.PageDown])) {
+                } else if (Jeeel.Hash.inHash(keyCode, [Jeeel.Dom.Event.KeyCode.Down, Jeeel.Dom.Event.KeyCode.PageDown])) {
 
                     e.stop();
 
@@ -56227,7 +61828,7 @@ Jeeel.Debug.Console = {
             return;
         }
         
-        if (this._consoleLog.length == 0) {
+        if (this._consoleLog.length === 0) {
             return;
         }
 
@@ -56251,7 +61852,7 @@ Jeeel.Debug.Console = {
             return;
         }
       
-        if (this._consoleLog.length == 0) {
+        if (this._consoleLog.length === 0) {
             return;
         }
 
@@ -56334,7 +61935,6 @@ Jeeel.Debug.Console = {
     _setCodeAssistData: (function () {
         var txtReg = /(^|[;:{}(\[\] ])([a-zA-Z$_][a-zA-Z0-9$_.]*)\.(|[a-zA-Z$_][a-zA-Z0-9$_]*)$/;
         var idxReg = /\.(|[a-zA-Z$_][a-zA-Z0-9$_]*)$/;
-        var rf = new Jeeel.Filter.String.RegularExpressionEscape();
         var appendKeys = [
             'var',
             'function',
@@ -56353,7 +61953,8 @@ Jeeel.Debug.Console = {
             'if',
             'else',
             'else if',
-            'with'
+            'with',
+            'arguments'
         ];
         
         return function () {
@@ -56443,7 +62044,7 @@ Jeeel.Debug.Console = {
 
             if (caData.child) {
 
-                var regVal = rf.filter(caData.child);
+                var regVal = Jeeel.String.escapeRegExp(caData.child);
 
                 var reg = new RegExp('^' + regVal);
 
@@ -56569,7 +62170,7 @@ Jeeel.Debug.Console = {
             return;
         } else if (index < 0) {
             index = 0;
-        } else if(index >= caData.keys.length) {
+        } else if (index >= caData.keys.length) {
             return;
         }
         
@@ -56773,7 +62374,7 @@ Jeeel.Debug.Profiler = {
     /**
      * 指定したオブジェクト以下のメソッドをプロファイリング対象にする
      * 
-     * @param {Object} object プロファイリング対象のメソッドを保持するオブジェクト
+     * @param {Object|Function} object プロファイリング対象のメソッドを保持するオブジェクトもしくは関数
      * @param {String} name オブジェクトの名前
      * @param {Boolean} [deepSet] オブジェクトのプロパティに対して再帰的にプロファイリングするかどうか
      * @return {Jeeel.Debug.Profiler} 自クラス
@@ -56935,7 +62536,7 @@ Jeeel.Debug.Profiler = {
             }
             
             avg = this._times[methodName] / this._counts[methodName];
-            manager.addProfile(new this.Profile(methodName, avg));
+            manager.addProfile(new this.Profile(methodName, null, avg));
         }
         
         return manager;
@@ -56998,7 +62599,7 @@ Jeeel.Debug.Profiler = {
             }
         }
         
-        return new this.Profile(key, max);
+        return new this.Profile(key, null, max);
     },
     
     /**
@@ -57021,11 +62622,11 @@ Jeeel.Debug.Profiler = {
                 time;
 
             if ( ! self._hierarchy) {
-                self._accessData = self._data = new self.Profile(fullName);
+                self._accessData = self._data = new self.Profile(fullName, this);
             } else {
                 tmp = self._accessData;
 
-                self._accessData = tmp.calls[tmp.calls.length] = new self.Profile(fullName);
+                self._accessData = tmp.calls[tmp.calls.length] = new self.Profile(fullName, this);
             }
 
             self._hierarchy++;
@@ -57035,7 +62636,7 @@ Jeeel.Debug.Profiler = {
             try {
                 
                 // このクロージャインスタンスだったらインスタンスの作成を行う
-                if (this instanceof arguments.callee) {
+                if (this instanceof arguments.callee && this.constructor === arguments.callee.prototype.constructor) {
                   
                     owner[self.TEMPORARY_METHOD_NAME] = func;
                     
@@ -57135,22 +62736,33 @@ Jeeel.Debug.Profiler = {
 Jeeel.file.Jeeel.Debug.Profiler = ['Profile', 'ProfileManager'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Debug.Profiler, Jeeel.file.Jeeel.Debug.Profiler);
+
 /**
  * コンストラクタ
  * 
  * @class プロファイル結果を保持するクラス
  * @param {String} methodName メソッド名
+ * @param {Object} instance インスタンス
  * @param {Number} [time] メソッドの実行に掛かった時間
  */
-Jeeel.Debug.Profiler.Profile = function (methodName, time) {
+Jeeel.Debug.Profiler.Profile = function (methodName, instance, time) {
     var self = this;
     
+    self.instance = instance || null;
     self.method = methodName;
     self.time = time || 0;
     self.calls = [];
 };
 
 Jeeel.Debug.Profiler.Profile.prototype = {
+    
+    /**
+     * メソッドを保有するインスタンス
+     * 
+     * @type Object
+     */
+    instance: null,
+    
     /**
      * メソッド名
      * 
@@ -57227,6 +62839,7 @@ Jeeel.Debug.Profiler.Profile.prototype = {
      */
     constructor: Jeeel.Debug.Profiler.Profile
 };
+
 /**
  * コンストラクタ
  * 
@@ -57339,6 +62952,7 @@ Jeeel.Debug.Profiler.ProfileManager.prototype = {
     
     constructor: Jeeel.Debug.Profiler.ProfileManager
 };
+
 /**
  * コンストラクタ
  * 
@@ -57615,7 +63229,7 @@ Jeeel.Debug.UnitTest.prototype = {
      * @return {Jeeel.Debug.UnitTest} 自インスタンス
      */
     assertHasKey: function (key, hash, message) {
-        return this._setAssertResult(Jeeel.Type.keyExists(key, hash), 'assertHasKey', message);
+        return this._setAssertResult(Jeeel.Hash.keyExists(key, hash), 'assertHasKey', message);
     },
     
     /**
@@ -57627,7 +63241,7 @@ Jeeel.Debug.UnitTest.prototype = {
      * @return {Jeeel.Debug.UnitTest} 自インスタンス
      */
     assertNotHasKey: function (key, hash, message) {
-        return this._setAssertResult( ! Jeeel.Type.keyExists(key, hash), 'assertNotHasKey', message);
+        return this._setAssertResult( ! Jeeel.Hash.keyExists(key, hash), 'assertNotHasKey', message);
     },
     
     /**
@@ -58306,9 +63920,13 @@ Jeeel.Debug.Debugger = {
             return false;
         } else if (Jeeel.Type.isElement(object) || Jeeel.Type.isDocument(object) || Jeeel.Type.isWindow(object)) {
             return false;
-        } else if (this.INFORMATION_NAME in object) {
-            return false;
         } else if (object instanceof Jeeel.Session.Core) {
+            return false;
+        } else if (object === Jeeel.Class.Abstract) {
+            object[this.INFORMATION_NAME] = new Jeeel.Object.Technical.Information('Jeeel.Class.Abstract', Jeeel.Class);
+            
+            return false;
+        } else if (this.INFORMATION_NAME in object) {
             return false;
         }
         
@@ -58345,6 +63963,8 @@ Jeeel.Debug.Debugger = {
                     var childName = isPrototype ? name + '#' + property : name + '.' + property;
                     
                     if (property === 'prototype') {
+                        childName = name;
+                    } else if (property === '_inherited') {
                         childName = name;
                     }
 

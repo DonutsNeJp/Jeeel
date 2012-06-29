@@ -26,7 +26,7 @@ Jeeel.Dom.Window = function (window) {
     
     if ( ! window) {
         window = Jeeel._global;
-    } else if (window.nodeName && window.nodeName.toUpperCase() == 'IFRAME') {
+    } else if (window.nodeName && window.nodeName.toUpperCase() === 'IFRAME') {
         window = window.contentWindow;
     } else if (window instanceof Jeeel.Dom.Document) {
         this._document = window;

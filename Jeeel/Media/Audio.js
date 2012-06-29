@@ -20,4 +20,6 @@ Jeeel.Media.Audio.create = function (audio) {
     return new this(audio);
 };
 
-Jeeel.Media.Audio.prototype = new Jeeel.Media.Abstract();
+Jeeel.Media.Audio.prototype = {};
+
+Jeeel.Class.extend(Jeeel.Media.Audio, Jeeel.Media.Abstract);

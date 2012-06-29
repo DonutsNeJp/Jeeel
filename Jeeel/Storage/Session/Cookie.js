@@ -6,6 +6,7 @@
  * @augments Jeeel.Storage.Session.Abstract
  * @param {String} name 読み込み・保存時の名前
  * @throws {Error} nameを文字列で指定しなかった場合に発生
+ * @see Jeeel.Session.Cookie
  */
 Jeeel.Storage.Session.Cookie = function (name) {
 

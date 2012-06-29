@@ -13,9 +13,21 @@ Jeeel.Dom.Element.Animator = function (style, returnInstance) {
 };
 
 Jeeel.Dom.Element.Animator.prototype = {
-  
+    
+    /**
+     * スタイルインスタンス
+     * 
+     * @type Jeeel.Dom.Style
+     * @private
+     */
     _style: null,
     
+    /**
+     * animate実行時の戻り値
+     * 
+     * @type Jeeel.Dom.Element
+     * @private
+     */
     _returnInstance: null,
     
     /**
@@ -140,7 +152,11 @@ Jeeel.Dom.Element.Animator.prototype = {
      * @return {Jeeel.Dom.Element.Animator} 自インスタンス
      */
     setCompleteCallback: function (callback, thisArg) {
-        this._complete = [callback, thisArg || this._returnInstance];
+        if (callback) {
+            this._complete = [callback, thisArg || this._returnInstance];
+        } else {
+            this._complete = null;
+        }
         
         return this;
     },
@@ -153,7 +169,11 @@ Jeeel.Dom.Element.Animator.prototype = {
      * @return {Jeeel.Dom.Element.Animator} 自インスタンス
      */
     setStepCallback: function (callback, thisArg) {
-        this._step = [callback, thisArg || this._returnInstance];
+        if (callback) {
+            this._step = [callback, thisArg || this._returnInstance];
+        } else {
+            this._step = null;
+        }
         
         return this;
     },
@@ -230,6 +250,15 @@ Jeeel.Dom.Element.Animator.prototype = {
         });
         
         return this._returnInstance;
+    },
+    
+    /**
+     * アニメーションが実行中かどうかを返す
+     * 
+     * @return {Boolean} 実行中かどうか
+     */
+    isAnimated: function () {
+        return Jeeel.Hash.inHash(this._returnInstance.getElement(), Jeeel.Dom.Style.Animation.animated, true);
     },
     
     /**

@@ -175,7 +175,7 @@ Jeeel.Framework.Layer.prototype = {
      */
     _flowBubblingPhaseEvent: function (event) {
         // 上位伝播対象でイベントがキャンセルしていない場合に親レイヤーに伝播する
-        if (this._parent && event.getBubbles() && ! event._cancelFlow) {
+        if (this._parent && event.useBubbles() && ! event._cancelFlow) {
             this._parent._flowEvent(event);
         }
     },
@@ -189,7 +189,7 @@ Jeeel.Framework.Layer.prototype = {
      */
     _flowFallingPhaseEvent: function (event) {
         // 下位伝播対象でイベントがキャンセルしていない場合に子レイヤーに伝播する
-        if (event.getFalls() && ! event._cancelFlow) {
+        if (event.useFalls() && ! event._cancelFlow) {
             for (var i =  this._children.length; i--;) {
                 this._children[i]._flowEvent(event);
             }

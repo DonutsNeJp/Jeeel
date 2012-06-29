@@ -1,8 +1,30 @@
+Jeeel.directory.Jeeel.Number = {
+
+    /**
+     * 自身を文字列参照された場合の変換
+     *
+     * @return {String} 自身のディレクトリ
+     * @private
+     */
+    toString: function () {
+        return Jeeel.directory.Jeeel + 'Number/';
+    }
+};
+
 /**
  * コンストラクタ
  * 
  * @class 数値の複雑な処理をするクラス
  * @param {Number} [number] 基となる数値
+ * @example
+ * 数値に対して複雑な処理を行うクラス
+ * 3桁区切りのフォーマット化や数値を指定範囲に収めたり、ランダムな整数を得たり平均や最小公倍数等を取得することが出来る
+ * 
+ * 例：
+ * Jeeel.Number.format(12548752, ',', '\'); // "\12,548,752"を取得する、主に金額を表示する際に使用する
+ * Jeeel.Number.limit(12, 0, 10); // 1つめの引数の数値が2つめと3つめの間に収まるように切り捨てる、この場合は10が返ってくる
+ * Jeeel.Number.random(1, 10); // 1～10の間の整数を取得する
+ * Jeeel.Number.getAvg(1, 5, 6); // 1, 5, 6を足し合わせて平均を取得する(戻り値4)
  */
 Jeeel.Number = function (number) {
     
@@ -289,3 +311,7 @@ Jeeel.Number.prototype = {
      */
     constructor: Jeeel.Number
 };
+
+Jeeel.file.Jeeel.Number = ['Fraction'];
+
+Jeeel._autoImports(Jeeel.directory.Jeeel.Number, Jeeel.file.Jeeel.Number);

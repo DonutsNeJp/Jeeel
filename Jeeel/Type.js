@@ -14,6 +14,26 @@ Jeeel.directory.Jeeel.Type = {
 
 /**
  * @staticClass 型に関する関数や定数を保持するスタティッククラス
+ * @example
+ * このクラスは型を判定する機能に特化したクラスである
+ * JavaScriptでは型があるにも関わらず正確な判別方法がデフォで無いため
+ * 正確な型判定をする必要がある際に利用する
+ * 
+ * 例：
+ * Jeeel.Type.isInteger(12); // true、数値で且整数なのでtrueになる
+ * Jeeel.Type.isInteger(12.5); // false、数値だか整数ではないのでfalseになる
+ * Jeeel.Type.isInteger(new Number(11)); // true、typeofではobject判定だが整数なのでtrueになる
+ * Jeeel.Type.isString('22'); // true、文字列なのでtrueになる
+ * Jeeel.Type.isString(22); // false、数値なのでfalseになる
+ * Jeeel.Type.isString(new String('22')); // true、typeofではobject判定だが文字列なのでtrueになる
+ * 
+ * 上記のように正確に判定する事が可能である
+ * 他にも良く使用するメソッドとして以下が挙げられる
+ * 
+ * Jeeel.Type.isArray([]); // 配列かどうかを判定する
+ * Jeeel.Type.isSet(null); // null, undefined以外かどうかを判定する(undefinedは a === undefined では判定出来ない)
+ * Jeeel.Type.isPrimitive(5); // 基本型かどうかを判定する(真偽値、数値、文字列値、null、undefinedが対象となる)
+ * Jeeel.Type.isHash({}); // 添え字を使用する事が出来るかどうかを判定する(基本型と関数以外全て)
  */
 Jeeel.Type = {
 
@@ -829,30 +849,6 @@ Jeeel.Type = {
     },
 
     /**
-     * 指定した値が配列式型の中に存在するかどうかを返す
-     *
-     * @param {Mixied} val 判定値
-     * @param {Hash} array 配列式型
-     * @param {Boolean} [strict] 厳密に型のチェックをするかどうか
-     * @return {Boolean} 判定結果
-     * @throws {Error} arrayが配列式でない場合に起こる
-     */
-    inArray: function (val, array, strict) {
-        var check = false;
-        
-        Jeeel.Hash.forEach(array,
-            function (elm) {
-                if (( ! strict && val == elm) || (strict && val === elm)) {
-                    check = true;
-                    return Jeeel.Hash.FOR_EACH_EXIT;
-                }
-            }
-        );
-
-        return check;
-    },
-
-    /**
      * 変数が配列式型で更に空であるかどうかを返す
      *
      * @param {Mixied} val 判定値
@@ -873,24 +869,16 @@ Jeeel.Type = {
         );
 
         return check;
-    },
-
-    /**
-     * 指定したキーが配列式型に存在するかどうかを返す
-     *
-     * @param {String|Integer} key 判定値
-     * @param {Hash} array 配列式型
-     * @return {Boolean} 判定結果
-     * @throws {TypeError} arrayが配列式でない場合に起こる
-     */
-    keyExists: function (key, array) {
-        return key in array;
     }
 };
 
 if (Jeeel._global && Jeeel._global.Array && Jeeel._global.Array.isArray) {
   
     /**
+     * 配列型かどうかを返す
+     *
+     * @param {Mixied} val 判定値
+     * @return {Boolean} 判定結果
      * @ignore
      */
     Jeeel.Type.isArray = function (val) {

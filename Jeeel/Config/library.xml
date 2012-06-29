@@ -7,15 +7,30 @@
 <!--
 hoigehogege
 -->
-<config h="n" j="k">
+<config head="non" jack="kick teck." xmlns:tag="http://example.com/ns/tag/">
   <debug>
     <url>/dev/debug/eval/</url>  
   </debug>
-  <time>
+  <time tag:a="test">
     <p>&hoge;</p>
     <copyright>&copy; OOO</copyright>
   </time>
-  <buki xmlns:a="http://example.com/ns/a/"></buki>
+  <jack:call xmlns:jack="http://example.com/ns/jack/">
+    <test>テストジャック</test>
+  </jack:call>
+  <buki xmlns:a="http://example.com/ns/a/">
+    <a:test>別空間</a:test>
+    <sword xmlns:b="http://example.com/ns/b/">
+      <ja xmlns:a="http://example.com/ns/a_ja/">
+        <a:test>別空間</a:test>
+        <b:test>別空間</b:test>
+      </ja>
+      <en>
+        <a:test>別空間</a:test>
+        <b:test>別空間</b:test>
+      </en>
+    </sword>
+  </buki>
   <hoge>
     AAAA
     <a></a>

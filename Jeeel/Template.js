@@ -17,6 +17,106 @@
  *           <li> {?escape?}, {?/escape?}: タグで囲まれたテンプレートの出力のHTMLタグ等を全てエスケープして表示する</li>
  *           <li> {#COMMENT#}: 表示も実行もされないコメント</li>
  *         </ul>
+ * @example
+ * Smartyの様なテンプレートエンジンとして使用することが出来るクラス
+ * 
+ * 例：
+ * ------------------------------------------------------------------------------------------
+ * {#キャプチャを行う#}
+ * {?capture 'hoge'?}
+ *   Pop Up
+ * {?/capture?}
+ * {#通常出力#}
+ * <h1>{+Jeeel.VERSION+}</h1>
+ * {?function 'title'?}{?strip?}
+ *   <li>タイトル-{+i+}</li>
+ *   {?if Math.random() < 0.5?}
+ *     {#再帰呼び出し#}
+ *     Recall {+title({i: Math.random()})+}
+ *   {?/if?}
+ * {?/strip?}{?/function?}
+ * <footer>
+ *   {#JSの実行#}
+ *   {!
+ *     var tpl = '';
+ *     tpl += '<h2>';
+ *     tpl += 'hoge';
+ *     tpl += Math.random();
+ *     tpl += '</h2>';
+ *     
+ *     var j = 10;
+ *   !}
+ *   {#whileループ#}
+ *   {?while j--?}
+ *     {#if分岐#}
+ *     {?if parseInt(Math.random() * 2) % 2?}
+ *       <div>
+ *         {#HTMLのエスケープ#}
+ *         {?escape?}
+ *           {+tpl+}
+ *         {?/escape?}
+ *       </div>
+ *     {?else?}
+ *       失敗
+ *     {?/if?}
+ *   {?/while?}
+ *   {+pot+}{+foot+}
+ * </footer>
+ * ------------------------------------------------------------------------------------------
+ * 
+ * 以上のようなファイルが/test/js-templateに存在した場合に以下の文を実行する事が出来る
+ * 
+ * var template = Jeeel.Template.create();
+ * template.assign('foot', '777'); // footの名前のテンプレート変数を定義する
+ * template.fetchFile('/test/js-template'); // 先のファイルを読み込んでコンパイルし実行する
+ * 
+ * 上記をサンプルにするとHTMLタグ以外にSmartyに似たタグが混じっているのが分かる
+ * {#と#}に挟まれた箇所はコメントとなる 例、{#ここはコメント#}
+ * {+と+}に挟まれた箇所は実行＋表示になる 例、{+Math.random()+}
+ * {!と!}に挟まれた箇所は複数行の実行になる 例、{! var a = 10; a += 50; a -= 30 !}
+ * {?と?}に挟まれた箇所は制御構文にある 例、{?if a > 50?}<div>テスト</div>{?/if?}
+ * これらを組み合わせることでテンプレート変数を動的に割り当てHTML文字列を作成することを主とする
+ * 
+ * シンプルな例
+ * ----------------------------------------------
+ * <table>
+ *   <tr>
+ *     <th>名前</th>
+ *     <th>コメント</th>
+ *   </tr>
+ *   {?for var i = 0; i < list.length; i++?}
+ *     <tr>
+ *       <td>{+list[i].name+}</td>
+ *       <td>{+list[i].comment+}</td>
+ *     </tr>
+ *   {?/for?}
+ * </table>
+ * ----------------------------------------------
+ * 上記のような文字列が変数strに入っているとする
+ * 
+ * var tpl = Jeeel.Template.create();
+ * tpl.assign('list', [{name: 'a', 'Aです'}, {name: 'b', 'Bです'}]);
+ * var res = tpl.fetchTemplate(str);
+ * 
+ * 上記を実行した場合は結果resは以下になる
+ * ----------------------------------------------
+ * <table>
+ *   <tr>
+ *     <th>名前</th>
+ *     <th>コメント</th>
+ *   </tr>
+ *     <tr>
+ *       <td>a</td>
+ *       <td>Aです</td>
+ *     </tr>
+ *     <tr>
+ *       <td>b</td>
+ *       <td>Bです</td>
+ *     </tr>
+ * </table>
+ * ----------------------------------------------
+ * 
+ * ファイルと通信するとあまり効率が良くないので、予めテンプレート文字列をJS側に定義しておくか引き渡しておくと効率が良い
  */
 Jeeel.Template = function () {
     this._params = {};
@@ -759,6 +859,6 @@ Jeeel.Template.prototype = {
      */
     _replaceEscape: function (template) {
         return template.replace(this.constructor.PATTERNS.ESCAPE, "\u001e; if ( ! $$__escapetmp__$$) { $$__escapetmp__$$ = $$__out__$$; $$__out__$$ = \u001e")
-                       .replace(this.constructor.PATTERNS.END_ESCAPE, "\u001e; $$__out__$$ = $$__escapetmp__$$ + Jeeel.Filter.Html.Escape.create().filter($$__out__$$); $$__escapetmp__$$ = null;} $$__out__$$ += \u001e");
+                       .replace(this.constructor.PATTERNS.END_ESCAPE, "\u001e; $$__out__$$ = $$__escapetmp__$$ + Jeeel.String.escapeHtml($$__out__$$); $$__escapetmp__$$ = null;} $$__out__$$ += \u001e");
     }
 };

@@ -273,7 +273,7 @@ Jeeel.Debug.Console = {
         var self = this;
         var session = Jeeel.Session.Name.create();
 
-        this._consoleSession = session.setExpires(-1);
+        this._consoleSession = session.setExpires(-1).setPath('/');
         
         this._consoleIn  = Jeeel.Dom.Element.Textarea.create(Jeeel.Document.getElementById(this.CONSOLE_LOG_ID));
         this._consoleOut = Jeeel.Document.getElementById(this.CONSOLE_RESULT_ID);
@@ -312,9 +312,9 @@ Jeeel.Debug.Console = {
             var timeoutId;
             
             if (self._codeAssistData.use) {
-                if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Space, Jeeel.Dom.Event.KeyCode.LeftBracket, Jeeel.Dom.Event.KeyCode.RightBracket])) {
+                if (Jeeel.Hash.inHash(keyCode, [Jeeel.Dom.Event.KeyCode.Space, Jeeel.Dom.Event.KeyCode.LeftBracket, Jeeel.Dom.Event.KeyCode.RightBracket])) {
                     self._codeAssistDataClose();
-                } else if (self._codeAssistData.enable || Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Period, Jeeel.Dom.Event.KeyCode.BackSpace]) || ! self._consoleIn.getText()) {
+                } else if (self._codeAssistData.enable || Jeeel.Hash.inHash(keyCode, [Jeeel.Dom.Event.KeyCode.Period, Jeeel.Dom.Event.KeyCode.BackSpace]) || ! self._consoleIn.getText()) {
                     timeoutId = Jeeel.Timer.setTimeout(self._setCodeAssistData, 1);
                 }
             }
@@ -327,7 +327,7 @@ Jeeel.Debug.Console = {
                 
                 return false;
                 
-            } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Up, Jeeel.Dom.Event.KeyCode.PageUp])) {
+            } else if (Jeeel.Hash.inHash(keyCode, [Jeeel.Dom.Event.KeyCode.Up, Jeeel.Dom.Event.KeyCode.PageUp])) {
 
                 e.stop();
 
@@ -337,7 +337,7 @@ Jeeel.Debug.Console = {
 
                 return false;
                 
-            } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Down, Jeeel.Dom.Event.KeyCode.PageDown])) {
+            } else if (Jeeel.Hash.inHash(keyCode, [Jeeel.Dom.Event.KeyCode.Down, Jeeel.Dom.Event.KeyCode.PageDown])) {
                 
                 e.stop();
 
@@ -399,7 +399,7 @@ Jeeel.Debug.Console = {
 
                     return false;
 
-                } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Up, Jeeel.Dom.Event.KeyCode.PageUp])) {
+                } else if (Jeeel.Hash.inHash(keyCode, [Jeeel.Dom.Event.KeyCode.Up, Jeeel.Dom.Event.KeyCode.PageUp])) {
 
                     e.stop();
 
@@ -407,7 +407,7 @@ Jeeel.Debug.Console = {
 
                     return false;
 
-                } else if (Jeeel.Type.inArray(keyCode, [Jeeel.Dom.Event.KeyCode.Down, Jeeel.Dom.Event.KeyCode.PageDown])) {
+                } else if (Jeeel.Hash.inHash(keyCode, [Jeeel.Dom.Event.KeyCode.Down, Jeeel.Dom.Event.KeyCode.PageDown])) {
 
                     e.stop();
 
@@ -707,7 +707,7 @@ Jeeel.Debug.Console = {
             return;
         }
         
-        if (this._consoleLog.length == 0) {
+        if (this._consoleLog.length === 0) {
             return;
         }
 
@@ -731,7 +731,7 @@ Jeeel.Debug.Console = {
             return;
         }
       
-        if (this._consoleLog.length == 0) {
+        if (this._consoleLog.length === 0) {
             return;
         }
 
@@ -814,7 +814,6 @@ Jeeel.Debug.Console = {
     _setCodeAssistData: (function () {
         var txtReg = /(^|[;:{}(\[\] ])([a-zA-Z$_][a-zA-Z0-9$_.]*)\.(|[a-zA-Z$_][a-zA-Z0-9$_]*)$/;
         var idxReg = /\.(|[a-zA-Z$_][a-zA-Z0-9$_]*)$/;
-        var rf = new Jeeel.Filter.String.RegularExpressionEscape();
         var appendKeys = [
             'var',
             'function',
@@ -833,7 +832,8 @@ Jeeel.Debug.Console = {
             'if',
             'else',
             'else if',
-            'with'
+            'with',
+            'arguments'
         ];
         
         return function () {
@@ -923,7 +923,7 @@ Jeeel.Debug.Console = {
 
             if (caData.child) {
 
-                var regVal = rf.filter(caData.child);
+                var regVal = Jeeel.String.escapeRegExp(caData.child);
 
                 var reg = new RegExp('^' + regVal);
 
@@ -1049,7 +1049,7 @@ Jeeel.Debug.Console = {
             return;
         } else if (index < 0) {
             index = 0;
-        } else if(index >= caData.keys.length) {
+        } else if (index >= caData.keys.length) {
             return;
         }
         

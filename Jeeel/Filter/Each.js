@@ -86,7 +86,7 @@ Jeeel.Filter.Each.prototype = {
         Jeeel.Hash.forEach(params,
             function (val, key) {
 
-                if ( ! this._keys || Jeeel.Type.inArray(key, this._keys)) {
+                if ( ! this._keys || Jeeel.Hash.inHash(key, this._keys)) {
                     result[key] = filter.filter(val);
                 }
                 else {

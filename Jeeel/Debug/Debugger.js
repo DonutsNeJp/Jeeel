@@ -382,9 +382,13 @@ Jeeel.Debug.Debugger = {
             return false;
         } else if (Jeeel.Type.isElement(object) || Jeeel.Type.isDocument(object) || Jeeel.Type.isWindow(object)) {
             return false;
-        } else if (this.INFORMATION_NAME in object) {
-            return false;
         } else if (object instanceof Jeeel.Session.Core) {
+            return false;
+        } else if (object === Jeeel.Class.Abstract) {
+            object[this.INFORMATION_NAME] = new Jeeel.Object.Technical.Information('Jeeel.Class.Abstract', Jeeel.Class);
+            
+            return false;
+        } else if (this.INFORMATION_NAME in object) {
             return false;
         }
         
@@ -421,6 +425,8 @@ Jeeel.Debug.Debugger = {
                     var childName = isPrototype ? name + '#' + property : name + '.' + property;
                     
                     if (property === 'prototype') {
+                        childName = name;
+                    } else if (property === '_inherited') {
                         childName = name;
                     }
 

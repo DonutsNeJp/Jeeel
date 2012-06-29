@@ -5,6 +5,7 @@
      * コンストラクタ
      * 
      * @class Jsonp通信の制御を行うクラス
+     * @augments Jeeel.Net.Abstract
      * @param {String} url Jsonp通信URL
      * @throws {Error} urlが指定されていない場合に起こる
      */
@@ -12,9 +13,10 @@
         if ( ! Jeeel.Type.isString(url)) {
             throw new Error('URLを指定してください。');
         }
+        
+        Jeeel.Net.Abstract.call(this);
 
         this._url = url;
-        this._params = new Jeeel.Parameter();
         this._loaded = Jeeel.Function.simpleBind(this._loaded, this);
 
         this._id = index++;
@@ -41,14 +43,6 @@ Jeeel.Net.Jsonp.prototype = {
      * @private
      */
     _id: null,
-
-    /**
-     * Jsonp通信の際にサーバー側に渡すパラメータのハッシュを保持するJeeel.Parameter
-     *
-     * @type Jeeel.Parameter
-     * @private
-     */
-    _params: null,
 
     /**
      * Jsonp通信URL
@@ -138,87 +132,6 @@ Jeeel.Net.Jsonp.prototype = {
     },
 
     /**
-     * Jsonpパラメータの全取得
-     *
-     * @return {Hash} 値リスト
-     */
-    getAll: function () {
-        return this._params.getAll();
-    },
-
-    /**
-     * Jsonpパラメータの取得
-     *
-     * @param {String} key キー
-     * @param {Mixied} [defaultValue] デフォルト値
-     * @return {Mixied} 値
-     */
-    get: function (key, defaultValue) {
-        return this._params.get(key, defaultValue);
-    },
-
-    /**
-     * Jsonpパラメータを総入れ替えする
-     *
-     * @param {Hash} vals 値リスト
-     * @return {Jeeel.Net.Jsonp} 自インスタンス
-     * @throws {Error} valsが配列式でない場合に起こる
-     */
-    setAll: function (vals) {
-
-        if ( ! Jeeel.Type.isHash(vals)) {
-            throw new Error('valsが配列・連想配列ではありあせん。');
-        }
-
-        this._params.setAll({});
-
-        var self = this;
-
-        Jeeel.Hash.forEach(vals,
-            function (val, key) {
-                self._params.set(key, val);
-            }
-        );
-
-        return this;
-    },
-
-    /**
-     * Jsonpパラメータの設定
-     *
-     * @param {String} key キー
-     * @param {Mixied} val 値
-     * @return {Jeeel.Net.Jsonp} 自インスタンス
-     */
-    set: function (key, val) {
-        this._params.set(key, val);
-
-        return this;
-    },
-    
-    /**
-     * Jsonpパラメータの指定キーの値を破棄する
-     *
-     * @param {String} key キー
-     * @return {Jeeel.Net.Jsonp} 自インスタンス
-     */
-    unset: function (key) {
-        this._params.unset(key);
-
-        return this;
-    },
-
-    /**
-     * Jsonpパラメータの指定キーの値を保持しているかどうかを返す
-     *
-     * @param {String} key キー
-     * @return {Boolean} 値を保持していたらtrueそれ以外はfalseを返す
-     */
-    has: function (key) {
-        return this._params.has(key);
-    },
-
-    /**
      * 実際にJsonp通信を実行する
      *
      * @return {Jeeel.Net.Jsonp} 自インスタンス
@@ -226,6 +139,10 @@ Jeeel.Net.Jsonp.prototype = {
     execute: function () {
         if (Jeeel.Acl && Jeeel.Acl.isDenied(this._url, '*', 'Url')) {
             Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
+        if ( ! this.isValid()) {
+            throw new Error('There is an error in the submission.');
         }
       
         var url = this._url + '?' + this._params.toQueryString();
@@ -261,3 +178,5 @@ Jeeel.Net.Jsonp.prototype = {
         this._script = null;
     }
 };
+
+Jeeel.Class.extend(Jeeel.Net.Jsonp, Jeeel.Net.Abstract);

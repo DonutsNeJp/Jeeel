@@ -16,7 +16,7 @@ Jeeel.String.Hash.Base64.decode = function (str) {
     out = [];
     
     while(i < len) {
-        /* c1 */
+        // c1
         do {
             c1 = this.DECODE_CHARS[str.charCodeAt(i++) & 0XFF];
         } while(i < len && c1 == -1);
@@ -25,7 +25,7 @@ Jeeel.String.Hash.Base64.decode = function (str) {
             break;
         }
 
-        /* c2 */
+        // c2
         do {
             c2 = this.DECODE_CHARS[str.charCodeAt(i++) & 0XFF];
         } while(i < len && c2 == -1);
@@ -36,7 +36,7 @@ Jeeel.String.Hash.Base64.decode = function (str) {
 
         out[out.length] = String.fromCharCode((c1 << 2) | ((c2 & 0x30) >> 4));
 
-        /* c3 */
+        // c3
         do {
             c3 = str.charCodeAt(i++) & 0XFF;
             
@@ -53,7 +53,7 @@ Jeeel.String.Hash.Base64.decode = function (str) {
 
         out[out.length] = String.fromCharCode(((c2 & 0XF) << 4) | ((c3 & 0x3C) >> 2));
 
-        /* c4 */
+        // c4
         do {
             c4 = str.charCodeAt(i++) & 0XFF;
             

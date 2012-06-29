@@ -1,13 +1,4 @@
-var _JEEEL_MANUAL_LOAD_;
-var _JEEEL_CLEAN_MODE_;
-var _JEEEL_DEBUG_MODE_;
-var _JEEEL_EXTEND_MODE_;
-var _JEEEL_FULL_MODE_;
-
-/**
- * グローバルオブジェクト(windowと同等)
- */
-var global = this;
+var jeeelConfig;
 
 /**
  * @class スレッドを管理するクラス
@@ -96,14 +87,12 @@ var Thread = {
         var res;
 
         for (var i = 0, l = this._tasks.length; i < l; i++) {
-            res = this._tasks[i].call(global, data);
+            res = this._tasks[i].call(self, data);
 
-            if (typeof res !== 'undefined') {
-                this.post({
-                    type: this._type,
-                    msg: res
-                });
-            }
+            this.post({
+                type: this._type,
+                msg: res
+            });
         }
     },
     
@@ -146,4 +135,4 @@ var Thread = {
 };
 
 // イベントの設定
-onmessage = Thread.messageEvent;
+self.onmessage = Thread.messageEvent;

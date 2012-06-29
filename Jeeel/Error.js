@@ -9,7 +9,7 @@
  */
 Jeeel.Error = function (message, code, nestCount) {
   
-    if (Error && Error.call) {
+    if (Jeeel._global.Error && Error.call) {
         var err = Error.call(this, message);
         var pairs = Jeeel.Hash.getPairs(err, false);
 

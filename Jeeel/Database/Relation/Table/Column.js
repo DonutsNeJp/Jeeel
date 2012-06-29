@@ -95,7 +95,7 @@ Jeeel.Database.Relation.Table.Column.prototype = {
     toString: function () {
         var sql = '`' + this._name + '` ' + this._type
                 + (this._null ? '' : ' NOT NULL')
-                + (this._default == 'NULL' ? '' : ' DEFAULT ' + this._default)
+                + (this._default === 'NULL' ? '' : ' DEFAULT ' + this._default)
                 + (this._extra ? ' ' + this._extra : '')
                 + (this._comment ? ' COMMENT ' + this._comment : '');
 

@@ -25,7 +25,7 @@
  *
  * @name Jeeel.js(Javascript Easy Error and Exception handling Library: Japanease Eeel)
  * @author Masato Shimada
- * @version 2.0.0 RC4
+ * @version 2.0.0 RC13
  * @license <a href="http://ja.wikipedia.org/wiki/MIT_License">MIT License</a>
  * @copylight (c) 2012 Donuts, Masato Shimada
  */
@@ -35,6 +35,127 @@
     /**
      * @namespace 汎用メソッド等を提供するネームスペース
      * @name Jeeel
+     * @see Jeeel.Dom
+     * @see Jeeel.Net
+     * @see Jeeel.Session
+     * @see Jeeel.Object
+     * @see Jeeel.Debug
+     * @see Jeeel.Type
+     * @see Jeeel.UserAgent
+     * @see Jeeel.Function
+     * @see Jeeel.Timer
+     * @see Jeeel.String
+     * @see Jeeel.Number
+     * @see Jeeel.Hash
+     * @see Jeeel.Json
+     * @see Jeeel.Loader
+     * @see Jeeel.Class
+     * @see Jeeel.Template
+     * @see Jeeel.Gui
+     * @see Jeeel.Graphics
+     * @see Jeeel.Framework
+     * @example
+     * Jeeelは幾つかの大きな機能を柱に構成されている
+     * また良く使う機能はショートカットが存在しており記述量を少なくできる
+     * 
+     * グローバルショートカット一覧
+     * $ID('id'); // 指定したIDの要素を取得する。document.getElementByIdに相当
+     * $CLASS('class'); // 指定したCLASSの要素のリストを取得する。document.getElementsByClassNameに相当(但し戻り値はNodeListではなく配列になる)
+     * $TAG('tag'); // 指定したタグ名の要素リストを取得する。document.getElementsByTagNameに相当(但し戻り値はNodeListではなく配列になる)
+     * $NAME('name'); // 指定した名前の要素リストを取得する。document.getElementsByNameに相当(但し戻り値はNodeListではなく配列になる)
+     * $QUERY('#id .class'); // 指定したセレクタから要素のリストを取得する。document.querySelectorAllに相当(但し戻り値はNodeListではなく配列になる)
+     * $ELM($ID('id')); // Jeeel.Dom.Elementのインスタンスを生成する。Jeeel.Dom.Element.createと同等
+     * $ELMOP('#id .class'); // Jeeel.Dom.ElementOperatorのインスタンスを生成する。Jeeel.Dom.ElementOperator.createと同等
+     * $FORM('test-form'); // Jeeel.Net.Formのインスタンスを生成する。Jeeel.Net.Form.createと同等
+     * $AJAX('/test/'); // Jeeel.Net.Ajaxのインスタンスを生成する。Jeeel.Net.Ajax.createと同等
+     * $PRM({a, 2, b: 7}); // Jeeel.Parameterのインスタンスを生成する。Jeeel.Parameter.createと同等
+     * $BIND(Test.func, Test); // Jeeel.Functionのインスタンスを生成しthisの束縛も行う。Jeeel.Function.create + Jeeel.Function#bindと同等
+     * 
+     * createConsole(); // JSコンソールを生成する。Jeeel.Debug.Console.createと同等
+     * 
+     * Jeeel名前空間ショートカット一覧
+     * Jeeel.addLoadEvent(Test.onload, Test); // ドキュメントが全て読み込まれたときのイベントを追加する。body.onloadやwindow.onloadに相当
+     * Jeeel.errorDump(1, 4, 5); // デバッグモードが有効な場合に限り可変引数で指定した値を文字列としてダンプする
+     * Jeeel.errorHtmlDump('<p>test</p>'); // デバッグモードが有効な場合に限り可変引数で指定した値をHTMLとしてダンプする
+     * Jeeel.errorDumpConsole({a: [1, 2, 3, 4]}); // デバッグモードが有効な場合に限り可変引数で指定した値をオブジェクトとしてダンプする
+     * Jeeel.Document; // Jeeel.Dom.Documentのインスタンス
+     * Jeeel.Window; // Jeeel.Dom.Windowのインスタンス
+     * 
+     * ・DOM操作機能(Jeeel.Dom)
+     * ・通信管理機能(Jeeel.Net)
+     * ・セッション管理機能(Jeeel.Session)
+     * ・日付を初めとする特殊値の管理操作機能(Jeeel.Object)
+     * ・デバッグ機能(Jeeel.Debug)
+     * ・ユーティリティ機能
+     * 
+     * DOM操作機能(Jeeel.Dom)
+     * この機能は一部拡張機能を除き全てJeeel.Dom以下に保持されている
+     * 拡張機能とはGUIを強化するJeeel.Gui以下やcanvasやSVGを管理するグラフィックス系のJeeel.Graphics以下などがある
+     * この機能で提供するものは大よそ以下の機能になる
+     * ・イベント管理
+     * ・アニメーション
+     * ・要素の移動、削除、スタイル変化
+     * ・要素生成
+     * ・要素情報操作
+     * ・要素検索(IDやclassなどの単体からセレクタまで)
+     * ・ウィンドウ操作
+     * 
+     * 通信管理機能(Jeeel.Net)
+     * この機能は数こそ少ないが通信に関係する強力な補助ツールである
+     * デバッグに属する機能とJeeel自体を操作する特殊な機能以外は全てJeeel.Net以下に保持される
+     * この機能が提供する機能は大よそ以下の機能になる
+     * ・Ajax通信(同期・非同期を含めたXMLHttpRequestを利用した通信)
+     * ・Form要素もしくはそれに見立てた要素に対しての操作
+     * ・JSONP通信
+     * ・ビーコン
+     * 
+     * セッション管理機能(Jeeel.Session)
+     * この機能はクッキーを初めとして擬似セッションを含めたセッション管理を行う機能である
+     * 機能は全てJeeel.Session以下に属する
+     * この機能が提供する機能は大よそ以下の機能になる
+     * ・cookie管理
+     * ・window.nameを利用した擬似セッションの管理
+     * ・localStorage, sessionStorageを使用した擬似セッションの管理
+     * 
+     * 日付を初めとする特殊値の管理操作機能(Jeeel.Object)
+     * この機能は日付や色を初めてするやや扱いが面倒な値を管理する機能を保有する
+     * この機能はJeeel.Object以下に属する
+     * この機能が提供する機能は大よそ以下の機能になる
+     * ・日付の取得、改変、整形、日付移動などの日付やタイムゾーンに関する操作
+     * ・色のRGB、HSLの相互変換、色同士のブレンド、書式変換に関する操作
+     * ・幅、高さを合わせて保持したり、X座標、Y座標を合わせて保持する型に近い動作を提供する機能
+     * 
+     * デバッグ機能(Jeeel.Debug)
+     * Jeeelの代名詞とも言える機能
+     * デバッグ機能の弱いブラウザや環境に対してJSのみでデバッグ機能を提供する
+     * この機能はJeeel.Debug以下に属する
+     * この機能が提供する機能は大よそ以下の機能になる
+     * ・JSコンソール
+     * ・メッセージダンパー
+     * ・タイマー
+     * ・プロファイラ
+     * 
+     * ユーティリティ機能
+     * 上記に入らなかった機能をまとめたようなもの
+     * その中でも以下のクラスが筆頭に上がる
+     * Jeeel.Type // 型の判定に特化したクラス
+     * Jeeel.UserAgent // ブラウザ情報やURL情報などに特化したクラス
+     * Jeeel.Function // 関数のthisの固定化や遅延実行など関数実行に特化したクラス
+     * Jeeel.Timer // タイマーを使用した遅延実行や繰り返し実行に特化したクラス
+     * Jeeel.String // 文字列操作に特化したクラス、ネームスペース
+     * Jeeel.Number // 数値操作に特化したクラス、ネームスペース
+     * Jeeel.Hash // 配列・連想配列操作に特化したクラス、ネームスペース
+     * Jeeel.Json // JSONのエンコード、デコードを行うクラス
+     * Jeeel.Loader // JSやCSSの読み込み・追加などに特化したクラス
+     * Jeeel.Class // オブジェクト指向の継承などに特化したクラス
+     * Jeeel.Template // Smartyの様なテンプレートエンジンクラス
+     * 
+     * 
+     * これらの機能の他に拡張機能として以下が使用されることが多い
+     * 
+     * Jeeel.Gui // GUIのパーツを提供する
+     * Jeeel.Graphics // canvasやSVGなどのグラフィカルな機能を使いやすく提供する
+     * Jeeel.Framework // JS側で大規模なアプリを作成する手助けを行う機能の集まり
      */
     var Jeeel = {
 
@@ -51,7 +172,7 @@
          * @type String
          * @constant
          */
-        VERSION: '2.0.0 RC4',
+        VERSION: '2.0.0 RC13',
 
         /**
          * Jeeelのscriptタグに付くclass名
@@ -205,6 +326,7 @@
          *
          * @type Jeeel.Dom.Document
          * @readOnly
+         * @see Jeeel.Dom.Document
          */
         Document: null,
 
@@ -213,6 +335,7 @@
          *
          * @type Jeeel.Dom.Window
          * @readOnly
+         * @see Jeeel.Dom.Window
          */
         Window: null,
         
@@ -221,6 +344,7 @@
          * 
          * @type Jeeel.Framework.Acl
          * @readOnly
+         * @see Jeeel.Framework.Acl
          */
         Acl: null,
         
@@ -243,7 +367,9 @@
         },
 
         /**
-         * @namespace Jeeel系のサブクラス保存のための媒体
+         * Jeeel系のサブクラス保存のための媒体
+         * 
+         * @type Hash
          * @private
          */
         _Object: {
@@ -555,7 +681,7 @@ Jeeel.getFilePath = function () {
 
                 if ( ! this._debugMode && subKey === 'Debug') {
                     continue;
-                } else if ( ! this._debugMode && key === 'Technical' && Jeeel.Type.inArray(subKey, ['Information', 'Trace'], true)) {
+                } else if ( ! this._debugMode && key === 'Technical' && Jeeel.Hash.inHash(subKey, ['Information', 'Trace'], true)) {
                     continue;
                 } else if ( ! this._extendMode.Gui && subKey === 'Gui') {
                     continue;
@@ -575,7 +701,7 @@ Jeeel.getFilePath = function () {
                     continue;
                 } else if ( ! this._extendMode.Framework && subKey === 'Framework') {
                     continue;
-                } else if ( ! this._extendMode.Net && Jeeel.Type.inArray(subKey, ['Comet', 'Socket'], true)) {
+                } else if ( ! this._extendMode.Net && Jeeel.Hash.inHash(subKey, ['Comet', 'Socket'], true)) {
                     continue;
                 }
 
@@ -615,7 +741,7 @@ Jeeel.getScript = function () {
 
                 if ( ! this._debugMode && subKey === 'Debug') {
                     continue;
-                }else if ( ! this._debugMode && key === 'Technical' && Jeeel.Type.inArray(subKey, ['Information', 'Trace'], true)) {
+                } else if ( ! this._debugMode && key === 'Technical' && Jeeel.Hash.inHash(subKey, ['Information', 'Trace'], true)) {
                     continue;
                 } else if ( ! this._extendMode.Gui && subKey === 'Gui') {
                     continue;
@@ -625,7 +751,7 @@ Jeeel.getScript = function () {
                     continue;
                 } else if ( ! this._extendMode.Worker && subKey === 'Worker') {
                     continue;
-                }else if ( ! this._extendMode.Geolocation && subKey === 'Geolocation') {
+                } else if ( ! this._extendMode.Geolocation && subKey === 'Geolocation') {
                     continue;
                 } else if ( ! this._extendMode.File && subKey === 'File') {
                     continue;
@@ -635,11 +761,11 @@ Jeeel.getScript = function () {
                     continue;
                 } else if ( ! this._extendMode.Framework && subKey === 'Framework') {
                     continue;
-                } else if ( ! this._extendMode.Net && Jeeel.Type.inArray(subKey, ['Comet', 'Socket'], true)) {
+                } else if ( ! this._extendMode.Net && Jeeel.Hash.inHash(subKey, ['Comet', 'Socket'], true)) {
                     continue;
                 }
 
-                paths[paths.length] = '<script type="text/javascript" class="'+Jeeel.SCRIPT_CLASS+'" src="'+dir + subKey+'.js"></script>\n';
+                paths[paths.length] = '<script type="text/javascript" class="' + Jeeel.SCRIPT_CLASS + '" src="' + dir + subKey + '.js"></script>\n';
 
                 if (dir[subKey] && file[key][subKey]) {
                     var dirTmp = {};
@@ -793,17 +919,20 @@ Jeeel.directory.Jeeel = {
     // ユニークIDを設定する
     Jeeel.UNIQUE_ID = 'Jeeel-' + (Jeeel.VERSION + Math.random()).replace(/\D/g, '');
     Jeeel.SCRIPT_ID = Jeeel.SCRIPT_ID + '-' + Jeeel.UNIQUE_ID;
+    
+    var jeeelMatch, jeeelRegExp, src;
 
-    // ベースURLとクラス、IDの設定
+    // ベースURL・QUERYとクラス、IDの設定(Worker内の場合はURLとQUERYのみ設定)
     if (Jeeel._doc) {
-
+        
+        jeeelRegExp = /^(.*?)\/(?:Jeeel\/)?Jeeel(?:-Set(?:-Min)?)?\.js(\?.*)?$/i;
+        
         var scripts = Jeeel._doc.getElementsByTagName('script');
-        var jeeelRegExp = /^(.*)\/Jeeel\/Jeeel(?:-Set(?:-Min)?)?\.js(\?.*)?$/i,
-            jeeelMatch;
 
         for (var i = scripts.length; i--;) {
-            var script = scripts[i],
-                src = script.getAttribute('src');
+            var script = scripts[i];
+            
+            src = script.getAttribute('src');
 
             if ( ! src || ! (jeeelMatch = src.match(jeeelRegExp))) {
                 continue;
@@ -817,104 +946,116 @@ Jeeel.directory.Jeeel = {
             
             break;
         }
+    } else if (Jeeel._global && Jeeel._global.importScripts && Jeeel._global.location) {
         
-        // クエリから設定内容の取得
-        if (Jeeel.QUERY) {
-            var config = Jeeel.QUERY.split('&');
-            var full = false;
+        jeeelRegExp = /^(.*?)\/(?:Jeeel\/)?Worker\/Thread\.js(\?.*)?$/i;
+        
+        src = Jeeel._global.location.pathname + Jeeel._global.location.search;
+        
+        jeeelMatch = (src || '').match(jeeelRegExp);
 
-            for (var j = config.length; j--;) {
-                var tmp = config[j].split('=');
-                var names = Jeeel._Object.Jeeel.getInputName(tmp[0]);
+        if (jeeelMatch) {
+            Jeeel.BASE_URL = jeeelMatch[1] + '/';
+            Jeeel.QUERY = jeeelMatch[2] && jeeelMatch[2].replace(/^\?/, '') || '';
+        }
+    }
+    
+    // クエリから設定内容の取得
+    if (Jeeel.QUERY) {
+        var config = Jeeel.QUERY.split('&');
+        var full = false;
 
-                switch (names[0]) {
-                    case 'ml':
-                        Jeeel._auto = !(+tmp[1]);
-                        break;
+        for (var j = config.length; j--;) {
+            var tmp = config[j].split('=');
+            var names = Jeeel._Object.Jeeel.getInputName(tmp[0]);
 
-                    case 'cl':
-                        Jeeel._cleanMode = !!(+tmp[1]);
-                        break;
+            switch (names[0]) {
+                case 'ml':
+                    Jeeel._auto = !(+tmp[1]);
+                    break;
 
-                    case 'dbg':
-                        Jeeel._debugMode = !!(+tmp[1]);
-                        break;
+                case 'cl':
+                    Jeeel._cleanMode = !!(+tmp[1]);
+                    break;
 
-                    case 'ext':
-                        switch (names[1]) {
-                            case 'gui':
-                                Jeeel._extendMode.Gui = !!(+tmp[1]);
-                                break;
+                case 'dbg':
+                    Jeeel._debugMode = !!(+tmp[1]);
+                    break;
 
-                            case 'ws':
-                                Jeeel._extendMode.WebStorage = !!(+tmp[1]);
-                                break;
+                case 'ext':
+                    switch (names[1]) {
+                        case 'gui':
+                            Jeeel._extendMode.Gui = !!(+tmp[1]);
+                            break;
 
-                            case 'db':
-                                Jeeel._extendMode.Database = !!(+tmp[1]);
-                                break;
+                        case 'ws':
+                            Jeeel._extendMode.WebStorage = !!(+tmp[1]);
+                            break;
 
-                            case 'wk':
-                                Jeeel._extendMode.Worker = !!(+tmp[1]);
-                                break;
+                        case 'db':
+                            Jeeel._extendMode.Database = !!(+tmp[1]);
+                            break;
 
-                            case 'geo':
-                                Jeeel._extendMode.Geolocation = !!(+tmp[1]);
-                                break;
+                        case 'wk':
+                            Jeeel._extendMode.Worker = !!(+tmp[1]);
+                            break;
 
-                            case 'file':
-                                Jeeel._extendMode.File = !!(+tmp[1]);
-                                break;
+                        case 'geo':
+                            Jeeel._extendMode.Geolocation = !!(+tmp[1]);
+                            break;
 
-                            case 'md':
-                                Jeeel._extendMode.Media = !!(+tmp[1]);
-                                break;
+                        case 'file':
+                            Jeeel._extendMode.File = !!(+tmp[1]);
+                            break;
 
-                            case 'grp':
-                                Jeeel._extendMode.Graphics = !!(+tmp[1]);
-                                break;
+                        case 'md':
+                            Jeeel._extendMode.Media = !!(+tmp[1]);
+                            break;
 
-                            case 'net':
-                                Jeeel._extendMode.Net = !!(+tmp[1]);
-                                break;
-                                
-                            case 'fw':
-                                Jeeel._extendMode.Framework = !!(+tmp[1]);
-                                break;
-                        }
-                        break;
+                        case 'grp':
+                            Jeeel._extendMode.Graphics = !!(+tmp[1]);
+                            break;
 
-                    case 'full':
-                        full = !!(+tmp[1]);
-                        break;
-                }
-            }
+                        case 'net':
+                            Jeeel._extendMode.Net = !!(+tmp[1]);
+                            break;
 
-            // FULLモードの際は全て上書きする
-            if (full) {
-                Jeeel._debugMode = Jeeel._extendMode.Gui
-                                 = Jeeel._extendMode.WebStorage
-                                 = Jeeel._extendMode.Database
-                                 = Jeeel._extendMode.Worker
-                                 = Jeeel._extendMode.Geolocation
-                                 = Jeeel._extendMode.File
-                                 = Jeeel._extendMode.Media
-                                 = Jeeel._extendMode.Graphics
-                                 = Jeeel._extendMode.Net
-                                 = Jeeel._extendMode.Framework
-                                 = true;
+                        case 'fw':
+                            Jeeel._extendMode.Framework = !!(+tmp[1]);
+                            break;
+                    }
+                    break;
+
+                case 'full':
+                    full = !!(+tmp[1]);
+                    break;
             }
         }
-        
-        // 不要な物を廃棄する
-        script = scripts = jeeelMatch = jeeelRegExp = full = config = tmp = names = host = null;
+
+        // FULLモードの際は全て上書きする
+        if (full) {
+            Jeeel._debugMode = Jeeel._extendMode.Gui
+                              = Jeeel._extendMode.WebStorage
+                              = Jeeel._extendMode.Database
+                              = Jeeel._extendMode.Worker
+                              = Jeeel._extendMode.Geolocation
+                              = Jeeel._extendMode.File
+                              = Jeeel._extendMode.Media
+                              = Jeeel._extendMode.Graphics
+                              = Jeeel._extendMode.Net
+                              = Jeeel._extendMode.Framework
+                              = true;
+        }
     }
+
+    // 不要な物を廃棄する
+    script = scripts = jeeelMatch = jeeelRegExp = full = config = tmp = names = host = null;
 
     if (Jeeel._disableAuto) {
         Jeeel._auto = false;
     }
 
-    Jeeel.file.Jeeel = ['Class', 'Function', 'Type', 'Method', 'Filter', 'Hash', 'String', 'Number', 'Code', 'Loader', 'UserAgent', 'Json', 'Session', 'Dom', 'Net', 'Template', 'Timer', 'DataStructure', 'Object', 'Parameter', 'Validator', 'Storage', 'External', 'Deferred', 'Config', 'Error', 'Util'];
+    Jeeel.file.Jeeel = ['Class', 'Function', 'Type', 'String', 'Number', 'Language', 'Method', 'Hash', 'Filter', 'Parameter', 'UserAgent', 'Dom', 'Net', 'Code', 'Loader', 'Json', 'Session', 'Template', 'Timer', 'DataStructure', 'Object', 'Validator', 'Storage', 'External', 'Deferred', 'Config', 'Error', 'Util'];
 
     if (Jeeel._extendMode.Gui && Jeeel._doc) {
         Jeeel.file.Jeeel[Jeeel.file.Jeeel.length] = 'Gui';
@@ -955,18 +1096,22 @@ Jeeel.directory.Jeeel = {
     // 自動ロードを始動
     if (Jeeel._auto) {
         Jeeel._tmp = function () {
-            for (var i = 5, l = Jeeel.file.Jeeel.length; i < l; i++) {
-                Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[i]);
-            }
+            Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[10]);
+            Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[11]);
+            Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[12]);
+            
+            Jeeel._tmp = function () {
+                for (var i = 13, l = Jeeel.file.Jeeel.length; i < l; i++) {
+                    Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[i]);
+                }
 
-            delete Jeeel._tmp;
+                delete Jeeel._tmp;
+            };
         };
 
-        Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[0]);
-        Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[1]);
-        Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[2]);
-        Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[3]);
-        Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[4]);
+        for (i = 0; i <= 9; i++) {
+            Jeeel._import(Jeeel.directory.Jeeel, Jeeel.file.Jeeel[i]);
+        }
     }
 
     // グローバル関数・変数の設定
@@ -1064,6 +1209,7 @@ Jeeel.directory.Jeeel = {
          * 
          * @name createConsole
          * @function
+         * @see Jeeel.Debug.Console
          */
         function createConsole() {
             Jeeel.Debug.Console.create();
@@ -1082,6 +1228,8 @@ Jeeel.directory.Jeeel = {
          * @return {Element} 取得したElement
          * @name $ID
          * @function
+         * @see Jeeel.Dom.Document#getElementById
+         * @see Jeeel.Dom.Element#getElementById
          */
         function $ID(id, target) {
 
@@ -1107,6 +1255,8 @@ Jeeel.directory.Jeeel = {
          * @return {Element[]} 取得したElement配列
          * @name $CLASS
          * @function
+         * @see Jeeel.Dom.Document#getElementsByClassName
+         * @see Jeeel.Dom.Element#getElementsByClassName
          */
         function $CLASS(className, target) {
 
@@ -1132,6 +1282,8 @@ Jeeel.directory.Jeeel = {
          * @return {Element[]} 取得したElement配列
          * @name $NAME
          * @function
+         * @see Jeeel.Dom.Document#getElementsByName
+         * @see Jeeel.Dom.Element#getElementsByName
          */
         function $NAME(name, target) {
 
@@ -1157,6 +1309,8 @@ Jeeel.directory.Jeeel = {
          * @return {Element[]} 取得したElement配列
          * @name $TAG
          * @function
+         * @see Jeeel.Dom.Document#getElementsByTagName
+         * @see Jeeel.Dom.Element#getElementsByTagName
          */
         function $TAG(tagName, target) {
 
@@ -1183,6 +1337,8 @@ Jeeel.directory.Jeeel = {
          * @see Jeeel.Dom.Selector
          * @name $QUERY
          * @function
+         * @see Jeeel.Dom.Document#getElementsBySelector
+         * @see Jeeel.Dom.Element#getElementsBySelector
          */
         function $QUERY(selector, target) {
 
@@ -1208,6 +1364,7 @@ Jeeel.directory.Jeeel = {
          * @throws {Error} paramsが配列式でない場合に起こる
          * @name $PRM
          * @function
+         * @see Jeeel.Parameter
          */
         function $PRM(params) {
             return new Jeeel.Parameter(params);
@@ -1225,6 +1382,7 @@ Jeeel.directory.Jeeel = {
          * @return {Jeeel.Dom.Element} 作成したインスタンス
          * @name $ELM
          * @function
+         * @see Jeeel.Dom.Element
          */
         function $ELM(element) {
             return new Jeeel.Dom.Element(element);
@@ -1242,6 +1400,7 @@ Jeeel.directory.Jeeel = {
          * @return {Jeeel.Dom.ElementOperator} 作成したインスタンス
          * @name $ELMOP
          * @function
+         * @see Jeeel.Dom.ElementOperator
          */
         function $ELMOP(elementList) {
             return new Jeeel.Dom.ElementOperator(elementList);
@@ -1260,6 +1419,7 @@ Jeeel.directory.Jeeel = {
          * @return {Jeeel.Function} 作成したインスタンス
          * @name $BIND
          * @function
+         * @see Jeeel.Function#bind
          */
         function $BIND(func, thisArg) {
             return Jeeel.Function.create(func).bind(thisArg);
@@ -1278,6 +1438,7 @@ Jeeel.directory.Jeeel = {
          * @return {Jeeel.Net.Ajax} 作成したインスタンス
          * @name $AJAX
          * @function
+         * @see Jeeel.Net.Ajax
          */
         function $AJAX(url, method) {
             return new Jeeel.Net.Ajax(url, method);
@@ -1295,6 +1456,7 @@ Jeeel.directory.Jeeel = {
          * @return {Jeeel.Net.Form} 作成したインスタンス
          * @name $FORM
          * @function
+         * @see Jeeel.Net.Form
          */
         function $FORM(form) {
             return new Jeeel.Net.Form(form);

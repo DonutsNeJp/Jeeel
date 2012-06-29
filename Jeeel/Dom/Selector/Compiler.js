@@ -19,7 +19,7 @@ Jeeel.Dom.Selector.Compiler = {
         
         var parenthesisCount = 0;
         var bracketCount = 0;
-        var quoteIn = false;
+        var quote = null;
         var i, j, l, $continue, chr, bchr = null, filtered = [];
         
         var res = [];
@@ -50,7 +50,11 @@ Jeeel.Dom.Selector.Compiler = {
                   
                 case "'":
                 case '"':
-                    quoteIn = !quoteIn;
+                    if ( ! quote) {
+                        quote = chr;
+                    } else if (quote === chr) {
+                        quote = null;
+                    }
                     $continue = true;
                     break;
                     
@@ -67,7 +71,7 @@ Jeeel.Dom.Selector.Compiler = {
             
             switch (chr) {
                 case ' ':
-                    if (quoteIn) {
+                    if (quote) {
                         filtered.push(chr);
                     } else if (bchr !== chr) {
                         
@@ -75,6 +79,7 @@ Jeeel.Dom.Selector.Compiler = {
                             case '+':
                             case '~':
                             case '>':
+                            case '/':
                                 break;
                             
                             default:
@@ -87,7 +92,8 @@ Jeeel.Dom.Selector.Compiler = {
                 case '+':
                 case '~':
                 case '>':
-                    if ( ! quoteIn && bchr === ' ') {
+                case '/':
+                    if ( ! quote && bchr === ' ') {
                         filtered.pop();
                     }
                     
@@ -95,7 +101,7 @@ Jeeel.Dom.Selector.Compiler = {
                     break;
                     
                 case ',':
-                    if ( ! parenthesisCount && ! bracketCount && ! quoteIn) {
+                    if ( ! parenthesisCount && ! bracketCount && ! quote) {
                         j = 0;
                         
                         while (filtered[j] && filtered[j] === ' ') {
@@ -108,6 +114,8 @@ Jeeel.Dom.Selector.Compiler = {
                         
                         res[res.length] = this.compileNodeList(filtered.join(''));
                         filtered = [];
+                    } else {
+                        filtered.push(chr);
                     }
                     break;
 
@@ -119,7 +127,7 @@ Jeeel.Dom.Selector.Compiler = {
             bchr = chr;
         }
         
-        if ( ! parenthesisCount && ! bracketCount && ! quoteIn) {
+        if ( ! parenthesisCount && ! bracketCount && ! quote) {
             
             j = 0;
             
@@ -153,8 +161,8 @@ Jeeel.Dom.Selector.Compiler = {
         
         var parenthesisCount = 0;
         var bracketCount = 0;
-        var quoteIn = false;
-        var i, l, type = null, newType = null;
+        var quote = null;
+        var i, l, ref, type = 'default', newType = null;
         var beforeIndex = -1;
 
         for (i = 0, l = selector.length; i < l; i++) {
@@ -183,13 +191,17 @@ Jeeel.Dom.Selector.Compiler = {
                 
                 case "'":
                 case '"':
-                    quoteIn = !quoteIn;
+                    if ( ! quote) {
+                        quote = chr;
+                    } else if (quote === chr) {
+                        quote = null;
+                    }
                     continue;
                     break;
                     
             }
             
-            if (parenthesisCount || bracketCount || quoteIn) {
+            if (parenthesisCount || bracketCount || quote) {
                 continue;
             }
             
@@ -210,21 +222,50 @@ Jeeel.Dom.Selector.Compiler = {
                     newType = 'sbrother';
                     break;
                     
+                case '/':
+                    newType = 'reference';
+                    break;
+                    
                 default:
                     continue;
                     break;
             }
             
-            nodeList[nodeList.length++] = this.compileNode(selector.substring(beforeIndex + 1, i), type);
+            nodeList[nodeList.length++] = this.compileNode(selector.substring(beforeIndex + 1, i), type, ref);
             beforeIndex = i;
             type = newType;
+            
+            if (newType === 'reference') {
+                beforeIndex = selector.indexOf('/', i + 1);
+                
+                if (beforeIndex < 0) {
+                    throw new Error('Selector compile error.');
+                }
+                
+                ref = selector.substring(i + 1, beforeIndex);
+                
+                i = beforeIndex;
+            }
         }
         
-        if (parenthesisCount || bracketCount || quoteIn) {
-            throw new Error('Compile error.');
+        if (parenthesisCount || bracketCount || quote) {
+            throw new Error('Selector compile error.');
         }
         
-        nodeList[nodeList.length++] = this.compileNode(selector.substring(beforeIndex + 1, l), type);
+        nodeList[nodeList.length++] = this.compileNode(selector.substring(beforeIndex + 1, l), type, ref);
+        
+        var targetCnt = 0;
+        
+        for (i = nodeList.length; i--;) {
+            if (nodeList[i].isTarget) {
+                nodeList.targetIndex = i;
+                targetCnt++;
+            }
+        }
+        
+        if (targetCnt > 1) {
+            throw new Error('Selector compile error.');
+        }
         
         return nodeList;
     },
@@ -233,10 +274,15 @@ Jeeel.Dom.Selector.Compiler = {
      * ノードのコンパイルを行う
      * 
      * @param {String} selector セレクタ
-     * @param {String} relationType このノードと他ノードの関係を示す文字列
+     * @param {String} [relationType] このノードと他ノードの関係を示す文字列
+     * @param {String} [ref] 属性参照のキー
      * @return {Jeeel.Dom.Selector.Node} コンパイル結果
      */
-    compileNode: function (selector, relationType) {
+    compileNode: function (selector, relationType, ref) {
+      
+        if ( ! relationType) {
+            relationType = 'default';
+        }
         
         var cache = Jeeel.Dom.Selector.Node.caches[selector];
         
@@ -244,11 +290,11 @@ Jeeel.Dom.Selector.Compiler = {
             return cache[relationType];
         }
         
-        var node = new Jeeel.Dom.Selector.Node(selector, relationType);
+        var node = new Jeeel.Dom.Selector.Node(selector, relationType, ref);
         
         var parenthesisCount = 0;
         var bracketCount = 0;
-        var quoteIn = false;
+        var quote = null;
         var attrs = [];
         var beforeIndex = -1;
         var type = 'tag', newType;
@@ -261,13 +307,13 @@ Jeeel.Dom.Selector.Compiler = {
             
             switch (chr) {
                 case '#':
-                    if ( ! parenthesisCount || ! bracketCount || ! quoteIn) {
+                    if ( ! parenthesisCount || ! bracketCount || ! quote) {
                         newType = 'id';
                     }
                     break;
                     
                 case '.':
-                    if ( ! parenthesisCount || ! bracketCount || ! quoteIn) {
+                    if ( ! parenthesisCount || ! bracketCount || ! quote) {
                         newType = 'class';
                     }
                     break;
@@ -275,13 +321,19 @@ Jeeel.Dom.Selector.Compiler = {
                 case ':':
                     if (bchar === ':') {
                         continue;
-                    } else if ( ! parenthesisCount || ! bracketCount || ! quoteIn) {
+                    } else if ( ! parenthesisCount || ! bracketCount || ! quote) {
                         newType = 'mock';
                     }
                     break;
                     
+                case '!':
+                    if ( ! parenthesisCount || ! bracketCount || ! quote) {
+                        newType = 'parent';
+                    }
+                    break;
+                    
                 case '[':
-                    if ( ! parenthesisCount || ! bracketCount || ! quoteIn) {
+                    if ( ! parenthesisCount || ! bracketCount || ! quote) {
                         newType = 'attr';
                         sp = true;
                     }
@@ -306,7 +358,11 @@ Jeeel.Dom.Selector.Compiler = {
                     
                 case "'":
                 case '"':
-                    quoteIn = !quoteIn;
+                    if ( ! quote) {
+                        quote = chr;
+                    } else if (quote === chr) {
+                        quote = null;
+                    }
                     bchar = chr;
                     continue;
                     break;
@@ -318,9 +374,9 @@ Jeeel.Dom.Selector.Compiler = {
             
             bchar = chr;
             
-            sp = sp && bracketCount && ( ! parenthesisCount && ! quoteIn);
+            sp = sp && bracketCount && ( ! parenthesisCount && ! quote);
             
-            if ( ! sp && (parenthesisCount || bracketCount || quoteIn)) {
+            if ( ! sp && (parenthesisCount || bracketCount || quote)) {
                 continue;
             }
             
@@ -344,6 +400,10 @@ Jeeel.Dom.Selector.Compiler = {
                 case 'mock':
                     node.mocks.push(this.compileMock(node, selector.substring(beforeIndex + 1, i)));
                     break;
+                    
+                case 'parent':
+                    throw new Error('Selector compile error.');
+                    break;
             }
             
             type = newType;
@@ -353,10 +413,22 @@ Jeeel.Dom.Selector.Compiler = {
         switch (type) {
             case 'tag':
                 node.tag = selector.substring(beforeIndex + 1, l).toUpperCase();
+                
+                if (node.tag === 'HTML' || node.tag === 'BODY' || node.tag === 'HEAD') {
+                    node.isOnlyNode = true;
+                }
                 break;
 
             case 'id':
+                if (node.id) {
+                    throw new Error('Selector compile error.');
+                }
+                
                 node.id = selector.substring(beforeIndex + 1, l);
+                
+                if ( ! node.id) {
+                    throw new Error('Selector compile error.');
+                }
                 break;
 
             case 'class':
@@ -370,11 +442,43 @@ Jeeel.Dom.Selector.Compiler = {
             case 'mock':
                 node.mocks.push(this.compileMock(node, selector.substring(beforeIndex + 1, l)));
                 break;
+                
+            case 'parent':
+                if (selector.charAt(selector.length - 1) === chr) {
+                    node.isTarget = true;
+                }
+                break;
         }
         
         node.attrs = this.compileAttribute(attrs);
         
+        if ( ! node.isOnlyNode) {
+            for (i = node.mocks.length; i--;) {
+                if (node.mocks[i].isOnlyMock) {
+                    node.isOnlyNode = true;
+                    break;
+                }
+            }
+        }
+        
         return node;
+    },
+    
+    /**
+     * 複数のノードのコンパイルを行う
+     * 
+     * @param {String} selector セレクタ
+     * @return {Jeeel.Dom.Selector.Node[]} コンパイル結果
+     */
+    compileNodes: function (selector) {
+        var selectors = selector.replace(/\s+/g, '').split(',');
+        var nodes = [];
+        
+        for (var i = 0, l = selectors.length; i < l; i++) {
+            nodes[i] = this.compileNode(selectors[i]);
+        }
+        
+        return nodes;
     },
     
     /**
@@ -384,49 +488,68 @@ Jeeel.Dom.Selector.Compiler = {
      * @return {Hash[]} コンパイル後の属性リスト
      */
     compileAttribute: function (selectors) {
-        var regFilter = new Jeeel.Filter.String.RegularExpressionEscape();
-        var attrReg = /([a-z0-9_\-]+)(?:((?:\^|\$|\*)?=)([\s\S]*))?/gi;
+        var attrReg = /([a-z0-9_\-]+)\s*(?:([\^|$*~]?=)\s*([\s\S]*))?/gi;
         var attrs = [];
         
         for (var i = 0, l = selectors.length; i < l; i++) {
             selectors[i].replace(attrReg, function (match, name, eq, value) {
+                
+                name = name.toLowerCase();
+                
                 if (eq) {
-
-                    value = value.replace(/^(["'])([\s\S]*)\1$/g, '$2');
+                    
+                    var flg;
+                    
+                    value = value.replace(/^(["'])([\s\S]*)\1(?:\s+(i))?$/g, function (match, quot, orgValue, flag) {
+                        flg = flag;
+                        
+                        return orgValue;
+                    });
+                    
+                    if (flg !== 'i') {
+                        flg = Jeeel.Dom.Selector.Node.IGNORE_CASE[name] ? 'i' : '';
+                    }
 
                     switch (eq.charAt(0)) {
                         case '=':
                             attrs[attrs.length] = {
                                 name: name,
-                                reg: new RegExp('^' + regFilter.filter(value) + '$', 'g')
+                                reg: new RegExp('^' + Jeeel.String.escapeRegExp(value) + '$', 'g' + flg)
                             };
                             break;
-
-                        case '|':
+                            
+                        case '~':
                             attrs[attrs.length] = {
                                 name: name,
-                                reg: new RegExp('^' + regFilter.filter(value) + '-?', 'g')
+                                reg: new RegExp('(?:^| )' + Jeeel.String.escapeRegExp(value) + '(?: |$)', 'g' + flg)
                             };
                             break;
 
                         case '^':
                             attrs[attrs.length] = {
                                 name: name,
-                                reg: new RegExp('^' + regFilter.filter(value), 'g')
+                                reg: new RegExp('^' + Jeeel.String.escapeRegExp(value), 'g' + flg)
                             };
                             break;
 
                         case '$':
                             attrs[attrs.length] = {
                                 name: name,
-                                reg: new RegExp(regFilter.filter(value) + '$', 'g')
+                                reg: new RegExp(Jeeel.String.escapeRegExp(value) + '$', 'g' + flg)
                             };
                             break;
 
                         case '*':
                             attrs[attrs.length] = {
                                 name: name,
-                                reg: new RegExp(regFilter.filter(value), 'g')
+                                reg: new RegExp(Jeeel.String.escapeRegExp(value), 'g' + flg)
+                            };
+                            break;
+                            
+                        case '|':
+                            attrs[attrs.length] = {
+                                name: name,
+                                reg: new RegExp('^' + Jeeel.String.escapeRegExp(value) + '(?:-|$)', 'g' + flg)
                             };
                             break;
 
@@ -459,10 +582,12 @@ Jeeel.Dom.Selector.Compiler = {
     compileMock: function (node, selector) {
         var mock = new Jeeel.Dom.Selector.Mock(node, selector);
         
-        var reg = /^([a-z0-9_\-]+)(?:\((.+)\))?$/i;
+        var reg = /^([a-z0-9_\-]+)(?:\((.*)\))?$/i;
         
         selector.replace(reg, function (match, name, args) {
-            mock.name = name;
+            mock.name = name.toLowerCase();
+            
+            args = Jeeel.String.trim(args);
             
             if (args) {
                 mock.args = args;

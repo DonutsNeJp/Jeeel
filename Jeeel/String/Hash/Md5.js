@@ -10,7 +10,7 @@ Jeeel.String.Hash.md5 = function (data) {
 };
 
 /**
- * @ignore
+ * @private
  */
 Jeeel._Object.JeeelStringHash.Md5 = {
   

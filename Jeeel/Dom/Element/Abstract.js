@@ -241,7 +241,7 @@ Jeeel.Dom.Element.Abstract.prototype = {
                 for (var i = 0, l = className.length; i < l; i++) {
                     if ( ! className[i]) {
                         continue;
-                    } else if(ec === className[i] || ec.search('\\b' + className[i] + '\\b') !== -1) {
+                    } else if (ec === className[i] || ec.search('\\b' + className[i] + '\\b') !== -1) {
                         continue;
                     }
                     
@@ -289,7 +289,7 @@ Jeeel.Dom.Element.Abstract.prototype = {
                 var classNames = this.getClassNames();
 
                 for (var i = 0, l = className.length; i < l; i++) {
-                    if (Jeeel.Type.inArray(className[i], classNames, true)) {
+                    if (Jeeel.Hash.inHash(className[i], classNames, true)) {
                         this.removeClassName(className[i]);
                     } else {
                         this.addClassName(className[i]);

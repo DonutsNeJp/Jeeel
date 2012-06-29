@@ -10,7 +10,6 @@
 Jeeel.Framework.Acl.Resource.Url = function (url, includeHierarchy) {
     Jeeel.Framework.Acl.Resource.Abstract.call(this);
     
-    var filter = Jeeel.Filter.String.RegularExpressionEscape.create();
     var absUrl = Jeeel.UserAgent.getBaseUrl() + url;
     
     var suffix;
@@ -22,8 +21,8 @@ Jeeel.Framework.Acl.Resource.Url = function (url, includeHierarchy) {
     }
     
     this._url = url;
-    this._reg = new RegExp('^' + filter.filter(this._url) + suffix, 'i');
-    this._regFull = new RegExp('^' + filter.filter(absUrl) + suffix, 'i');
+    this._reg = new RegExp('^' + Jeeel.String.escapeRegExp(this._url) + suffix, 'i');
+    this._regFull = new RegExp('^' + Jeeel.String.escapeRegExp(absUrl) + suffix, 'i');
     
     // URLのリソースはアクセス以外に権限がない
     this.addAuthorization('Access');

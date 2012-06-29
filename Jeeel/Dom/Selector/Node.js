@@ -5,10 +5,12 @@
  * @class セレクタの中で要素を示すクラス(スペース, ~, +, > などを除いたセレクタ)
  * @param {String} selector セレクタ
  * @param {String} relationType 一つ前のノードとの関係性を示す文字列
+ * @param {String} [referenceKey] relationTypeが属性参照だった場合に指定
  */
-Jeeel.Dom.Selector.Node = function (selector, relationType) {
+Jeeel.Dom.Selector.Node = function (selector, relationType, referenceKey) {
     this.selector = selector;
     this.relationType = relationType || null;
+    this.referenceKey = referenceKey || null;
     this.classes = [];
     this.mocks = [];
     
@@ -26,6 +28,19 @@ Jeeel.Dom.Selector.Node = function (selector, relationType) {
  */
 Jeeel.Dom.Selector.Node.caches = {};
 
+Jeeel.Dom.Selector.Node.IGNORE_CASE = {
+    align: true,
+    charset: true,
+    type: true,
+    'http-equiv': true,
+    method: true,
+    'accept-charset': true,
+    lang: true,
+    dir: true,
+    rel: true,
+    shape: true
+};
+
 Jeeel.Dom.Selector.Node.prototype = {
     
     /**
@@ -41,6 +56,20 @@ Jeeel.Dom.Selector.Node.prototype = {
      * @type String
      */
     relationType: null,
+    
+    /**
+     * 関係が属性参照だった場合の属性名
+     * 
+     * @type String
+     */
+    referenceKey: null,
+    
+    /**
+     * 関係が属性参照だった場合の複数のIDリスト
+     * 
+     * @type String[]
+     */
+    referenceAttrs: null,
     
     /**
      * タグ名
@@ -78,6 +107,20 @@ Jeeel.Dom.Selector.Node.prototype = {
     mocks: [],
     
     /**
+     * このノードのヒットする要素が一つのみかどうか
+     * 
+     * @type Boolean
+     */
+    isOnlyNode: false,
+    
+    /**
+     * この要素が検索結果の対象になるかどうか
+     * 
+     * @type Boolean
+     */
+    isTarget: false,
+    
+    /**
      * 指定した要素がセレクタと一致するかどうか返す
      * 
      * @param {Element} element 調べる要素
@@ -87,22 +130,15 @@ Jeeel.Dom.Selector.Node.prototype = {
         
         var i, l;
         
-        // MOCK
-        for (i = 0, l = this.mocks.length; i < l; i++) {
-            if ( ! this.mocks[i].isMatch(element)) {
-                return false;
-            }
+        // ID
+        if (this.id && this.id !== element.id) {
+            return false;
         }
         
         var nodeName = element.nodeName.toUpperCase();
         
         // TAG
         if (this.tag !== '*' && this.tag !== nodeName) {
-            return false;
-        }
-        
-        // ID
-        if (this.id && this.id !== element.id) {
             return false;
         }
         
@@ -118,12 +154,14 @@ Jeeel.Dom.Selector.Node.prototype = {
                 for (i = tmp.length; i--;) {
                     classes[i] = tmp.item(i);
                 }
+            } else if (element.className && ('baseVal' in Object(element.className))) {
+                classes = element.className.baseVal.replace(/\s+/g, ' ').split(' ');
             } else {
-                classes = element.className.split(/\s+/g);
+                classes = element.className.replace(/\s+/g, ' ').split(' ');
             }
 
             for (i = this.classes.length; i--;) {
-                if ( ! Jeeel.Type.inArray(this.classes[i], classes, true)) {
+                if ( ! Jeeel.Hash.inHash(this.classes[i], classes, true)) {
                     return false;
                 }
             }
@@ -146,23 +184,14 @@ Jeeel.Dom.Selector.Node.prototype = {
             }
         }
         
-        return true;
-    },
-    
-    /**
-     * 指定した要素リストをフィルタリングする
-     * 
-     * @param {Element[]} elements 要素リスト
-     * @return {Element[]} フィルタリング後の要素リスト
-     */
-    filter: function (elements) {
-        
         // MOCK
-        for (var i = 0, l = this.mocks.length; i < l; i++) {
-            elements = this.mocks[i].filter(elements);
+        for (i = 0, l = this.mocks.length; i < l; i++) {
+            if ( ! this.mocks[i].isMatch(element)) {
+                return false;
+            }
         }
         
-        return elements;
+        return true;
     },
     
     /**

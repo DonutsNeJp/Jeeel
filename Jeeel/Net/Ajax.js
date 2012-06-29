@@ -15,6 +15,7 @@ Jeeel.directory.Jeeel.Net.Ajax = {
  * コンストラクタ
  * 
  * @class Ajaxの制御を行うクラス
+ * @augments Jeeel.Net.Abstract
  * @param {String} url Ajax対象URLの文字列
  * @param {String} [method] HTTPメソッド(getまたはpost、大文字小文字は問わない、初期値はPOST)
  * @throws {Error} urlが指定されていない場合に起こる
@@ -24,11 +25,14 @@ Jeeel.Net.Ajax = function (url, method) {
     if ( ! Jeeel.Type.isString(url)) {
         throw new Error('URLを指定してください。');
     }
+    
+    Jeeel.Net.Abstract.call(this);
 
     this.setMethod(method);
-
+    
+    this._requestQueue = [];
+    
     this._url = url;
-    this._params = new Jeeel.Parameter();
     this._fields = new Jeeel.Parameter();
 };
 
@@ -143,14 +147,6 @@ Jeeel.Net.Ajax.serverResponse = function (url, parameter) {
 Jeeel.Net.Ajax.prototype = {
 
     /**
-     * Ajaxの際にサーバー側に渡すパラメータのハッシュを保持するJeeel.Parameter
-     *
-     * @type Jeeel.Parameter
-     * @private
-     */
-    _params: null,
-
-    /**
      * Ajaxの際にサーバー側に渡さずに戻り値に定義づけるパラメータのハッシュを保持するJeeel.Parameter
      *
      * @type Jeeel.Parameter
@@ -213,6 +209,14 @@ Jeeel.Net.Ajax.prototype = {
      * @private
      */
     _collisionPolicy: 0,
+    
+    /**
+     * 通信に必要な情報
+     * 
+     * @type Array
+     * @private
+     */
+    _requestQueue: [],
 
     /**
      * 作成メソッド
@@ -303,6 +307,14 @@ Jeeel.Net.Ajax.prototype = {
     _exception: null,
     
     /**
+     * 内部通信完了メソッド
+     * 
+     * @type Jeeel.Function.Callback
+     * @private
+     */
+    _innerComplete: null,
+    
+    /**
      * リクエスト
      *
      * @type Jeeel.Net.Ajax.Request
@@ -346,7 +358,7 @@ Jeeel.Net.Ajax.prototype = {
         if ( ! Jeeel.Type.isString(url)) {
             throw new Error('URLを指定してください。');
         }
-
+        
         this._url = url;
 
         return this;
@@ -476,8 +488,15 @@ Jeeel.Net.Ajax.prototype = {
             collisionPolicy = this.constructor.CollisionPolicy.IGNORE;
         }
         
-        if (collisionPolicy !== this.constructor.CollisionPolicy.CHANGE && collisionPolicy !== this.constructor.CollisionPolicy.IGNORE) {
-            collisionPolicy = this.constructor.CollisionPolicy.IGNORE;
+        switch (collisionPolicy) {
+            case this.constructor.CollisionPolicy.IGNORE:
+            case this.constructor.CollisionPolicy.CHANGE:
+            case this.constructor.CollisionPolicy.ENQUEUE:
+                break;
+                
+            default:
+                collisionPolicy = this.constructor.CollisionPolicy.IGNORE;
+                break;
         }
         
         this._collisionPolicy = collisionPolicy;
@@ -651,85 +670,6 @@ Jeeel.Net.Ajax.prototype = {
     },
     
     /**
-     * Ajaxパラメータの全取得
-     *
-     * @return {Hash} 値リスト
-     */
-    getAll: function () {
-        return this._params.getAll();
-    },
-
-    /**
-     * Ajaxパラメータの取得
-     *
-     * @param {String} key キー
-     * @param {Mixied} [defaultValue] デフォルト値
-     * @return {Mixied} 値
-     */
-    get: function (key, defaultValue) {
-        return this._params.get(key, defaultValue);
-    },
-
-    /**
-     * Ajaxパラメータの全設定
-     *
-     * @param {Hash} vals 値リスト
-     * @return {Jeeel.Net.Ajax} 自身のインスタンス
-     * @throws {Error} valsが配列式でない場合に起こる
-     */
-    setAll: function (vals) {
-
-        if ( ! Jeeel.Type.isHash(vals)) {
-            throw new Error('valsが配列・連想配列ではありあせん。');
-        }
-
-        var self = this;
-
-        Jeeel.Hash.forEach(vals,
-            function (val, key) {
-                self._params.set(key, val);
-            }
-        );
-
-        return this;
-    },
-
-    /**
-     * Ajaxパラメータの設定
-     *
-     * @param {String} key キー
-     * @param {Mixied} val 値
-     * @return {Jeeel.Net.Ajax} 自身のインスタンス
-     */
-    set: function (key, val) {
-        this._params.set(key, val);
-
-        return this;
-    },
-    
-    /**
-     * Ajaxパラメータの指定キーの値を破棄する
-     *
-     * @param {String} key キー
-     * @return {Jeeel.Net.Ajax} 自インスタンス
-     */
-    unset: function (key) {
-        this._params.unset(key);
-
-        return this;
-    },
-
-    /**
-     * Ajaxパラメータの指定キーの値を保持しているかどうかを返す
-     *
-     * @param {String} key キー
-     * @return {Boolean} 値を保持していたらtrueそれ以外はfalseを返す
-     */
-    has: function (key) {
-        return this._params.has(key);
-    },
-
-    /**
      * レスポンスフィールドパラメータの全取得
      *
      * @return {Hash} 値リスト
@@ -757,20 +697,11 @@ Jeeel.Net.Ajax.prototype = {
      * @throws {Error} valsが配列式でない場合に起こる
      */
     setFieldAll: function (vals) {
-
         if ( ! Jeeel.Type.isHash(vals)) {
             throw new Error('valsが配列・連想配列ではありあせん。');
         }
 
-        this._fields.setAll({});
-
-        var self = this;
-
-        Jeeel.Hash.forEach(vals,
-            function (val, key) {
-                self._fields.set(key, val);
-            }
-        );
+        this._fields.setAll(vals);
 
         return this;
     },
@@ -816,7 +747,7 @@ Jeeel.Net.Ajax.prototype = {
      * @return {Boolean} 通信中かどうか
      */
     isExecuting: function () {
-        return this._executing;
+        return this._executing || !!this._requestQueue.length;
     },
     
     /**
@@ -857,13 +788,28 @@ Jeeel.Net.Ajax.prototype = {
             Jeeel.Acl.throwError('Access Error', 404);
         }
         
+        if ( ! this.isValid()) {
+            throw new Error('There is an error in the submission.');
+        }
+        
         // 通信中だった場合コリジョンポリシーに基づき動作を変える
         if (this._executing) {
             
-            if (this._collisionPolicy === this.constructor.CollisionPolicy.IGNORE) {
-                return this;
-            } else {
-                this.abort();
+            switch (this._collisionPolicy) {
+                case this.constructor.CollisionPolicy.IGNORE:
+                    return this;
+                    break;
+                
+                case this.constructor.CollisionPolicy.CHANGE:
+                    this.abort();
+                    break;
+                    
+                case this.constructor.CollisionPolicy.ENQUEUE:
+                    var ajax = this.clone();
+                    this._requestQueue.push(ajax);
+                    (this._requestQueue[this._requestQueue.length - 2] || this)._innerComplete = Jeeel.Function.Callback.create('_onRequestComplete', this);
+                    return this;
+                    break;
             }
         }
         
@@ -896,12 +842,16 @@ Jeeel.Net.Ajax.prototype = {
 
                 self._response  = response;
                 self._executing = false;
+                
+                if ( ! (self._retry && self._retry.retrying) && self._innerComplete) {
+                    self._innerComplete.call();
+                }
             },
             onSuccess: function (response, jsonHeader){
                 self._callMethod('_success', [response, jsonHeader]);
             },
             onFailure: function (response, jsonHeader){
-                if (self._retry && ! self._retry.limit || (self._retry.count < self._retry.limit)) {
+                if (self._retry && ( ! self._retry.limit || (self._retry.count < self._retry.limit))) {
                     self._retry.retrying = true;
                     self._retry.count++;
                     
@@ -918,7 +868,7 @@ Jeeel.Net.Ajax.prototype = {
                 self._callMethod('_abort', [response, jsonHeader]);
             },
             onTimeout: function (response, jsonHeader) {
-                if (self._retry && ! self._retry.limit || (self._retry.count < self._retry.limit)) {
+                if (self._retry && ( ! self._retry.limit || (self._retry.count < self._retry.limit))) {
                     self._retry.retrying = true;
                     self._retry.count++;
                     
@@ -969,6 +919,42 @@ Jeeel.Net.Ajax.prototype = {
     },
     
     /**
+     * インスタンスの複製を作成する
+     * 
+     * @return {Jeeel.Net.Ajax} 複製インスタンス
+     */
+    clone: function () {
+        var ajax = new this.constructor(this._url, this._method);
+        
+        for (var key in this) {
+            if (this.hasOwnProperty(key)) {
+                
+                // 状態変数や一時変数は複製すべきではない
+                switch (key) {
+                    case '_requestQueue':
+                    case '_innerComplete':
+                    case '_executing':
+                    case '_request':
+                    case '_response':
+                    case '_error':
+                        continue;
+                        break;
+                }
+                
+                if (Jeeel.Type.isArray(this[key])) {
+                    ajax[key] = this[key].concat();
+                } else if (this[key] instanceof Jeeel.Parameter) {
+                    ajax[key] = this[key].clone();
+                } else {
+                    ajax[key] = this[key];
+                }
+            }
+        }
+        
+        return ajax;
+    },
+    
+    /**
      * コンストラクタ
      * 
      * @param {String} url Ajax対象URLの文字列
@@ -989,8 +975,26 @@ Jeeel.Net.Ajax.prototype = {
         }
         
         this[name].func.apply(this[name].thisArg || this, args || []);
+    },
+    
+    /**
+     * _innerCompleteに対して登録するコールバック
+     */
+    _onRequestComplete: function () {
+        
+        switch (this._collisionPolicy) {
+            case this.constructor.CollisionPolicy.ENQUEUE:
+                var ajax = this._requestQueue.shift();
+                
+                if (ajax) {
+                    ajax.execute();
+                }
+                break;
+        }
     }
 };
+
+Jeeel.Class.extend(Jeeel.Net.Ajax, Jeeel.Net.Abstract);
 
 Jeeel.file.Jeeel.Net.Ajax = ['Request', 'Response', 'CollisionPolicy'];
 

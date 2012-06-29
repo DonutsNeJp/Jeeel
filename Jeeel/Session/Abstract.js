@@ -6,6 +6,7 @@
  */
 Jeeel.Session.Abstract = function () {
     this._session = Jeeel.Session.Core.create({});
+    this._changedValues = {};
 };
 
 Jeeel.Session.Abstract.prototype = {
@@ -17,6 +18,14 @@ Jeeel.Session.Abstract.prototype = {
      * @protected
      */
     _session: null,
+    
+    /**
+     * 変更された値
+     * 
+     * @type Hash
+     * @private
+     */
+    _changedValues: {},
 
     /**
      * パラメータを取得する
@@ -47,6 +56,7 @@ Jeeel.Session.Abstract.prototype = {
      */
     set: function (key, value) {
         this._session.params[key] = value;
+        this._changedValues[key] = value;
 
         return this;
     },
@@ -63,7 +73,10 @@ Jeeel.Session.Abstract.prototype = {
             throw new Error('valuesがHashではありません。');
         }
 
-        this._session.params = values;
+        Jeeel.Hash.forEach(values, function (val, key) {
+            this._session.params[key] = val;
+            this._changedValues[key] = val;
+        }, this);
 
         return this;
     },
@@ -76,7 +89,22 @@ Jeeel.Session.Abstract.prototype = {
      */
     unset: function (key) {
         this._session.params[key] = undefined;
+        this._changedValues[key] = undefined;
 
+        return this;
+    },
+    
+    /**
+     * パラメータを全て破棄する
+     *
+     * @return {Jeeel.Session.Abstract} 自インスタンス
+     */
+    clear: function () {
+        for (var key in this._session.params) {
+            this._session.params[key] = undefined;
+            this._changedValues[key] = undefined;
+        }
+        
         return this;
     },
 
@@ -87,18 +115,7 @@ Jeeel.Session.Abstract.prototype = {
      * @return {Boolean} 値を保持していたらtrueそれ以外はfalseを返す
      */
     has: function (key) {
-        return key in this._session.params;
-    },
-
-    /**
-     * パラメータを全て破棄する
-     *
-     * @return {Jeeel.Session.Abstract} 自インスタンス
-     */
-    clear: function () {
-        this._session.params = {};
-        
-        return this;
+        return key in this._session.params && this._session.params[key] !== undefined;
     },
 
     /**
@@ -112,6 +129,7 @@ Jeeel.Session.Abstract.prototype = {
 
     /**
      * Sessionの保存期間を設定する<br />
+     * 0を指定でブラウザを閉じるまでで(cookieのみ)、<br />
      * マイナスを指定すると無制限になる
      *
      * @param {Integer} expires 保存期間(秒)

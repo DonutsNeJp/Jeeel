@@ -3,7 +3,6 @@
  * コンストラクタ
  * @class カレンダーを扱うクラス
  * @param {Boolean} [multiSelect] 日付複数選択するかどうか
- * @ignore 未完成
  */
 Jeeel.Gui.Calendar = function (multiSelect) { 
     Jeeel.Gui.Abstract.call(this);
@@ -661,7 +660,7 @@ Jeeel.Gui.Calendar.prototype = {
         }
         
         var dates = toMonth.getDatesOfMonth();
-        var l = Jeeel.Object.Date.DAYS.length;
+        var l = Jeeel.Object.Date.getDays().length;
         var title = this._calendar.$CLASS(this.constructor.CLASS.TITLE);
         var body = this._calendar.$CLASS(this.constructor.CLASS.WEEK);
         
@@ -796,7 +795,7 @@ Jeeel.Gui.Calendar.prototype = {
         
         opBar.appendChild([pYear, pMonth, today, nMonth, nYear]);
         
-        var tr, th, td, w, l = Jeeel.Object.Date.DAYS.length;
+        var tr, th, td, w, l = Jeeel.Object.Date.getDays().length;
         var dayClasses = this.constructor.CLASS.DAYS;
         var weekTitle = this._createElm('tr')
                             .addClass(this.constructor.CLASS.TABLE_HEADER);
@@ -810,7 +809,7 @@ Jeeel.Gui.Calendar.prototype = {
         for (w = 0; w < l; w++) {
             th = this._createElm('th');
             th.addClass([this.constructor.CLASS.TABLE_HEADER_TITLE, dayClasses[w]])
-              .setText(Jeeel.Object.Date.DAYS[w]);
+              .setText(Jeeel.Object.Date.getDays()[w].substr(0, 1));
             
             weekTitle.appendChild(th);
         }

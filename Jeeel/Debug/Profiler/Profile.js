@@ -4,17 +4,27 @@
  * 
  * @class プロファイル結果を保持するクラス
  * @param {String} methodName メソッド名
+ * @param {Object} instance インスタンス
  * @param {Number} [time] メソッドの実行に掛かった時間
  */
-Jeeel.Debug.Profiler.Profile = function (methodName, time) {
+Jeeel.Debug.Profiler.Profile = function (methodName, instance, time) {
     var self = this;
     
+    self.instance = instance || null;
     self.method = methodName;
     self.time = time || 0;
     self.calls = [];
 };
 
 Jeeel.Debug.Profiler.Profile.prototype = {
+    
+    /**
+     * メソッドを保有するインスタンス
+     * 
+     * @type Object
+     */
+    instance: null,
+    
     /**
      * メソッド名
      * 

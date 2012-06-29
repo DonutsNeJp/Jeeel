@@ -10,6 +10,88 @@
     var style = Jeeel._elm.style;
     var parts = [], i = 0, part, name, get, set, filter;
     
+    // floatの登録
+    parts[i] = {name: 'float'};
+    
+    if ('float' in style) {
+        name = 'float';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style['float'] || this._computedStyle['float'] || 'none';
+        };
+        
+        /**
+         * @ignore
+         */
+        set = function (floatStyle) {
+            this._style['float'] = floatStyle;
+        };
+        
+        filter = null;
+    } else if ('cssFloat' in style) {
+        name = 'float';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.cssFloat || this._computedStyle.cssFloat || 'none';
+        };
+        
+        /**
+         * @ignore
+         */
+        set = function (floatStyle) {
+            this._style.cssFloat = floatStyle;
+        };
+        
+        filter = null;
+    } else if ('styleFloat' in style) {
+        name = 'float';
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return this._style.styleFloat || this._computedStyle.styleFloat || 'none';
+        };
+        
+        /**
+         * @ignore
+         */
+        set = function (floatStyle) {
+            this._style.styleFloat = floatStyle;
+        };
+        
+        filter = null;
+    } else {
+        name = null;
+        
+        /**
+         * @ignore
+         */
+        get = function () {
+            return 'none';
+        };
+        
+        /**
+         * @ignore
+         */
+        set = function (floatStyle) {};
+        
+        filter = null;
+    }
+    
+    parts[i].originName = name;
+    parts[i].get = get;
+    parts[i].set = set;
+    parts[i].filter = filter;
+    
+    i++;
+    
     // opacityの登録
     parts[i] = {name: 'opacity'};
     

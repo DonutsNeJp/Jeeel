@@ -793,7 +793,7 @@ Jeeel.Gui.ColorPicker.prototype = {
             return;
         }
         
-        var color = Jeeel.Object.Color.createRgbString(ctdText);
+        var color = Jeeel.Object.Color.create(ctdText);
         
         this.setColor(color);
     },
@@ -1016,7 +1016,7 @@ Jeeel.Gui.ColorPicker.prototype = {
             height: p.height + 'px'
         });
         
-        var isIEQuirks = !!(Jeeel._doc.uniqueID && Jeeel._doc.compatMode == "BackCompat");
+        var isIEQuirks = !!(Jeeel._doc.uniqueID && Jeeel._doc.compatMode === "BackCompat");
         
         Jeeel.Dom.Element.create(colorIndicator).setStyleList({
             width: isIEQuirks ? "5px" : "3px",

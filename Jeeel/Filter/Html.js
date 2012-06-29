@@ -18,6 +18,6 @@ Jeeel.Filter.Html = {
 
 };
 
-Jeeel.file.Jeeel.Filter.Html = ['Escape', 'Unescape', 'Form', 'FormValue', 'Hidden', 'HiddenString'];
+Jeeel.file.Jeeel.Filter.Html = ['Form', 'FormValue', 'Hidden', 'HiddenString'];
 
 Jeeel._autoImports(Jeeel.directory.Jeeel.Filter.Html, Jeeel.file.Jeeel.Filter.Html);

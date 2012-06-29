@@ -643,7 +643,7 @@ Jeeel.Dom.Event.dispatchEvent = function (element, type, option) {
     
     if (Jeeel._doc.createEvent) {
         ev = Jeeel._doc.createEvent(evType);
-    } else if(Jeeel._doc.createEventObject) {
+    } else if (Jeeel._doc.createEventObject) {
         ev = Jeeel._doc.createEventObject(evType);
     }
     

@@ -13,6 +13,25 @@ Jeeel.directory.Jeeel.UserAgent = {
 
 /**
  * @staticClass ブラウザの情報を判別するためのクラス
+ * @example
+ * このクラスはブラウザ情報からURL情報まで一括で管理するクラスである
+ * ブラウザ毎に正確に挙動を分けたい場合やURLのクエリなどを取得したい際に使用する
+ * 
+ * 例：
+ * Jeeel.UserAgent.isInternetExplorer(); // ブラウザがIEの場合にtrue
+ * Jeeel.UserAgent.isInternetExplorer(6); // 引数にバージョンを指定して、ブラウザがIE6の場合にtrueになる
+ * Jeeel.UserAgent.getVersion(); // ブラウザの正確なバージョン情報を返す、Chromeなら"19.0.1084.56"など
+ * Jeeel.UserAgent.getBrowserName(); // ブラウザの正確な名前を返す、Firefoxなら"Mozilla Firefox"など
+ * Jeeel.UserAgent.getQuery(); // URLのクエリ文字列を解析した連想配列を取得する
+ * 
+ * 他にも以下のメソッド等が良く使われる
+ * 
+ * Jeeel.UserAgent.isFirefox(4); // Firefoxかどうかを判定する、引数でバージョンを指定
+ * Jeeel.UserAgent.isChrome(); // Chromeかどうかを判定する、引数でバージョンを指定
+ * Jeeel.UserAgent.isOpera();  // Opearaかどうかを判定する、引数でバージョンを指定
+ * Jeeel.UserAgent.isSafari(); // Safariかどうかを判定する、引数でバージョンを指定
+ * Jeeel.UserAgent.isIPhone(); // iPhoneかどうかを判定する
+ * Jeeel.UserAgent.isAndroid(); // Androidかどうかを判定する
  */
 Jeeel.UserAgent = {
 
@@ -130,6 +149,13 @@ Jeeel.UserAgent = {
      * @return {Boolean} Mobileかどうか
      */
     isMobile: function () {},
+    
+    /**
+     * Workerとして動作しているかどうかを返す
+     * 
+     * @return {Boolean} Workerかどうか
+     */
+    isWorker: function () {},
 
     /**
      * ブラウザのレンダリングエンジンがTridentかどうかを返す
@@ -201,7 +227,9 @@ Jeeel.UserAgent = {
      * @return {String} ブラウザの使用言語
      */
     getLanguage: function () {
-        return navigator.language;
+        var lang = navigator.userLanguage || navigator.browserLanguage || navigator.language;
+        
+        return lang && lang.substr(0, 2) || Jeeel.Language.getDefaultLocale();
     },
 
     /**
@@ -335,6 +363,15 @@ Jeeel.UserAgent = {
     },
     
     /**
+     * リファラを取得する
+     * 
+     * @return {String} リファラ
+     */
+    getReferrer: function () {
+        return Jeeel._doc.referrer;
+    },
+    
+    /**
      * 現在のURLを解析して結果を返す
      * 
      * @return {Hash} URL解析結果の連想配列
@@ -351,6 +388,10 @@ Jeeel.UserAgent = {
      * @param {String} url 移行先URL
      */
     redirect: function (url) {
+        if (Jeeel.Acl && Jeeel.Acl.isDenied(url, '*', 'Url')) {
+            Jeeel.Acl.throwError('Access Error', 404);
+        }
+        
         location.replace(url);
     },
 
@@ -454,6 +495,8 @@ Jeeel.UserAgent = {
         this.isIPod = (uao.indexOf("(iPod;") !== -1 ? trueF : falseF);
         this.isMobile = (uao.indexOf("Mobile") !== -1 ? trueF : falseF);
         this.isAndroid = (uao.indexOf("Android") !== -1 ? trueF : falseF);
+        
+        this.isWorker = (Jeeel._global && Jeeel._global.importScripts ? trueF : falseF);
 
         idx = uao.indexOf("Firefox");
         
@@ -597,6 +640,13 @@ Jeeel.UserAgent = {
 };
 
 Jeeel.UserAgent._init();
+
+// 初期のロケールを設定
+if (Jeeel.UserAgent.isWorker()) {
+    Jeeel.Language.setLocale(Jeeel.UserAgent.getQuery().lang || Jeeel.Language.getDefaultLocale());
+} else {
+    Jeeel.Language.setLocale(Jeeel.UserAgent.getLanguage());
+}
 
 Jeeel.file.Jeeel.UserAgent = [];
 

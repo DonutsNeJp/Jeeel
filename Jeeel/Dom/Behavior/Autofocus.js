@@ -62,6 +62,10 @@ Jeeel.Dom.Behavior.Autofocus = {
     _init: function () {
         delete this._init;
         
+        if ( ! Jeeel._doc) {
+            return;
+        }
+        
         var input = Jeeel._doc.createElement('input');
         
         input.type = 'text';

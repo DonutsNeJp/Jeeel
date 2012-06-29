@@ -1,6 +1,6 @@
 
 /**
- * カラーコードの列挙体
+ * @namespace カラーコードの列挙体
  */
 Jeeel.Object.Color.Code = {
   

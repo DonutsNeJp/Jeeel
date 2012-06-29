@@ -235,6 +235,8 @@ Jeeel.Framework.Mvc.View.prototype = {
      * コンストラクタ
      * 
      * @param {Element|String} element このビューが扱うElement
+     * @param {Boolean} [useAutoAdd] このビューのオーナーコントローラが親コントローラに追加された時に、<br />
+     *                                自動的にこのビューのElementを親コントローラのビューに追加するかどうか
      * @constructor
      */
     constructor: Jeeel.Framework.Mvc.View

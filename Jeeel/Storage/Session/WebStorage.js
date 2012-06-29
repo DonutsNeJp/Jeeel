@@ -7,6 +7,7 @@
  * @param {String} name 読み込み・保存時の名前
  * @param {Boolean} [isPersistent] データの永続化をするかどうか(ブラウザを閉じてもアクセス出来るか)
  * @throws {Error} nameを文字列で指定しなかった場合に発生
+ * @see Jeeel.Storage.Session.Abstract
  */
 Jeeel.Storage.Session.WebStorage = function (name, isPersistent) {
 

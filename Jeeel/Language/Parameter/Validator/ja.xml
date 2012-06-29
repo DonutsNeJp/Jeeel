@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+  <required>:labelは必須項目です。省略できません。</required>
+  <enum>:labelには指定不可能な値が入っています</enum>
+  <numeric-min>:labelは:param:1以上でなければなりません</numeric-min>
+  <numeric-max>:labelは:param:1以下でなければなりません</numeric-max>
+  <between>:labelは:param:1以上:param:2以下でなければなりません</between>
+  <min-length>:labelは:param:1文字以上でなければなりません</min-length>
+  <max-length>:labelは:param:1文字以下でなければなりません</max-length>
+  <length>:labelは:param:1文字以上:param:2文字以下でなければなりません</length>
+  <alnum>:labelは半角英数字でなければなりません</alnum>
+  <alpha>:labelは半角英字でなければなりません</alpha>
+  <digits>:labelは数値でなければなりません</digits>
+  <half-width>:labelは半角でなければなりません</half-width>
+  <full-width>:labelは全角でなければなりません</full-width>
+  <hiragana>:labelはひらがなでなければなりません</hiragana>
+  <katakana>:labelはカタカナでなければなりません</katakana>
+  <half-width-kana>:labelは半角カナでなければなりません</half-width-kana>
+  <bool>:labelは真偽値でなければなりません</bool>
+  <email>:labelはメールアドレスである必要があります</email>
+  <url>:labelはURLである必要があります</url>
+  <ip>:labelはIPである必要があります</ip>
+  <regex>:labelの形式が間違っています</regex>
+</language>

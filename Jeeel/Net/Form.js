@@ -3,18 +3,22 @@
  * コンストラクタ
  *
  * @class フォームの操作及び送信を管理するクラス
+ * @augments Jeeel.Net.Abstract
  * @param {String|Element} form フォームを示すIDもしくはフォーム自身
  * @throws {Error} 指定したformがフォームのIDもしくはフォーム自身でなかった場合に発生
  */
 Jeeel.Net.Form = function (form) {
+    
+    Jeeel.Net.Abstract.call(this);
+    
     if (Jeeel.Type.isString(form)) {
         form = Jeeel.Document.getElementById(form);
     }
 
-    if ( ! form || ! form.nodeName || form.nodeName.toLowerCase() !== 'form') {
+    if ( ! form || ! form.tagName || form.tagName.toUpperCase() !== 'FORM') {
         throw new Error('指定されたIDまたはElementはform固有のものではありません。');
     }
-
+    
     this._form = form;
     
     if (Jeeel.Type.isElement(arguments[1])) {
@@ -47,8 +51,6 @@ Jeeel.Net.Form.createByPseudoForm = function (pseudoForm, action, method) {
 
     newForm.style.display = 'none';
 
-    Jeeel.Document.appendToBody(newForm);
-    
     if (Jeeel.Type.isString(pseudoForm)) {
         pseudoForm = Jeeel.Document.getElementById(pseudoForm);
     }
@@ -83,8 +85,6 @@ Jeeel.Net.Form.newForm = function (action, method) {
     var newForm = Jeeel.Document.createElement('form');
 
     newForm.style.display = 'none';
-
-    Jeeel.Document.appendToBody(newForm);
 
     var res = new this(newForm);
     
@@ -132,8 +132,6 @@ Jeeel.Net.Form.copyBy = function (form, newForm) {
     res.setAction(base.getAction());
     res.setTarget(base.getTarget());
     res.setAll(base.getAll());
-
-    Jeeel.Document.appendToBody(newForm);
 
     return res.setRemoveFormAtSubmit(submitRemove);
 };
@@ -384,8 +382,16 @@ Jeeel.Net.Form.prototype = {
     
     /**
      * 値をhiddenでセットする<br />
-     * もし指定したキーが存在した場合は上書きを試みるが、値がHash形式だった場合は元の値を削除して新たに作る<br />
-     * また、セレクトボックスのに対して一覧にない値を上書きしようとすると挙動がブラウザによって変わる場合があるので注意
+     * 対象の要素が無い場合はhiddenで埋め込み、対象の要素がある場合は以下のような動作になる<br />
+     * radio: 指定した値のradioにチェックが付く<br />
+     * checkbox: 指定した値と同じだった場合にはチェックが付きそれ以外はチェックが外れる<br />
+     * select: 指定した値のオプションをセレクトする<br />
+     * それ以外: 値自体が上書きされる<br />
+     * また、対象の要素と埋め込もうとした値が一致しなかった場合は要素を削除してhiddenが埋め込まれる<br />
+     * 例: <br />
+     * name="test"の要素があった場合にJeeel.Net.Form#set('test', [1, 2, 3]);<br />
+     * こういう記述の場合要素に対して配列つまり test に対して test[0] などの名前で上書きしようとするので削除の対象となる<br />
+     * 同じく name="test[a]" に対して Jeeel.Net.Form#set('test', 44); などの指定も同じく削除の対象となる
      *
      * @param {String} key キー(inputタグのnameと同じ書式)
      * @param {Mixied} val 値
@@ -409,7 +415,7 @@ Jeeel.Net.Form.prototype = {
             val = base[key];
         }
         
-        var input = this.getElementAll()[key];
+        var input = this.getElementAll(true)[key];
         
         Jeeel.Dom.ElementOperator.create(this.getOverwrittenElements())
                                .filterName(key, true)
@@ -446,9 +452,9 @@ Jeeel.Net.Form.prototype = {
      * @return {Jeeel.Net.Form} 自インスタンス
      */
     unset: function (key) {
-        Jeeel.Dom.ElementOperator.create([this.getElement(key), this.getOverwrittenElements()])
-                               .filterName(key, true)
-                               .removeAttr('name');
+        Jeeel.Dom.ElementOperator.create([this.getElement(key, true), this.getOverwrittenElements()])
+                                 .filterName(key, true)
+                                 .removeAttr('name');
         
         return this;
     },
@@ -471,7 +477,7 @@ Jeeel.Net.Form.prototype = {
      * @return {Element|Hash} inputの要素
      */
     getElement: function (key) {
-        var param = this.getElementAll();
+        var param = this.getElementAll(arguments[1]);
         var names = this._getName('' + key);
         
         // 配列るキーの場合(a[b]やa[]の場合)
@@ -557,7 +563,7 @@ Jeeel.Net.Form.prototype = {
      * @return {Jeeel.Net.Form} 自インスタンス
      */
     unsetElement: function (key) {
-        Jeeel.Dom.ElementOperator.create([this.getElement(key), this.getOverwrittenElements()])
+        Jeeel.Dom.ElementOperator.create([this.getElement(key, true), this.getOverwrittenElements()])
                                .filterName(key, true)
                                .remove();
         
@@ -584,19 +590,48 @@ Jeeel.Net.Form.prototype = {
         select = new Jeeel.Dom.Element(select);
         
         var addOptions = [],
-            txtFilter = Jeeel.Filter.Html.Escape.create(),
             val, option;
         
         for (val in options) {
             option = Jeeel.Document.createElement('option');
             option.value = val;
-            option.innerHTML = txtFilter.filter(options[val]);
+            option.innerHTML = Jeeel.String.escapeHtml(options[val]);
             
             addOptions[addOptions.length] = option;
         }
         
         select.clearChildNodes()
               .appendChild(addOptions);
+        
+        return this;
+    },
+    
+    /**
+     * 自動的にフィルタ、バリデータを起動させるようにする
+     * 
+     * @ignore 未完成
+     */
+    enableAutoChecker: function () {
+        var elms = Jeeel.Dom.ElementOperator.create(this._pseudoForm || this._form).$QUERY('input[name]');
+        
+        for (var i = elms.length; i--;) {
+            var vRules = elms.getData('validationRules', i);
+            var fRules = elms.getData('filtrationRules', i);
+            
+            
+        }
+    },
+    
+    /**
+     * 設定した全てのフィルタ・検証を行う
+     * 
+     * @return {Jeeel.Net.Form} 自インスタンス
+     */
+    validate: function () {
+        this._params.clear();
+        this._params.setAll(this.getAll());
+        
+        this._super.validate.call(this);
         
         return this;
     },
@@ -611,8 +646,17 @@ Jeeel.Net.Form.prototype = {
             Jeeel.Acl.throwError('Access Error', 404);
         }
         
+        if ( ! this.isValid()) {
+            throw new Error('There is an error in the contents of the form.');
+        }
+        
         if (this._pseudoForm) {
             this._setAllForm(this.getAll());
+        }
+        
+        // formがDOM上に居ない場合IE等のブラウザにて送信が出来ないので埋め込んでから送信を行う
+        if ( ! this._form.parentNode || this._form.parentNode.nodeType === Jeeel.Dom.Node.DOCUMENT_FRAGMENT_NODE) {
+            Jeeel.Document.appendToBody(this._form);
         }
         
         this._form.submit();
@@ -631,9 +675,53 @@ Jeeel.Net.Form.prototype = {
      */
     toAjax: function () {
         var params = this.getAll();
-
-        return Jeeel.Net.Ajax.create(this.getAction(), this.getMethod())
-                           .setAll(params);
+        var fields = this._params.getFields();
+        
+        var ajax = new Jeeel.Net.Ajax(this.getAction(), this.getMethod());
+        
+        ajax.setAll(params);
+        
+        for (var i = fields.length; i--;) {
+            var field = fields[i];
+            
+            ajax.addRule(field.getName(), field.getLabel(), field.getValidateRules(), field.getFilterRules());
+        }
+        
+        return ajax;
+    },
+    
+    /**
+     * 必須項目のバリデートを行う(空文字も弾く様に上書き)
+     * 
+     * @param {Mixed} value バリデート値
+     * @return {Boolean} 空じゃなかったかどうか(null, undefined, ''以外が通過)
+     * @private
+     */
+    _validateRequired: function (value) {
+        return ! Jeeel.Type.isEmpty(value) && value !== '';
+    },
+    
+    /**
+     * 値が無かったら無視する(空文字も値なしとするように上書き)
+     * 
+     * @param {Mixed} value フィルタ値
+     * @return int フィルタ後の値
+     * @private
+     */
+    _filterOption: function (value) {
+        return this._validateRequired(value) ? value : Jeeel.Parameter.Filter.IGNORED_VALUE;
+    },
+    
+    /**
+     * 値が指定されていなかった場合に代わりに代替値を返す(空文字も値なしとするように上書き)
+     * 
+     * @param {Mixed} value 対象値
+     * @param {Mixed} defaultValue デフォルト値
+     * @return {Mixed} 処理後の値
+     * @private
+     */
+    _filterDefault: function (value, defaultValue) {
+        return this._validateRequired(value) ? value : defaultValue;
     },
     
     _init: function () {
@@ -663,8 +751,10 @@ Jeeel.Net.Form.prototype = {
         /**
          * @ignore
          */
-        this.getElementAll = function () {
-            return fnef.filter(this._pseudoForm || this._form);
+        this.getElementAll = function (secretPrm) {
+            var res = fnef.enableAccurateList(secretPrm).filter(this._pseudoForm || this._form);
+            
+            return res;
         };
         
         /**
@@ -687,7 +777,7 @@ Jeeel.Net.Form.prototype = {
          * @ignore
          */
         this._setAllForm = function (vals) {
-            var inputs = fnef.filter(this._form);
+            var inputs = fnef.enableAccurateList(true).filter(this._form);
 
             Jeeel.Hash.forEach(vals,
                 function (val, key) {
@@ -702,13 +792,23 @@ Jeeel.Net.Form.prototype = {
          * @ignore
          */
         this._set = function (key, val, input, toForm) {
-            // inputがElementの場合
-            if (Jeeel.Type.isElement(input)) {
-
-                // valが単体の場合そのまま代入
+            
+            var i;
+            
+            // inputが配列の場合(ラジオボタン)
+            if (Jeeel.Type.isArray(input)) {
+                
+                // valが単体の場合指定した値と合致するラジオボタンにチェックを付ける
                 if ( ! Jeeel.Type.isHash(val)) {
-                    input.value = uef.filter(val);
-                } 
+                    val = '' + val;
+                    
+                    for (i = input.length; i--;) {
+                        if (input[i].value === val) {
+                            input[i].checked = true;
+                            break;
+                        }
+                    }
+                }
 
                 // valが複数の場合inputと形式が一致しないためinputを削除してから値の設定を行う
                 else {
@@ -716,7 +816,26 @@ Jeeel.Net.Form.prototype = {
 
                     this._set(key, val, null, toForm);
                 }
-            } 
+            }
+            // inputがElementの場合
+            else if (Jeeel.Type.isElement(input)) {
+
+                // valが単体の場合そのまま代入
+                if ( ! Jeeel.Type.isHash(val)) {
+                    if (input.tagName.toUpperCase() === 'INPUT' && input.type.toLowerCase() === 'checkbox') {
+                        input.checked = input.value === ('' + val);
+                    } else {
+                        input.value = uef.filter(val);
+                    }
+                }
+
+                // valが複数の場合inputと形式が一致しないためinputを削除してから値の設定を行う
+                else {
+                    Jeeel.Dom.ElementOperator.create(input).remove();
+
+                    this._set(key, val, null, toForm);
+                }
+            }
             // inputがHashの場合
             else if (input) {
 
@@ -736,7 +855,7 @@ Jeeel.Net.Form.prototype = {
                     }, this
                 );
 
-            } 
+            }
             // inputが存在しない場合
             else {
 
@@ -748,7 +867,7 @@ Jeeel.Net.Form.prototype = {
 
                 // 作成したHiddenインスタンスを対象に埋め込む
                 if (Jeeel.Type.isArray(input)) {
-                    for (var i = 0; i < input.length; i++) {
+                    for (i = 0; i < input.length; i++) {
                         owner.appendChild(input[i]);
                     }
                 } else {
@@ -760,5 +879,7 @@ Jeeel.Net.Form.prototype = {
         delete this._init;
     }
 };
+
+Jeeel.Class.extend(Jeeel.Net.Form, Jeeel.Net.Abstract);
 
 Jeeel.Net.Form.prototype._init();
